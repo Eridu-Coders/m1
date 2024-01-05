@@ -13,9 +13,9 @@
 
 Q_LOGGING_CATEGORY(g_cat_store, "store.members_access")
 
-// ---------------------------------------------------------------------------------------------------------
-// ----------------------------- M1Store::ItemType -------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
+// ----------------------------- M1Store::ItemType --------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
 void M1Store::ItemType::setSpecialType(unsigned int p_index, SpecialItemID p_id) {
     qCDebug(g_cat_store) << QString("setting special type %1 to %2").arg(p_index).arg(p_id);
     Q_ASSERT(p_index < 4);
@@ -44,6 +44,16 @@ QString M1Store::ItemType::dbgString(){
 // ---------------------------------------------------------------------------------------------------------
 // ----------------------------- M1Store::Item -------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------
+
+// Item ID
+/**
+ * @brief M1Store::Item::id get the ID of this Item
+ * @return the ID
+ */
+M1Store::ItemID M1Store::Item::id(){
+    qCDebug(g_cat_store) << QString("Get Item ID: 0x%1").arg(m_id, 16, 16, QLatin1Char('0'));
+    return m_id;
+}
 
 // common flag field access
 // initialize all members if the vertex/edge or simple/full flags are changed
@@ -642,11 +652,6 @@ char* M1Store::Item::text(){
 M1Store::Item::Item(const ItemID p_ID, const FlagField p_flags, const ItemType p_type){
     initializeMembers(p_ID, p_flags, p_type);
 }
-
-M1Store::ItemID M1Store::Item::id(){
-    qCDebug(g_cat_store) << QString("Get Item ID: 0x%1").arg(m_id, 16, 16, QLatin1Char('0'));
-    return m_id;
-} ///< get the ID of this Item
 
 // Item initialization
 /**
