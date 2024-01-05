@@ -33,6 +33,7 @@ int main(int argc, char *argv[])
 
     M1Store::Storage::storeString(QString("End [%1]").arg(QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss")));
 
+    // github commit test
     M1Store::Storage::close();
     M1Store::M1Env::close();
 
