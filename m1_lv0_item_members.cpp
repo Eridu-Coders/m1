@@ -9,7 +9,7 @@
 
 #include <gtest/gtest.h>
 
-#include "m1_lv0_store.h"
+#include "m1_store.h"
 
 Q_LOGGING_CATEGORY(g_cat_store, "store.members_access")
 
@@ -50,7 +50,7 @@ QString M1Store::ItemType::dbgString(){
  * @brief M1Store::Item::id get the ID of this Item
  * @return the ID
  */
-M1Store::ItemID M1Store::Item::id(){
+M1Store::ItemID M1Store::Item_lv0::id(){
     qCDebug(g_cat_store) << QString("Get Item ID: 0x%1").arg(m_id, 16, 16, QLatin1Char('0'));
     return m_id;
 }
@@ -67,7 +67,7 @@ M1Store::ItemID M1Store::Item::id(){
  * @param p_flags the new value (by default, false)
  * @param p_force_init true -> force initialization of other fields
  */
-void M1Store::Item::setFlags(const M1Store::FlagField p_flags, bool p_force_init){
+void M1Store::Item_lv0::setFlags(const M1Store::FlagField p_flags, bool p_force_init){
     qCDebug(g_cat_store) << QString("Setting flags to %1 (0b%2)").arg(p_flags).arg(p_flags, 64, 2, QLatin1Char('0'));
     M1Store::FlagField l_old_flags = m_flags;
     m_flags = p_flags;
@@ -84,7 +84,7 @@ void M1Store::Item::setFlags(const M1Store::FlagField p_flags, bool p_force_init
  * @brief M1Store::Item::flags get main flag field value
  * @return this value
  */
-M1Store::FlagField M1Store::Item::flags(){
+M1Store::FlagField M1Store::Item_lv0::flags(){
     qCDebug(g_cat_store) << QString("get main flag field %1 (0b%2)").arg(m_flags).arg(m_flags, 64, 2, QLatin1Char('0'));
     return m_flags;
 }
@@ -96,7 +96,7 @@ M1Store::FlagField M1Store::Item::flags(){
  * @param p_index index of the one to set (0 to 3)
  * @param p_type the new value
  */
-void M1Store::Item::setType(const unsigned int p_index, const M1Store::SpecialItemID p_type){
+void M1Store::Item_lv0::setType(const unsigned int p_index, const M1Store::SpecialItemID p_type){
     Q_ASSERT(p_index < 4);
     qCDebug(g_cat_store) << QString("Set special type %1 to %2").arg(p_index).arg(p_type);
 
@@ -107,7 +107,7 @@ void M1Store::Item::setType(const unsigned int p_index, const M1Store::SpecialIt
  * @param p_index index of the one to get (0 to 3)
  * @return the value of this special type
  */
-M1Store::SpecialItemID M1Store::Item::getType(const unsigned int p_index){
+M1Store::SpecialItemID M1Store::Item_lv0::getType(const unsigned int p_index){
     Q_ASSERT(p_index < 4);
     qCDebug(g_cat_store) << QString("get special type %1 --> %2").arg(p_index).arg(m_type.getSpecialType(p_index));
 
@@ -117,7 +117,7 @@ M1Store::SpecialItemID M1Store::Item::getType(const unsigned int p_index){
  * @brief M1Store::Item::getType as a single ItemID type value
  * @return The single ItemID type value
  */
-M1Store::ItemID M1Store::Item::getType(){
+M1Store::ItemID M1Store::Item_lv0::getType(){
     M1Store::ItemID l_ret = m_type.getItemIDType();
     qCDebug(g_cat_store) << QString("get single ID type 0x%1 %2").arg(l_ret, 16, 16, QLatin1Char('0')).arg(l_ret);
     return l_ret;
@@ -127,7 +127,7 @@ M1Store::ItemID M1Store::Item::getType(){
  * @brief M1Store::Item::setType set type as an ItemID
  * @param p_type the new type value
  */
-void M1Store::Item::setType(const M1Store::ItemID p_type){
+void M1Store::Item_lv0::setType(const M1Store::ItemID p_type){
     qCDebug(g_cat_store) << QString("Set Item ID type to 0x%1").arg(p_type, 16, 16, QLatin1Char('0'));
     m_type = p_type;
 }
@@ -136,7 +136,7 @@ void M1Store::Item::setType(const M1Store::ItemID p_type){
  * @param p_type the value to test
  * @return true/false
  */
-bool M1Store::Item::isOfType(const M1Store::ItemID p_type){
+bool M1Store::Item_lv0::isOfType(const M1Store::ItemID p_type){
     qCDebug(g_cat_store) << QString("Checking whether is of type (ItemID) 0x%1 ...").arg(p_type, 16, 16, QLatin1Char('0'));
     Q_ASSERT_X((m_flags & TYPE_IS_ITEM_ID) > 0,
                "M1Store::Item::isOfType(M1Store::ItemID)",
@@ -152,7 +152,7 @@ bool M1Store::Item::isOfType(const M1Store::ItemID p_type){
  * @param p_type the value to test
  * @return true/false
  */
-bool M1Store::Item::isOfType(const M1Store::SpecialItemID p_type){
+bool M1Store::Item_lv0::isOfType(const M1Store::SpecialItemID p_type){
     qCDebug(g_cat_store) << QString("Checking whether is of type (SpecialItemID) %1 ...").arg(p_type);
     Q_ASSERT_X((m_flags & TYPE_IS_ITEM_ID) == 0,
                "M1Store::Item::isOfType(M1Store::SpecialItemID)",
@@ -171,7 +171,7 @@ bool M1Store::Item::isOfType(const M1Store::SpecialItemID p_type){
  * @brief M1Store::Item::setFlagsExtra set the extra flags field (not for simple items)
  * @param p_flags the new value
  */
-void M1Store::Item::setFlagsExtra(const M1Store::FlagField p_flags){
+void M1Store::Item_lv0::setFlagsExtra(const M1Store::FlagField p_flags){
     qCDebug(g_cat_store) << QString("Setting extra flag field to 0x%1 (0b%2)").arg(p_flags,0,16).arg(p_flags, 64, 2, QLatin1Char('0'));
     Q_ASSERT_X((m_flags & ITEM_IS_SIMPLE) == 0,
                "M1Store::Item::setFlagsExtra()",
@@ -186,7 +186,7 @@ void M1Store::Item::setFlagsExtra(const M1Store::FlagField p_flags){
  * @brief M1Store::Item::flagsExtra get the extra flags field (if there is one)
  * @return the flags value
  */
-M1Store::FlagField M1Store::Item::flagsExtra(){
+M1Store::FlagField M1Store::Item_lv0::flagsExtra(){
     qCDebug(g_cat_store) << QString("Getting extra flag field ...");
     Q_ASSERT_X((m_flags & ITEM_IS_SIMPLE) == 0,
                "M1Store::Item::flagsExtra()",
@@ -208,7 +208,7 @@ M1Store::FlagField M1Store::Item::flagsExtra(){
  * @brief M1Store::Item::setOrigin set origin (edges only)
  * @param p_origin ItemID of origin
  */
-void M1Store::Item::setOrigin(const M1Store::ItemID p_origin){
+void M1Store::Item_lv0::setOrigin(const M1Store::ItemID p_origin){
     qCDebug(g_cat_store) << QString("setting m_v_origin to 0x%1").arg(p_origin, 16, 16, QLatin1Char('0'));
     Q_ASSERT_X((m_flags & ITEM_IS_VERTEX) == 0,
                "Item::setOrigin()",
@@ -221,7 +221,7 @@ void M1Store::Item::setOrigin(const M1Store::ItemID p_origin){
  * @brief M1Store::Item::origin get origin (edges only)
  * @return ItemID of origin
  */
-M1Store::ItemID M1Store::Item::origin(){
+M1Store::ItemID M1Store::Item_lv0::origin(){
     qCDebug(g_cat_store) << QString("Getting m_v_origin ...");
     Q_ASSERT_X((m_flags & ITEM_IS_VERTEX) == 0, "Item::origin()",
                "accessing vOrigin on a vertex");
@@ -240,7 +240,7 @@ M1Store::ItemID M1Store::Item::origin(){
  * @brief M1Store::Item::setTarget set target ItemID (only for full edges)
  * @param p_target the new value
  */
-void M1Store::Item::setTarget(const M1Store::ItemID p_target){
+void M1Store::Item_lv0::setTarget(const M1Store::ItemID p_target){
     qCDebug(g_cat_store) << QString("setting m_v_target to 0x%1").arg(p_target, 16, 16, QLatin1Char('0'));
     Q_ASSERT_X((m_flags & ITEM_NATURE_MASK) == 0,
                "Item::setTarget(M1Store::ItemID)",
@@ -252,7 +252,7 @@ void M1Store::Item::setTarget(const M1Store::ItemID p_target){
  * @brief M1Store::Item::target get target ItemID (only for full edges)
  * @return the value
  */
-M1Store::ItemID M1Store::Item::target(){
+M1Store::ItemID M1Store::Item_lv0::target(){
     qCDebug(g_cat_store) << QString("Getting m_v_target ...");
     Q_ASSERT_X((m_flags & ITEM_NATURE_MASK) == 0,
                "Item::target()",
@@ -269,7 +269,7 @@ M1Store::ItemID M1Store::Item::target(){
  * @brief M1Store::Item::setPrevious set previous edge ItemID (only for edges)
  * @param p_previous the new value
  */
-void M1Store::Item::setPrevious(const M1Store::ItemID p_previous){
+void M1Store::Item_lv0::setPrevious(const M1Store::ItemID p_previous){
     qCDebug(g_cat_store) << QString("setting previous edge to 0x%1").arg(p_previous, 16, 16, QLatin1Char('0'));
     Q_ASSERT_X((m_flags & ITEM_IS_VERTEX) == 0,
                "Item::setPrevious()",
@@ -282,7 +282,7 @@ void M1Store::Item::setPrevious(const M1Store::ItemID p_previous){
  * @brief M1Store::Item::previous get previous edge ItemID (only for edges)
  * @return the value
  */
-M1Store::ItemID M1Store::Item::previous(){
+M1Store::ItemID M1Store::Item_lv0::previous(){
     qCDebug(g_cat_store) << QString("Getting previous edge ...");
     Q_ASSERT_X((m_flags & ITEM_IS_VERTEX) == 0,
                "Item::previous()",
@@ -301,7 +301,7 @@ M1Store::ItemID M1Store::Item::previous(){
  * @brief M1Store::Item::setNext set next edge ItemID (edges only)
  * @param p_next the new value
  */
-void M1Store::Item::setNext(const M1Store::ItemID p_next){
+void M1Store::Item_lv0::setNext(const M1Store::ItemID p_next){
     qCDebug(g_cat_store) << QString("setting next edge to 0x%1").arg(p_next, 16, 16, QLatin1Char('0'));
     Q_ASSERT_X((m_flags & ITEM_IS_VERTEX) == 0, "Item::setNext()", "accessing the next edge on a vertex");
 
@@ -312,7 +312,7 @@ void M1Store::Item::setNext(const M1Store::ItemID p_next){
  * @brief M1Store::Item::next get next edge ItemID (edges only)
  * @return the value
  */
-M1Store::ItemID M1Store::Item::next(){
+M1Store::ItemID M1Store::Item_lv0::next(){
     qCDebug(g_cat_store) << QString("Getting next edge ...");
     Q_ASSERT_X((m_flags & ITEM_IS_VERTEX) == 0, "Item::next()", "accessing the next edge on a vertex");
 
@@ -329,7 +329,7 @@ M1Store::ItemID M1Store::Item::next(){
  * @brief M1Store::Item::setReciprocal set ItemID of reciprocal edge (full edges only)
  * @param p_reciprocal the ItemID
  */
-void M1Store::Item::setReciprocal(const M1Store::ItemID p_reciprocal){
+void M1Store::Item_lv0::setReciprocal(const M1Store::ItemID p_reciprocal){
     qCDebug(g_cat_store) << QString("setting reciprocal edge to 0x%1").arg(p_reciprocal, 16, 16, QLatin1Char('0'));
     Q_ASSERT_X((m_flags & ITEM_NATURE_MASK) == 0,
                "Item::setReciprocal()",
@@ -341,7 +341,7 @@ void M1Store::Item::setReciprocal(const M1Store::ItemID p_reciprocal){
  * @brief M1Store::Item::reciprocal get ItemID of reciprocal edge (full edges only)
  * @return the ItemID value
  */
-M1Store::ItemID M1Store::Item::reciprocal(){
+M1Store::ItemID M1Store::Item_lv0::reciprocal(){
     qCDebug(g_cat_store) << QString("Getting reciprocal edge ...");
     Q_ASSERT_X((m_flags & ITEM_NATURE_MASK) == 0,
                "Item::reciprocal()",
@@ -358,7 +358,7 @@ M1Store::ItemID M1Store::Item::reciprocal(){
  * @brief M1Store::Item::setFirstEdge set first edge (not for simple items)
  * @param p_first_edge the ItemID value
  */
-void M1Store::Item::setFirstEdge(const M1Store::ItemID p_first_edge){
+void M1Store::Item_lv0::setFirstEdge(const M1Store::ItemID p_first_edge){
     qCDebug(g_cat_store) << QString("setting first edge to 0x%1").arg(p_first_edge, 16, 16, QLatin1Char('0'));
     Q_ASSERT_X((m_flags & ITEM_IS_SIMPLE) == 0, "Item::setFirstEdge()", "accessing the first edge on a non-full item");
 
@@ -369,7 +369,7 @@ void M1Store::Item::setFirstEdge(const M1Store::ItemID p_first_edge){
  * @brief M1Store::Item::firstEdge get first edge (not for simple items)
  * @return the ItemID value
  */
-M1Store::ItemID M1Store::Item::firstEdge(){
+M1Store::ItemID M1Store::Item_lv0::firstEdge(){
     qCDebug(g_cat_store) << QString("Getting first edge ...");
     Q_ASSERT_X((m_flags & ITEM_IS_SIMPLE) == 0, "Item::FirstEdge()", "accessing the first edge on a non-full item");
 
@@ -386,7 +386,7 @@ M1Store::ItemID M1Store::Item::firstEdge(){
  * @brief M1Store::Item::setFirstEdgeSpecial set first special edge (only for full items)
  * @param p_first_edge_special the ItemID value
  */
-void M1Store::Item::setFirstEdgeSpecial(const M1Store::ItemID p_first_edge_special){
+void M1Store::Item_lv0::setFirstEdgeSpecial(const M1Store::ItemID p_first_edge_special){
     qCDebug(g_cat_store) << QString("setting first special edge to 0x%1").arg(p_first_edge_special, 16, 16, QLatin1Char('0'));
     Q_ASSERT_X((m_flags & ITEM_IS_SIMPLE) == 0, "Item::setFirstEdgeSpecial()", "accessing the special first edge on a non-full item");
 
@@ -397,7 +397,7 @@ void M1Store::Item::setFirstEdgeSpecial(const M1Store::ItemID p_first_edge_speci
  * @brief M1Store::Item::firstEdgeSpecial get first special edge (only for full items)
  * @return the ItemID value
  */
-M1Store::ItemID M1Store::Item::firstEdgeSpecial(){
+M1Store::ItemID M1Store::Item_lv0::firstEdgeSpecial(){
     qCDebug(g_cat_store) << QString("Getting first special edge ...");
     Q_ASSERT_X((m_flags & ITEM_IS_SIMPLE) == 0, "Item::firstEdgeSpecial()", "accessing the special first edge on a non-full item");
 
@@ -414,7 +414,7 @@ M1Store::ItemID M1Store::Item::firstEdgeSpecial(){
  * @brief M1Store::Item::setCreationDate set creation date (for full items)
  * @param p_date the date value as a QDateTime
  */
-void M1Store::Item::setCreationDate(const QDateTime& p_date){
+void M1Store::Item_lv0::setCreationDate(const QDateTime& p_date){
     qCDebug(g_cat_store) << QString("setting creation date to %1").arg(p_date.toString("dd/MM/yyyy hh:mm:ss"));
     Q_ASSERT_X((m_flags & ITEM_IS_SIMPLE) == 0, "Item::setCreationDate()", "accessing the creation date on a non-full item");
 
@@ -425,7 +425,7 @@ void M1Store::Item::setCreationDate(const QDateTime& p_date){
  * @brief M1Store::Item::creationDate get creation date (for full items)
  * @return the date value as a QDateTime
  */
-QDateTime M1Store::Item::creationDate(){
+QDateTime M1Store::Item_lv0::creationDate(){
     qCDebug(g_cat_store) << QString("Getting creation date ...");
     Q_ASSERT_X((m_flags & ITEM_IS_SIMPLE) == 0, "Item::creationDate()", "accessing the creation date on a non-full item");
 
@@ -442,7 +442,7 @@ QDateTime M1Store::Item::creationDate(){
  * @brief M1Store::Item::setLastmodDate set Last modification date (for full items)
  * @param p_date the date value as a QDateTime
  */
-void M1Store::Item::setLastmodDate(const QDateTime& p_date){
+void M1Store::Item_lv0::setLastmodDate(const QDateTime& p_date){
     qCDebug(g_cat_store) << QString("setting last mod date to %1").arg(p_date.toString("dd/MM/yyyy hh:mm:ss"));
     Q_ASSERT_X((m_flags & ITEM_IS_SIMPLE) == 0, "Item::setLastmodDate()", "accessing the lastmod date on a non-full item");
 
@@ -453,7 +453,7 @@ void M1Store::Item::setLastmodDate(const QDateTime& p_date){
  * @brief M1Store::Item::lastmodDate get Last modification date (for full items)
  * @return the date value as a QDateTime
  */
-QDateTime M1Store::Item::lastmodDate(){
+QDateTime M1Store::Item_lv0::lastmodDate(){
     qCDebug(g_cat_store) << QString("Getting lastmod date ...");
     Q_ASSERT_X((m_flags & ITEM_IS_SIMPLE) == 0, "Item::lastmodDate()", "accessing the lastmod date on a non-full item");
 
@@ -470,7 +470,7 @@ QDateTime M1Store::Item::lastmodDate(){
  * @brief M1Store::Item::setIncomingEdges set the incoming edge count (for full items only)
  * @param p_incoming_edges the count value
  */
-void M1Store::Item::setIncomingEdges(M1Store::ItemCounter p_incoming_edges){
+void M1Store::Item_lv0::setIncomingEdges(M1Store::ItemCounter p_incoming_edges){
     qCDebug(g_cat_store) << QString("setting incoming edges count to %1").arg(p_incoming_edges);
     Q_ASSERT_X((m_flags & ITEM_IS_SIMPLE) == 0, "Item::setIncomingEdges()", "accessing the incoming edges counter on a non-full item");
 
@@ -481,7 +481,7 @@ void M1Store::Item::setIncomingEdges(M1Store::ItemCounter p_incoming_edges){
  * @brief M1Store::Item::incomingEdges get the incoming edge count (for full items only)
  * @return the count value
  */
-M1Store::ItemCounter M1Store::Item::incomingEdges(){
+M1Store::ItemCounter M1Store::Item_lv0::incomingEdges(){
     qCDebug(g_cat_store) << QString("Getting incoming edges count ...");
     Q_ASSERT_X((m_flags & ITEM_IS_SIMPLE) == 0, "Item::incomingEdges()", "accessing the incoming edges counter on a non-full item");
 
@@ -495,7 +495,7 @@ M1Store::ItemCounter M1Store::Item::incomingEdges(){
  * @brief M1Store::Item::addIncomingEdges increment incoming edge counter (only for full items)
  * @param p_add the increment
  */
-void M1Store::Item::addIncomingEdges(M1Store::ItemCounter p_add){
+void M1Store::Item_lv0::addIncomingEdges(M1Store::ItemCounter p_add){
     qCDebug(g_cat_store) << QString("incrementing incoming edges by %1").arg(p_add);
     Q_ASSERT_X((m_flags & ITEM_IS_SIMPLE) == 0, "Item::addIncomingEdges()", "accessing the incoming edges counter on a non-full item");
 
@@ -509,7 +509,7 @@ void M1Store::Item::addIncomingEdges(M1Store::ItemCounter p_add){
  * @brief M1Store::Item::setVisibleEdges set the visible edges counter (only for full vertex)
  * @param p_visible_edges the counter value
  */
-void M1Store::Item::setVisibleEdges(M1Store::ItemCounter p_visible_edges){
+void M1Store::Item_lv0::setVisibleEdges(M1Store::ItemCounter p_visible_edges){
     qCDebug(g_cat_store) << QString("setting visible edges count to %1").arg(p_visible_edges);
     Q_ASSERT_X((m_flags & ITEM_NATURE_MASK) == FULL_VERTEX,
                "Item::setVisibleEdges()",
@@ -521,7 +521,7 @@ void M1Store::Item::setVisibleEdges(M1Store::ItemCounter p_visible_edges){
  * @brief M1Store::Item::visibleEdges get the visible edges counter (only for full vertex)
  * @return the counter value
  */
-M1Store::ItemCounter M1Store::Item::visibleEdges(){
+M1Store::ItemCounter M1Store::Item_lv0::visibleEdges(){
     qCDebug(g_cat_store) << QString("Getting visible edges count ...");
     Q_ASSERT_X((m_flags & ITEM_NATURE_MASK) == FULL_VERTEX,
                "Item::visibleEdges()",
@@ -536,7 +536,7 @@ M1Store::ItemCounter M1Store::Item::visibleEdges(){
  * @brief M1Store::Item::addVisibleEdges increment visible edge counter (only full vertex)
  * @param p_add the increment
  */
-void M1Store::Item::addVisibleEdges(M1Store::ItemCounter p_add){
+void M1Store::Item_lv0::addVisibleEdges(M1Store::ItemCounter p_add){
     qCDebug(g_cat_store) << QString("incrementing incoming edges by %1").arg(p_add);
     Q_ASSERT_X((m_flags & ITEM_NATURE_MASK) == FULL_VERTEX,
                "Item::addVisibleEdges()",
@@ -551,7 +551,7 @@ void M1Store::Item::addVisibleEdges(M1Store::ItemCounter p_add){
  * @brief M1Store::Item::setText set the text value of the item (valid for all Item natures)
  * @param p_text the text (char *). Must be below max length for edges and simple vertex (-1 to accomodate the \0 terminator)
  */
-void M1Store::Item::setText(const QString& p_text){
+void M1Store::Item_lv0::setText(const QString& p_text){
     qCDebug(g_cat_store) << QString("setting text to [%1] (Utf8 len = %2)").arg(p_text).arg(p_text.toUtf8().length());
     Q_ASSERT_X(((m_flags & ITEM_NATURE_MASK) == FULL_EDGE) ? (p_text.toUtf8().length() <= FULL_EDGE_TEXT_LEN-1) : true,
                "Item::setText()", "full edge --> length must be < FULL_EDGE_TEXT_LEN");
@@ -614,7 +614,7 @@ void M1Store::Item::setText(const QString& p_text){
  * @brief M1Store::Item::text get item text
  * @return text, as a char*
  */
-char* M1Store::Item::text(){
+char* M1Store::Item_lv0::text(){
     qCDebug(g_cat_store) << QString("getting text ...");
     // no condition. If no text available, return ""
 
@@ -649,7 +649,7 @@ char* M1Store::Item::text(){
  * @param p_flags flags
  * @param p_type type
  */
-M1Store::Item::Item(const ItemID p_ID, const FlagField p_flags, const ItemType p_type){
+M1Store::Item_lv0::Item_lv0(const ItemID p_ID, const FlagField p_flags, const ItemType p_type){
     initializeMembers(p_ID, p_flags, p_type);
 }
 
@@ -660,7 +660,7 @@ M1Store::Item::Item(const ItemID p_ID, const FlagField p_flags, const ItemType p
  * @param p_flags flags
  * @param p_type type
  */
-void M1Store::Item::initializeMembers(M1Store::ItemID p_id, M1Store::FlagField p_flags, M1Store::ItemType p_type){
+void M1Store::Item_lv0::initializeMembers(M1Store::ItemID p_id, M1Store::FlagField p_flags, M1Store::ItemType p_type){
     qCDebug(g_cat_store) << QString("Item initialization p_id: 0x%1, p_flags: %2 (0b%3), p_type: %4")
                                 .arg(p_id, 16, 16, QLatin1Char('0'))    // %1
                                 .arg(p_flags)                           // %2
@@ -676,7 +676,7 @@ void M1Store::Item::initializeMembers(M1Store::ItemID p_id, M1Store::FlagField p
 /**
  * @brief M1Store::Item::initializeMembers initialization of non-shared members
  */
-void M1Store::Item::initializeMembers(){
+void M1Store::Item_lv0::initializeMembers(){
     qCDebug(g_cat_store) << QString("Initializing members ...");
     if((m_flags & ITEM_NATURE_MASK) == FULL_EDGE){
         // full edge

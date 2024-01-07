@@ -1,4 +1,4 @@
-#include "m1_lv1_store.h"
+#include "m1_lv2_item.h"
 
 void M1Store::ItemWrapper::initializeMembers(const ItemID p_ID, const FlagField p_flags, const ItemType p_type){
     m_item->initializeMembers(p_ID, p_flags, p_type);
@@ -10,7 +10,7 @@ void M1Store::ItemWrapper::initializeMembers(const ItemID p_ID, const FlagField 
  * @return an ItemWrapper pointer
  */
 M1Store::ItemWrapper* M1Store::ItemWrapper::instantiateFromMMap(void* p){
-    M1Store::Item* l_item = reinterpret_cast<M1Store::Item*>(p);
+    M1Store::Item_lv0* l_item = reinterpret_cast<M1Store::Item_lv0*>(p);
     return M1Store::ItemWrapper::instantiateFromMMap(l_item);
 }
 /**
@@ -22,7 +22,7 @@ M1Store::ItemWrapper* M1Store::ItemWrapper::instantiateFromMMap(void* p){
  * @return an ItemWrapper pointer
  */
 M1Store::ItemWrapper* M1Store::ItemWrapper::instantiateFromMMap(void* p, const ItemID p_ID, const FlagField p_flags, const ItemType p_type){
-    M1Store::Item* l_item = reinterpret_cast<M1Store::Item*>(p);
+    M1Store::Item_lv0* l_item = reinterpret_cast<M1Store::Item_lv0*>(p);
 
     l_item->initializeMembers(p_ID, p_flags, p_type);
 
@@ -33,7 +33,7 @@ M1Store::ItemWrapper* M1Store::ItemWrapper::instantiateFromMMap(void* p, const I
  * @param p the item
  * @return a new wrapper for p
  */
-M1Store::ItemWrapper* M1Store::ItemWrapper::instantiateFromMMap(M1Store::Item* p){
+M1Store::ItemWrapper* M1Store::ItemWrapper::instantiateFromMMap(M1Store::Item_lv0* p){
     M1Store::ItemWrapper* l_ret;
 
     switch(p->m_flags & ITEM_NATURE_MASK){

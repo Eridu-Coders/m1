@@ -19,12 +19,13 @@ add_executable(m1
   # main_test_store_lv0.cpp
   m1_env.h
   m1_env.cpp
-  m1_lv0_store.h
-  m1_lv0_store.cpp
+  m1_store.h
+  m1_store.cpp
+  m1_lv0_item.h
   m1_lv0_item_members.cpp
-  m1_lv0_store_test.cpp
-  m1_lv1_store.h
-  m1_lv1_store.cpp
+  m1_lv0_item_test.cpp
+  m1_lv2_item.h
+  m1_lv2_item.cpp
 )
 target_link_libraries(m1 Qt${QT_VERSION_MAJOR}::Core gtest gtest_main lmdb ${Boost_FILESYSTEM_LIBRARY})
 

@@ -1,4 +1,4 @@
-#include "m1_lv0_store.h"
+#include "m1_lv0_item.h"
 
 #ifndef M1_LV1_STORE_H
 #define M1_LV1_STORE_H
@@ -11,17 +11,17 @@ namespace M1Store{
         friend class ItemWrapperFullEdge;
         friend class ItemWrapperSimpleEdge;
     private:
-        Item* m_item;
+        Item_lv0* m_item;
         bool m_must_delete = false;
 
-        static ItemWrapper* instantiateFromMMap(Item* p);
+        static ItemWrapper* instantiateFromMMap(Item_lv0* p);
     public:
         ItemWrapper(){}
         ItemWrapper(const ItemID p_ID, const FlagField p_flags, const ItemType p_type){
-            m_item = new Item(p_ID, p_flags, p_type);
+            m_item = new Item_lv0(p_ID, p_flags, p_type);
             m_must_delete = true;
         }
-        ItemWrapper(Item* p_item){m_item = p_item;}
+        ItemWrapper(Item_lv0* p_item){m_item = p_item;}
         virtual ~ItemWrapper();
 
         virtual bool isFullVertex(){return (m_item->m_flags & ITEM_NATURE_MASK) == FULL_VERTEX;}
@@ -41,7 +41,7 @@ namespace M1Store{
 
     class ItemWrapperFullVertex : public virtual ItemWrapper{
     public:
-        ItemWrapperFullVertex(Item* p_item) : ItemWrapper(p_item){}
+        ItemWrapperFullVertex(Item_lv0* p_item) : ItemWrapper(p_item){}
         ~ItemWrapperFullVertex();
 
         virtual bool isFullVertex(){return true;}
@@ -54,7 +54,7 @@ namespace M1Store{
 
     class ItemWrapperSimpleVertex : public virtual ItemWrapper{
     public:
-        ItemWrapperSimpleVertex(Item* p_item) : ItemWrapper(p_item){}
+        ItemWrapperSimpleVertex(Item_lv0* p_item) : ItemWrapper(p_item){}
         ~ItemWrapperSimpleVertex(){}
 
         virtual bool isFullVertex(){return false;}
@@ -67,7 +67,7 @@ namespace M1Store{
 
     class ItemWrapperFullEdge : public virtual ItemWrapper{
     public:
-        ItemWrapperFullEdge(Item* p_item) : ItemWrapper(p_item){}
+        ItemWrapperFullEdge(Item_lv0* p_item) : ItemWrapper(p_item){}
         ~ItemWrapperFullEdge(){}
 
         virtual bool isFullVertex(){return false;}
@@ -80,7 +80,7 @@ namespace M1Store{
 
     class ItemWrapperSimpleEdge : public virtual ItemWrapper{
     public:
-        ItemWrapperSimpleEdge(Item* p_item) : ItemWrapper(p_item){}
+        ItemWrapperSimpleEdge(Item_lv0* p_item) : ItemWrapper(p_item){}
         ~ItemWrapperSimpleEdge(){}
 
         virtual bool isFullVertex(){return false;}
