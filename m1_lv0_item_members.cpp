@@ -74,11 +74,63 @@ void M1Store::Item_lv0::setFlags(const M1Store::FlagField p_flags, bool p_force_
     if( (((l_old_flags & ITEM_NATURE_MASK) ^ (m_flags & ITEM_NATURE_MASK)) > 0) || p_force_init ){
         // erase all other flags
         m_flags = m_flags & ITEM_NATURE_MASK;
-        // initalize as 4 void special types (TYPE_IS_ITEM_ID has just ben set to 0)
+        // initalize as 4 void special types (TYPE_IS_ITEM_ID has just been set to 0)
         m_type.initSpecials();
         // initialize other members
         initializeMembers();
     }
+}
+/**
+ * @brief M1Store::Item_lv0::setFlag set a particular flag
+ * @param p_flag the flag
+ * @param p_force_init true -> force initialization of other fields
+ */
+void M1Store::Item_lv0::setFlag(const M1Store::FlagField p_flag, bool p_force_init){
+    qCDebug(g_cat_store) << QString("Setting flag %1 (0b%2)").arg(p_flag).arg(p_flag, 64, 2, QLatin1Char('0'));
+    Q_ASSERT_X(M1Store::Item_lv0::count_1_bits(p_flag) == 1,
+               "M1Store::Item_lv0::setFlag(M1Store::FlagField, bool)",
+               "p_flag must have exactly one bit set");
+    M1Store::FlagField l_old_flags = m_flags;
+    m_flags = m_flags | p_flag;
+    if( (((l_old_flags & ITEM_NATURE_MASK) ^ (m_flags & ITEM_NATURE_MASK)) > 0) || p_force_init ){
+        // erase all other flags
+        m_flags = m_flags & ITEM_NATURE_MASK;
+        // initalize as 4 void special types (TYPE_IS_ITEM_ID has just been set to 0)
+        m_type.initSpecials();
+        // initialize other members
+        initializeMembers();
+    }
+}
+/**
+ * @brief M1Store::Item_lv0::unSetFlag unset a particular flag
+ * @param p_flag the flag
+ * @param p_force_init true -> force initialization of other fields
+ */
+void M1Store::Item_lv0::unSetFlag(const M1Store::FlagField p_flag, bool p_force_init){
+    qCDebug(g_cat_store) << QString("Unsetting flag %1 (0b%2)").arg(p_flag).arg(p_flag, 64, 2, QLatin1Char('0'));
+    Q_ASSERT_X(M1Store::Item_lv0::count_1_bits(p_flag) == 1,
+               "M1Store::Item_lv0::unSetFlag(M1Store::FlagField, bool)",
+               "p_flag must have exactly one bit set");
+    M1Store::FlagField l_old_flags = m_flags;
+    m_flags = m_flags & (~p_flag);
+    if( (((l_old_flags & ITEM_NATURE_MASK) ^ (m_flags & ITEM_NATURE_MASK)) > 0) || p_force_init ){
+        // erase all other flags
+        m_flags = m_flags & ITEM_NATURE_MASK;
+        // initalize as 4 void special types (TYPE_IS_ITEM_ID has just been set to 0)
+        m_type.initSpecials();
+        // initialize other members
+        initializeMembers();
+    }
+}
+// number of bits == 1 in a flag field (for set/unset flags)
+unsigned short M1Store::Item_lv0::count_1_bits(const M1Store::FlagField p_flag){
+    unsigned int l_ret = 0;
+    M1Store::FlagField n = p_flag;
+    while (n) {
+        l_ret += n & 1;
+        n >>= 1;
+    }
+    return l_ret;
 }
 /**
  * @brief M1Store::Item::flags get main flag field value
@@ -181,6 +233,42 @@ void M1Store::Item_lv0::setFlagsExtra(const M1Store::FlagField p_flags){
         p.v.f.m_flags_extra = p_flags;
     else
         p.e.f.m_flags_extra = p_flags;
+}
+/**
+ * @brief M1Store::Item_lv0::setFlagExtra set a particular flag (in the extra field)
+ * @param p_flag the flag
+ * @param p_force_init
+ */
+void M1Store::Item_lv0::setFlagExtra(const M1Store::FlagField p_flag){
+    qCDebug(g_cat_store) << QString("Setting flag %1 (0b%2)").arg(p_flag).arg(p_flag, 64, 2, QLatin1Char('0'));
+    Q_ASSERT_X(M1Store::Item_lv0::count_1_bits(p_flag) == 1,
+               "M1Store::Item_lv0::setFlagExtra(M1Store::FlagField)",
+               "p_flag must have exactly one bit set");
+    Q_ASSERT_X((m_flags & ITEM_IS_SIMPLE) == 0,
+               "M1Store::Item::setFlagExtra()",
+               "simple items do not have an extra flag field");
+    if(m_flags & ITEM_IS_VERTEX)
+        p.v.f.m_flags_extra = p.v.f.m_flags_extra | p_flag;
+    else
+        p.e.f.m_flags_extra = p.e.f.m_flags_extra | p_flag;
+}
+/**
+ * @brief M1Store::Item_lv0::unSetFlagExtra unset a particular flag (in the extra field)
+ * @param p_flag the flag
+ * @param p_force_init
+ */
+void M1Store::Item_lv0::unSetFlagExtra(const M1Store::FlagField p_flag){
+    qCDebug(g_cat_store) << QString("Setting flag %1 (0b%2)").arg(p_flag).arg(p_flag, 64, 2, QLatin1Char('0'));
+    Q_ASSERT_X(M1Store::Item_lv0::count_1_bits(p_flag) == 1,
+               "M1Store::Item_lv0::unSetFlagExtra(M1Store::FlagField)",
+               "p_flag must have exactly one bit set");
+    Q_ASSERT_X((m_flags & ITEM_IS_SIMPLE) == 0,
+               "M1Store::Item::unSetFlagExtra()",
+               "simple items do not have an extra flag field");
+    if(m_flags & ITEM_IS_VERTEX)
+        p.v.f.m_flags_extra = p.v.f.m_flags_extra & (~p_flag);
+    else
+        p.e.f.m_flags_extra = p.e.f.m_flags_extra & (~p_flag);
 }
 /**
  * @brief M1Store::Item::flagsExtra get the extra flags field (if there is one)

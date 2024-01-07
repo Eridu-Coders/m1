@@ -1,7 +1,7 @@
 #include "m1_lv0_item.h"
 
-#ifndef M1_LV1_STORE_H
-#define M1_LV1_STORE_H
+#ifndef M1_LV2_STORE_H
+#define M1_LV2_STORE_H
 
 namespace M1Store{
 
@@ -92,4 +92,4 @@ namespace M1Store{
     };
 }
 
-#endif // M1_LV1_STORE_H
+#endif // M1_LV2_STORE_H

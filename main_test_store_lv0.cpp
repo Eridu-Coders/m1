@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     qDebug() << "After Tests";
 
     qDebug() << "sizeof(M1Store::ItemType):" << sizeof(M1Store::ItemType);
-    qDebug() << "sizeof(M1Store::Item):" << sizeof(M1Store::Item);
+    qDebug() << "sizeof(M1Store::Item):" << sizeof(M1Store::Item_lv0);
 
     M1Store::Storage::storeString(QString("Dummy End [%1]").arg(QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss")));
 

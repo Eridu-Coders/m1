@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
     M1Store::Storage::storeString(QString("Start [%1]").arg(QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss")));
 
     qDebug() << "sizeof(M1Store::ItemType):" << sizeof(M1Store::ItemType);
-    qDebug() << "sizeof(M1Store::Item):" << sizeof(M1Store::Item_lv0);
+    qDebug() << "sizeof(M1Store::Item_lv0):" << sizeof(M1Store::Item_lv0);
     qDebug() << "sizeof(M1Store::ItemWrapper):" << sizeof(M1Store::ItemWrapper);
     qDebug() << "sizeof(M1Store::ItemWrapperFullVertex):" << sizeof(M1Store::ItemWrapperFullVertex);
 
