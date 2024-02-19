@@ -6,8 +6,6 @@
 
 namespace M1Store{
 
-static const char* LOG_FILE_NAME = "m1_log.csv";
-
     class M1Env{
     private:
         // path to log file
@@ -22,9 +20,6 @@ static const char* LOG_FILE_NAME = "m1_log.csv";
         // startup and closing function for the environment
         static void init();
         static void close();
-
-        // to shut up warnings
-        // static void use(unsigned long long p_use){ unsigned long long v_use = p_use; v_use ++;}
     };
 
 }

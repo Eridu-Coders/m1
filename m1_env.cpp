@@ -5,6 +5,7 @@
 
 #include <iostream>
 
+#include "m1_constants.h"
 #include "m1_env.h"
 
 /**
@@ -26,8 +27,8 @@ void M1Store::M1Env::myMessageHandler(QtMsgType p_type, const QMessageLogContext
     QString l_msg = (p_msg.at(0) == '"' && p_msg.at(p_msg.length()-1) == '"') ? p_msg.sliced(1, p_msg.length()-2) : p_msg;
 
     // message for screen debug
-    QString l_txt_screen = QString("[%1] %2 (%3 %4:%5) %6")
-                               .arg(l_level, QDateTime::currentDateTime().toString("hh:mm:ss.zzz"))
+    QString l_txt_screen = QString("[%1] [%2] %3 (%4 %5:%6) %7")
+                               .arg(l_level, p_context.category, QDateTime::currentDateTime().toString("hh:mm:ss.zzz"))
                                .arg(p_context.file, p_context.function)
                                .arg(p_context.line).arg(l_msg);
 

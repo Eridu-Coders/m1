@@ -25,6 +25,7 @@ add_executable(m1
   m1_lv0_item_test.cpp
   m1_lv2_item.h
   m1_lv2_item.cpp
+  m1_constants.h
 )
 target_link_libraries(m1 Qt${QT_VERSION_MAJOR}::Core gtest gtest_main lmdb ${Boost_FILESYSTEM_LIBRARY})
 
@@ -37,6 +38,7 @@ add_executable(m1_test_lv0_item
   m1_lv0_item.h
   m1_lv0_item_members.cpp
   m1_lv0_item_test.cpp
+  m1_lv2_item.cpp
 )
 target_link_libraries(m1_test_lv0_item Qt${QT_VERSION_MAJOR}::Core gtest gtest_main lmdb ${Boost_FILESYSTEM_LIBRARY})
 

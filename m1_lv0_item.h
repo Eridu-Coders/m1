@@ -4,19 +4,11 @@
 #include <QDateTime>
 #include <QLoggingCategory>
 
+#include "m1_constants.h"
+
 Q_DECLARE_LOGGING_CATEGORY(g_cat_store)
 
 namespace M1Store{
-
-    typedef unsigned long long FlagField;   ///< unsigned 64-bit wide flag field
-    typedef unsigned long long ItemID;      ///< unsigned 64-bit wide ID number for both vertices and edges
-    typedef unsigned long long StringID;    ///< unsigned 64-bit wide ID number for vertex strings
-    typedef unsigned long long Date;        ///< unsigned 64-bit wide date (seconds since 1-1-1970)
-    typedef long long ItemCounter;          ///< signed 64-bit wide counter (incoming edges, etc) -1 = unset
-    typedef unsigned short SpecialItemID;   ///< unsigned 16-bit wide ID number for core type numbers, etc
-
-    const ItemID G_VOID_ID = 0xffffffffffffffff; ///< -1 = NULL value
-    const SpecialItemID G_VOID_TYPE_ID = 0xffff; ///< -1 = NULL value
 
     // ----------------------------------------- ItemType ----------------------------------------------------
     /**
@@ -105,30 +97,8 @@ namespace M1Store{
          * @brief get a debug representation of this type
          * @return the debug string
          */
-        QString dbgString();
+        QString dbgString() const;
     }__attribute__((__packed__));
-
-    const unsigned long long ITEM_IS_VERTEX         = 0x0000000000000001; ///< 0 --> item is an edge, 1 --> item is a vertex
-    const unsigned long long ITEM_IS_SIMPLE         = 0x0000000000000002; ///< 1 --> item is either a simple edge or simple vertex
-    const unsigned long long ITEM_HAS_LOCAL_STRING  = 0x0000000000000004; ///< 1 --> the local m_text (if any) is used to store the string
-    const unsigned long long TYPE_IS_ITEM_ID        = 0x0000000000000008; ///< 1 --> the type field is a single ItemID, 0 --> 4 SpecialItemIDs
-
-    // composite flag values for item nature testing
-    const unsigned long long FULL_VERTEX = ITEM_IS_VERTEX;
-    const unsigned long long SIMPLE_VERTEX = ITEM_IS_VERTEX | ITEM_IS_SIMPLE;
-    const unsigned long long FULL_EDGE = 0x0;
-    const unsigned long long SIMPLE_EDGE = ITEM_IS_SIMPLE;
-    const unsigned long long ITEM_NATURE_MASK = 0x0000000000000003;     ///< all bits to determine Item nature
-    const unsigned long long ITEM_BASE0_MASK = 0x0000000000000007;      ///< same as ITEM_NATURE_MASK + ITEM_HAS_LOCAL_STRING
-    const unsigned long long ITEM_BASE1_MASK = 0x000000000000000f;      ///< same as ITEM_BASE0_MASK + TYPE_IS_ITEM_ID
-
-    const int SIMPLE_EDGE_TEXT_LEN = 72;    ///< text length for simple edges
-    const int SIMPLE_VERTEX_TEXT_LEN = 96;  ///< text length for simple vertices
-    const int FULL_VERTEX_TEXT_LEN = 32;    ///< text length for full vertices
-    const int FULL_EDGE_TEXT_LEN = 16;      ///< text length for full edges
-
-    const int ITEM_NEXT_KEY = 0xABCD;
-    const int ITEM_NEXT_STRING = 0xDCBA;
 
     // ----------------------------------------- Item ----------------------------------------------------
 
@@ -255,6 +225,41 @@ namespace M1Store{
         void setText(const QString& p_text);
         char* text();
     };
+
+    // ----------------------------------------- SpecialItem ----------------------------------------------------
+
+    /**
+     * @brief The Special Item class - Quick access for types, anchor nodes, etc - 32 bytes long
+     */
+    class SpecialItem{
+    private:
+        FlagField m_flags;      ///< [8] flags
+        ItemID m_item_id;       ///< [8] ItemID of corresponding item
+        SpecialItemID m_id;     ///< [2] 16 bit special item id
+        char m_mnemonic[5];     ///< [5] menmonic
+        /// [2] 16 bit special item id of the reciprocal type (for edge types only)
+        SpecialItemID m_id_reciprocal;
+        char m_extra[7];        ///< [7] extra data storage field (len = 7 to make total 32)
+    public:
+        SpecialItem(){}
+        ~SpecialItem(){}
+
+        void setAttr(
+            const ItemID p_item_id, const SpecialItemID p_id, const SpecialItemID p_reciprocal,
+            const FlagField p_flags, const char* p_mnemonic);
+
+        void setReciprocal(SpecialItemID p){m_id_reciprocal = p;}
+
+        SpecialItemID getSpecialId() const {return m_id;}
+        SpecialItemID reciprocalId() const {return m_id_reciprocal;}
+        ItemID itemId() const {return m_item_id;}
+        FlagField flags() const {return m_flags;}
+        QString mnemonic() const;
+        const char* mnemonic_raw() const {return m_mnemonic;}
+
+        QString dbgString();
+    };
+
 } // end namespace M1Store
 
 #endif // M1_LV0_ITEM_H

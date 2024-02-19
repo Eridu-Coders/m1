@@ -14,7 +14,7 @@
 
 #include "m1_lv0_item.h"
 
-Q_LOGGING_CATEGORY(g_cat_store_test, "Testing member access")
+Q_LOGGING_CATEGORY(g_cat_lv0_test, "lv0.test")
 
 // ----------------------------- M1Store::ItemType -------------------------------------------------------------
 
@@ -46,12 +46,12 @@ TEST(ItemTypeTest, ValueStore){
 
 // triggers asserts that protect against unlawful combinations of item config and member access
 TEST(ItemTest, AppropriateConfig){
-    qCDebug(g_cat_store_test) << QString("Testing the asserts guaranteeing proper access to members");
+    qCDebug(g_cat_lv0_test) << QString("Testing the asserts guaranteeing proper access to members");
 
     // start as a full edge with 4 short types (all flags = 0)
     M1Store::Item_lv0 l_item(0, 0, M1Store::ItemType());
 
-    qCDebug(g_cat_store_test) << QString("isOfType(SpecialItemID) call / TYPE_IS_ITEM_ID inconsistency");
+    qCDebug(g_cat_lv0_test) << QString("isOfType(SpecialItemID) call / TYPE_IS_ITEM_ID inconsistency");
     EXPECT_DEATH(l_item.isOfType((M1Store::ItemID) 43), "");
     l_item.setFlags(M1Store::TYPE_IS_ITEM_ID);
     EXPECT_DEATH(l_item.isOfType((M1Store::SpecialItemID) 44), "");
@@ -69,7 +69,7 @@ TEST(ItemTest, AppropriateConfig){
     EXPECT_DEATH(l_item.unSetFlagExtra(0xf000), "");
 
     // becomes simple (edge)
-    qCDebug(g_cat_store_test) << QString("setFlagsExtra() call / ITEM_IS_SIMPLE inconsistency");
+    qCDebug(g_cat_lv0_test) << QString("setFlagsExtra() call / ITEM_IS_SIMPLE inconsistency");
     l_item.setFlags(M1Store::ITEM_IS_SIMPLE);
     EXPECT_DEATH(l_item.setFlagsExtra(3218), "");
     M1Store::FlagField v = 0;
@@ -80,7 +80,7 @@ TEST(ItemTest, AppropriateConfig){
     // becomes full vertex
     l_item.setFlags(M1Store::FULL_VERTEX);
     M1Store::ItemID w = 0;
-    qCDebug(g_cat_store_test) << QString("setOrigin/target() call / FULL_VERTEX,SIMPLE_VERTEX inconsistency");
+    qCDebug(g_cat_lv0_test) << QString("setOrigin/target() call / FULL_VERTEX,SIMPLE_VERTEX inconsistency");
     EXPECT_DEATH(l_item.setOrigin(2315), "");
     EXPECT_DEATH(w = l_item.origin(), "");
     // becomes simple vertex
@@ -99,7 +99,7 @@ TEST(ItemTest, AppropriateConfig){
     EXPECT_DEATH(w = l_item.target(), "");
 
     // becomes full vertex
-    qCDebug(g_cat_store_test) << QString("setPrevious() call / vertices inconsistency");
+    qCDebug(g_cat_lv0_test) << QString("setPrevious() call / vertices inconsistency");
     l_item.setFlags(M1Store::FULL_VERTEX);
     EXPECT_DEATH(l_item.setPrevious(2325), "");
     EXPECT_DEATH(w = l_item.previous(), "");
@@ -108,7 +108,7 @@ TEST(ItemTest, AppropriateConfig){
     EXPECT_DEATH(l_item.setPrevious(2326), "");
     EXPECT_DEATH(w = l_item.previous(), "");
 
-    qCDebug(g_cat_store_test) << QString("setReciprocal() call / anything other than full edge inconsistency");
+    qCDebug(g_cat_lv0_test) << QString("setReciprocal() call / anything other than full edge inconsistency");
     // becomes full vertex
     l_item.setFlags(M1Store::FULL_VERTEX);
     EXPECT_DEATH(l_item.setReciprocal(2415), "");
@@ -122,7 +122,7 @@ TEST(ItemTest, AppropriateConfig){
     EXPECT_DEATH(l_item.setReciprocal(2417), "");
     EXPECT_DEATH(w = l_item.reciprocal(), "");
 
-    qCDebug(g_cat_store_test) << QString("setFirstEdge() call / simples inconsistency");
+    qCDebug(g_cat_lv0_test) << QString("setFirstEdge() call / simples inconsistency");
     // becomes simple edge
     l_item.setFlags(M1Store::SIMPLE_EDGE);
     EXPECT_DEATH(l_item.setFirstEdge(2327), "");
@@ -132,7 +132,7 @@ TEST(ItemTest, AppropriateConfig){
     EXPECT_DEATH(l_item.setFirstEdge(2328), "");
     EXPECT_DEATH(w = l_item.firstEdge(), "");
 
-    qCDebug(g_cat_store_test) << QString("setFirstEdgeSpecial() call / simples inconsistency");
+    qCDebug(g_cat_lv0_test) << QString("setFirstEdgeSpecial() call / simples inconsistency");
     // becomes simple edge
     l_item.setFlags(M1Store::SIMPLE_EDGE);
     EXPECT_DEATH(l_item.setFirstEdgeSpecial(2329), "");
@@ -143,7 +143,7 @@ TEST(ItemTest, AppropriateConfig){
     EXPECT_DEATH(w = l_item.firstEdgeSpecial(), "");
 
     QDateTime t;
-    qCDebug(g_cat_store_test) << QString("setCreationDate()/setLastmodDate() call / simples inconsistency");
+    qCDebug(g_cat_lv0_test) << QString("setCreationDate()/setLastmodDate() call / simples inconsistency");
     // becomes simple edge
     l_item.setFlags(M1Store::SIMPLE_EDGE);
     EXPECT_DEATH(l_item.setCreationDate(QDateTime::currentDateTime()), "");
@@ -162,7 +162,7 @@ TEST(ItemTest, AppropriateConfig){
     EXPECT_DEATH(l_item.setLastmodDate(QDateTime::currentDateTime()), "");
     EXPECT_DEATH(t = l_item.lastmodDate(), "");
 
-    qCDebug(g_cat_store_test) << QString("setIncomingEdges() call / simples inconsistency");
+    qCDebug(g_cat_lv0_test) << QString("setIncomingEdges() call / simples inconsistency");
     // becomes simple edge
     l_item.setFlags(M1Store::SIMPLE_EDGE);
     EXPECT_DEATH(l_item.setIncomingEdges(45), "");
@@ -174,7 +174,7 @@ TEST(ItemTest, AppropriateConfig){
     EXPECT_DEATH(w = l_item.incomingEdges(), "");
     EXPECT_DEATH(l_item.addIncomingEdges(31), "");
 
-    qCDebug(g_cat_store_test) << QString("setVisibleEdges() call / non full vertex inconsistency");
+    qCDebug(g_cat_lv0_test) << QString("setVisibleEdges() call / non full vertex inconsistency");
     l_item.setFlags(M1Store::FULL_EDGE);
     EXPECT_DEATH(l_item.setVisibleEdges(55), "");
     EXPECT_DEATH(w = l_item.visibleEdges(), "");
@@ -190,7 +190,7 @@ TEST(ItemTest, AppropriateConfig){
     EXPECT_DEATH(w = l_item.visibleEdges(), "");
     EXPECT_DEATH(l_item.addVisibleEdges(9), "");
 
-    qCDebug(g_cat_store_test) << QString("text length violations + default empty string");
+    qCDebug(g_cat_lv0_test) << QString("text length violations + default empty string");
     l_item.setFlags(M1Store::FULL_EDGE);
     EXPECT_EQ(QString(l_item.text()), QString(""));
     EXPECT_DEATH(l_item.setText(QString("").fill('x', M1Store::FULL_EDGE_TEXT_LEN)), "");
@@ -361,9 +361,9 @@ TEST(ItemTest, ValuesRoundTrip){
 
 // set/get of members in different Item configs
 TEST(ItemTest, ValuesRoundTripFullVertex){
-    qCDebug(g_cat_store_test) << QString("Putting random values in and retrieving them in a FULL_VERTEX");
+    qCDebug(g_cat_lv0_test) << QString("Putting random values in and retrieving them in a FULL_VERTEX");
     for(int t=0; t<20; t++){
-        qCDebug(g_cat_store_test) << QString("Item: %1").arg(t);
+        qCDebug(g_cat_lv0_test) << QString("Item: %1").arg(t);
 
         std::random_device l_rd; // obtain a random number from hardware
         std::mt19937 l_gen(l_rd()); // seed the generator
@@ -413,7 +413,7 @@ TEST(ItemTest, ValuesRoundTripFullVertex){
 
         for(int i = 0; i<30; i++){
             int m = l_distr_member(l_gen);
-            qCDebug(g_cat_store_test) << QString("Round: %1 --> %2 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++").arg(i).arg(m);
+            qCDebug(g_cat_lv0_test) << QString("Round: %1 --> %2 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++").arg(i).arg(m);
             /*
             void initializeMembers(const ItemID p_ID, const FlagField p_flags, const ItemType p_type);
 
@@ -523,33 +523,33 @@ TEST(ItemTest, ValuesRoundTripFullVertex){
             case 15:
                 // set flag
                 l_bit = 0x8000000000000000 >> l_distr_bit(l_gen);
-                qCDebug(g_cat_store_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
+                qCDebug(g_cat_lv0_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
                 l_item.setFlag(l_bit);
                 l_flags = l_flags | l_bit;
                 break;
             case 16:
                 // unset flag
                 l_bit = 0x8000000000000000 >> l_distr_bit(l_gen);
-                qCDebug(g_cat_store_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
+                qCDebug(g_cat_lv0_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
                 l_item.unSetFlag(l_bit);
                 l_flags = l_flags & (~l_bit);
                 break;
             case 17:
                 // set flag extra
                 l_bit = 0x8000000000000000 >> l_distr_bit_extra(l_gen);
-                qCDebug(g_cat_store_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
+                qCDebug(g_cat_lv0_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
                 l_item.setFlagExtra(l_bit);
                 l_flags_extra = l_flags_extra | l_bit;
                 break;
             case 18:
                 // unset flag extra
                 l_bit = 0x8000000000000000 >> l_distr_bit_extra(l_gen);
-                qCDebug(g_cat_store_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
+                qCDebug(g_cat_lv0_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
                 l_item.unSetFlagExtra(l_bit);
                 l_flags_extra = l_flags_extra & (~l_bit);
                 break;
             }
-            qCDebug(g_cat_store_test) << QString("Round: %1 Testing equalities").arg(i);
+            qCDebug(g_cat_lv0_test) << QString("Round: %1 Testing equalities").arg(i);
             EXPECT_EQ(l_item.id(), l_id);
             EXPECT_EQ(l_item.flags(), l_flags);
             EXPECT_EQ(l_item.getType(), l_type.getItemIDType());
@@ -561,16 +561,16 @@ TEST(ItemTest, ValuesRoundTripFullVertex){
             EXPECT_EQ(l_item.firstEdge(), l_first_edge);
             EXPECT_EQ(l_item.firstEdgeSpecial(), l_first_edge_special);
             EXPECT_EQ(QString(l_item.text()), l_text);
-            qCDebug(g_cat_store_test) << QString("Round: %1 Testing Done ----------------------------------------------------").arg(i);
+            qCDebug(g_cat_lv0_test) << QString("Round: %1 Testing Done ----------------------------------------------------").arg(i);
         }
         //qCDebug(g_cat_store_test) << QString("Random: %1").arg(l_distr(l_gen));
     }
 }
 
 TEST(ItemTest, ValuesRoundTripFullEdge){
-    qCDebug(g_cat_store_test) << QString("Putting random values in and retrieving them in a FULL_EDGE");
+    qCDebug(g_cat_lv0_test) << QString("Putting random values in and retrieving them in a FULL_EDGE");
     for(int t=0; t<20; t++){
-        qCDebug(g_cat_store_test) << QString("Item: %1").arg(t);
+        qCDebug(g_cat_lv0_test) << QString("Item: %1").arg(t);
 
         std::random_device l_rd; // obtain a random number from hardware
         std::mt19937 l_gen(l_rd()); // seed the generator
@@ -621,7 +621,7 @@ TEST(ItemTest, ValuesRoundTripFullEdge){
 
         for(int i = 0; i<30; i++){
             int m = l_distr_member(l_gen);
-            qCDebug(g_cat_store_test) << QString("Round: %1 --> %2 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++").arg(i).arg(m);
+            qCDebug(g_cat_lv0_test) << QString("Round: %1 --> %2 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++").arg(i).arg(m);
             /*
             void initializeMembers(const ItemID p_ID, const FlagField p_flags, const ItemType p_type);
 
@@ -740,33 +740,33 @@ TEST(ItemTest, ValuesRoundTripFullEdge){
             case 17:
                 // set flag
                 l_bit = 0x8000000000000000 >> l_distr_bit(l_gen);
-                qCDebug(g_cat_store_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
+                qCDebug(g_cat_lv0_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
                 l_item.setFlag(l_bit);
                 l_flags = l_flags | l_bit;
                 break;
             case 18:
                 // unset flag
                 l_bit = 0x8000000000000000 >> l_distr_bit(l_gen);
-                qCDebug(g_cat_store_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
+                qCDebug(g_cat_lv0_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
                 l_item.unSetFlag(l_bit);
                 l_flags = l_flags & (~l_bit);
                 break;
             case 19:
                 // set flag extra
                 l_bit = 0x8000000000000000 >> l_distr_bit_extra(l_gen);
-                qCDebug(g_cat_store_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
+                qCDebug(g_cat_lv0_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
                 l_item.setFlagExtra(l_bit);
                 l_flags_extra = l_flags_extra | l_bit;
                 break;
             case 20:
                 // unset flag extra
                 l_bit = 0x8000000000000000 >> l_distr_bit_extra(l_gen);
-                qCDebug(g_cat_store_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
+                qCDebug(g_cat_lv0_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
                 l_item.unSetFlagExtra(l_bit);
                 l_flags_extra = l_flags_extra & (~l_bit);
                 break;
             }
-            qCDebug(g_cat_store_test) << QString("Round: %1 Testing equalities").arg(i);
+            qCDebug(g_cat_lv0_test) << QString("Round: %1 Testing equalities").arg(i);
             EXPECT_EQ(l_item.id(), l_id);
             EXPECT_EQ(l_item.flags(), l_flags);
             EXPECT_EQ(l_item.getType(), l_type.getItemIDType());
@@ -782,16 +782,16 @@ TEST(ItemTest, ValuesRoundTripFullEdge){
             EXPECT_EQ(l_item.next(), l_e_next);
             EXPECT_EQ(l_item.reciprocal(), l_e_reciprocal);
             EXPECT_EQ(QString(l_item.text()), l_text);
-            qCDebug(g_cat_store_test) << QString("Round: %1 Testing Done ----------------------------------------------------").arg(i);
+            qCDebug(g_cat_lv0_test) << QString("Round: %1 Testing Done ----------------------------------------------------").arg(i);
         }
         //qCDebug(g_cat_store_test) << QString("Random: %1").arg(l_distr(l_gen));
     }
 }
 
 TEST(ItemTest, ValuesRoundTripSimpleEdge){
-    qCDebug(g_cat_store_test) << QString("Putting random values in and retrieving them in a FULL_EDGE");
+    qCDebug(g_cat_lv0_test) << QString("Putting random values in and retrieving them in a FULL_EDGE");
     for(int t=0; t<20; t++){
-        qCDebug(g_cat_store_test) << QString("Item: %1").arg(t);
+        qCDebug(g_cat_lv0_test) << QString("Item: %1").arg(t);
 
         std::random_device l_rd; // obtain a random number from hardware
         std::mt19937 l_gen(l_rd()); // seed the generator
@@ -823,7 +823,7 @@ TEST(ItemTest, ValuesRoundTripSimpleEdge){
 
         for(int i = 0; i<30; i++){
             int m = l_distr_member(l_gen);
-            qCDebug(g_cat_store_test) << QString("Round: %1 --> %2 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++").arg(i).arg(m);
+            qCDebug(g_cat_lv0_test) << QString("Round: %1 --> %2 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++").arg(i).arg(m);
             /*
             void initializeMembers(const ItemID p_ID, const FlagField p_flags, const ItemType p_type);
 
@@ -887,19 +887,19 @@ TEST(ItemTest, ValuesRoundTripSimpleEdge){
             case 8:
                 // set flag
                 l_bit = 0x8000000000000000 >> l_distr_bit(l_gen);
-                qCDebug(g_cat_store_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
+                qCDebug(g_cat_lv0_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
                 l_item.setFlag(l_bit);
                 l_flags = l_flags | l_bit;
                 break;
             case 9:
                 // unset flag
                 l_bit = 0x8000000000000000 >> l_distr_bit(l_gen);
-                qCDebug(g_cat_store_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
+                qCDebug(g_cat_lv0_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
                 l_item.unSetFlag(l_bit);
                 l_flags = l_flags & (~l_bit);
                 break;
             }
-            qCDebug(g_cat_store_test) << QString("Round: %1 Testing equalities").arg(i);
+            qCDebug(g_cat_lv0_test) << QString("Round: %1 Testing equalities").arg(i);
             EXPECT_EQ(l_item.id(), l_id);
             EXPECT_EQ(l_item.flags(), l_flags);
             EXPECT_EQ(l_item.getType(), l_type.getItemIDType());
@@ -907,16 +907,16 @@ TEST(ItemTest, ValuesRoundTripSimpleEdge){
             EXPECT_EQ(l_item.previous(), l_e_previous);
             EXPECT_EQ(l_item.next(), l_e_next);
             EXPECT_EQ(QString(l_item.text()), l_text);
-            qCDebug(g_cat_store_test) << QString("Round: %1 Testing Done ----------------------------------------------------").arg(i);
+            qCDebug(g_cat_lv0_test) << QString("Round: %1 Testing Done ----------------------------------------------------").arg(i);
         }
         //qCDebug(g_cat_store_test) << QString("Random: %1").arg(l_distr(l_gen));
     }
 }
 
 TEST(ItemTest, ValuesRoundTripSimpleVertex){
-    qCDebug(g_cat_store_test) << QString("Putting random values in and retrieving them in a FULL_EDGE");
+    qCDebug(g_cat_lv0_test) << QString("Putting random values in and retrieving them in a FULL_EDGE");
     for(int t=0; t<20; t++){
-        qCDebug(g_cat_store_test) << QString("Item: %1").arg(t);
+        qCDebug(g_cat_lv0_test) << QString("Item: %1").arg(t);
 
         std::random_device l_rd; // obtain a random number from hardware
         std::mt19937 l_gen(l_rd()); // seed the generator
@@ -944,7 +944,7 @@ TEST(ItemTest, ValuesRoundTripSimpleVertex){
 
         for(int i = 0; i<30; i++){
             int m = l_distr_member(l_gen);
-            qCDebug(g_cat_store_test) << QString("Round: %1 --> %2 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++").arg(i).arg(m);
+            qCDebug(g_cat_lv0_test) << QString("Round: %1 --> %2 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++").arg(i).arg(m);
             /*
             void initializeMembers(const ItemID p_ID, const FlagField p_flags, const ItemType p_type);
 
@@ -989,24 +989,24 @@ TEST(ItemTest, ValuesRoundTripSimpleVertex){
             case 5:
                 // set flag
                 l_bit = 0x8000000000000000 >> l_distr_bit(l_gen);
-                qCDebug(g_cat_store_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
+                qCDebug(g_cat_lv0_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
                 l_item.setFlag(l_bit);
                 l_flags = l_flags | l_bit;
                 break;
             case 6:
                 // unset flag
                 l_bit = 0x8000000000000000 >> l_distr_bit(l_gen);
-                qCDebug(g_cat_store_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
+                qCDebug(g_cat_lv0_test) << QString("l_bit %1 (0b%2)").arg(l_bit).arg(l_bit, 64, 2, QLatin1Char('0'));
                 l_item.unSetFlag(l_bit);
                 l_flags = l_flags & (~l_bit);
                 break;
             }
-            qCDebug(g_cat_store_test) << QString("Round: %1 Testing equalities").arg(i);
+            qCDebug(g_cat_lv0_test) << QString("Round: %1 Testing equalities").arg(i);
             EXPECT_EQ(l_item.id(), l_id);
             EXPECT_EQ(l_item.flags(), l_flags);
             EXPECT_EQ(l_item.getType(), l_type.getItemIDType());
             EXPECT_EQ(QString(l_item.text()), l_text);
-            qCDebug(g_cat_store_test) << QString("Round: %1 Testing Done ----------------------------------------------------").arg(i);
+            qCDebug(g_cat_lv0_test) << QString("Round: %1 Testing Done ----------------------------------------------------").arg(i);
         }
         //qCDebug(g_cat_store_test) << QString("Random: %1").arg(l_distr(l_gen));
     }

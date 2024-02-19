@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 
 #include "m1_store.h"
+#include "m1_env.h"
 
 Q_LOGGING_CATEGORY(g_cat_store, "store.members_access")
 
@@ -31,7 +32,7 @@ M1Store::SpecialItemID M1Store::ItemType::getSpecialType(unsigned int p_index) {
     return t.m_type_short[p_index];
 }
 
-QString M1Store::ItemType::dbgString(){
+QString M1Store::ItemType::dbgString() const{
     return QString("4s[0x%1 0x%2 0x%3 0x%4]-id[0x%7 %8]")
         .arg(t.m_type_short[0], 4, 16, QLatin1Char('0'))
         .arg(t.m_type_short[1], 4, 16, QLatin1Char('0'))
@@ -41,6 +42,35 @@ QString M1Store::ItemType::dbgString(){
         .arg(t.m_type_item);
 }
 
+// ---------------------------------------------------------------------------------------------------------
+// ----------------------------- M1Store::SpecialItem ------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------
+
+QString M1Store::SpecialItem::mnemonic() const {
+    char l_buf[6] = {0};
+    strncpy(l_buf, m_mnemonic, 5);
+    return QString(l_buf);
+}
+
+void M1Store::SpecialItem::setAttr(
+    const ItemID p_item_id, const SpecialItemID p_id, const SpecialItemID p_reciprocal,
+    const FlagField p_flags, const char* p_mnemonic){
+
+    m_flags = p_flags;
+    m_id = p_id;
+    m_id_reciprocal = p_reciprocal;
+    m_item_id = p_item_id;
+    memset(m_mnemonic, 0, 5);
+    strncpy(m_mnemonic, p_mnemonic, 5);
+}
+
+QString M1Store::SpecialItem::dbgString(){
+    return QString("%1 %2 %3%4")
+        .arg(m_id, 2, 16, QLatin1Char('0'))
+        .arg(mnemonic())
+        .arg(m_flags, 64, 2, QLatin1Char('0'))
+        .arg(m_flags & SI_HAS_RECIPROCAL ? QString(" --> ") + M1Store::Storage::getSpecialSlotPointer(m_id_reciprocal)->mnemonic(): "");
+}
 // ---------------------------------------------------------------------------------------------------------
 // ----------------------------- M1Store::Item -------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------
@@ -657,14 +687,17 @@ void M1Store::Item_lv0::setText(const QString& p_text){
             p.v.f.m_string_id = G_VOID_ID;
         }
 
-        if(p_text.length() == 0) // 0 length
+        if(p_text.length() == 0){ // 0 length
             // unset ITEM_HAS_LOCAL_STRING
             m_flags = m_flags & (~ITEM_HAS_LOCAL_STRING);
+            // truncate local string
+            p.v.f.m_text[0] = 0;
+        }
         else
         if(p_text.toUtf8().length() <= FULL_VERTEX_TEXT_LEN-1){ // 0 < length < FULL_VERTEX_TEXT_LEN-1
             qCDebug(g_cat_store) << QString("storing into local string");
             strncpy(p.v.f.m_text, p_text.toUtf8().data(), FULL_VERTEX_TEXT_LEN); // strncpy() padds with \0
-            p.v.f.m_text[FULL_VERTEX_TEXT_LEN-1] = 0; // to make sure
+            p.v.f.m_text[m1_min(SIMPLE_VERTEX_TEXT_LEN-1, p_text.length())] = 0; // to make sure
             // set ITEM_HAS_LOCAL_STRING
             m_flags = m_flags | ITEM_HAS_LOCAL_STRING;
         }
@@ -680,18 +713,19 @@ void M1Store::Item_lv0::setText(const QString& p_text){
         if((m_flags & ITEM_NATURE_MASK) == FULL_EDGE){
             // full edge
             strncpy(p.e.f.m_text, p_text.toUtf8().data(), FULL_EDGE_TEXT_LEN); // strncpy() padds with \0
-            p.e.f.m_text[FULL_EDGE_TEXT_LEN-1] = 0; // to make sure
+            p.e.f.m_text[m1_min(SIMPLE_VERTEX_TEXT_LEN-1, p_text.length())] = 0; // to make sure
         }
         else if((m_flags & ITEM_NATURE_MASK) == SIMPLE_EDGE){
             // simple edge
             strncpy(p.e.s.m_text, p_text.toUtf8().data(), SIMPLE_EDGE_TEXT_LEN); // strncpy() padds with \0
-            p.e.s.m_text[SIMPLE_EDGE_TEXT_LEN-1] = 0; // to make sure
+            p.e.s.m_text[m1_min(SIMPLE_VERTEX_TEXT_LEN-1, p_text.length())] = 0; // to make sure
         }
         else{ // if((m_flags & ITEM_NATURE_MASK) == SIMPLE_VERTEX){
             // simple vertex (only choice left)
             strncpy(p.v.s.m_text, p_text.toUtf8().data(), SIMPLE_VERTEX_TEXT_LEN);  // strncpy() padds with \0
-            p.v.s.m_text[SIMPLE_VERTEX_TEXT_LEN-1] = 0; // to make sure
+            p.v.s.m_text[m1_min(SIMPLE_VERTEX_TEXT_LEN-1, p_text.length())] = 0; // to make sure
         }
+
         if(p_text.length() > 0) // set ITEM_HAS_LOCAL_STRING if string length > 0. Unset it otherwise
             m_flags = m_flags | ITEM_HAS_LOCAL_STRING;
         else

@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 {
     ::testing::InitGoogleTest(&argc, argv);
     M1Store::M1Env::init();
-    M1Store::Storage::init();
+    M1Store::Storage::storeSetUp();
 
     M1Store::Storage::storeString(QString("Dummy Start [%1]").arg(QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss")));
 
@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 
     M1Store::Storage::storeString(QString("Dummy End [%1]").arg(QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss")));
 
-    M1Store::Storage::close();
+    M1Store::Storage::storeShutDown();
     M1Store::M1Env::close();
 
     return l_ret;
