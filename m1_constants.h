@@ -9,11 +9,11 @@
 
 // debug categories pre-declarations
 Q_DECLARE_LOGGING_CATEGORY(g_cat_store)                 ///< for Storage class
-Q_DECLARE_LOGGING_CATEGORY(g_cat_lv0_members)           ///< for lv0_Item class
+Q_DECLARE_LOGGING_CATEGORY(g_cat_lv0_members)           ///< for lv0_Item and ancillary classes
 Q_DECLARE_LOGGING_CATEGORY(g_cat_lv0_test)              ///< for tests of the lv0_Item class
-Q_DECLARE_LOGGING_CATEGORY(g_cat_silence)               ///< for debug strings generation (silencing all other debug categories)
 Q_DECLARE_LOGGING_CATEGORY(g_cat_lv2_members)           ///< for ItemWrapper class (lv2) members
 Q_DECLARE_LOGGING_CATEGORY(g_cat_lv2_constructors)      ///< for ItemWrapper class (lv2) constructors and instanciation from mmap()
+Q_DECLARE_LOGGING_CATEGORY(g_cat_silence)               ///< for debug strings generation (silencing all other debug categories)
 
 namespace M1Store{
 
@@ -28,8 +28,8 @@ namespace M1Store{
     typedef unsigned short SpecialItemID;   ///< unsigned 16-bit wide ID number for core type numbers, etc
 
     // Null values for ItemID (64 bits) and SpecialItemID (16 bits) respectively
-    const ItemID G_VOID_ID = 0xffffffffffffffff; ///< -1 = NULL value for ItemID
-    const SpecialItemID G_VOID_TYPE_ID = 0xffff; ///< -1 = NULL value for SpecialItemID
+    const ItemID G_VOID_ITEM_ID = 0xffffffffffffffff;   ///< -1 = NULL value for ItemID
+    const SpecialItemID G_VOID_SI_ID = 0xffff;          ///< -1 = NULL value for SpecialItemID
 
     // flag bits for items
     const unsigned long long ITEM_IS_VERTEX         = 0x0000000000000001; ///< 0 --> item is an edge, 1 --> item is a vertex

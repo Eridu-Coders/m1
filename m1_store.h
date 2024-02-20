@@ -41,11 +41,6 @@ namespace M1Store{
         static unsigned long cm_item_map_length;    ///< length of mmap() area for items
         static unsigned long cm_special_length;     ///< length of mmap() area for special items
     public:
-        static SpecialItemID ROOT_SPECIAL_ID;       ///< Sepcial Vertex ID of root
-        static SpecialItemID HOME_SPECIAL_ID;       ///< Sepcial Vertex ID of home
-        static SpecialItemID TEXT_SPECIAL_ID;       ///< Sepcial Vertex ID of text root
-        static SpecialItemID WORD_SPECIAL_ID;       ///< Sepcial Vertex ID of word root
-
         static M1Store::Item_lv0* getItemSlotPointer(const ItemID p_id);
         static M1Store::Item_lv0* getNewItemSlotPointer(const FlagField p_flags, const ItemType p_type);
 

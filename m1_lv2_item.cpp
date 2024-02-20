@@ -7,16 +7,16 @@ Q_LOGGING_CATEGORY(g_cat_lv2_constructors, "lv2.constructors")
 // ---------------------------------- Constructors and instantiation from mmap() data -------------------------------------------
 M1Store::ItemWrapper::ItemWrapper(Item_lv0* p_item){m_item = p_item;}
 M1Store::ItemWrapperFullVertex::ItemWrapperFullVertex(Item_lv0* p_item) : ItemWrapper(p_item){
-    qCDebug(g_cat_lv2_constructors) << QString("p_item: %1").arg(p_item->id());
+    qCDebug(g_cat_lv2_constructors) << QString("p_item: %1").arg(p_item->item_id());
 }
 M1Store::ItemWrapperSimpleVertex::ItemWrapperSimpleVertex(Item_lv0* p_item) : ItemWrapper(p_item){
-    qCDebug(g_cat_lv2_constructors) << QString("p_item: %1").arg(p_item->id());
+    qCDebug(g_cat_lv2_constructors) << QString("p_item: %1").arg(p_item->item_id());
 }
 M1Store::ItemWrapperFullEdge::ItemWrapperFullEdge(Item_lv0* p_item) : ItemWrapper(p_item){
-    qCDebug(g_cat_lv2_constructors) << QString("p_item: %1").arg(p_item->id());
+    qCDebug(g_cat_lv2_constructors) << QString("p_item: %1").arg(p_item->item_id());
 }
 M1Store::ItemWrapperSimpleEdge::ItemWrapperSimpleEdge(Item_lv0* p_item) : ItemWrapper(p_item){
-    qCDebug(g_cat_lv2_constructors) << QString("p_item: %1").arg(p_item->id());
+    qCDebug(g_cat_lv2_constructors) << QString("p_item: %1").arg(p_item->item_id());
 }
 
 /**
@@ -25,7 +25,7 @@ M1Store::ItemWrapperSimpleEdge::ItemWrapperSimpleEdge(Item_lv0* p_item) : ItemWr
  * @return an ItemWrapper pointer
  */
 M1Store::ItemWrapper* M1Store::ItemWrapper::instantiateFromMMap(Item_lv0* p){
-    qCDebug(g_cat_lv2_constructors) << QString("instantiateFromMMap from lv0 ID: %1").arg(p->id());
+    qCDebug(g_cat_lv2_constructors) << QString("instantiateFromMMap from lv0 ID: %1").arg(p->item_id());
     M1Store::ItemWrapper* l_ret;
 
     switch(p->flags() & ITEM_NATURE_MASK){
@@ -98,7 +98,7 @@ M1Store::ItemWrapper* M1Store::ItemWrapper::getNew(
 
 M1Store::ItemWrapper* M1Store::ItemWrapper::getExisting(const ItemID p_ID){
     qCDebug(g_cat_lv2_constructors) << QString("getExisting from ItemID: %1").arg(p_ID);
-    if(p_ID == G_VOID_ID) return nullptr;
+    if(p_ID == G_VOID_ITEM_ID) return nullptr;
     return M1Store::ItemWrapper::instantiateFromMMap(
         M1Store::Storage::getItemSlotPointer(p_ID));
 }
@@ -161,19 +161,19 @@ void M1Store::ItemWrapper::recurGraph(const ItemID p_item_id, std::set<ItemID>& 
 QString M1Store::ItemWrapper::dbgString(){
     QString l_types(" [");
     for(int i = 0; i < 4; i++)
-        if(m_item->getType(i) != G_VOID_TYPE_ID)
+        if(m_item->getType(i) != G_VOID_SI_ID)
             l_types += Storage::getSpecialSlotPointer(m_item->getType(i))->mnemonic();
     if(l_types.length() == 2) l_types = "";
     else l_types += "]";
     return QString("\n-----------------------------------------------------------------------------------------\n%1\n%2\n%3\n")
-        .arg(QString("m_id                 : 0x%1").arg(m_item->m_id, 16, 16, QLatin1Char('0')))
+        .arg(QString("m_id                 : 0x%1").arg(m_item->m_item_id, 16, 16, QLatin1Char('0')))
         .arg(QString("m_flags              : 0b%1").arg(m_item->m_flags, 64, 2, QLatin1Char('0')))
         .arg(QString("m_type               : %1").arg(m_item->m_type.dbgString() + l_types));
 }
 QString M1Store::ItemWrapperFullVertex::dbgString(){
     QString l_text(m_item->text());
     QString l_edges;
-    if(m_item->firstEdgeSpecial() != G_VOID_ID){
+    if(m_item->firstEdgeSpecial() != G_VOID_ITEM_ID){
         ItemWrapper* l_current_edge = getExisting(m_item->firstEdgeSpecial());
         l_edges += "\nSpecial edges:";
         do {
@@ -185,7 +185,7 @@ QString M1Store::ItemWrapperFullVertex::dbgString(){
         } while (l_current_edge->itemID() != m_item->firstEdgeSpecial());
         delete l_current_edge;
     }
-    if(m_item->firstEdge() != G_VOID_ID){
+    if(m_item->firstEdge() != G_VOID_ITEM_ID){
         ItemWrapper* l_current_edge = getExisting(m_item->firstEdge());
         l_edges += "\nOrdinary edges:";
         do {
@@ -247,7 +247,7 @@ QString M1Store::ItemWrapperSimpleEdge::dbgString(){
 }
 
 QString M1Store::ItemWrapper::dbgTypeShort(){
-    if(m_item->getType(0) == G_VOID_TYPE_ID)
+    if(m_item->getType(0) == G_VOID_SI_ID)
         return "_____";
     else
         return Storage::getSpecialSlotPointer(m_item->getType(0))->mnemonic();
@@ -259,7 +259,7 @@ QString M1Store::ItemWrapperFullVertex::dbgShort(int p_depth){
     return QString("ITEM [%1] %2%3")
         .arg(dbgTypeShort())
         .arg(m_item->text())
-        .arg((m_item->flags() & IS_SPECIAL) ? QString(" (%1)").arg(M1Store::Storage::getSpecial(m_item->id())->mnemonic()) : "");
+        .arg((m_item->flags() & IS_SPECIAL) ? QString(" (%1)").arg(M1Store::Storage::getSpecial(m_item->item_id())->mnemonic()) : "");
 }
 QString M1Store::ItemWrapperSimpleVertex::dbgShort(int p_depth){
     return QString("VFLD [%1]").arg(m_item->text());
@@ -306,10 +306,10 @@ M1Store::ItemWrapper* M1Store::ItemWrapperFullEdge::getFirstEdgeSpecial(){return
 M1Store::ItemWrapper* M1Store::ItemWrapperSimpleEdge::getFirstEdge(){qFatal("Aborting / Cannot get first edge of a simple edge"); return nullptr;}
 M1Store::ItemWrapper* M1Store::ItemWrapperSimpleEdge::getFirstEdgeSpecial(){qFatal("Aborting / Cannot get first special edge of a simple edge"); return nullptr;}
 
-M1Store::ItemID M1Store::ItemWrapperFullVertex::getTarget(){qFatal("Aborting / Cannot get target of a full vertex"); return G_VOID_ID;}
-M1Store::ItemID M1Store::ItemWrapperSimpleVertex::getTarget(){qFatal("Aborting / Cannot get target of a simple vertex"); return G_VOID_ID;}
+M1Store::ItemID M1Store::ItemWrapperFullVertex::getTarget(){qFatal("Aborting / Cannot get target of a full vertex"); return G_VOID_ITEM_ID;}
+M1Store::ItemID M1Store::ItemWrapperSimpleVertex::getTarget(){qFatal("Aborting / Cannot get target of a simple vertex"); return G_VOID_ITEM_ID;}
 M1Store::ItemID M1Store::ItemWrapperFullEdge::getTarget(){return ItemWrapper::getTarget();}
-M1Store::ItemID M1Store::ItemWrapperSimpleEdge::getTarget(){qFatal("Aborting / Cannot get target of a simple edge"); return G_VOID_ID;}
+M1Store::ItemID M1Store::ItemWrapperSimpleEdge::getTarget(){qFatal("Aborting / Cannot get target of a simple edge"); return G_VOID_ITEM_ID;}
 
 void M1Store::ItemWrapperFullVertex::defaultConnections(){
     qCDebug(g_cat_lv2_members) << "Default connections for full vertex";
@@ -317,12 +317,12 @@ void M1Store::ItemWrapperFullVertex::defaultConnections(){
         dynamic_cast<M1Store::ItemWrapperFullEdge*>(
         getNew(FULL_EDGE | IS_AUTO,
                M1Store::ItemType(M1Store::Storage::getSpecialID("AUTO_"),
-                                 G_VOID_TYPE_ID,
-                                 G_VOID_TYPE_ID,
-                                 G_VOID_TYPE_ID))
+                                 G_VOID_SI_ID,
+                                 G_VOID_SI_ID,
+                                 G_VOID_SI_ID))
     );
-    l_auto_edge->setTarget(m_item->id());
-    l_auto_edge->setOrigin(m_item->id());
+    l_auto_edge->setTarget(m_item->item_id());
+    l_auto_edge->setOrigin(m_item->item_id());
 
     l_auto_edge->setPrevious(l_auto_edge->itemID());
     l_auto_edge->setNext(l_auto_edge->itemID());
@@ -330,7 +330,7 @@ void M1Store::ItemWrapperFullVertex::defaultConnections(){
     this->setFirstEdge(l_auto_edge->itemID());
 
     createTypeEdges();
-    qCDebug(g_cat_lv2_members) << QString("Default connections for full vertex end: %1").arg(m_item->id());
+    qCDebug(g_cat_lv2_members) << QString("Default connections for full vertex end: %1").arg(m_item->item_id());
     delete l_auto_edge;
 }
 void M1Store::ItemWrapperSimpleVertex::defaultConnections(){
@@ -348,13 +348,13 @@ void M1Store::ItemWrapperSimpleEdge::defaultConnections(){
 void M1Store::ItemWrapper::setType(const SpecialItem* p_type_si){
     qCDebug(g_cat_lv2_members) << QString("Set type to: %1").arg(p_type_si->mnemonic());
 
-    int l_free_slot = m_item->getType(0) == G_VOID_TYPE_ID ? 0 :
-        m_item->getType(1) == G_VOID_TYPE_ID ? 1 :
-        m_item->getType(2) == G_VOID_TYPE_ID ? 2 :
-        m_item->getType(3) == G_VOID_TYPE_ID ? 3 : -1;
+    int l_free_slot = m_item->getType(0) == G_VOID_SI_ID ? 0 :
+                          m_item->getType(1) == G_VOID_SI_ID ? 1 :
+                                                               m_item->getType(2) == G_VOID_SI_ID ? 2 :
+                                                               m_item->getType(3) == G_VOID_SI_ID ? 3 : -1;
 
     if(l_free_slot >= 0)
-        m_item->setType(l_free_slot, p_type_si->getSpecialId());
+        m_item->setType(l_free_slot, p_type_si->specialId());
 
     if(l_free_slot < 0 || p_type_si->flags() & SI_REQUIRES_EDGE)
         linkTo(p_type_si->itemId(), "_ISA_");
@@ -374,9 +374,9 @@ void M1Store::ItemWrapper::linkTo(ItemWrapper* p_target, const SpecialItemID p_t
                     .arg(M1Store::Storage::getSpecialSlotPointer(p_type_edge)->mnemonic());
 
     M1Store::ItemWrapperFullEdge* l_new_edge =
-        dynamic_cast<M1Store::ItemWrapperFullEdge*>(getNew(FULL_EDGE, M1Store::ItemType(p_type_edge, G_VOID_TYPE_ID, G_VOID_TYPE_ID, G_VOID_TYPE_ID)));
+        dynamic_cast<M1Store::ItemWrapperFullEdge*>(getNew(FULL_EDGE, M1Store::ItemType(p_type_edge, G_VOID_SI_ID, G_VOID_SI_ID, G_VOID_SI_ID)));
     l_new_edge->setTarget(p_target->itemID());
-    l_new_edge->setOrigin(m_item->id());
+    l_new_edge->setOrigin(m_item->item_id());
 
     if(M1Store::Storage::getSpecialSlotPointer(p_type_edge)->flags() & SI_HAS_RECIPROCAL){
         SpecialItemID l_reciprocal_id = M1Store::Storage::getSpecialSlotPointer(p_type_edge)->reciprocalId();
@@ -386,7 +386,7 @@ void M1Store::ItemWrapper::linkTo(ItemWrapper* p_target, const SpecialItemID p_t
         );
 
         l_new_edge_reciprocal->setOrigin(p_target->itemID());
-        l_new_edge_reciprocal->setTarget(m_item->id());
+        l_new_edge_reciprocal->setTarget(m_item->item_id());
 
         l_new_edge->setReciprocal(l_new_edge_reciprocal->itemID());
         l_new_edge_reciprocal->setReciprocal(l_new_edge->itemID());
@@ -401,7 +401,7 @@ void M1Store::ItemWrapper::linkTo(ItemWrapper* p_target, const SpecialItemID p_t
 void M1Store::ItemWrapper::linkTo(ItemWrapper* p_target, const char* p_mnemonic_edge){
     qCDebug(g_cat_lv2_members) << QString("link to: %1 [%2]").arg(p_target->dbgShort()).arg(p_mnemonic_edge);
 
-    linkTo(p_target, M1Store::Storage::getSpecialSlotPointer(p_mnemonic_edge)->getSpecialId());
+    linkTo(p_target, M1Store::Storage::getSpecialSlotPointer(p_mnemonic_edge)->specialId());
 }
 void M1Store::ItemWrapper::linkTo(ItemID p_target_id, const SpecialItemID p_type){
     M1Store::ItemWrapper* l_target = getExisting(p_target_id);
@@ -420,7 +420,7 @@ void M1Store::ItemWrapper::addFullEdge(ItemWrapperFullEdge* p_new_edge, const Sp
 
     ItemID first_edge_id = edge_is_special ? m_item->firstEdgeSpecial() : m_item->firstEdge();
 
-    if(first_edge_id == G_VOID_ID){
+    if(first_edge_id == G_VOID_ITEM_ID){
         p_new_edge->setPrevious(new_edge_id);
         p_new_edge->setNext(new_edge_id);
 

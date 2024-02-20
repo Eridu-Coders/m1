@@ -57,12 +57,12 @@ void M1Store::Storage::storeSetUp(){
     int l_rc;
 
     // create data directory if not exists
-    if ( ! fs::is_directory(STORE_DATA_PATH) ) {
-        qCDebug(g_cat_store) << QString("Data directory [%1] does not exist - creating it").arg(STORE_DATA_PATH);
-        fs::create_directory(STORE_DATA_PATH);
+    if ( ! fs::is_directory(M1Store::STORE_DATA_PATH) ) {
+        qCDebug(g_cat_store) << QString("Data directory [%1] does not exist - creating it").arg(M1Store::STORE_DATA_PATH);
+        fs::create_directory(M1Store::STORE_DATA_PATH);
     }
     // create LMDB storage path if not exists
-    fs::path l_env_dir = fs::path(STORE_DATA_PATH) / fs::path(STORE_LMDB_DIR);
+    fs::path l_env_dir = fs::path(M1Store::STORE_DATA_PATH) / fs::path(M1Store::STORE_LMDB_DIR);
     if (!fs::is_directory(l_env_dir)) {
         qCDebug(g_cat_store) << QString("LMDB directory [%1] does not exist - creating it\n").arg(l_env_dir.c_str());
         fs::create_directory(l_env_dir);
@@ -85,21 +85,21 @@ void M1Store::Storage::storeSetUp(){
     bool l_not_found;
 
     // test the existence of string db and creates it if absent
-    qCDebug(g_cat_store) << QString("Testing existence of table [%1] ... ").arg(LMDB_STRING_DB);
-    l_not_found = (mdb_dbi_open(l_txn, LMDB_STRING_DB, 0, &cm_dbi_string) == MDB_NOTFOUND);
+    qCDebug(g_cat_store) << QString("Testing existence of table [%1] ... ").arg(M1Store::LMDB_STRING_DB);
+    l_not_found = (mdb_dbi_open(l_txn, M1Store::LMDB_STRING_DB, 0, &cm_dbi_string) == MDB_NOTFOUND);
     if(l_not_found){
-        E(mdb_dbi_open(l_txn, LMDB_STRING_DB, MDB_CREATE , &cm_dbi_string));
+        E(mdb_dbi_open(l_txn, M1Store::LMDB_STRING_DB, MDB_CREATE , &cm_dbi_string));
     }
     qCDebug(g_cat_store) << QString(l_not_found ? "does not exist --> creating it" : "exists");
 
     // test the existence of util db and creates it if absent
-    qCDebug(g_cat_store) << QString("Testing existence of table [%1] ... ").arg(LMDB_UTIL_DB);
-    l_not_found = (mdb_dbi_open(l_txn, LMDB_UTIL_DB, 0, &cm_dbi_util) == MDB_NOTFOUND);
+    qCDebug(g_cat_store) << QString("Testing existence of table [%1] ... ").arg(M1Store::LMDB_UTIL_DB);
+    l_not_found = (mdb_dbi_open(l_txn, M1Store::LMDB_UTIL_DB, 0, &cm_dbi_util) == MDB_NOTFOUND);
     qCDebug(g_cat_store) << QString(l_not_found ? "does not exist --> creating it" : "exists");
 
     if(l_not_found){
         // create util table if not found and store 0 counters
-        E(mdb_dbi_open(l_txn, LMDB_UTIL_DB, MDB_CREATE , &cm_dbi_util));
+        E(mdb_dbi_open(l_txn, M1Store::LMDB_UTIL_DB, MDB_CREATE , &cm_dbi_util));
         saveCounters(l_txn);
     }
     else loadCounters(l_txn);
@@ -111,8 +111,8 @@ void M1Store::Storage::storeSetUp(){
     qDebug() << "init mmap() storage ...";
 
     // path to item mmap() file
-    fs::path l_filepath(STORE_DATA_PATH);
-    l_filepath /= LMDB_ITEM_MMAP_FILE;
+    fs::path l_filepath(M1Store::STORE_DATA_PATH);
+    l_filepath /= M1Store::LMDB_ITEM_MMAP_FILE;
 
     cm_item_map_length = 1000 * sizeof(M1Store::Item_lv0);
     qDebug() << QString("opening item mmap() file [%1]").arg(l_filepath.c_str());
@@ -148,8 +148,8 @@ void M1Store::Storage::storeSetUp(){
     }
 
     // path to item mmap() file
-    fs::path l_filepath_special(STORE_DATA_PATH);
-    l_filepath_special /= LMDB_SPECIAL_MMAP_FILE;
+    fs::path l_filepath_special(M1Store::STORE_DATA_PATH);
+    l_filepath_special /= M1Store::LMDB_SPECIAL_MMAP_FILE;
 
     cm_special_length = 65536 * sizeof(M1Store::SpecialItem);
     l_fd = open(l_filepath_special.c_str(), O_RDWR); // open storage in R/W mode
@@ -183,12 +183,18 @@ void M1Store::Storage::storeSetUp(){
         qFatal("Aborting / mmap() special items");
     }
 
+    QLoggingCategory::setFilterRules("*.debug=false\n"
+                                     "dump.debug=true");
+
+
     // pre-load special items associative array
     for(SpecialItemID i = 0; i<cm_next_special; i++){
         SpecialItem* l_slot = getSpecialSlotPointer(i);
-        qDebug() << QString("Special: [%1] ---> %2").arg(l_slot->mnemonic()).arg(i);
+        qCDebug(g_cat_silence) << QString("Special: [%1] ---> 0x%2").arg(l_slot->mnemonic()).arg(i, 4, 16, QChar('0'));
         cm_mnemonic_to_special[l_slot->mnemonic()] = l_slot;
     }
+
+    QLoggingCategory::setFilterRules("*.debug=true");
 
     qDebug() << "init item mmap() storage complete";
 
@@ -223,7 +229,7 @@ M1Store::SpecialItem* M1Store::Storage::getSpecialSlotPointer(const M1Store::Spe
     return (M1Store::SpecialItem*)(cm_special_mmap_base + (p_id << 5));
 }
 M1Store::SpecialItem* M1Store::Storage::getSpecialSlotPointer(const char* p_mnemonic){
-    return M1Store::Storage::getSpecialSlotPointer(cm_mnemonic_to_special[p_mnemonic]->getSpecialId());
+    return M1Store::Storage::getSpecialSlotPointer(cm_mnemonic_to_special[p_mnemonic]->specialId());
 }
 
 // new item
@@ -254,24 +260,24 @@ M1Store::SpecialItem* M1Store::Storage::getSpecial(const char* p_mnemonic){
 M1Store::SpecialItem* M1Store::Storage::newSpecial(const ItemID p_item_id, const FlagField p_flags, const char* p_mnemonic){
     qDebug() << QString("Creating special item [%1]%2")
                     .arg(p_mnemonic)
-                    .arg((p_item_id == G_VOID_ID) ? " (item-less)" : "");
+                    .arg((p_item_id == G_VOID_ITEM_ID) ? " (item-less)" : "");
 
     M1Store::SpecialItem* l_ret = getSpecialSlotPointer(cm_next_special);
-    l_ret->setAttr(p_item_id, cm_next_special, 0, p_flags, p_mnemonic);
+    l_ret->setAttr(p_item_id, cm_next_special, p_flags, p_mnemonic);
     cm_next_special += 1;
     cm_mnemonic_to_special[p_mnemonic] = l_ret;
     return l_ret;
 }
 M1Store::SpecialItem* M1Store::Storage::newSpecial(const FlagField p_flags, const char* p_mnemonic){
-    return newSpecial(G_VOID_ID, p_flags | SI_HAS_NO_ITEM, p_mnemonic);
+    return newSpecial(G_VOID_ITEM_ID, p_flags | SI_HAS_NO_ITEM, p_mnemonic);
 }
 
 void M1Store::Storage::newSpecial(const FlagField p_flags, const char* p_mnemonic_1, const char* p_mnemonic_2){
     M1Store::SpecialItem* l_s1 = newSpecial(p_flags | SI_HAS_RECIPROCAL, p_mnemonic_1);
     M1Store::SpecialItem* l_s2 = newSpecial(p_flags | SI_HAS_RECIPROCAL, p_mnemonic_2);
 
-    l_s1->setReciprocal(l_s2->getSpecialId());
-    l_s2->setReciprocal(l_s1->getSpecialId());
+    l_s1->setReciprocal(l_s2->specialId());
+    l_s2->setReciprocal(l_s1->specialId());
 }
 
 void M1Store::Storage::version_0_to_1(){
@@ -400,7 +406,7 @@ void M1Store::Storage::version_1_to_2(){
         // category & attributes
         M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
         // type
-        M1Store::ItemType(getSpecialSlotPointer("TYPE_")->getSpecialId(), G_VOID_TYPE_ID, G_VOID_TYPE_ID, G_VOID_TYPE_ID),
+        M1Store::ItemType(getSpecialSlotPointer("TYPE_")->specialId(), G_VOID_SI_ID, G_VOID_SI_ID, G_VOID_SI_ID),
         // label
         "Texts root and type",
         // special item flags
@@ -414,7 +420,7 @@ void M1Store::Storage::version_1_to_2(){
         // category & attributes
         M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
         // type
-        M1Store::ItemType(getSpecialSlotPointer("TYPE_")->getSpecialId(), G_VOID_TYPE_ID, G_VOID_TYPE_ID, G_VOID_TYPE_ID),
+        M1Store::ItemType(getSpecialSlotPointer("TYPE_")->specialId(), G_VOID_SI_ID, G_VOID_SI_ID, G_VOID_SI_ID),
         // label
         "Text words (type)",
         // special item flags
@@ -433,7 +439,7 @@ void M1Store::Storage::version_1_to_2(){
 }
 
 M1Store::SpecialItemID M1Store::Storage::getSpecialID(const char* p_mnemonic){
-    return cm_mnemonic_to_special[p_mnemonic]->getSpecialId();
+    return cm_mnemonic_to_special[p_mnemonic]->specialId();
 }
 void M1Store::Storage::setConstants(){
     ROOT_SPECIAL_ID = getSpecialID("ROOT_");
@@ -544,17 +550,17 @@ void M1Store::Storage::storeShutDown(){
         E(mdb_txn_commit(l_txn));
     }
 
-    // dump special items table
-    qCDebug(g_cat_lv0_members) << QString("========= Special Items dump ========");
-
-    for(SpecialItemID i = 0; i < cm_next_special; i++)
-        qCDebug(g_cat_store) << getSpecialSlotPointer(i)->dbgString();
-
-    // dump items --------------------------------------------------------------
-    qCDebug(g_cat_lv0_members) << QString("========= Items dump ================");
-
     QLoggingCategory::setFilterRules("*.debug=false\n"
                                      "dump.debug=true");
+
+    // dump special items table
+    qCDebug(g_cat_silence) << QString("========= Special Items dump ========");
+
+    for(SpecialItemID i = 0; i < cm_next_special; i++)
+        qCDebug(g_cat_silence) << getSpecialSlotPointer(i)->dbgString();
+
+    // dump items --------------------------------------------------------------
+    qCDebug(g_cat_silence) << QString("========= Items dump ================");
 
     for(ItemID i = 0; i < cm_next_item; i++){
         ItemWrapper* l_item = ItemWrapper::getExisting(i);
@@ -564,7 +570,7 @@ void M1Store::Storage::storeShutDown(){
 
     //QLoggingCategory::setFilterRules("*.debug=true");
     // dump vertices --------------------------------------------------------------
-    qCDebug(g_cat_lv0_members) << QString("========= Vertices dump =============");
+    qCDebug(g_cat_silence) << QString("========= Vertices dump =============");
 
     for(ItemID i = 0; i < cm_next_item; i++){
         ItemWrapper* l_item = ItemWrapper::getExisting(i);
@@ -780,7 +786,7 @@ char* M1Store::Storage::retrieveString(ItemID p_string_id){
 
     // don't even try if p_string_id == G_VOID_ID
     static char l_empty_string[1] = "";
-    if(p_string_id == G_VOID_ID) return l_empty_string;
+    if(p_string_id == G_VOID_ITEM_ID) return l_empty_string;
 
     // LMDB return code (for use with return code test macros)
     int l_rc;

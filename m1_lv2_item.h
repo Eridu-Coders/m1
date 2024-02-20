@@ -57,7 +57,7 @@ namespace M1Store{
         virtual QString dbgHalf();
 
         void setText(const QString& s){m_item->setText(s);}
-        ItemID itemID(){return m_item->id();}
+        ItemID itemID(){return m_item->item_id();}
 
         void setType(const SpecialItem* p_type_si);
         void setType(const SpecialItemID p_type_id);

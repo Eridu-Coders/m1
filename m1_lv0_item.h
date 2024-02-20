@@ -27,15 +27,15 @@ namespace M1Store{
          * @brief initSpecials initialize as 4 void special types
          */
         void initSpecials(){
-            t.m_type_short[0] = G_VOID_TYPE_ID;
-            t.m_type_short[1] = G_VOID_TYPE_ID;
-            t.m_type_short[2] = G_VOID_TYPE_ID;
-            t.m_type_short[3] = G_VOID_TYPE_ID;
+            t.m_type_short[0] = G_VOID_SI_ID;
+            t.m_type_short[1] = G_VOID_SI_ID;
+            t.m_type_short[2] = G_VOID_SI_ID;
+            t.m_type_short[3] = G_VOID_SI_ID;
         }
         /**
          * @brief initItem initialize as 1 Item type
          */
-        void initItem(){t.m_type_item = G_VOID_ID;}
+        void initItem(){t.m_type_item = G_VOID_ITEM_ID;}
     public:
         /**
          * @brief ItemType Constructor 0 (Empty constructor) --> init as 4 void special types
@@ -55,7 +55,7 @@ namespace M1Store{
          * @param p_2 4 types
          * @param p_3 4 types
          */
-        ItemType(SpecialItemID p_0, SpecialItemID p_1, SpecialItemID p_2, SpecialItemID p_3) {
+        ItemType(const SpecialItemID p_0, const SpecialItemID p_1, const SpecialItemID p_2, const SpecialItemID p_3) {
             t.m_type_short[0] = p_0;
             t.m_type_short[1] = p_1;
             t.m_type_short[2] = p_2;
@@ -66,7 +66,7 @@ namespace M1Store{
          * @brief Constructor 3 - set the ItemID type
          * @param p
          */
-        ItemType(ItemID p_item_id) { t.m_type_item = p_item_id; }
+        ItemType(const ItemID p_item_id) { t.m_type_item = p_item_id; }
 
         /**
          * @brief operator = overloading
@@ -78,21 +78,20 @@ namespace M1Store{
          * @brief Setter 1 - 1 ItemID type
          * @param p_id
          */
-        void setItemIDType(ItemID p_item_id) { t.m_type_item = p_item_id;}
+        void setItemIDType(const ItemID p_item_id) { t.m_type_item = p_item_id;}
 
         /**
          * @brief getter 1 - as an ItemID
          * @return
          */
-        ItemID getItemIDType() { return t.m_type_item; }
+        ItemID getItemIDType() const {return t.m_type_item; }
 
-        void setSpecialType(unsigned int p_index, SpecialItemID p_si_id);
-        SpecialItemID getSpecialType(unsigned int p_index);
+        void setSpecialType(const unsigned int p_index, const SpecialItemID p_si_id);
+        SpecialItemID getSpecialType(const unsigned int p_index) const;
         QString dbgString() const;
     }__attribute__((__packed__));
 
     // ----------------------------------------- Item ----------------------------------------------------
-
     /**
      * @brief The Item class - vertices and edges - 128 bytes long
      */
@@ -104,9 +103,9 @@ namespace M1Store{
         friend class ItemWrapperFullEdge;
         friend class ItemWrapperSimpleEdge;
     private:
-        ItemID m_id;        ///< Item ID
+        ItemID m_item_id;   ///< Item ID
         FlagField m_flags;  ///< (1) Primary flag field
-        ItemType m_type;    ///< (2)Item type
+        ItemType m_type;    ///< (2) Item type
 
         // union for the 4 cases
         union{
@@ -160,95 +159,103 @@ namespace M1Store{
         // Does nothing. The class is not supposed to be constructed but cast from an mmap() area pointer
         Item_lv0(){}
         // For testing purposes only
-        Item_lv0(const ItemID p_ID, const FlagField p_flags, const ItemType p_type);
+        Item_lv0(const ItemID p_item_id, const FlagField p_flags, const ItemType p_type);
 
         // to be used in real situations when instantiating from mmap() area pointer
-        void initializeMembers(const ItemID p_ID, const FlagField p_flags, const ItemType p_type);
+        void initializeMembers(const ItemID p_item_id, const FlagField p_flags, const ItemType p_type);
         void initializeMembers();
 
-        ItemID id();
+        ItemID item_id() const;
 
         void setFlags(const FlagField p_flags, bool p_force_init = false);
         void setFlag(const FlagField p_flag, bool p_force_init = false);
         void unSetFlag(const FlagField p_flag, bool p_force_init = false);
-        FlagField flags();
+        FlagField flags() const;
 
         void setType(const unsigned int p_index, const SpecialItemID p_type);
-        SpecialItemID getType(const unsigned int p_index);
-        ItemID getType();
+        SpecialItemID getType(const unsigned int p_index) const;
+        ItemID getType() const;
         void setType(const ItemID p_type);
-        bool isOfType(const ItemID p_type);
-        bool isOfType(const SpecialItemID p_type);
+        bool isOfType(const ItemID p_type) const;
+        bool isOfType(const SpecialItemID p_type) const;
 
         void setFlagsExtra(const FlagField p_flags);
         void setFlagExtra(const FlagField p_flag);
         void unSetFlagExtra(const FlagField p_flag);
-        FlagField flagsExtra();
+        FlagField flagsExtra() const;
 
         void setOrigin(const ItemID p_origin);
-        ItemID origin();
+        ItemID origin() const;
         void setTarget(const ItemID p_target);
-        ItemID target();
+        ItemID target() const;
         void setPrevious(const ItemID p_previous);
-        ItemID previous();
+        ItemID previous() const;
         void setNext(const ItemID p_next);
-        ItemID next();
+        ItemID next() const;
         void setReciprocal(const ItemID p_reciprocal);
-        ItemID reciprocal();
+        ItemID reciprocal() const;
         void setFirstEdge(const ItemID p_first_edge);
-        ItemID firstEdge();
+        ItemID firstEdge() const;
         void setFirstEdgeSpecial(const ItemID p_first_edge_special);
-        ItemID firstEdgeSpecial();
+        ItemID firstEdgeSpecial() const;
 
         void setCreationDate(const QDateTime& p_date);
-        QDateTime creationDate();
+        QDateTime creationDate() const;
         void setLastmodDate(const QDateTime& p_date);
-        QDateTime lastmodDate();
+        QDateTime lastmodDate() const;
 
-        void setIncomingEdges(ItemCounter p_incoming_edges);
-        ItemCounter incomingEdges();
-        void addIncomingEdges(ItemCounter p_add); // can be negative
+        void setIncomingEdges(const ItemCounter p_incoming_edges);
+        ItemCounter incomingEdges() const;
+        void addIncomingEdges(const ItemCounter p_add); // can be negative
 
-        void setVisibleEdges(ItemCounter p_visible_edges);
-        ItemCounter visibleEdges();
-        void addVisibleEdges(ItemCounter p_add); // can be negative
+        void setVisibleEdges(const ItemCounter p_visible_edges);
+        ItemCounter visibleEdges() const;
+        void addVisibleEdges(const ItemCounter p_add); // can be negative
 
         void setText(const QString& p_text);
-        char* text();
+        char* text() const;
     };
 
     // ----------------------------------------- SpecialItem ----------------------------------------------------
 
     /**
-     * @brief The Special Item class - Quick access for types, anchor nodes, etc - 32 bytes long
+     * @brief The Special Item class - Quick access for types, anchor nodes, etc - 32 bytes long.
+     * Instances of this class live in the special items mmap() area
      */
     class SpecialItem{
     private:
-        FlagField m_flags;      ///< [8] flags
-        ItemID m_item_id;       ///< [8] ItemID of corresponding item
-        SpecialItemID m_id;     ///< [2] 16 bit special item id
-        char m_mnemonic[5];     ///< [5] menmonic
-        /// [2] 16 bit special item id of the reciprocal type (for edge types only)
-        SpecialItemID m_id_reciprocal;
-        char m_extra[7];        ///< [7] extra data storage field (len = 7 to make total 32)
+        FlagField m_flags;                  ///< [8] flags
+        ItemID m_item_id;                   ///< [8] ItemID of corresponding item (= G_VOID_ID if none)
+        SpecialItemID m_si_id;              ///< [2] 16 bit special item id
+        char m_mnemonic[5];                 ///< [5] menmonic
+        SpecialItemID m_si_id_reciprocal;   ///< [2] 16 bit special item id of the reciprocal type (for edge types only, SI_HAS_RECIPROCAL must be set)
+        char m_extra[7];                    ///< [7] extra data storage field (len = 7 to make total 32)
     public:
+        /**
+         * @brief SpecialItem default constructor.
+         * Never called normally bc class resides in mmap() area
+         */
         SpecialItem(){}
+        /**
+         * @brief SpecialItem default destructor.
+         * Never called normally bc class resides in mmap() area
+         */
         ~SpecialItem(){}
 
         void setAttr(
-            const ItemID p_item_id, const SpecialItemID p_id, const SpecialItemID p_reciprocal,
-            const FlagField p_flags, const char* p_mnemonic);
+            const ItemID p_item_id, const SpecialItemID p_si_id, const FlagField p_flags, const char* p_mnemonic);
 
-        void setReciprocal(SpecialItemID p){m_id_reciprocal = p;}
+        /// reciprocal ID setter
+        void setReciprocal(const SpecialItemID p_si_id){m_si_id_reciprocal = p_si_id;}
 
-        SpecialItemID getSpecialId() const {return m_id;}
-        SpecialItemID reciprocalId() const {return m_id_reciprocal;}
-        ItemID itemId() const {return m_item_id;}
-        FlagField flags() const {return m_flags;}
+        SpecialItemID specialId() const {return m_si_id;}               ///< special ID getter
+        SpecialItemID reciprocalId() const {return m_si_id_reciprocal;} ///< reciprocal ID getter
+        ItemID itemId() const {return m_item_id;}                       ///< ItemID getter
+        FlagField flags() const {return m_flags;}                       ///< flags getter
+        const char* mnemonic_raw() const {return m_mnemonic;}           ///< raw mnemonic pointer getter (!! NOT a \0 terminated string)
+
         QString mnemonic() const;
-        const char* mnemonic_raw() const {return m_mnemonic;}
-
-        QString dbgString();
+        QString dbgString() const;
     };
 
 } // end namespace M1Store

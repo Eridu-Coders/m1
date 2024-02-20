@@ -403,11 +403,11 @@ TEST(ItemTest, ValuesRoundTripFullVertex){
         M1Store::ItemCounter l_incoming_edges = 0;
         M1Store::ItemCounter l_visible_edges = 0;
 
-        M1Store::ItemID l_first_edge = M1Store::G_VOID_ID;
-        M1Store::ItemID l_first_edge_special = M1Store::G_VOID_ID;
+        M1Store::ItemID l_first_edge = M1Store::G_VOID_ITEM_ID;
+        M1Store::ItemID l_first_edge_special = M1Store::G_VOID_ITEM_ID;
 
-        M1Store::StringID l_string_id = M1Store::G_VOID_ID;
-        M1Store::StringID l_search_string_id = M1Store::G_VOID_ID;
+        M1Store::StringID l_string_id = M1Store::G_VOID_ITEM_ID;
+        M1Store::StringID l_search_string_id = M1Store::G_VOID_ITEM_ID;
 
         QString l_text = QString();
 
@@ -550,7 +550,7 @@ TEST(ItemTest, ValuesRoundTripFullVertex){
                 break;
             }
             qCDebug(g_cat_lv0_test) << QString("Round: %1 Testing equalities").arg(i);
-            EXPECT_EQ(l_item.id(), l_id);
+            EXPECT_EQ(l_item.item_id(), l_id);
             EXPECT_EQ(l_item.flags(), l_flags);
             EXPECT_EQ(l_item.getType(), l_type.getItemIDType());
             EXPECT_EQ(l_item.flagsExtra(), l_flags_extra);
@@ -608,14 +608,14 @@ TEST(ItemTest, ValuesRoundTripFullEdge){
 
         M1Store::ItemCounter l_incoming_edges = 0;
 
-        M1Store::ItemID l_v_origin = M1Store::G_VOID_ID;
-        M1Store::ItemID l_v_target = M1Store::G_VOID_ID;
-        M1Store::ItemID l_e_previous = M1Store::G_VOID_ID;
-        M1Store::ItemID l_e_next = M1Store::G_VOID_ID;
-        M1Store::ItemID l_e_reciprocal = M1Store::G_VOID_ID;
+        M1Store::ItemID l_v_origin = M1Store::G_VOID_ITEM_ID;
+        M1Store::ItemID l_v_target = M1Store::G_VOID_ITEM_ID;
+        M1Store::ItemID l_e_previous = M1Store::G_VOID_ITEM_ID;
+        M1Store::ItemID l_e_next = M1Store::G_VOID_ITEM_ID;
+        M1Store::ItemID l_e_reciprocal = M1Store::G_VOID_ITEM_ID;
 
-        M1Store::ItemID l_first_edge = M1Store::G_VOID_ID;
-        M1Store::ItemID l_first_edge_special = M1Store::G_VOID_ID;
+        M1Store::ItemID l_first_edge = M1Store::G_VOID_ITEM_ID;
+        M1Store::ItemID l_first_edge_special = M1Store::G_VOID_ITEM_ID;
 
         QString l_text = QString();
 
@@ -767,7 +767,7 @@ TEST(ItemTest, ValuesRoundTripFullEdge){
                 break;
             }
             qCDebug(g_cat_lv0_test) << QString("Round: %1 Testing equalities").arg(i);
-            EXPECT_EQ(l_item.id(), l_id);
+            EXPECT_EQ(l_item.item_id(), l_id);
             EXPECT_EQ(l_item.flags(), l_flags);
             EXPECT_EQ(l_item.getType(), l_type.getItemIDType());
             EXPECT_EQ(l_item.flagsExtra(), l_flags_extra);
@@ -815,9 +815,9 @@ TEST(ItemTest, ValuesRoundTripSimpleEdge){
 
         M1Store::Item_lv0 l_item(l_id, l_flags, l_type);
 
-        M1Store::ItemID l_v_origin = M1Store::G_VOID_ID;
-        M1Store::ItemID l_e_previous = M1Store::G_VOID_ID;
-        M1Store::ItemID l_e_next = M1Store::G_VOID_ID;
+        M1Store::ItemID l_v_origin = M1Store::G_VOID_ITEM_ID;
+        M1Store::ItemID l_e_previous = M1Store::G_VOID_ITEM_ID;
+        M1Store::ItemID l_e_next = M1Store::G_VOID_ITEM_ID;
 
         QString l_text = QString();
 
@@ -900,7 +900,7 @@ TEST(ItemTest, ValuesRoundTripSimpleEdge){
                 break;
             }
             qCDebug(g_cat_lv0_test) << QString("Round: %1 Testing equalities").arg(i);
-            EXPECT_EQ(l_item.id(), l_id);
+            EXPECT_EQ(l_item.item_id(), l_id);
             EXPECT_EQ(l_item.flags(), l_flags);
             EXPECT_EQ(l_item.getType(), l_type.getItemIDType());
             EXPECT_EQ(l_item.origin(), l_v_origin);
@@ -1002,7 +1002,7 @@ TEST(ItemTest, ValuesRoundTripSimpleVertex){
                 break;
             }
             qCDebug(g_cat_lv0_test) << QString("Round: %1 Testing equalities").arg(i);
-            EXPECT_EQ(l_item.id(), l_id);
+            EXPECT_EQ(l_item.item_id(), l_id);
             EXPECT_EQ(l_item.flags(), l_flags);
             EXPECT_EQ(l_item.getType(), l_type.getItemIDType());
             EXPECT_EQ(QString(l_item.text()), l_text);

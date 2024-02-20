@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 
     qDebug() << "Main start";
 
-    if(true){
+    if(false){
         qDebug() << "opening file";
         QString l_path("../Enoch-words.txt");
         int l_count = 0;
@@ -38,9 +38,9 @@ int main(int argc, char *argv[])
                     // type
                     M1Store::ItemType(
                         M1Store::WORD_SPECIAL_ID,
-                        M1Store::G_VOID_TYPE_ID,
-                        M1Store::G_VOID_TYPE_ID,
-                        M1Store::G_VOID_TYPE_ID),
+                        M1Store::G_VOID_SI_ID,
+                        M1Store::G_VOID_SI_ID,
+                        M1Store::G_VOID_SI_ID),
                     // label
                     line.c_str()
                 );
