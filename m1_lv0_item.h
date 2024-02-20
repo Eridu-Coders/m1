@@ -38,17 +38,18 @@ namespace M1Store{
         void initItem(){t.m_type_item = G_VOID_ID;}
     public:
         /**
-         * @brief ItemType Constructor 0 (copy constructor)
+         * @brief ItemType Constructor 0 (Empty constructor) --> init as 4 void special types
+         */
+        ItemType(){initSpecials();}
+
+        /**
+         * @brief ItemType Constructor 1 (copy constructor)
          * @param p_type ref to another ItemType instance
          */
-        ItemType(const ItemType& p_type){ t.m_type_item = p_type.t.m_type_item;}
+        ItemType(const ItemType& p_type_item_id){ t.m_type_item = p_type_item_id.t.m_type_item;}
+
         /**
-         * @brief operator = overloading
-         * @param p_type ref to another ItemType instance
-         */
-        void operator=(const ItemType& p_type){ t.m_type_item = p_type.t.m_type_item;}
-        /**
-         * @brief Constructor 1 - set all 4 short types at once
+         * @brief Constructor 2 - set all 4 short types at once
          * @param p_0 4 types
          * @param p_1 4 types
          * @param p_2 4 types
@@ -60,43 +61,33 @@ namespace M1Store{
             t.m_type_short[2] = p_2;
             t.m_type_short[3] = p_3;
         }
+
         /**
-         * @brief Constructor 2 - set the ItemID type
+         * @brief Constructor 3 - set the ItemID type
          * @param p
          */
-        ItemType(ItemID p) { t.m_type_item = p; }
+        ItemType(ItemID p_item_id) { t.m_type_item = p_item_id; }
+
         /**
-         * @brief Empty constructor --> init as 4 void special types
+         * @brief operator = overloading
+         * @param p_type ref to another ItemType instance
          */
-        ItemType(){initSpecials();}
+        void operator=(const ItemType& p_type_class){ t.m_type_item = p_type_class.t.m_type_item;}
+
         /**
          * @brief Setter 1 - 1 ItemID type
          * @param p_id
          */
-        void setItemIDType(ItemID p_id) { t.m_type_item = p_id;}
-        /**
-         * @brief Setter 2 - one of the 4 short type
-         * @param p_index the number of the type to set (0 to 3)
-         * @param p_id the value
-         */
-        void setSpecialType(unsigned int p_index, SpecialItemID p_id);
+        void setItemIDType(ItemID p_item_id) { t.m_type_item = p_item_id;}
 
         /**
          * @brief getter 1 - as an ItemID
          * @return
          */
         ItemID getItemIDType() { return t.m_type_item; }
-        /**
-         * @brief getter 2 : One of the 4 short types
-         * @param p_index the number of the type to get (0 to 3)
-         * @return
-         */
-        SpecialItemID getSpecialType(unsigned int p_index);
 
-        /**
-         * @brief get a debug representation of this type
-         * @return the debug string
-         */
+        void setSpecialType(unsigned int p_index, SpecialItemID p_si_id);
+        SpecialItemID getSpecialType(unsigned int p_index);
         QString dbgString() const;
     }__attribute__((__packed__));
 

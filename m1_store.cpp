@@ -441,10 +441,7 @@ void M1Store::Storage::setConstants(){
     TEXT_SPECIAL_ID = getSpecialID("TEXT_");
     WORD_SPECIAL_ID = getSpecialID("TWORD");
 }
-M1Store::SpecialItemID M1Store::Storage::ROOT_SPECIAL_ID;
-M1Store::SpecialItemID M1Store::Storage::HOME_SPECIAL_ID;
-M1Store::SpecialItemID M1Store::Storage::TEXT_SPECIAL_ID;
-M1Store::SpecialItemID M1Store::Storage::WORD_SPECIAL_ID;
+
 /**
  * @brief M1Store::Storage::close shut down LMDB environment and mmap() area for items
  */

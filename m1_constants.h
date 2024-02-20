@@ -3,16 +3,17 @@
 
 #include <QLoggingCategory>
 
-// classic min macro
+// classic min/max macros
 #define m1_min(a, b) (((a) < (b)) ? (a) : (b))
+#define m1_max(a, b) (((a) > (b)) ? (a) : (b))
 
-Q_DECLARE_LOGGING_CATEGORY(g_cat_store)
-Q_DECLARE_LOGGING_CATEGORY(g_cat_lv0_members)
-Q_DECLARE_LOGGING_CATEGORY(g_cat_lv0_test)
-Q_DECLARE_LOGGING_CATEGORY(g_cat_wrapper)
-Q_DECLARE_LOGGING_CATEGORY(g_cat_silence)
-Q_DECLARE_LOGGING_CATEGORY(g_cat_lv2_members)
-Q_DECLARE_LOGGING_CATEGORY(g_cat_lv2_constructors)
+// debug categories pre-declarations
+Q_DECLARE_LOGGING_CATEGORY(g_cat_store)                 ///< for Storage class
+Q_DECLARE_LOGGING_CATEGORY(g_cat_lv0_members)           ///< for lv0_Item class
+Q_DECLARE_LOGGING_CATEGORY(g_cat_lv0_test)              ///< for tests of the lv0_Item class
+Q_DECLARE_LOGGING_CATEGORY(g_cat_silence)               ///< for debug strings generation (silencing all other debug categories)
+Q_DECLARE_LOGGING_CATEGORY(g_cat_lv2_members)           ///< for ItemWrapper class (lv2) members
+Q_DECLARE_LOGGING_CATEGORY(g_cat_lv2_constructors)      ///< for ItemWrapper class (lv2) constructors and instanciation from mmap()
 
 namespace M1Store{
 
@@ -27,8 +28,8 @@ namespace M1Store{
     typedef unsigned short SpecialItemID;   ///< unsigned 16-bit wide ID number for core type numbers, etc
 
     // Null values for ItemID (64 bits) and SpecialItemID (16 bits) respectively
-    const ItemID G_VOID_ID = 0xffffffffffffffff; ///< -1 = NULL value
-    const SpecialItemID G_VOID_TYPE_ID = 0xffff; ///< -1 = NULL value
+    const ItemID G_VOID_ID = 0xffffffffffffffff; ///< -1 = NULL value for ItemID
+    const SpecialItemID G_VOID_TYPE_ID = 0xffff; ///< -1 = NULL value for SpecialItemID
 
     // flag bits for items
     const unsigned long long ITEM_IS_VERTEX         = 0x0000000000000001; ///< 0 --> item is an edge, 1 --> item is a vertex
@@ -39,13 +40,14 @@ namespace M1Store{
     const unsigned long long IS_AUTO                = 0x0000000000000020; ///< 1 --> this is an AUTO_ edge
 
     // composite flag values for item nature testing
-    const unsigned long long FULL_VERTEX = ITEM_IS_VERTEX;                      // 0x1
-    const unsigned long long SIMPLE_VERTEX = ITEM_IS_VERTEX | ITEM_IS_SIMPLE;   // 0x3
-    const unsigned long long FULL_EDGE = 0x0;                                   // 0x0
-    const unsigned long long SIMPLE_EDGE = ITEM_IS_SIMPLE;                      // 0x2
-    const unsigned long long ITEM_NATURE_MASK = 0x0000000000000003;     ///< all bits to determine Item nature
-    const unsigned long long ITEM_BASE0_MASK = 0x0000000000000007;      ///< same as ITEM_NATURE_MASK + ITEM_HAS_LOCAL_STRING
-    const unsigned long long ITEM_BASE1_MASK = 0x000000000000000f;      ///< same as ITEM_BASE0_MASK + TYPE_IS_ITEM_ID
+    const unsigned long long FULL_VERTEX = ITEM_IS_VERTEX;                      ///< (0x1) flag & ITEM_NATURE_MASK == FULL_VERTEX --> it is a full vertex
+    const unsigned long long SIMPLE_VERTEX = ITEM_IS_VERTEX | ITEM_IS_SIMPLE;   ///< (0x3) flag & ITEM_NATURE_MASK == SIMPLE_VERTEX --> it is a simple vertex
+    const unsigned long long FULL_EDGE = 0x0;                                   ///< (0x0) flag & ITEM_NATURE_MASK == FULL_EDGE --> it is a full edge
+    const unsigned long long SIMPLE_EDGE = ITEM_IS_SIMPLE;                      ///< (0x2) flag & ITEM_NATURE_MASK == SIMPLE_EDGE --> it is a simple vertex
+    // bit masks for testing the above
+    const unsigned long long ITEM_NATURE_MASK = 0x0000000000000003;             ///< all bits to determine Item nature
+    const unsigned long long ITEM_BASE0_MASK = 0x0000000000000007;              ///< same as ITEM_NATURE_MASK + ITEM_HAS_LOCAL_STRING
+    const unsigned long long ITEM_BASE1_MASK = 0x000000000000000f;              ///< same as ITEM_BASE0_MASK + TYPE_IS_ITEM_ID
 
     // length of text area in each of the 4 types of items
     const unsigned int SIMPLE_EDGE_TEXT_LEN = 72;    ///< text length for simple edges
@@ -69,7 +71,7 @@ namespace M1Store{
 
     // M1Store constants
     // class-level constants holding the names of various things
-    // root dire for data storage
+    /// root dir for data storage
     static const char* STORE_DATA_PATH           = "/home/fi11222/disk-share/Dev/m1/Storage";
     static const char* STORE_LMDB_DIR            = "lmdb";           // subdir for LMDB data
     static const char* LMDB_UTIL_DB              = "util_db";        // name of the utilities table
@@ -77,5 +79,10 @@ namespace M1Store{
     static const char* LMDB_ITEM_MMAP_FILE       = "local_store.m1"; // name of mmap() file for items
     static const char* LMDB_SPECIAL_MMAP_FILE    = "specials.m1";    // name of mmap() file for special items
 
+    // "false" constants set by the Storage class after loading the special items table
+    static SpecialItemID ROOT_SPECIAL_ID;       ///< Sepcial Vertex ID of root
+    static SpecialItemID HOME_SPECIAL_ID;       ///< Sepcial Vertex ID of home
+    static SpecialItemID TEXT_SPECIAL_ID;       ///< Sepcial Vertex ID of text root
+    static SpecialItemID WORD_SPECIAL_ID;       ///< Sepcial Vertex ID of word root
 } // end of M1Store namespace
 #endif // M1_CONSTANTS_H

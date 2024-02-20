@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
                     M1Store::FULL_VERTEX,
                     // type
                     M1Store::ItemType(
-                        M1Store::Storage::WORD_SPECIAL_ID,
+                        M1Store::WORD_SPECIAL_ID,
                         M1Store::G_VOID_TYPE_ID,
                         M1Store::G_VOID_TYPE_ID,
                         M1Store::G_VOID_TYPE_ID),

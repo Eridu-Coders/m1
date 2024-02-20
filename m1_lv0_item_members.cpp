@@ -10,20 +10,30 @@
 #include <gtest/gtest.h>
 
 #include "m1_store.h"
-#include "m1_env.h"
 
 Q_LOGGING_CATEGORY(g_cat_store, "store.members_access")
 
 // --------------------------------------------------------------------------------------------------------
 // ----------------------------- M1Store::ItemType --------------------------------------------------------
 // --------------------------------------------------------------------------------------------------------
-void M1Store::ItemType::setSpecialType(unsigned int p_index, SpecialItemID p_id) {
-    qCDebug(g_cat_store) << QString("setting special type %1 to %2").arg(p_index).arg(p_id);
+
+/**
+ * @brief Setter 2 - one of the 4 short type
+ * @param p_index the number of the type to set (0 to 3)
+ * @param p_id the value
+ */
+void M1Store::ItemType::setSpecialType(unsigned int p_index, SpecialItemID p_si_id) {
+    qCDebug(g_cat_store) << QString("setting special type %1 to %2").arg(p_index).arg(p_si_id);
     Q_ASSERT(p_index < 4);
 
-    t.m_type_short[p_index] = p_id;
+    t.m_type_short[p_index] = p_si_id;
 }
 
+/**
+ * @brief getter 2 : One of the 4 short types
+ * @param p_index the number of the type to get (0 to 3)
+ * @return
+ */
 M1Store::SpecialItemID M1Store::ItemType::getSpecialType(unsigned int p_index) {
     qCDebug(g_cat_store) << QString("getting special type %1 ...").arg(p_index);
     Q_ASSERT(p_index < 4);
@@ -32,6 +42,10 @@ M1Store::SpecialItemID M1Store::ItemType::getSpecialType(unsigned int p_index) {
     return t.m_type_short[p_index];
 }
 
+/**
+ * @brief get a debug representation of this type
+ * @return the debug string
+ */
 QString M1Store::ItemType::dbgString() const{
     return QString("4s[0x%1 0x%2 0x%3 0x%4]-id[0x%7 %8]")
         .arg(t.m_type_short[0], 4, 16, QLatin1Char('0'))
@@ -53,11 +67,11 @@ QString M1Store::SpecialItem::mnemonic() const {
 }
 
 void M1Store::SpecialItem::setAttr(
-    const ItemID p_item_id, const SpecialItemID p_id, const SpecialItemID p_reciprocal,
+    const ItemID p_item_id, const SpecialItemID p_si_id, const SpecialItemID p_reciprocal,
     const FlagField p_flags, const char* p_mnemonic){
 
     m_flags = p_flags;
-    m_id = p_id;
+    m_id = p_si_id;
     m_id_reciprocal = p_reciprocal;
     m_item_id = p_item_id;
     memset(m_mnemonic, 0, 5);

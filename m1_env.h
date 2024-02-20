@@ -8,8 +8,6 @@ namespace M1Store{
 
     class M1Env{
     private:
-        // path to log file
-
         // static variables for the CSV output
         static QTextStream* cm_debug_stream;
         static QFile* cm_debug_file;
