@@ -19,6 +19,23 @@ Q_LOGGING_CATEGORY(g_cat_lv0_members, "lv0.members_access")
 // --------------------------------------------------------------------------------------------------------
 
 /**
+ * @brief Constructor 2 - set all 4 short types at once
+ * @param p_0 4 types
+ * @param p_1 4 types
+ * @param p_2 4 types
+ * @param p_3 4 types
+ */
+M1Store::ItemType::ItemType(const SpecialItemID p_0, const SpecialItemID p_1, const SpecialItemID p_2, const SpecialItemID p_3) {
+    t.m_type_short[0] = p_0;
+    t.m_type_short[1] = p_1;
+    t.m_type_short[2] = p_2;
+    t.m_type_short[3] = p_3;
+
+    qCDebug(g_cat_lv0_members) << QString("Constructed: %1").arg(dbgString());
+}
+
+
+/**
  * @brief Setter 2 - one of the 4 short type
  * @param p_index the number of the type to set (0 to 3)
  * @param p_id the value
@@ -82,7 +99,7 @@ QString M1Store::SpecialItem::mnemonic() const {
  */
 void M1Store::SpecialItem::setAttr(
     const ItemID p_item_id, const SpecialItemID p_si_id, const FlagField p_flags, const char* p_mnemonic){
-    qCDebug(g_cat_lv0_members) << QString("Setting attributes: p_item_id 0x%1 p_si_id 0x%2 p_flags 0b%3 p_mnemonic %1")
+    qCDebug(g_cat_lv0_members) << QString("Setting attributes: p_item_id 0x%1 p_si_id 0x%2 p_flags 0b%3 p_mnemonic %4")
                                       .arg(p_item_id, 16, 16, QLatin1Char('0'))
                                       .arg(p_si_id, 4, 16, QLatin1Char('0'))
                                       .arg(p_flags, 64, 2, QLatin1Char('0'))
@@ -107,8 +124,7 @@ void M1Store::SpecialItem::setAttr(
  */
 QString M1Store::SpecialItem::dbgString() const {
     QString l_item_dbg;
-    if(m_item_id != G_VOID_ITEM_ID){
-        M1Store::ItemWrapper* l_item = M1Store::ItemWrapper::getExisting(m_item_id);
+    if(M1Store::ItemWrapper* l_item = M1Store::ItemWrapper::mbd_getExisting(m_item_id)){
         l_item_dbg = " --ITEM--> " +l_item->dbgShort();
         delete l_item;
     }

@@ -6,8 +6,6 @@
 
 #include "m1_constants.h"
 
-Q_DECLARE_LOGGING_CATEGORY(g_cat_store)
-
 namespace M1Store{
 
     // ----------------------------------------- ItemType ----------------------------------------------------
@@ -49,20 +47,6 @@ namespace M1Store{
         ItemType(const ItemType& p_type_item_id){ t.m_type_item = p_type_item_id.t.m_type_item;}
 
         /**
-         * @brief Constructor 2 - set all 4 short types at once
-         * @param p_0 4 types
-         * @param p_1 4 types
-         * @param p_2 4 types
-         * @param p_3 4 types
-         */
-        ItemType(const SpecialItemID p_0, const SpecialItemID p_1, const SpecialItemID p_2, const SpecialItemID p_3) {
-            t.m_type_short[0] = p_0;
-            t.m_type_short[1] = p_1;
-            t.m_type_short[2] = p_2;
-            t.m_type_short[3] = p_3;
-        }
-
-        /**
          * @brief Constructor 3 - set the ItemID type
          * @param p
          */
@@ -85,6 +69,8 @@ namespace M1Store{
          * @return
          */
         ItemID getItemIDType() const {return t.m_type_item; }
+
+        ItemType(const SpecialItemID p_0, const SpecialItemID p_1, const SpecialItemID p_2, const SpecialItemID p_3);
 
         void setSpecialType(const unsigned int p_index, const SpecialItemID p_si_id);
         SpecialItemID getSpecialType(const unsigned int p_index) const;

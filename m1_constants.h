@@ -7,14 +7,6 @@
 #define m1_min(a, b) (((a) < (b)) ? (a) : (b))
 #define m1_max(a, b) (((a) > (b)) ? (a) : (b))
 
-// debug categories pre-declarations
-Q_DECLARE_LOGGING_CATEGORY(g_cat_store)                 ///< for Storage class
-Q_DECLARE_LOGGING_CATEGORY(g_cat_lv0_members)           ///< for lv0_Item and ancillary classes
-Q_DECLARE_LOGGING_CATEGORY(g_cat_lv0_test)              ///< for tests of the lv0_Item class
-Q_DECLARE_LOGGING_CATEGORY(g_cat_lv2_members)           ///< for ItemWrapper class (lv2) members
-Q_DECLARE_LOGGING_CATEGORY(g_cat_lv2_constructors)      ///< for ItemWrapper class (lv2) constructors and instanciation from mmap()
-Q_DECLARE_LOGGING_CATEGORY(g_cat_silence)               ///< for debug strings generation (silencing all other debug categories)
-
 namespace M1Store{
 
     /// file name for the storage of log messages by M1Env
@@ -59,7 +51,7 @@ namespace M1Store{
     const unsigned int ITEM_NEXT_KEY = 0xABCD;       ///< LMDB key for next ItemID
     const unsigned int ITEM_NEXT_STRING = 0xDCBA;    ///< LMDB key for next string ID
     const unsigned int ITEM_NEXT_SPECIAL = 0xDCBB;   ///< LMDB key for next special ID
-    const unsigned int CURRENT_VERSION = 0xFFAA;     ///< current version of the graph
+    const unsigned int CURRENT_VERSION = 0xFFAA;     ///< LMDB key for the current version of the graph
 
     // flag bits for special items
     const unsigned long long SI_IS_TYPE         = 0x0000000000000001; ///< is a type
@@ -80,9 +72,18 @@ namespace M1Store{
     static const char* LMDB_SPECIAL_MMAP_FILE    = "specials.m1";    // name of mmap() file for special items
 
     // "false" constants set by the Storage class after loading the special items table
-    static SpecialItemID ROOT_SPECIAL_ID;       ///< Sepcial Vertex ID of root
-    static SpecialItemID HOME_SPECIAL_ID;       ///< Sepcial Vertex ID of home
-    static SpecialItemID TEXT_SPECIAL_ID;       ///< Sepcial Vertex ID of text root
-    static SpecialItemID WORD_SPECIAL_ID;       ///< Sepcial Vertex ID of word root
+    extern SpecialItemID ROOT_SPECIAL_ID;       ///< Sepcial Vertex ID of root
+    extern SpecialItemID HOME_SPECIAL_ID;       ///< Sepcial Vertex ID of home
+    extern SpecialItemID TEXT_SPECIAL_ID;       ///< Sepcial Vertex ID of text root
+    extern SpecialItemID T_WORD_SPECIAL_ID;     ///< Sepcial Vertex ID of word root
 } // end of M1Store namespace
+
+// debug categories pre-declarations
+Q_DECLARE_LOGGING_CATEGORY(g_cat_store)                 ///< for Storage class
+Q_DECLARE_LOGGING_CATEGORY(g_cat_lv0_members)           ///< for lv0_Item and ancillary classes
+Q_DECLARE_LOGGING_CATEGORY(g_cat_lv0_test)              ///< for tests of the lv0_Item class
+Q_DECLARE_LOGGING_CATEGORY(g_cat_lv2_members)           ///< for ItemWrapper class (lv2) members
+Q_DECLARE_LOGGING_CATEGORY(g_cat_lv2_constructors)      ///< for ItemWrapper class (lv2) constructors and instanciation from mmap()
+Q_DECLARE_LOGGING_CATEGORY(g_cat_silence)               ///< for debug strings generation (silencing all other debug categories)
+
 #endif // M1_CONSTANTS_H

@@ -40,6 +40,7 @@ unsigned int M1Store::Storage::cm_current_version{0};
 // base address of the mmapped space for special items(char* to make pointer arithmetic possible)
 char* M1Store::Storage::cm_special_mmap_base;
 unsigned long M1Store::Storage::cm_special_length;
+// Mnemonic --> SpecialItem* associative array
 std::map<QString, M1Store::SpecialItem*> M1Store::Storage::cm_mnemonic_to_special;
 
 // base address of mmap segment (as char* to make pointer arithmetic possible in getItemSlotPointer())
@@ -49,13 +50,21 @@ unsigned long M1Store::Storage::cm_item_map_length;
 // simplified namespace to access boost filesystem library functions
 namespace fs = boost::filesystem;
 
+M1Store::SpecialItemID M1Store::ROOT_SPECIAL_ID;
+M1Store::SpecialItemID M1Store::HOME_SPECIAL_ID;
+M1Store::SpecialItemID M1Store::TEXT_SPECIAL_ID;
+M1Store::SpecialItemID M1Store::T_WORD_SPECIAL_ID;
+
 /**
- * @brief M1Store::Storage::init initialize LMDB environment (util + string) and mmap() areas for items and specials
+ * @brief initialize LMDB environment (util + string) and mmap() areas for items and specials.
+ *
+ * Also does version updates and sets constants values depending on up to date version
  */
 void M1Store::Storage::storeSetUp(){
     // LMDB return code (for use with return code test macros)
     int l_rc;
 
+    // ------------------------------------ LMDB set-up -------------------------------------------------------------------------
     // create data directory if not exists
     if ( ! fs::is_directory(M1Store::STORE_DATA_PATH) ) {
         qCDebug(g_cat_store) << QString("Data directory [%1] does not exist - creating it").arg(M1Store::STORE_DATA_PATH);
@@ -107,19 +116,22 @@ void M1Store::Storage::storeSetUp(){
     // commit transaction
     E(mdb_txn_commit(l_txn));
 
+    // ------------------------------------ mmap() set-up -------------------------------------------------------------------------
     // mmap() init
-    qDebug() << "init mmap() storage ...";
+    qCDebug(g_cat_store) << "init mmap() storage ...";
 
     // path to item mmap() file
     fs::path l_filepath(M1Store::STORE_DATA_PATH);
     l_filepath /= M1Store::LMDB_ITEM_MMAP_FILE;
 
-    cm_item_map_length = 1000 * sizeof(M1Store::Item_lv0);
-    qDebug() << QString("opening item mmap() file [%1]").arg(l_filepath.c_str());
-    int l_fd = open(l_filepath.c_str(), O_RDWR); // open storage in R/W mode
+    // size of mmap() item area
+    cm_item_map_length = 10000 * sizeof(M1Store::Item_lv0);
+
+    qCDebug(g_cat_store) << QString("opening item mmap() file [%1]").arg(l_filepath.c_str());
+    int l_fd = open(l_filepath.c_str(), O_RDWR); // open storage file in R/W mode
     if (l_fd == -1) {
         qDebug() << QString("mmap() file [%1] does not exist. Creating it").arg(l_filepath.c_str());
-        // failure to open --> assumes does not exist
+        // failure to open --> assumes file does not exist --> creating it
         EK( (l_fd = open(l_filepath.c_str(), O_RDWR | O_CREAT, 0664)) < 0)
         // fill the file to the mmap() length (as per
         // https://www.linuxquestions.org/questions/programming-9/mmap-tutorial-c-c-511265/ third post, by Hko)
@@ -130,9 +142,9 @@ void M1Store::Storage::storeSetUp(){
     // set up the memory map for items
     cm_item_mmap_base = (char*)mmap(
         NULL,                               // placed anywhere in RAM by kernel
-        cm_item_map_length,                      // size
+        cm_item_map_length,                 // size
         PROT_READ | PROT_WRITE,             // R/W allowed
-        MAP_SHARED,                         //
+        MAP_SHARED,                         // not private --> written to disk
         l_fd,                               // file descriptor
         0                                   // no offset within the file. Map starts at file origin
         );
@@ -143,7 +155,7 @@ void M1Store::Storage::storeSetUp(){
 
     if(cm_item_mmap_base == MAP_FAILED){
         // mmap() error
-        qDebug() << QString("mmap() error: [%1]-%2").arg(errno).arg(strerror(errno));
+        qCDebug(g_cat_store) << QString("mmap() error (items): [%1]-%2").arg(errno).arg(strerror(errno));
         qFatal("Aborting / mmap() items");
     }
 
@@ -154,8 +166,8 @@ void M1Store::Storage::storeSetUp(){
     cm_special_length = 65536 * sizeof(M1Store::SpecialItem);
     l_fd = open(l_filepath_special.c_str(), O_RDWR); // open storage in R/W mode
     if (l_fd == -1) {
-        qDebug() << QString("mmap() file [%1] does not exist. Creating it").arg(l_filepath.c_str());
-        // failure to open --> assumes does not exist
+        qCDebug(g_cat_store) << QString("mmap() file [%1] does not exist. Creating it").arg(l_filepath.c_str());
+        // failure to open --> assumes file does not exist --> creating it
         EK( (l_fd = open(l_filepath_special.c_str(), O_RDWR | O_CREAT, 0664)) < 0)
         // fill the file to the mmap() length (as per
         // https://www.linuxquestions.org/questions/programming-9/mmap-tutorial-c-c-511265/ third post, by Hko)
@@ -168,7 +180,7 @@ void M1Store::Storage::storeSetUp(){
         NULL,                               // placed anywhere in RAM by kernel
         cm_special_length,                  // size
         PROT_READ | PROT_WRITE,             // R/W allowed
-        MAP_SHARED,                         //
+        MAP_SHARED,                         // not private --> written to disk
         l_fd,                               // file descriptor
         0                                   // no offset within the file. Map starts at file origin
         );
@@ -179,10 +191,11 @@ void M1Store::Storage::storeSetUp(){
 
     if(cm_special_mmap_base == MAP_FAILED){
         // mmap() error
-        qDebug() << QString("mmap() error: [%1]-%2").arg(errno).arg(strerror(errno));
+        qDebug() << QString("mmap() error (special items): [%1]-%2").arg(errno).arg(strerror(errno));
         qFatal("Aborting / mmap() special items");
     }
 
+    // set debug categories to just allow g_cat_silence (= "dump")
     QLoggingCategory::setFilterRules("*.debug=false\n"
                                      "dump.debug=true");
 
@@ -194,101 +207,201 @@ void M1Store::Storage::storeSetUp(){
         cm_mnemonic_to_special[l_slot->mnemonic()] = l_slot;
     }
 
+    // restore categories --> all allowed
     QLoggingCategory::setFilterRules("*.debug=true");
 
-    qDebug() << "init item mmap() storage complete";
+    qCDebug(g_cat_store) << "init item mmap() storage complete";
 
     // ------------------------------------------- version updates ----------------------------------------------------------------
-    qDebug() << "version updates";
+    qCDebug(g_cat_store) << "version updates";
     if(cm_current_version == 0)
         version_0_to_1();
     if (cm_current_version == 1)
         version_1_to_2();
 
     // ------------------------------------------- special ID constants ----------------------------------------------------------------
-    qDebug() << "set Item id constants";
+    qCDebug(g_cat_store) << "set Item id constants";
     setConstants();
+    qCDebug(g_cat_store) << QString("ROOT_SPECIAL_ID = %1").arg(M1Store::ROOT_SPECIAL_ID);
+    qCDebug(g_cat_store) << QString("HOME_SPECIAL_ID = %1").arg(M1Store::HOME_SPECIAL_ID);
+    qCDebug(g_cat_store) << QString("TEXT_SPECIAL_ID = %1").arg(M1Store::TEXT_SPECIAL_ID);
+    qCDebug(g_cat_store) << QString("T_WORD_SPECIAL_ID = %1").arg(M1Store::T_WORD_SPECIAL_ID);
 
-    qDebug() << "storage environment set-up complete";
+    qCDebug(g_cat_store) << "storage environment set-up complete";
 }
 
 // mmap() force synchronization - to be called after each transaction
+/**
+ * @brief force mmap() synchronization for both items and special items.
+ * To be called after each transaction
+ */
 void M1Store::Storage::mmapSync(){
     msync(cm_item_mmap_base, cm_item_map_length, MS_SYNC);
     msync(cm_special_mmap_base, cm_special_length, MS_SYNC);
 }
 
-// ItemID --> pointer to Item_lv0 class instance
-M1Store::Item_lv0* M1Store::Storage::getItemSlotPointer(ItemID p_id){
-    qCDebug(g_cat_store) << QString("getItemSlotPointer from ItemID: %1").arg(p_id);
+/**
+ * @brief ItemID --> Item_lv0 pointer in mmap() area
+ * @param p_item_id the ItemID
+ * @return the pointer
+ */
+M1Store::Item_lv0* M1Store::Storage::getItemSlotPointer(ItemID p_item_id){
+    qCDebug(g_cat_store) << QString("getItemSlotPointer from ItemID: 0x%1").arg(p_item_id, 16, 16, QChar('0'));
     // shift left by 7 bits = mult by 128
-    return (M1Store::Item_lv0*)(cm_item_mmap_base + (p_id << 7));
-}
-M1Store::SpecialItem* M1Store::Storage::getSpecialSlotPointer(const M1Store::SpecialItemID p_id){
-    // shift left by 5 bits = mult by 32
-    return (M1Store::SpecialItem*)(cm_special_mmap_base + (p_id << 5));
-}
-M1Store::SpecialItem* M1Store::Storage::getSpecialSlotPointer(const char* p_mnemonic){
-    return M1Store::Storage::getSpecialSlotPointer(cm_mnemonic_to_special[p_mnemonic]->specialId());
+    return (Item_lv0*)(cm_item_mmap_base + (p_item_id << 7));
 }
 
-// new item
+/**
+ * @brief SpecialItemID --> SpecialItem pointer in mmap() area
+ * @param p_si_id the special item id
+ * @return the pointer
+ */
+M1Store::SpecialItem* M1Store::Storage::getSpecialSlotPointer(const SpecialItemID p_si_id){
+    qCDebug(g_cat_store) << QString("getSpecialSlotPointer from SpecialItemID: 0x%1").arg(p_si_id, 4, 16, QChar('0'));
+    // shift left by 5 bits = mult by 32
+    return (SpecialItem*)(cm_special_mmap_base + (p_si_id << 5));
+}
+
+/**
+ * @brief allocate new Item_lv0 in the mmap() area and give it a new ItemID.
+ *
+ * Also initialize members. This function "replaces" the Item_lv0() constructor which is never used except for testing
+ *
+ * @param p_flags flag value for initialization
+ * @param p_type ItemType value for initialization
+ * @return pointer to the new Item_lv0
+ */
 M1Store::Item_lv0* M1Store::Storage::getNewItemSlotPointer(const FlagField p_flags, const ItemType p_type){
-    M1Store::Item_lv0* l_ret = getItemSlotPointer(cm_next_item);
+    qCDebug(g_cat_store) << QString("initialize new item: flags 0b%1 type %2").arg(p_flags, 64, 2, QChar('0')).arg(p_type.dbgString());
+    // get the pointer inside the mmap() area
+    Item_lv0* l_ret = getItemSlotPointer(cm_next_item);
+    // initialize members (depending on category determined from flags), including the new ItemID
     l_ret->initializeMembers(cm_next_item, p_flags, p_type);
+    // increase top ItemID
     cm_next_item += 1;
     return l_ret;
 }
 
-M1Store::SpecialItem* M1Store::Storage::getSpecial(const ItemID p){
-    M1Store::SpecialItem* l_ret = nullptr;
-    for(SpecialItemID i = 0; i < cm_next_special; i++){
-        M1Store::SpecialItem* l_special_item = getSpecialSlotPointer(i);
-        if(l_special_item->itemId() == p) return l_special_item;
-    }
-    return l_ret;
-}
-M1Store::SpecialItem* M1Store::Storage::getSpecial(const SpecialItemID p){
-    M1Store::SpecialItem* l_ret = getSpecialSlotPointer(p);
-    return l_ret;
-}
+/**
+ * @brief Mnemonic --> SpecialItem pointer in mmap() area
+ *
+ * find the SpecialItemID corresponding to the mnemonic using cm_mnemonic_to_special then call getSpecialSlotPointer(SpecialItemID)
+ *
+ * @param p_mnemonic the mnemonic
+ * @return the pointer
+ */
 M1Store::SpecialItem* M1Store::Storage::getSpecial(const char* p_mnemonic){
-    qDebug() << QString("getSpecial from mnemonic: %1").arg(p_mnemonic);
-    M1Store::SpecialItem* l_ret = cm_mnemonic_to_special[p_mnemonic];
+    qCDebug(g_cat_store) << QString("getSpecial from mnemonic: %1").arg(p_mnemonic);
+    Q_ASSERT_X(cm_mnemonic_to_special.find(p_mnemonic) != cm_mnemonic_to_special.end(),
+               "Storage::getSpecial()", (QString("Missing mnemonic: %1").arg(p_mnemonic)).toUtf8());
+    M1Store::SpecialItem* l_ret = cm_mnemonic_to_special.at(p_mnemonic);
     return l_ret;
 }
+
+/**
+ * @brief ItemID --> SpecialItem pointer corresponding to it (if any)
+ *
+ * triggers an error if not found
+ *
+ * @param p_item_id the ItemID
+ * @return the pointer
+ */
+M1Store::SpecialItem* M1Store::Storage::getSpecial(const ItemID p_item_id){
+    qCDebug(g_cat_store) << QString("getSpecial from ItemID: 0x%1").arg(p_item_id, 16, 16, QChar('0'));
+    SpecialItem* l_ret = nullptr;
+    // goes through the whole table to find the corresponding SpecialItem, if it exists
+    for(SpecialItemID i = 0; i < cm_next_special; i++){
+        SpecialItem* l_special_item = getSpecialSlotPointer(i);
+        if(l_special_item->itemId() == p_item_id) return l_special_item;
+    }
+
+    // not found --> fatal error
+    qFatal("Aborting / searcing in the special items table for an item that is not there");
+    return l_ret;
+}
+
+/**
+ * @brief initialize a new special item in the mmap() area and allocates a new SpecialItemID
+ * @param p_item_id the correspoinding item, if any, or G_VOID_ITEM_ID
+ * @param p_flags flags for the new special item
+ * @param p_mnemonic mnemonic for th new special item
+ * @return pointer to the new special item
+ */
 M1Store::SpecialItem* M1Store::Storage::newSpecial(const ItemID p_item_id, const FlagField p_flags, const char* p_mnemonic){
-    qDebug() << QString("Creating special item [%1]%2")
+    qCDebug(g_cat_store) << QString("Creating special item [%1]%2")
                     .arg(p_mnemonic)
                     .arg((p_item_id == G_VOID_ITEM_ID) ? " (item-less)" : "");
 
+    // gets the pointer
     M1Store::SpecialItem* l_ret = getSpecialSlotPointer(cm_next_special);
+    // sets the attributes, including the new SpecialItemID
     l_ret->setAttr(p_item_id, cm_next_special, p_flags, p_mnemonic);
+    // increments top special item ID
     cm_next_special += 1;
+    // update the mnemonic --> SpecialItem* map
     cm_mnemonic_to_special[p_mnemonic] = l_ret;
     return l_ret;
 }
+
+/**
+ * @brief initialize an item-less new special item in the mmap() area and allocates a new SpecialItemID
+ * @param p_flags flags for the new special item
+ * @param p_mnemonic mnemonic for th new special item
+ * @return pointer to the new special item
+ */
 M1Store::SpecialItem* M1Store::Storage::newSpecial(const FlagField p_flags, const char* p_mnemonic){
+    // calls newSpecial() with G_VOID_ITEM_ID is ItemID
     return newSpecial(G_VOID_ITEM_ID, p_flags | SI_HAS_NO_ITEM, p_mnemonic);
 }
 
+/**
+ * @brief Creates a pair of reciprocal item-less type special items
+ *
+ * Does not return anything, contrary to the other newSpecial() variants
+ *
+ * @param p_flags flags for both
+ * @param p_mnemonic_1 first mnemonic
+ * @param p_mnemonic_2 second mnemonic
+ */
 void M1Store::Storage::newSpecial(const FlagField p_flags, const char* p_mnemonic_1, const char* p_mnemonic_2){
+    qCDebug(g_cat_store) << QString("Creating reciprocal item-less special items [%1] and [%2]")
+                                .arg(p_mnemonic_1)
+                                .arg(p_mnemonic_2);
+
+    // forces the flag SI_HAS_RECIPROCAL for both
     M1Store::SpecialItem* l_s1 = newSpecial(p_flags | SI_HAS_RECIPROCAL, p_mnemonic_1);
     M1Store::SpecialItem* l_s2 = newSpecial(p_flags | SI_HAS_RECIPROCAL, p_mnemonic_2);
 
+    // iondicate that both are reciprocal of each other
     l_s1->setReciprocal(l_s2->specialId());
     l_s2->setReciprocal(l_s1->specialId());
 }
 
+/**
+ * @brief mnemonic to SpecialItemID
+ * @param p_mnemonic the mnemonic
+ * @return SpecialItemID for this mnemonic
+ */
+M1Store::SpecialItemID M1Store::Storage::getSpecialID(const char* p_mnemonic){
+    Q_ASSERT_X(cm_mnemonic_to_special.find(p_mnemonic) != cm_mnemonic_to_special.end(),
+               "Storage::getSpecialID()", (QString("Missing mnemonic: %1").arg(p_mnemonic)).toUtf8());
+    return cm_mnemonic_to_special.at(p_mnemonic)->specialId();
+}
+
+/**
+ * @brief Version update for 0 to 1
+ *
+ * Creates the basic structure of the graph root and associated nodes (Home, me, inboxes, ...) + basic types (ISA, ITO, etc.)
+ */
 void M1Store::Storage::version_0_to_1(){
-    qDebug() << QString("Creating item-less basic types");
+    qCDebug(g_cat_store) << QString("Creating item-less basic types");
 
     newSpecial(SI_IS_TYPE, "AUTO_");
     newSpecial(SI_IS_TYPE, "OWNS_", "BLNGS");
     newSpecial(SI_IS_TYPE | SI_IS_SPECIAL_EDGE, "_ISA_", "_ITO_");
 
-    qDebug() << QString("Creating root item");
-    M1Store::ItemWrapper* l_root = M1Store::ItemWrapper::getNew(
+    qCDebug(g_cat_store) << QString("Creating root item");
+    M1Store::ItemWrapper* l_root = M1Store::ItemWrapper::mbd_getNew(
         // category & attributes
         M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
         M1Store::ItemType(),    // type
@@ -297,8 +410,8 @@ void M1Store::Storage::version_0_to_1(){
         "ROOT_"                 // special item mnemonic
         );
 
-    qDebug() << QString("Creating home item");
-    M1Store::ItemWrapper* l_home = M1Store::ItemWrapper::getNew(
+    qCDebug(g_cat_store) << QString("Creating home item");
+    M1Store::ItemWrapper* l_home = M1Store::ItemWrapper::mbd_getNew(
         // category & attributes
         M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
         M1Store::ItemType(),    // type
@@ -307,7 +420,7 @@ void M1Store::Storage::version_0_to_1(){
         "HOME_"                 // special item mnemonic
         );
 
-    M1Store::ItemWrapper* l_me = M1Store::ItemWrapper::getNew(
+    M1Store::ItemWrapper* l_me = M1Store::ItemWrapper::mbd_getNew(
         // category & attributes
         M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
         M1Store::ItemType(),    // type
@@ -316,7 +429,7 @@ void M1Store::Storage::version_0_to_1(){
         "ME___"                 // special item mnemonic
         );
 
-    M1Store::ItemWrapper* l_type = M1Store::ItemWrapper::getNew(
+    M1Store::ItemWrapper* l_type = M1Store::ItemWrapper::mbd_getNew(
         // category & attributes
         M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
         M1Store::ItemType(),    // type
@@ -326,7 +439,7 @@ void M1Store::Storage::version_0_to_1(){
         "TYPE_"                 // special item mnemonic
         );
 
-    M1Store::ItemWrapper* l_person = M1Store::ItemWrapper::getNew(
+    M1Store::ItemWrapper* l_person = M1Store::ItemWrapper::mbd_getNew(
         // category & attributes
         M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
         M1Store::ItemType(),    // type
@@ -336,14 +449,14 @@ void M1Store::Storage::version_0_to_1(){
         "PERSN"                 // special item mnemonic
         );
 
-    M1Store::ItemWrapper* l_inboxes = M1Store::ItemWrapper::getNew(
+    M1Store::ItemWrapper* l_inboxes = M1Store::ItemWrapper::mbd_getNew(
         // category & attributes
         M1Store::FULL_VERTEX,
         M1Store::ItemType(),    // type
         "Inboxes"               // label
         );
 
-    M1Store::ItemWrapper* l_email = M1Store::ItemWrapper::getNew(
+    M1Store::ItemWrapper* l_email = M1Store::ItemWrapper::mbd_getNew(
         // category & attributes
         M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
         M1Store::ItemType(),    // type
@@ -353,7 +466,7 @@ void M1Store::Storage::version_0_to_1(){
         "EMAIL"                 // special item mnemonic
         );
 
-    M1Store::ItemWrapper* l_whatsapp = M1Store::ItemWrapper::getNew(
+    M1Store::ItemWrapper* l_whatsapp = M1Store::ItemWrapper::mbd_getNew(
         // category & attributes
         M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
         M1Store::ItemType(),    // type
@@ -363,7 +476,7 @@ void M1Store::Storage::version_0_to_1(){
         "WHTSP"                 // special item mnemonic
         );
 
-    M1Store::ItemWrapper* l_discord = M1Store::ItemWrapper::getNew(
+    M1Store::ItemWrapper* l_discord = M1Store::ItemWrapper::mbd_getNew(
         // category & attributes
         M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
         M1Store::ItemType(),    // type
@@ -399,14 +512,20 @@ void M1Store::Storage::version_0_to_1(){
     M1Store::Storage::mmapSync();
     M1Store::Storage::incrementCurrentVersion();
 }
-void M1Store::Storage::version_1_to_2(){
-    M1Store::ItemWrapper* l_root = M1Store::ItemWrapper::getExisting("ROOT_");
 
-    M1Store::ItemWrapper* l_text = M1Store::ItemWrapper::getNew(
+/**
+ * @brief version update 1 to 2
+ *
+ * Creates the root nodes for texts
+ */
+void M1Store::Storage::version_1_to_2(){
+    M1Store::ItemWrapper* l_root = M1Store::ItemWrapper::mbd_getExisting("ROOT_");
+
+    M1Store::ItemWrapper* l_text = M1Store::ItemWrapper::mbd_getNew(
         // category & attributes
         M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
         // type
-        M1Store::ItemType(getSpecialSlotPointer("TYPE_")->specialId(), G_VOID_SI_ID, G_VOID_SI_ID, G_VOID_SI_ID),
+        M1Store::ItemType(getSpecial("TYPE_")->specialId(), G_VOID_SI_ID, G_VOID_SI_ID, G_VOID_SI_ID),
         // label
         "Texts root and type",
         // special item flags
@@ -416,11 +535,11 @@ void M1Store::Storage::version_1_to_2(){
         );
     l_text->linkTo(l_root, "BLNGS");
 
-    M1Store::ItemWrapper* l_word = M1Store::ItemWrapper::getNew(
+    M1Store::ItemWrapper* l_word = M1Store::ItemWrapper::mbd_getNew(
         // category & attributes
         M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
         // type
-        M1Store::ItemType(getSpecialSlotPointer("TYPE_")->specialId(), G_VOID_SI_ID, G_VOID_SI_ID, G_VOID_SI_ID),
+        M1Store::ItemType(getSpecial("TYPE_")->specialId(), G_VOID_SI_ID, G_VOID_SI_ID, G_VOID_SI_ID),
         // label
         "Text words (type)",
         // special item flags
@@ -438,18 +557,19 @@ void M1Store::Storage::version_1_to_2(){
     M1Store::Storage::incrementCurrentVersion();
 }
 
-M1Store::SpecialItemID M1Store::Storage::getSpecialID(const char* p_mnemonic){
-    return cm_mnemonic_to_special[p_mnemonic]->specialId();
-}
+/**
+ * @brief sets the "constants" that require an up to date version
+ */
 void M1Store::Storage::setConstants(){
-    ROOT_SPECIAL_ID = getSpecialID("ROOT_");
-    HOME_SPECIAL_ID = getSpecialID("HOME_");
-    TEXT_SPECIAL_ID = getSpecialID("TEXT_");
-    WORD_SPECIAL_ID = getSpecialID("TWORD");
+    qCDebug(g_cat_store) << "setting Item id constants";
+    M1Store::ROOT_SPECIAL_ID = getSpecialID("ROOT_");
+    M1Store::HOME_SPECIAL_ID = getSpecialID("HOME_");
+    M1Store::TEXT_SPECIAL_ID = getSpecialID("TEXT_");
+    M1Store::T_WORD_SPECIAL_ID = getSpecialID("TWORD");
 }
 
 /**
- * @brief M1Store::Storage::close shut down LMDB environment and mmap() area for items
+ * @brief Shuts down LMDB environment and mmap() areas for items and specials
  */
 void M1Store::Storage::storeShutDown(){
     Q_ASSERT_X( cm_lmdb_env != NULL, "Storage::close()", "LMDB env must be initialized");
@@ -496,6 +616,7 @@ void M1Store::Storage::storeShutDown(){
     MDB_val l_key, l_data;
     MDB_cursor* l_curs;
 
+    // various table dumps, executed only in debug build
 #if CMAKE_BUILD_TYPE == Debug
     // table dumps only in Debug mode
     // dump util table
@@ -563,7 +684,7 @@ void M1Store::Storage::storeShutDown(){
     qCDebug(g_cat_silence) << QString("========= Items dump ================");
 
     for(ItemID i = 0; i < cm_next_item; i++){
-        ItemWrapper* l_item = ItemWrapper::getExisting(i);
+        ItemWrapper* l_item = ItemWrapper::mbd_getExisting(i);
         qCDebug(g_cat_silence) << l_item->dbgShort();
         delete l_item;
     }
@@ -573,7 +694,7 @@ void M1Store::Storage::storeShutDown(){
     qCDebug(g_cat_silence) << QString("========= Vertices dump =============");
 
     for(ItemID i = 0; i < cm_next_item; i++){
-        ItemWrapper* l_item = ItemWrapper::getExisting(i);
+        ItemWrapper* l_item = ItemWrapper::mbd_getExisting(i);
         if(l_item->isFullVertex())
             qCDebug(g_cat_silence) << l_item->dbgString().toUtf8().constData();
         delete l_item;
@@ -581,8 +702,7 @@ void M1Store::Storage::storeShutDown(){
 
     // tree dump --------------------------------------------------------------
     qCDebug(g_cat_silence) << QString("========= Tree Dump =================");
-    std::set<ItemID> l_already_expanded;
-    ItemWrapper::recurGraph(getSpecialSlotPointer("ROOT_")->itemId(), l_already_expanded, "");
+    ItemWrapper::dbgRecurGraphStart(getSpecial("ROOT_")->itemId());
 
     QLoggingCategory::setFilterRules("*.debug=true");
 
@@ -615,7 +735,7 @@ void M1Store::Storage::storeShutDown(){
 }
 
 /**
- * @brief M1Store::Storage::loadCounters load counters from LMDB util table
+ * @brief load counters from LMDB util table
  * @param p_txn (required) LMDB transaction
  */
 void M1Store::Storage::loadCounters(MDB_txn *p_txn){
@@ -677,7 +797,7 @@ void M1Store::Storage::loadCounters(MDB_txn *p_txn){
 }
 
 /**
- * @brief M1Store::Storage::saveCounters store counters into LMDB util table
+ * @brief store counters into LMDB util table
  * @param p_txn (optional) LMDB transaction
  */
 void M1Store::Storage::saveCounters(MDB_txn *p_txn){
@@ -735,9 +855,8 @@ void M1Store::Storage::saveCounters(MDB_txn *p_txn){
     if( l_local_txn ) mdb_txn_commit(l_txn);
 }
 
-// store a new string into the string table and return the corresponding newly created string ID
 /**
- * @brief M1Store::Storage::storeString store a new string into the string table and return the corresponding newly created string ID
+ * @brief store a new string into the string table and return the corresponding newly created string ID
  * @param p_string the string (QString)
  * @return the StringID of the stored string
  */
@@ -777,7 +896,7 @@ M1Store::ItemID M1Store::Storage::storeString(QString p_string){
 }
 
 /**
- * @brief M1Store::Storage::retrieveString retrieve a string from LMDB storage
+ * @brief retrieve a string from LMDB storage
  * @param p_string_id the StringID of the requested string
  * @return the string, as a (char *)
  */
@@ -822,7 +941,7 @@ char* M1Store::Storage::retrieveString(ItemID p_string_id){
 }
 
 /**
- * @brief M1Store::Storage::freeString Free a string from the LMDB store
+ * @brief Free a string from the LMDB store
  * @param p_string_id the StringID of the string
  */
 void M1Store::Storage::freeString(ItemID p_string_id){

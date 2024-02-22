@@ -10,21 +10,16 @@
 
 #include "m1_lv0_item.h"
 
-Q_DECLARE_LOGGING_CATEGORY(g_cat_storage)
-Q_DECLARE_LOGGING_CATEGORY(g_cat_store)
-
 namespace M1Store{
 
     // ----------------------------------------- Storage ----------------------------------------------------
+    /**
+     * @brief The Storage class encapsulates all the storage-related features of the app
+     *
+     * It is a purely static class grouping a number of storage-related features for convenience
+     */
     class Storage{
     private:
-        static const char* STORE_DATA_PATH;         ///< Path to the data store
-        static const char* STORE_LMDB_DIR;          ///< Subdir for LMDB store (strings + utilities)
-        static const char* LMDB_UTIL_DB;            ///< name of the table for util data
-        static const char* LMDB_STRING_DB;          ///< string table
-        static const char* LMDB_ITEM_MMAP_FILE;     ///< name of mmap file for item storage
-        static const char* LMDB_SPECIAL_MMAP_FILE;  ///< name of mmap file for item storage
-
         static MDB_env* cm_lmdb_env;                ///< LMDB env
         static MDB_dbi cm_dbi_util;                 ///< util table handle
         static MDB_dbi cm_dbi_string;               ///< string table handle
@@ -41,15 +36,19 @@ namespace M1Store{
         static unsigned long cm_item_map_length;    ///< length of mmap() area for items
         static unsigned long cm_special_length;     ///< length of mmap() area for special items
     public:
-        static M1Store::Item_lv0* getItemSlotPointer(const ItemID p_id);
-        static M1Store::Item_lv0* getNewItemSlotPointer(const FlagField p_flags, const ItemType p_type);
-
-        static M1Store::SpecialItem* getSpecialSlotPointer(const SpecialItemID p_id);
-        static M1Store::SpecialItem* getSpecialSlotPointer(const char* p_mnemonic);
-
         static void storeSetUp();
         static void mmapSync();
         static void storeShutDown();
+
+        static Item_lv0* getItemSlotPointer(const ItemID p_item_id);
+
+        static Item_lv0* getNewItemSlotPointer(const FlagField p_flags, const ItemType p_type);
+
+        static SpecialItem* getSpecialSlotPointer(const SpecialItemID p_si_id);
+
+        static SpecialItem* getSpecial(const ItemID p_item_id);
+        static SpecialItem* getSpecial(const char* p_mnemonic);
+        static SpecialItemID getSpecialID(const char* p_mnemonic);
 
         /// with corresponding Item
         static SpecialItem* newSpecial(const ItemID p_item_id, const FlagField p_flags, const char* p_mnemonic);
@@ -58,12 +57,9 @@ namespace M1Store{
         /// without corresponding item and reciprocal type
         static void newSpecial(const FlagField p_flags, const char* p_mnemonic_1, const char* p_mnemonic_2);
 
-        static SpecialItem* getSpecial(const SpecialItemID p);
-        static SpecialItem* getSpecial(const ItemID p);
-        static SpecialItem* getSpecial(const char* p_mnemonic);
-        static SpecialItemID getSpecialID(const char* p_mnemonic);
-
+        /// increment the current version counter
         static void incrementCurrentVersion(){cm_current_version += 1;}
+        /// get the current version number
         static unsigned int currentVersion(){return cm_current_version;}
 
         static void loadCounters(MDB_txn* p_txn);
@@ -73,6 +69,7 @@ namespace M1Store{
         static char* retrieveString(ItemID p_string_id);
         static void freeString(ItemID p_string_id);
 
+        /// for testing purposes only
         static StringID dbg_get_string_id(Item_lv0& p_item) {return p_item.p.v.f.m_string_id;}
 
         static void setConstants();

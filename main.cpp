@@ -17,7 +17,12 @@ int main(int argc, char *argv[])
 
     qDebug() << "Main start";
 
-    if(false){
+    qCDebug(g_cat_store) << QString("ROOT_SPECIAL_ID = %1").arg(M1Store::ROOT_SPECIAL_ID);
+    qCDebug(g_cat_store) << QString("HOME_SPECIAL_ID = %1").arg(M1Store::HOME_SPECIAL_ID);
+    qCDebug(g_cat_store) << QString("TEXT_SPECIAL_ID = %1").arg(M1Store::TEXT_SPECIAL_ID);
+    qCDebug(g_cat_store) << QString("T_WORD_SPECIAL_ID = %1").arg(M1Store::T_WORD_SPECIAL_ID);
+
+    if(true){
         qDebug() << "opening file";
         QString l_path("../Enoch-words.txt");
         int l_count = 0;
@@ -25,19 +30,19 @@ int main(int argc, char *argv[])
             boost::filesystem::ifstream fileHandler(l_path.toStdString());
             std::string line;
             while(getline(fileHandler, line)){
+                /*
                 QLoggingCategory::setFilterRules("*.debug=false\n"
                                                  "dump.debug=true");
-                std::set<M1Store::ItemID> l_already_expanded;
-                M1Store::ItemWrapper::recurGraph(M1Store::Storage::getSpecialSlotPointer("ROOT_")->itemId(), l_already_expanded, "");
+                M1Store::ItemWrapper::recurGraphStart(M1Store::Storage::getSpecial("ROOT_")->itemId());
                 QLoggingCategory::setFilterRules("*.debug=true");
-
+                */
                 qDebug() << line;
-                M1Store::ItemWrapper* l_word = M1Store::ItemWrapper::getNew(
+                M1Store::ItemWrapper* l_word = M1Store::ItemWrapper::mbd_getNew(
                     // category & attributes
                     M1Store::FULL_VERTEX,
                     // type
                     M1Store::ItemType(
-                        M1Store::WORD_SPECIAL_ID,
+                        M1Store::T_WORD_SPECIAL_ID,
                         M1Store::G_VOID_SI_ID,
                         M1Store::G_VOID_SI_ID,
                         M1Store::G_VOID_SI_ID),
