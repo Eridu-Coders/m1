@@ -28,6 +28,8 @@ add_executable(m1
   m1_constants.h
   m1_lv1_item.h
   m1_lv1_item.cpp
+  m1_lv1_item_test.cpp
+  main_test_store_lv1.cpp
 )
 target_link_libraries(m1 Qt${QT_VERSION_MAJOR}::Core gtest gtest_main lmdb ${Boost_FILESYSTEM_LIBRARY})
 
@@ -43,6 +45,22 @@ add_executable(m1_test_lv0_item
   m1_lv2_item.cpp
 )
 target_link_libraries(m1_test_lv0_item Qt${QT_VERSION_MAJOR}::Core gtest gtest_main lmdb ${Boost_FILESYSTEM_LIBRARY})
+
+add_executable(m1_test_lv1_item
+  main_test_store_lv1.cpp
+  m1_env.h
+  m1_env.cpp
+  m1_store.h
+  m1_store.cpp
+  m1_lv0_item.h
+  m1_lv0_item_members.cpp
+  m1_lv0_item_test.cpp
+  m1_lv1_item.h
+  m1_lv1_item.cpp
+  m1_lv1_item_test.cpp
+  m1_lv2_item.cpp
+)
+target_link_libraries(m1_test_lv1_item Qt${QT_VERSION_MAJOR}::Core gtest gtest_main lmdb ${Boost_FILESYSTEM_LIBRARY})
 
 include(GNUInstallDirs)
 install(TARGETS m1
