@@ -31,7 +31,8 @@ set(PROJECT_SOURCES
         main.cpp
         m1_main_window.cpp
         m1_main_window.h
-        m1_main_window.ui
+        m1_tree_display.h
+        m1_tree_display.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
