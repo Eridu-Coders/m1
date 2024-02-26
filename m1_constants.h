@@ -64,7 +64,7 @@ namespace M1Store{
     // M1Store constants
     // class-level constants holding the names of various things
     /// root dir for data storage
-    static const char* STORE_DATA_PATH           = "/home/fi11222/disk-share/Dev/m1/Storage";
+    static const char* STORE_DATA_PATH           = "../Storage";
     static const char* STORE_LMDB_DIR            = "lmdb";           // subdir for LMDB data
     static const char* LMDB_UTIL_DB              = "util_db";        // name of the utilities table
     static const char* LMDB_STRING_DB            = "string_db";      // name of the strings table
