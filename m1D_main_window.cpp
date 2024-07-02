@@ -1,12 +1,10 @@
 #include <gtest/gtest.h>
 #include <boost/filesystem.hpp>
 
-#include "m1_main_window.h"
+#include "m1D_main_window.h"
 
-#include "m1_lv2_item.h"
-#include "m1_store.h"
-#include "m1_env.h"
-#include "m1_tree_display.h"
+#include "m1B_lv2_item.h"
+#include "m1D_tree_display.h"
 
 void loadWords(){
     qDebug() << "opening file";
@@ -28,7 +26,7 @@ void loadWords(){
                 M1Store::FULL_VERTEX,
                 // type
                 M1Store::ItemType(
-                    M1Store::T_WORD_SPECIAL_ID,
+                    M1Store::TEXT_WORD_SPECIAL_ID,
                     M1Store::G_VOID_SI_ID,
                     M1Store::G_VOID_SI_ID,
                     M1Store::G_VOID_SI_ID),
@@ -42,6 +40,8 @@ void loadWords(){
     }
     else
         qDebug() << "can't open";
+
+    M1_FUNC_EXIT
 }
 
 void Ui_MainWindow::setupUi(QMainWindow *MainWindow){
@@ -63,34 +63,25 @@ void Ui_MainWindow::setupUi(QMainWindow *MainWindow){
     retranslateUi(MainWindow);
 
     QMetaObject::connectSlotsByName(MainWindow);
+
+    M1_FUNC_EXIT
 } // setupUi
 
 void Ui_MainWindow::retranslateUi(QMainWindow *MainWindow){
     MainWindow->setWindowTitle(QCoreApplication::translate("m1 Main", "m1 Main", nullptr));
+
+    M1_FUNC_EXIT
 } // retranslateUi
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
-    qDebug() << "App starts";
-
-    M1Store::M1Env::init();
-    M1Store::Storage::storeSetUp();
-
-    qCDebug(g_cat_store) << QString("ROOT_SPECIAL_ID = %1").arg(M1Store::ROOT_SPECIAL_ID);
-    qCDebug(g_cat_store) << QString("HOME_SPECIAL_ID = %1").arg(M1Store::HOME_SPECIAL_ID);
-    qCDebug(g_cat_store) << QString("TEXT_SPECIAL_ID = %1").arg(M1Store::TEXT_SPECIAL_ID);
-    qCDebug(g_cat_store) << QString("T_WORD_SPECIAL_ID = %1").arg(M1Store::T_WORD_SPECIAL_ID);
-
-    QLoggingCategory::setFilterRules("qt.*.debug=false");
-
     m_ui = new Ui_MainWindow();
     m_ui->setupUi(this);
+
+    M1_FUNC_EXIT
 }
 
 MainWindow::~MainWindow(){
     delete m_ui;
 
-    M1Store::Storage::storeShutDown();
-    M1Store::M1Env::close();
-
-    qDebug() << "App ends";
+    M1_FUNC_EXIT
 }

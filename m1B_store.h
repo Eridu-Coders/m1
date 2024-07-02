@@ -8,7 +8,7 @@
 #include <QDateTime>
 #include <QLoggingCategory>
 
-#include "m1_lv0_item.h"
+#include "m1B_lv0_item.h"
 
 namespace M1Store{
 
@@ -40,22 +40,21 @@ namespace M1Store{
         static void mmapSync();
         static void storeShutDown();
 
-        static Item_lv0* getItemSlotPointer(const ItemID p_item_id);
+        static Item_lv0* getItemPointer_lv0(const ItemID p_item_id);
 
-        static Item_lv0* getNewtemSlotPointer(const FlagField p_flags, const ItemType p_type);
+        static Item_lv0* getNewItemPointer_lv0(const FlagField p_flags, const ItemType p_type);
 
-        static SpecialItem* getSpecialSlotPointer(const SpecialItemID p_si_id);
-
-        static SpecialItem* getSpecial(const ItemID p_item_id);
-        static SpecialItem* getSpecial(const char* p_mnemonic);
+        static SpecialItem* getSpecialItemPointer(const SpecialItemID p_si_id);
+        static SpecialItem* getSpecialItemPointer(const ItemID p_item_id);
+        static SpecialItem* getSpecialItemPointer(const char* p_mnemonic);
         static SpecialItemID getSpecialID(const char* p_mnemonic);
 
         /// with corresponding Item
-        static SpecialItem* newSpecial(const ItemID p_item_id, const FlagField p_flags, const char* p_mnemonic);
+        static SpecialItem* getNewSpecialWithItem(const ItemID p_item_id, const FlagField p_flags, const char* p_mnemonic);
         /// without corresponding item
-        static SpecialItem* newSpecial(const FlagField p_flags, const char* p_mnemonic);
+        static SpecialItem* getNewSpecialNoItem(const FlagField p_flags, const char* p_mnemonic);
         /// without corresponding item and reciprocal type
-        static void newSpecial(const FlagField p_flags, const char* p_mnemonic_1, const char* p_mnemonic_2);
+        static void getNewSpecialWithReciprocal(const FlagField p_flags, const char* p_mnemonic_1, const char* p_mnemonic_2);
 
         /// increment the current version counter
         static void incrementCurrentVersion(){cm_current_version += 1;}

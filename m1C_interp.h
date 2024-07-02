@@ -1,7 +1,7 @@
 #ifndef INTERP_H
 #define INTERP_H
 
-#include "m1_nav.h"
+#include "m1B_nav.h"
 
 namespace M1MidPlane{
 

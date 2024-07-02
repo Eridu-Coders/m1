@@ -15,24 +15,26 @@ find_package(GTest REQUIRED)
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 
 set(PROJECT_SOURCES
-        m1_constants.h
-        m1_env.h
-        m1_lv0_item.h
-        m1_lv1_item.h
-        m1_lv2_item.h
-        m1_main_window.h
-        m1_store.h
-        m1_env.cpp
-        m1_lv0_item_members.cpp
-        m1_lv1_item.cpp
-        m1_lv1_item_test.cpp
-        m1_lv2_item.cpp
-        m1_store.cpp
+        m1A_constants.h
+        m1A_env.h
+        m1A_env.cpp
+        m1B_store.h
+        m1B_store.cpp
+        m1B_lv0_item.h
+        m1B_lv0_item.cpp
+        m1B_lv1_item.h
+        m1B_lv1_item.cpp
+        m1B_lv2_item.h
+        m1B_lv2_item.cpp
+        m1B_nav.h
+        m1B_nav.cpp
+        m1C_interp.h 
+        m1C_interp.cpp
+        m1D_main_window.h
+        m1D_main_window.cpp
+        m1D_tree_display.h
+        m1D_tree_display.cpp
         main.cpp
-        m1_main_window.cpp
-        m1_main_window.h
-        m1_tree_display.h
-        m1_tree_display.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

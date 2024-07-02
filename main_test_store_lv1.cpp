@@ -26,4 +26,6 @@ int main(int argc, char *argv[])
 
     return l_ret;
     //return 0;
+
+    M1_FUNC_EXIT
 }

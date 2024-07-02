@@ -15,17 +15,17 @@ find_package(GTest REQUIRED)
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 
 add_executable(lv0_test
-  ../m1_constants.h
-  ../m1_lv2_item.cpp
-  ../m1_lv2_item.h
-  ../m1_store.cpp
-  ../m1_lv0_item_members.cpp
-  ../m1_lv0_item.h
-  ../m1_store.h
-  ../m1_lv0_item_test.cpp
-  ../m1_env.h
-  ../m1_env.cpp
-  ../main_test_store_lv0.cpp
+    ../m1A_constants.h
+    ../m1A_env.h
+    ../m1A_env.cpp
+    ../m1B_store.h
+    ../m1B_store.cpp
+    ../m1B_lv0_item.h
+    ../m1B_lv0_item.cpp
+    ../m1B_lv0_item_test.cpp
+    ../m1B_lv2_item.h
+    ../m1B_lv2_item.cpp
+    ../main_test_store_lv0.cpp
 )
 target_link_libraries(lv0_test Qt${QT_VERSION_MAJOR}::Core gtest gtest_main lmdb ${Boost_FILESYSTEM_LIBRARY})
 

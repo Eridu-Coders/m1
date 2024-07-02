@@ -7,7 +7,7 @@
 #define m1_min(a, b) (((a) < (b)) ? (a) : (b))
 #define m1_max(a, b) (((a) > (b)) ? (a) : (b))
 
-namespace M1Store{
+namespace M1Env{
 
     /// file name for the storage of log messages by M1Env
     static const char* LOG_FILE_NAME = "m1_log.csv";
@@ -72,18 +72,26 @@ namespace M1Store{
     static const char* LMDB_SPECIAL_MMAP_FILE    = "specials.m1";    // name of mmap() file for special items
 
     // "false" constants set by the Storage class after loading the special items table
-    extern SpecialItemID ROOT_SPECIAL_ID;       ///< Sepcial Vertex ID of root
-    extern SpecialItemID HOME_SPECIAL_ID;       ///< Sepcial Vertex ID of home
-    extern SpecialItemID TEXT_SPECIAL_ID;       ///< Sepcial Vertex ID of text root
-    extern SpecialItemID T_WORD_SPECIAL_ID;     ///< Sepcial Vertex ID of word root
+    extern SpecialItemID ROOT_SPECIAL_ID;       ///< Special Vertex ID of root
+    extern SpecialItemID HOME_SPECIAL_ID;       ///< Special Vertex ID of home
+    extern SpecialItemID TEXT_SPECIAL_ID;       ///< Special Vertex ID for the root of a text
+    extern SpecialItemID TEXT_WORD_SPECIAL_ID;  ///< Special Vertex ID for a word within a text
+    extern SpecialItemID ISA_SPECIAL_ID;        ///< Special Vertex ID of _ISA_
+    extern SpecialItemID ITO_SPECIAL_ID;        ///< Special Vertex ID of _ITO_
+    extern SpecialItemID OWNS_SPECIAL_ID;       ///< Special Vertex ID of _OWNS
+    extern SpecialItemID BLNGS_SPECIAL_ID;      ///< Special Vertex ID of BLNGS
+
 } // end of M1Store namespace
 
 // debug categories pre-declarations
 Q_DECLARE_LOGGING_CATEGORY(g_cat_store)                 ///< for Storage class
-Q_DECLARE_LOGGING_CATEGORY(g_cat_lv0_members)           ///< for lv0_Item and ancillary classes
+Q_DECLARE_LOGGING_CATEGORY(g_cat_lv0_item_type)         ///< for ItemType
+Q_DECLARE_LOGGING_CATEGORY(g_cat_lv0_special_item)      ///< for SpecialItem
+Q_DECLARE_LOGGING_CATEGORY(g_cat_lv0_members)           ///< for lv0_Item
 Q_DECLARE_LOGGING_CATEGORY(g_cat_lv0_test)              ///< for tests of the lv0_Item class
 Q_DECLARE_LOGGING_CATEGORY(g_cat_lv2_members)           ///< for ItemWrapper class (lv2) members
 Q_DECLARE_LOGGING_CATEGORY(g_cat_lv2_constructors)      ///< for ItemWrapper class (lv2) constructors and instanciation from mmap()
 Q_DECLARE_LOGGING_CATEGORY(g_cat_silence)               ///< for debug strings generation (silencing all other debug categories)
+Q_DECLARE_LOGGING_CATEGORY(g_main_test)                 ///<
 
 #endif // M1_CONSTANTS_H

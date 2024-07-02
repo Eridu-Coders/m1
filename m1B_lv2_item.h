@@ -3,7 +3,7 @@
 
 #include <set>
 
-#include "m1_lv0_item.h"
+#include "m1B_lv0_item.h"
 
 namespace M1Store{
     /**
@@ -43,38 +43,45 @@ class Item_lv2 : public Item_lv0 {
         Item_lv2(const ItemID p_item_id, const FlagField p_flags, const ItemType p_type) : Item_lv0(p_item_id, p_flags, p_type){}
         ~Item_lv2();
 
-        /// normally never called (only the descendents are called)
         bool isFullVertex(){return (flags() & ITEM_NATURE_MASK) == FULL_VERTEX;}
-        /// normally never called (only the descendents are called)
         bool isSimpleVertex(){return (flags() & ITEM_NATURE_MASK) == SIMPLE_VERTEX;}
-        /// normally never called (only the descendents are called)
         bool isFullEdge(){return (flags() & ITEM_NATURE_MASK) == FULL_EDGE;}
-        /// normally never called (only the descendents are called)
         bool isSimpleEdge(){return (flags() & ITEM_NATURE_MASK) == SIMPLE_EDGE;}
 
         QString dbgString();
-        QString dbgTypeShort();
         QString dbgShort(int p_depth = 0);
         QString dbgHalf();
 
         /// text setter - calls the underlying member from m_item
-        void setText(const QString& s){setText(s);}
+        void setText(const QString& s){Item_lv0::setText(s);}
         /// ItemID getter - calls the underlying member from m_item
+        /*
         ItemID itemID(){return item_id();}
+        */
 
         Item_lv2* getFirstEdgeWrapper();
         Item_lv2* getFirstEdgeSpecialWrapper();
         Item_lv2* getNextWrapper();
+        Item_lv2* getPreviousWrapper();
 
         bool setType(const SpecialItem* p_type_si);
-        bool setType(const SpecialItemID p_type_id);
+        bool setType(const SpecialItemID p_type_si_id);
         bool setType(const char* p_mnemonic);
+
+        bool isOfType(const SpecialItem* p_type_si);
+        bool isOfType(const ItemID p_type_item_id) const;
+        bool isOfType(const SpecialItemID p_type_si_id) const;
+        bool isOfType(const char* p_mnemonic) const;
 
         void linkTo(Item_lv2* p_target, const SpecialItemID p_type);
         void linkTo(Item_lv2* p_target, const char* p_mnemonic);
         void linkTo(ItemID p_target_id, const SpecialItemID p_type);
         void linkTo(ItemID p_target_id, const char* p_mnemonic);
     };
+
 }
+
+    QDebug operator<<(QDebug d, M1Store::Item_lv2 p);
+    QDebug operator<<(QDebug d, M1Store::Item_lv2* p);
 
 #endif // M1_LV2_STORE_H

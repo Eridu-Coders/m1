@@ -4,10 +4,11 @@
 #include <QDateTime>
 #include <QLoggingCategory>
 
-#include "m1_constants.h"
+#include "m1A_constants.h"
 
 namespace M1Store{
 
+using namespace M1Env;
     // ----------------------------------------- ItemType ----------------------------------------------------
     /**
      * @brief Union struct for Item types. Either 4 16-bit short types or an regular ItemID
@@ -156,10 +157,11 @@ namespace M1Store{
         void setType_si_id(const unsigned int p_index, const SpecialItemID p_type);
         SpecialItemID getType_si_id(const unsigned int p_index) const;
         ItemID getType_item_id() const;
-        void setType_item_id(const ItemID p_type);
-        bool isOfType(const ItemID p_type) const;
-        bool isOfType(const SpecialItemID p_type) const;
-        QString getTypeDbg_string(){return m_type.dbgString();}
+        void setType_item_id(const ItemID p_type_item_id);
+
+        bool isOfType_member(const ItemID p_type) const;
+        bool isOfType_member(const SpecialItemID p_type) const;
+        bool isOfType_member(const char* p_type) const;
 
         void setFlagsExtra(const FlagField p_flags);
         void setFlagExtra(const FlagField p_flag);
@@ -196,6 +198,11 @@ namespace M1Store{
 
         void setText(const QString& p_text);
         char* text() const;
+
+        QString dbgString() const;
+        QString dbgTypeShort() const;
+        QString dbgShort() const;
+        QString getTypeDbg_string(){return m_type.dbgString();}
     };
 
     // ----------------------------------------- SpecialItem ----------------------------------------------------
@@ -242,4 +249,12 @@ namespace M1Store{
 
 } // end namespace M1Store
 
+    QDebug operator<<(QDebug d, M1Store::ItemType p);
+    QDebug operator<<(QDebug d, M1Store::ItemType* p);
+
+    QDebug operator<<(QDebug d, M1Store::Item_lv0 p);
+    QDebug operator<<(QDebug d, M1Store::Item_lv0* p);
+
+    QDebug operator<<(QDebug d, M1Store::SpecialItem p);
+    QDebug operator<<(QDebug d, M1Store::SpecialItem* p);
 #endif // M1_LV0_ITEM_H

@@ -12,13 +12,15 @@
 
 #include <gtest/gtest.h>
 
-#include "m1_lv0_item.h"
+#include "m1B_lv0_item.h"
+#include "m1A_env.h"
 
 Q_LOGGING_CATEGORY(g_cat_lv0_test, "lv0.test")
 
 // ----------------------------- M1Store::ItemType -------------------------------------------------------------
 
 TEST(ItemTypeTest, IndexOutOfBounds){
+    M1_FUNC_ENTRY(g_main_test, QString("ItemTypeTest/IndexOutOfBounds test "))
     M1Store::ItemType l_type;
 
     EXPECT_DEATH(l_type.setSpecialType(4, 47), "");
@@ -27,9 +29,12 @@ TEST(ItemTypeTest, IndexOutOfBounds){
 
     EXPECT_DEATH(l_type.getSpecialType(4), "");
     EXPECT_DEATH(l_type.getSpecialType(-1), "");
+
+    M1_FUNC_EXIT
 }
 
 TEST(ItemTypeTest, ValueStore){
+    M1_FUNC_ENTRY(g_main_test, QString("ItemTypeTest/ValueStore test "))
     M1Store::ItemType l_type;
 
     l_type.setSpecialType(0, 0x10ab);
@@ -40,21 +45,24 @@ TEST(ItemTypeTest, ValueStore){
     EXPECT_EQ(l_type.getSpecialType(1), 48);
     EXPECT_EQ(l_type.getSpecialType(2), 59);
     EXPECT_EQ(l_type.getSpecialType(3), 0xf001);
+
+    M1_FUNC_EXIT
 }
 
 // ----------------------------- M1Store::Item -------------------------------------------------------------
 
 // triggers asserts that protect against unlawful combinations of item config and member access
 TEST(ItemTest, AppropriateConfig){
+    M1_FUNC_ENTRY(g_main_test, QString("ItemTest/AppropriateConfig test "))
     qCDebug(g_cat_lv0_test) << QString("Testing the asserts guaranteeing proper access to members");
 
     // start as a full edge with 4 short types (all flags = 0)
     M1Store::Item_lv0 l_item(0, 0, M1Store::ItemType());
 
     qCDebug(g_cat_lv0_test) << QString("isOfType(SpecialItemID) call / TYPE_IS_ITEM_ID inconsistency");
-    EXPECT_DEATH(l_item.isOfType((M1Store::ItemID) 43), "");
+    EXPECT_DEATH(l_item.isOfType_member((M1Store::ItemID) 43), "");
     l_item.setFlags(M1Store::TYPE_IS_ITEM_ID);
-    EXPECT_DEATH(l_item.isOfType((M1Store::SpecialItemID) 44), "");
+    EXPECT_DEATH(l_item.isOfType_member((M1Store::SpecialItemID) 44), "");
     EXPECT_DEATH(l_item.setFlag(0x3, false), "");
     EXPECT_DEATH(l_item.setFlag(0xb0, false), "");
     EXPECT_DEATH(l_item.setFlag(0xf000, false), "");
@@ -82,65 +90,65 @@ TEST(ItemTest, AppropriateConfig){
     M1Store::ItemID w = 0;
     qCDebug(g_cat_lv0_test) << QString("setOrigin/target() call / FULL_VERTEX,SIMPLE_VERTEX inconsistency");
     EXPECT_DEATH(l_item.setOrigin(2315), "");
-    EXPECT_DEATH(w = l_item.origin(), "");
+    EXPECT_DEATH(w = l_item.origin_item_id(), "");
     // becomes simple vertex
     l_item.setFlags(M1Store::SIMPLE_VERTEX);
     EXPECT_DEATH(l_item.setOrigin(2316), "");
-    EXPECT_DEATH(w = l_item.origin(), "");
+    EXPECT_DEATH(w = l_item.origin_item_id(), "");
 
     l_item.setFlags(M1Store::FULL_VERTEX);
     EXPECT_DEATH(l_item.setTarget(2315), "");
-    EXPECT_DEATH(w = l_item.target(), "");
+    EXPECT_DEATH(w = l_item.target_item_id(), "");
     l_item.setFlags(M1Store::SIMPLE_VERTEX);
     EXPECT_DEATH(l_item.setTarget(2316), "");
-    EXPECT_DEATH(w = l_item.target(), "");
+    EXPECT_DEATH(w = l_item.target_item_id(), "");
     l_item.setFlags(M1Store::SIMPLE_EDGE);
     EXPECT_DEATH(l_item.setTarget(2317), "");
-    EXPECT_DEATH(w = l_item.target(), "");
+    EXPECT_DEATH(w = l_item.target_item_id(), "");
 
     // becomes full vertex
     qCDebug(g_cat_lv0_test) << QString("setPrevious() call / vertices inconsistency");
     l_item.setFlags(M1Store::FULL_VERTEX);
     EXPECT_DEATH(l_item.setPrevious(2325), "");
-    EXPECT_DEATH(w = l_item.previous(), "");
+    EXPECT_DEATH(w = l_item.previous_item_id(), "");
     // becomes simple vertex
     l_item.setFlags(M1Store::SIMPLE_VERTEX);
     EXPECT_DEATH(l_item.setPrevious(2326), "");
-    EXPECT_DEATH(w = l_item.previous(), "");
+    EXPECT_DEATH(w = l_item.previous_item_id(), "");
 
     qCDebug(g_cat_lv0_test) << QString("setReciprocal() call / anything other than full edge inconsistency");
     // becomes full vertex
     l_item.setFlags(M1Store::FULL_VERTEX);
     EXPECT_DEATH(l_item.setReciprocal(2415), "");
-    EXPECT_DEATH(w = l_item.reciprocal(), "");
+    EXPECT_DEATH(w = l_item.reciprocal_item_id(), "");
     // becomes simple vertex
     l_item.setFlags(M1Store::SIMPLE_VERTEX);
     EXPECT_DEATH(l_item.setReciprocal(2416), "");
-    EXPECT_DEATH(w = l_item.reciprocal(), "");
+    EXPECT_DEATH(w = l_item.reciprocal_item_id(), "");
     // becomes simple edge
     l_item.setFlags(M1Store::SIMPLE_EDGE);
     EXPECT_DEATH(l_item.setReciprocal(2417), "");
-    EXPECT_DEATH(w = l_item.reciprocal(), "");
+    EXPECT_DEATH(w = l_item.reciprocal_item_id(), "");
 
     qCDebug(g_cat_lv0_test) << QString("setFirstEdge() call / simples inconsistency");
     // becomes simple edge
     l_item.setFlags(M1Store::SIMPLE_EDGE);
     EXPECT_DEATH(l_item.setFirstEdge(2327), "");
-    EXPECT_DEATH(w = l_item.firstEdge(), "");
+    EXPECT_DEATH(w = l_item.firstEdge_item_id(), "");
     // becomes simple vertex
     l_item.setFlags(M1Store::SIMPLE_VERTEX);
     EXPECT_DEATH(l_item.setFirstEdge(2328), "");
-    EXPECT_DEATH(w = l_item.firstEdge(), "");
+    EXPECT_DEATH(w = l_item.firstEdge_item_id(), "");
 
     qCDebug(g_cat_lv0_test) << QString("setFirstEdgeSpecial() call / simples inconsistency");
     // becomes simple edge
     l_item.setFlags(M1Store::SIMPLE_EDGE);
     EXPECT_DEATH(l_item.setFirstEdgeSpecial(2329), "");
-    EXPECT_DEATH(w = l_item.firstEdgeSpecial(), "");
+    EXPECT_DEATH(w = l_item.firstEdgeSpecial_item_id(), "");
     // becomes simple vertex
     l_item.setFlags(M1Store::SIMPLE_VERTEX);
     EXPECT_DEATH(l_item.setFirstEdgeSpecial(2330), "");
-    EXPECT_DEATH(w = l_item.firstEdgeSpecial(), "");
+    EXPECT_DEATH(w = l_item.firstEdgeSpecial_item_id(), "");
 
     QDateTime t;
     qCDebug(g_cat_lv0_test) << QString("setCreationDate()/setLastmodDate() call / simples inconsistency");
@@ -205,162 +213,14 @@ TEST(ItemTest, AppropriateConfig){
     // becomes full vertex
     l_item.setFlags(M1Store::FULL_VERTEX);
     EXPECT_EQ(QString(l_item.text()), QString(""));
+
+    M1_FUNC_EXIT
 }
-/*
-// set/get of members in different Item configs
-TEST(ItemTest, ValuesRoundTrip){
-    M1Store::Item l_item(0, 0, M1Store::ItemType());
 
-    l_item.setFlags(M1Store::FULL_VERTEX);
-    l_item.setFlagsExtra(0xab01);
-    EXPECT_EQ(l_item.flagsExtra(), 0xab01);
-    l_item.setFlags(M1Store::FULL_EDGE);
-    l_item.setFlagsExtra(0x90b2);
-    EXPECT_EQ(l_item.flagsExtra(), 0x90b2);
-
-    l_item.setOrigin(213);
-    EXPECT_EQ(l_item.origin(), 213);
-    l_item.setFlags(M1Store::SIMPLE_EDGE);
-    l_item.setOrigin(313);
-    EXPECT_EQ(l_item.origin(), 313);
-
-    l_item.setFlags(M1Store::FULL_EDGE);
-    l_item.setTarget(813);
-    EXPECT_EQ(l_item.target(), 813);
-
-    l_item.setFlags(M1Store::FULL_EDGE);
-    l_item.setPrevious(814);
-    EXPECT_EQ(l_item.previous(), 814);
-    l_item.setFlags(M1Store::SIMPLE_EDGE);
-    l_item.setPrevious(816);
-    EXPECT_EQ(l_item.previous(), 816);
-
-    l_item.setFlags(M1Store::FULL_EDGE);
-    l_item.setNext(914);
-    EXPECT_EQ(l_item.next(), 914);
-    l_item.setFlags(M1Store::SIMPLE_EDGE);
-    l_item.setNext(916);
-    EXPECT_EQ(l_item.next(), 916);
-
-    l_item.setFlags(M1Store::FULL_EDGE);
-    l_item.setTarget(823);
-    EXPECT_EQ(l_item.target(), 823);
-
-    l_item.setFlags(M1Store::FULL_EDGE);
-    l_item.setFirstEdge(924);
-    EXPECT_EQ(l_item.firstEdge(), 924);
-    l_item.setFlags(M1Store::FULL_VERTEX);
-    l_item.setFirstEdge(926);
-    EXPECT_EQ(l_item.firstEdge(), 926);
-
-    l_item.setFlags(M1Store::FULL_EDGE);
-    l_item.setFirstEdgeSpecial(934);
-    EXPECT_EQ(l_item.firstEdgeSpecial(), 934);
-    l_item.setFlags(M1Store::FULL_VERTEX);
-    l_item.setFirstEdgeSpecial(926);
-    EXPECT_EQ(l_item.firstEdgeSpecial(), 926);
-
-    l_item.setFlags(M1Store::FULL_EDGE);
-    QDateTime d = QDateTime::currentDateTime();
-    l_item.setCreationDate(d);
-    // a round trip between QDateTime and ms since epoch can result in a difference of 1 ms
-    EXPECT_NEAR(l_item.creationDate().currentMSecsSinceEpoch(), d.currentMSecsSinceEpoch(), 1);
-    d = d.addSecs(10);
-    l_item.setFlags(M1Store::FULL_VERTEX);
-    l_item.setCreationDate(d);
-    // a round trip between QDateTime and ms since epoch can result in a difference of 1 ms
-    EXPECT_NEAR(l_item.creationDate().currentMSecsSinceEpoch(), d.currentMSecsSinceEpoch(), 1);
-
-    l_item.setFlags(M1Store::FULL_EDGE);
-    d = d.addSecs(12);
-    l_item.setLastmodDate(d);
-    // a round trip between QDateTime and ms since epoch can result in a difference of 1 ms
-    EXPECT_NEAR(l_item.lastmodDate().currentMSecsSinceEpoch(), d.currentMSecsSinceEpoch(), 1);
-    d = d.addSecs(15);
-    l_item.setFlags(M1Store::FULL_VERTEX);
-    l_item.setLastmodDate(d);
-    // a round trip between QDateTime and ms since epoch can result in a difference of 1 ms
-    EXPECT_NEAR(l_item.lastmodDate().currentMSecsSinceEpoch(), d.currentMSecsSinceEpoch(), 1);
-
-    l_item.setFlags(M1Store::FULL_EDGE);
-    l_item.setIncomingEdges(87);
-    EXPECT_EQ(l_item.incomingEdges(), 87);
-    l_item.addIncomingEdges(3);
-    EXPECT_EQ(l_item.incomingEdges(), 90);
-    l_item.setFlags(M1Store::FULL_VERTEX);
-    l_item.setIncomingEdges(88);
-    EXPECT_EQ(l_item.incomingEdges(), 88);
-    l_item.addIncomingEdges(3);
-    EXPECT_EQ(l_item.incomingEdges(), 91);
-
-    l_item.setFlags(M1Store::FULL_VERTEX);
-    l_item.setVisibleEdges(145);
-    EXPECT_EQ(l_item.visibleEdges(), 145);
-    l_item.addVisibleEdges(5);
-    EXPECT_EQ(l_item.visibleEdges(), 150);
-
-    QString s0("");
-    l_item.setFlags(M1Store::SIMPLE_EDGE);
-    EXPECT_EQ(l_item.flags() & M1Store::ITEM_HAS_LOCAL_STRING, 0);
-    QString s1("toto dggsgsdghrwthhs sfghdsfsg sdsfggsdfg sdtewrwwtwrwjdd efhhjetyje");
-    l_item.setText(s1);
-    EXPECT_EQ(l_item.flags() & M1Store::ITEM_HAS_LOCAL_STRING, M1Store::ITEM_HAS_LOCAL_STRING);
-    EXPECT_EQ(QString(l_item.text()), s1);
-    l_item.setText(s0);
-    EXPECT_EQ(l_item.flags() & M1Store::ITEM_HAS_LOCAL_STRING, 0);
-
-    l_item.setFlags(M1Store::SIMPLE_VERTEX);
-    EXPECT_EQ(l_item.flags() & M1Store::ITEM_HAS_LOCAL_STRING, 0);
-    QString s2("tutu JLK sfddsgfk dlfgkdfo dlfgkodpofit ddifigudffnd dfiiugoddeeoritu dfigu");
-    l_item.setText(s2);
-    EXPECT_EQ(l_item.flags() & M1Store::ITEM_HAS_LOCAL_STRING, M1Store::ITEM_HAS_LOCAL_STRING);
-    EXPECT_EQ(QString(l_item.text()), s2);
-    l_item.setText(s0);
-    EXPECT_EQ(l_item.flags() & M1Store::ITEM_HAS_LOCAL_STRING, 0);
-
-    l_item.setFlags(M1Store::FULL_VERTEX);
-    EXPECT_EQ(l_item.flags() & M1Store::ITEM_HAS_LOCAL_STRING, 0);
-    EXPECT_EQ(M1Store::Storage::dbg_get_string_id(l_item), M1Store::G_VOID_ID);
-    QString s3;
-    s3.fill('x', M1Store::FULL_VERTEX_TEXT_LEN -1);
-    l_item.setText(s3);
-    EXPECT_EQ(M1Store::Storage::dbg_get_string_id(l_item), M1Store::G_VOID_ID);
-    EXPECT_EQ(l_item.flags() & M1Store::ITEM_HAS_LOCAL_STRING, M1Store::ITEM_HAS_LOCAL_STRING);
-    EXPECT_EQ(QString(l_item.text()), s3);
-    s3 = "x" + s3;
-    l_item.setText(s3);
-    EXPECT_NE(M1Store::Storage::dbg_get_string_id(l_item), M1Store::G_VOID_ID);
-    EXPECT_EQ(l_item.flags() & M1Store::ITEM_HAS_LOCAL_STRING, 0);
-    EXPECT_EQ(QString(l_item.text()), s3);
-    s3 = "titi " + s3;
-    l_item.setText(s3);
-    EXPECT_NE(M1Store::Storage::dbg_get_string_id(l_item), M1Store::G_VOID_ID);
-    EXPECT_EQ(l_item.flags() & M1Store::ITEM_HAS_LOCAL_STRING, 0);
-    EXPECT_EQ(QString(l_item.text()), s3);
-    QString s4;
-    s4.fill('z', M1Store::FULL_VERTEX_TEXT_LEN -1);
-    l_item.setText(s4);
-    EXPECT_EQ(M1Store::Storage::dbg_get_string_id(l_item), M1Store::G_VOID_ID);
-    EXPECT_EQ(l_item.flags() & M1Store::ITEM_HAS_LOCAL_STRING, M1Store::ITEM_HAS_LOCAL_STRING);
-    EXPECT_EQ(QString(l_item.text()), s4);
-    s4 = "z" + s4;
-    l_item.setText(s4);
-    EXPECT_NE(M1Store::Storage::dbg_get_string_id(l_item), M1Store::G_VOID_ID);
-    EXPECT_EQ(l_item.flags() & M1Store::ITEM_HAS_LOCAL_STRING, 0);
-    EXPECT_EQ(QString(l_item.text()), s4);
-    s4 = "tata " + s4;
-    l_item.setText(s4);
-    EXPECT_NE(M1Store::Storage::dbg_get_string_id(l_item), M1Store::G_VOID_ID);
-    EXPECT_EQ(l_item.flags() & M1Store::ITEM_HAS_LOCAL_STRING, 0);
-    EXPECT_EQ(QString(l_item.text()), s4);
-    l_item.setText(s0);
-    EXPECT_EQ(M1Store::Storage::dbg_get_string_id(l_item), M1Store::G_VOID_ID);
-    EXPECT_EQ(l_item.flags() & M1Store::ITEM_HAS_LOCAL_STRING, 0);
-}
-*/
 
 // set/get of members in different Item configs
 TEST(ItemTest, ValuesRoundTripFullVertex){
+    M1_FUNC_ENTRY(g_main_test, QString("ItemTest/ValuesRoundTripFullVertex test "))
     qCDebug(g_cat_lv0_test) << QString("Putting random values in and retrieving them in a FULL_VERTEX");
     for(int t=0; t<20; t++){
         qCDebug(g_cat_lv0_test) << QString("Item: %1").arg(t);
@@ -445,7 +305,7 @@ TEST(ItemTest, ValuesRoundTripFullVertex){
             case 2:
                 // m_type
                 l_type = M1Store::ItemType(l_distr_id(l_gen));
-                l_item.setType(l_type.getItemIDType());
+                l_item.setType_item_id(l_type.getItemIDType());
                 break;
             case 3:
                 // m_flags_extra
@@ -506,7 +366,7 @@ TEST(ItemTest, ValuesRoundTripFullVertex){
                 l_slot = l_distr_slot(l_gen);
                 l_special = l_distr_special(l_gen);
                 l_type.setSpecialType(l_slot, l_special);
-                l_item.setType(l_slot, l_special);
+                l_item.setType_si_id(l_slot, l_special);
                 break;
             case 13:
                 // add to incoming edges
@@ -552,23 +412,24 @@ TEST(ItemTest, ValuesRoundTripFullVertex){
             qCDebug(g_cat_lv0_test) << QString("Round: %1 Testing equalities").arg(i);
             EXPECT_EQ(l_item.item_id(), l_id);
             EXPECT_EQ(l_item.flags(), l_flags);
-            EXPECT_EQ(l_item.getType(), l_type.getItemIDType());
+            EXPECT_EQ(l_item.getType_item_id(), l_type.getItemIDType());
             EXPECT_EQ(l_item.flagsExtra(), l_flags_extra);
             EXPECT_NEAR(l_item.creationDate().currentMSecsSinceEpoch(), l_date_creation.currentMSecsSinceEpoch(), 100);
             EXPECT_NEAR(l_item.lastmodDate().currentMSecsSinceEpoch(), l_date_lastmod.currentMSecsSinceEpoch(), 100);
             EXPECT_EQ(l_item.incomingEdges(), l_incoming_edges);
             EXPECT_EQ(l_item.visibleEdges(), l_visible_edges);
-            EXPECT_EQ(l_item.firstEdge(), l_first_edge);
-            EXPECT_EQ(l_item.firstEdgeSpecial(), l_first_edge_special);
+            EXPECT_EQ(l_item.firstEdge_item_id(), l_first_edge);
+            EXPECT_EQ(l_item.firstEdgeSpecial_item_id(), l_first_edge_special);
             EXPECT_EQ(QString(l_item.text()), l_text);
             qCDebug(g_cat_lv0_test) << QString("Round: %1 Testing Done ----------------------------------------------------").arg(i);
         }
         //qCDebug(g_cat_store_test) << QString("Random: %1").arg(l_distr(l_gen));
     }
+    M1_FUNC_EXIT
 }
 
 TEST(ItemTest, ValuesRoundTripFullEdge){
-    qCDebug(g_cat_lv0_test) << QString("Putting random values in and retrieving them in a FULL_EDGE");
+    M1_FUNC_ENTRY(g_main_test, QString("ItemTest/ValuesRoundTripFullEdge test "))
     for(int t=0; t<20; t++){
         qCDebug(g_cat_lv0_test) << QString("Item: %1").arg(t);
 
@@ -655,7 +516,7 @@ TEST(ItemTest, ValuesRoundTripFullEdge){
             case 2:
                 // m_type
                 l_type = M1Store::ItemType(l_distr_id(l_gen));
-                l_item.setType(l_type.getItemIDType());
+                l_item.setType_item_id(l_type.getItemIDType());
                 break;
             case 3:
                 // m_flags_extra
@@ -729,7 +590,7 @@ TEST(ItemTest, ValuesRoundTripFullEdge){
                 l_slot = l_distr_slot(l_gen);
                 l_special = l_distr_special(l_gen);
                 l_type.setSpecialType(l_slot, l_special);
-                l_item.setType(l_slot, l_special);
+                l_item.setType_si_id(l_slot, l_special);
                 break;
             case 16:
                 // add to incoming edges
@@ -769,27 +630,28 @@ TEST(ItemTest, ValuesRoundTripFullEdge){
             qCDebug(g_cat_lv0_test) << QString("Round: %1 Testing equalities").arg(i);
             EXPECT_EQ(l_item.item_id(), l_id);
             EXPECT_EQ(l_item.flags(), l_flags);
-            EXPECT_EQ(l_item.getType(), l_type.getItemIDType());
+            EXPECT_EQ(l_item.getType_item_id(), l_type.getItemIDType());
             EXPECT_EQ(l_item.flagsExtra(), l_flags_extra);
             EXPECT_NEAR(l_item.creationDate().currentMSecsSinceEpoch(), l_date_creation.currentMSecsSinceEpoch(), 100);
             EXPECT_NEAR(l_item.lastmodDate().currentMSecsSinceEpoch(), l_date_lastmod.currentMSecsSinceEpoch(), 100);
             EXPECT_EQ(l_item.incomingEdges(), l_incoming_edges);
-            EXPECT_EQ(l_item.firstEdge(), l_first_edge);
-            EXPECT_EQ(l_item.firstEdgeSpecial(), l_first_edge_special);
-            EXPECT_EQ(l_item.origin(), l_v_origin);
-            EXPECT_EQ(l_item.target(), l_v_target);
-            EXPECT_EQ(l_item.previous(), l_e_previous);
-            EXPECT_EQ(l_item.next(), l_e_next);
-            EXPECT_EQ(l_item.reciprocal(), l_e_reciprocal);
+            EXPECT_EQ(l_item.firstEdge_item_id(), l_first_edge);
+            EXPECT_EQ(l_item.firstEdgeSpecial_item_id(), l_first_edge_special);
+            EXPECT_EQ(l_item.origin_item_id(), l_v_origin);
+            EXPECT_EQ(l_item.target_item_id(), l_v_target);
+            EXPECT_EQ(l_item.previous_item_id(), l_e_previous);
+            EXPECT_EQ(l_item.next_item_id(), l_e_next);
+            EXPECT_EQ(l_item.reciprocal_item_id(), l_e_reciprocal);
             EXPECT_EQ(QString(l_item.text()), l_text);
             qCDebug(g_cat_lv0_test) << QString("Round: %1 Testing Done ----------------------------------------------------").arg(i);
         }
         //qCDebug(g_cat_store_test) << QString("Random: %1").arg(l_distr(l_gen));
     }
+    M1_FUNC_EXIT
 }
 
 TEST(ItemTest, ValuesRoundTripSimpleEdge){
-    qCDebug(g_cat_lv0_test) << QString("Putting random values in and retrieving them in a FULL_EDGE");
+    M1_FUNC_ENTRY(g_main_test, QString("ItemTest/ValuesRoundTripSimpleEdge test "))
     for(int t=0; t<20; t++){
         qCDebug(g_cat_lv0_test) << QString("Item: %1").arg(t);
 
@@ -850,7 +712,7 @@ TEST(ItemTest, ValuesRoundTripSimpleEdge){
             case 2:
                 // m_type
                 l_type = M1Store::ItemType(l_distr_id(l_gen));
-                l_item.setType(l_type.getItemIDType());
+                l_item.setType_item_id(l_type.getItemIDType());
                 break;
             case 3:
                 // m_v_origin
@@ -882,7 +744,7 @@ TEST(ItemTest, ValuesRoundTripSimpleEdge){
                 l_slot = l_distr_slot(l_gen);
                 l_special = l_distr_special(l_gen);
                 l_type.setSpecialType(l_slot, l_special);
-                l_item.setType(l_slot, l_special);
+                l_item.setType_si_id(l_slot, l_special);
                 break;
             case 8:
                 // set flag
@@ -902,19 +764,20 @@ TEST(ItemTest, ValuesRoundTripSimpleEdge){
             qCDebug(g_cat_lv0_test) << QString("Round: %1 Testing equalities").arg(i);
             EXPECT_EQ(l_item.item_id(), l_id);
             EXPECT_EQ(l_item.flags(), l_flags);
-            EXPECT_EQ(l_item.getType(), l_type.getItemIDType());
-            EXPECT_EQ(l_item.origin(), l_v_origin);
-            EXPECT_EQ(l_item.previous(), l_e_previous);
-            EXPECT_EQ(l_item.next(), l_e_next);
+            EXPECT_EQ(l_item.getType_item_id(), l_type.getItemIDType());
+            EXPECT_EQ(l_item.origin_item_id(), l_v_origin);
+            EXPECT_EQ(l_item.previous_item_id(), l_e_previous);
+            EXPECT_EQ(l_item.next_item_id(), l_e_next);
             EXPECT_EQ(QString(l_item.text()), l_text);
             qCDebug(g_cat_lv0_test) << QString("Round: %1 Testing Done ----------------------------------------------------").arg(i);
         }
         //qCDebug(g_cat_store_test) << QString("Random: %1").arg(l_distr(l_gen));
     }
+    M1_FUNC_EXIT
 }
 
 TEST(ItemTest, ValuesRoundTripSimpleVertex){
-    qCDebug(g_cat_lv0_test) << QString("Putting random values in and retrieving them in a FULL_EDGE");
+    M1_FUNC_ENTRY(g_main_test, QString("ItemTest/ValuesRoundTripSimpleVertex test "))
     for(int t=0; t<20; t++){
         qCDebug(g_cat_lv0_test) << QString("Item: %1").arg(t);
 
@@ -967,7 +830,7 @@ TEST(ItemTest, ValuesRoundTripSimpleVertex){
             case 2:
                 // m_type
                 l_type = M1Store::ItemType(l_distr_id(l_gen));
-                l_item.setType(l_type.getItemIDType());
+                l_item.setType_item_id(l_type.getItemIDType());
                 break;
             case 3:
                 // text below FULL_EDGE_TEXT_LEN
@@ -984,7 +847,7 @@ TEST(ItemTest, ValuesRoundTripSimpleVertex){
                 l_slot = l_distr_slot(l_gen);
                 l_special = l_distr_special(l_gen);
                 l_type.setSpecialType(l_slot, l_special);
-                l_item.setType(l_slot, l_special);
+                l_item.setType_si_id(l_slot, l_special);
                 break;
             case 5:
                 // set flag
@@ -1004,12 +867,12 @@ TEST(ItemTest, ValuesRoundTripSimpleVertex){
             qCDebug(g_cat_lv0_test) << QString("Round: %1 Testing equalities").arg(i);
             EXPECT_EQ(l_item.item_id(), l_id);
             EXPECT_EQ(l_item.flags(), l_flags);
-            EXPECT_EQ(l_item.getType(), l_type.getItemIDType());
+            EXPECT_EQ(l_item.getType_item_id(), l_type.getItemIDType());
             EXPECT_EQ(QString(l_item.text()), l_text);
             qCDebug(g_cat_lv0_test) << QString("Round: %1 Testing Done ----------------------------------------------------").arg(i);
         }
-        //qCDebug(g_cat_store_test) << QString("Random: %1").arg(l_distr(l_gen));
     }
+    M1_FUNC_EXIT
 }
 
 
