@@ -22,9 +22,11 @@ add_executable(lv0_test
     ../m1B_store.cpp
     ../m1B_lv0_item.h
     ../m1B_lv0_item.cpp
-    ../m1B_lv0_item_test.cpp
+    ../m1B_lv1_item.h
+    ../m1B_lv1_item.cpp
     ../m1B_lv2_item.h
     ../m1B_lv2_item.cpp
+    ../m1B_lv0_item_test.cpp
     ../main_test_store_lv0.cpp
 )
 target_link_libraries(lv0_test Qt${QT_VERSION_MAJOR}::Core gtest gtest_main lmdb ${Boost_FILESYSTEM_LIBRARY})

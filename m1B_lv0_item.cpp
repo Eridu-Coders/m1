@@ -37,7 +37,6 @@ M1Store::ItemType::ItemType(const SpecialItemID p_0, const SpecialItemID p_1, co
     qCDebug(g_cat_lv0_item_type) << QString("Constructed: %1").arg(dbgString());
 }
 
-
 /**
  * @brief Setter 2 - one of the 4 short type
  * @param p_index the number of the type to set (0 to 3)
@@ -66,7 +65,7 @@ M1Store::SpecialItemID M1Store::ItemType::getSpecialType(const unsigned int p_in
 }
 
 /**
- * @brief get a debug representation of this type
+ * @brief low-level debug representation
  * @return the debug string
  */
 QString M1Store::ItemType::dbgString() const{
@@ -79,9 +78,36 @@ QString M1Store::ItemType::dbgString() const{
         .arg(t.m_type_item);
 }
 
+/**
+ * @brief Human readable debug string
+ * @return
+ */
+QString M1Store::ItemType::dbgStringHr(bool p_is_item_id) const{
+    if(p_is_item_id)
+        return QString("<II %1>").arg(Item_lv2::getExisting(t.m_type_item)->text());
+    else
+        return QString("<4SI %1%2%3%4>")
+            .arg(t.m_type_short[0] == M1Env::G_VOID_SI_ID ? "" : Storage::getSpecialItemPointer(t.m_type_short[0])->mnemonic())
+            .arg(t.m_type_short[1] == M1Env::G_VOID_SI_ID ? "" : Storage::getSpecialItemPointer(t.m_type_short[1])->mnemonic())
+            .arg(t.m_type_short[2] == M1Env::G_VOID_SI_ID ? "" : Storage::getSpecialItemPointer(t.m_type_short[2])->mnemonic())
+            .arg(t.m_type_short[3] == M1Env::G_VOID_SI_ID ? "" : Storage::getSpecialItemPointer(t.m_type_short[3])->mnemonic())
+            .replace("<4SI >", "<4SI None>");
+}
+
 // ---------------------------------------------------------------------------------------------------------
 // ----------------------------- M1Store::SpecialItem ------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------
+
+/**
+ * @brief Use for debug purposes
+ * @param p_mnemo
+ */
+M1Store::SpecialItem::SpecialItem(const char* p_mnemo){
+    // make sure the memonic member is initialized to 0 (normally not necessary
+    memset(m_mnemonic, 0, 5);
+    strncpy(m_mnemonic, p_mnemo, 5);
+}
+M1Store::SpecialItem* M1Store::SpecialItem::cm_dummy = new M1Store::SpecialItem("dummy");
 
 /**
  * @brief mnemonic getter (as a QString)
@@ -133,7 +159,7 @@ void M1Store::SpecialItem::setAttr(const ItemID p_item_id, const SpecialItemID p
 QString M1Store::SpecialItem::dbgString() const {
     QString l_item_dbg;
     if(M1Store::Item_lv2* l_item = M1Store::Item_lv2::getExisting(m_item_id)){
-        l_item_dbg = " --ITEM--> " +l_item->dbgShort();
+        l_item_dbg = " --ITEM--> " + l_item->dbgShort();
     }
 
     return QString("0x%1 %2 0x%3 0b%4%5%6")
@@ -267,7 +293,7 @@ M1Store::FlagField M1Store::Item_lv0::flags() const {
  * @param p_index index of the one to set (0 to 3)
  * @param p_type the new value
  */
-void M1Store::Item_lv0::setType_si_id(const unsigned int p_index, const M1Store::SpecialItemID p_type){
+void M1Store::Item_lv0::setType_member_si_id(const unsigned int p_index, const M1Store::SpecialItemID p_type){
     M1_FUNC_ENTRY(g_cat_lv0_members, QString("Set special type %1 to %2").arg(p_index).arg(p_type))
     Q_ASSERT(p_index < 4);
 
@@ -303,7 +329,7 @@ M1Store::ItemID M1Store::Item_lv0::getType_item_id() const{
  * @brief set type as an ItemID
  * @param p_type the new type value
  */
-void M1Store::Item_lv0::setType_item_id(const M1Store::ItemID p_type_item_id){
+void M1Store::Item_lv0::setType_member_item_id(const M1Store::ItemID p_type_item_id){
     M1_FUNC_ENTRY(g_cat_lv0_members, QString("Set Item ID type to 0x%1").arg(p_type_item_id, 16, 16, QLatin1Char('0')))
     m_type = p_type_item_id;
 
@@ -357,6 +383,7 @@ bool M1Store::Item_lv0::isOfType_member(const M1Store::SpecialItemID p_type) con
  */
 bool M1Store::Item_lv0::isOfType_member(const char* p_mnemonic) const{
     SpecialItem* pi = Storage::getSpecialItemPointer(p_mnemonic);
+    M1_FUNC_ENTRY(g_cat_lv0_members, QString("Checking whether is of type (mnemonic) %1 ...").arg(p_mnemonic))
 
     M1_FUNC_EXIT
     return M1Store::Item_lv0::isOfType_member(pi->specialId());
@@ -646,6 +673,36 @@ M1Store::ItemID M1Store::Item_lv0::firstEdge_item_id() const {
 }
 
 // ---------------------------------------------------------------------------------------------------------
+// auto edge (not for simple items)
+/**
+ * @brief set auto edge (not for simple items)
+ * @param p_auto_edge the ItemID value
+ */
+void M1Store::Item_lv0::setAutoEdge(const ItemID p_auto_edge){
+    M1_FUNC_ENTRY(g_cat_lv0_members, QString("setting auto edge to 0x%1").arg(p_auto_edge, 16, 16, QLatin1Char('0')))
+    Q_ASSERT_X((m_flags & ITEM_NATURE_MASK) == FULL_VERTEX, "Item::setAutoEdge()", "accessing the auto edge on a non-full vertex");
+
+    p.v.f.m_auto_edge = p_auto_edge;
+
+    M1_FUNC_EXIT
+}
+/**
+ * @brief get auto edge (not for simple items)
+ * @return the ItemID value
+ */
+M1Store::ItemID M1Store::Item_lv0::autoEdge_item_id() const{
+    M1_FUNC_ENTRY(g_cat_lv0_members, QString("Getting auto edge ..."))
+    Q_ASSERT_X((m_flags & ITEM_NATURE_MASK) == FULL_VERTEX, "Item::autoEdge_item_id()", "accessing the auto edge on a non-full vertex");
+
+    ItemID l_ret;
+    l_ret = p.v.f.m_auto_edge;
+    qCDebug(g_cat_lv0_members) << QString("--> 0x%1 %2").arg(l_ret, 16, 16, QLatin1Char('0')).arg(l_ret);
+
+    M1_FUNC_EXIT
+    return l_ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------
 // first special edge (not for simples)
 /**
  * @brief set first special edge (only for full items)
@@ -730,7 +787,7 @@ void M1Store::Item_lv0::setLastmodDate(const QDateTime& p_date){
  */
 QDateTime M1Store::Item_lv0::lastmodDate() const {
     M1_FUNC_ENTRY(g_cat_lv0_members, QString("Getting lastmod date ..."))
-    Q_ASSERT_X((m_flags & ITEM_IS_SIMPLE) == 0, "Item::lastmodDate()", "accessing the lastmod date on a non-full item");
+    Q_ASSERT_X((m_flags & ITEM_IS_SIMPLE) == 0, "Item_lv0::lastmodDate()", "accessing the lastmod date on a non-full item");
 
     QDateTime l_ret;
     if(m_flags & ITEM_IS_VERTEX) l_ret = QDateTime::fromMSecsSinceEpoch(p.v.f.m_lastmod_date);
@@ -741,6 +798,17 @@ QDateTime M1Store::Item_lv0::lastmodDate() const {
     return l_ret;
 }
 
+/**
+ * @brief getting the string ID (for Debug purposes)
+ * @return the string ID
+ */
+M1Env::StringID M1Store::Item_lv0::string_id() const{
+    M1_FUNC_ENTRY(g_cat_lv0_members, QString("Getting string id ..."))
+    Q_ASSERT_X((m_flags & ITEM_NATURE_MASK) == FULL_VERTEX, "Item_lv0::string_id()", "accessing the string id on a non-full vertex");
+    StringID l_ret = p.v.f.m_string_id;
+    M1_FUNC_EXIT
+    return l_ret;
+}
 // ---------------------------------------------------------------------------------------------------------
 // incoming edges count (not for simples)
 /**
@@ -868,7 +936,7 @@ void M1Store::Item_lv0::setText(const QString& p_text){
         if(p_text.toUtf8().length() <= FULL_VERTEX_TEXT_LEN-1){ // 0 < length < FULL_VERTEX_TEXT_LEN-1
             qCDebug(g_cat_lv0_members) << QString("storing into local string");
             strncpy(p.v.f.m_text, p_text.toUtf8().data(), FULL_VERTEX_TEXT_LEN); // strncpy() padds with \0
-            p.v.f.m_text[m1_min(SIMPLE_VERTEX_TEXT_LEN-1, p_text.length())] = 0; // to make sure
+            p.v.f.m_text[m1_min(FULL_VERTEX_TEXT_LEN-1, p_text.toUtf8().length())] = 0; // to make sure
             // set ITEM_HAS_LOCAL_STRING
             m_flags = m_flags | ITEM_HAS_LOCAL_STRING;
         }
@@ -884,17 +952,17 @@ void M1Store::Item_lv0::setText(const QString& p_text){
         if((m_flags & ITEM_NATURE_MASK) == FULL_EDGE){
             // full edge
             strncpy(p.e.f.m_text, p_text.toUtf8().data(), FULL_EDGE_TEXT_LEN); // strncpy() padds with \0
-            p.e.f.m_text[m1_min(SIMPLE_VERTEX_TEXT_LEN-1, p_text.length())] = 0; // to make sure
+            p.e.f.m_text[m1_min(FULL_EDGE_TEXT_LEN-1, p_text.toUtf8().length())] = 0; // to make sure
         }
         else if((m_flags & ITEM_NATURE_MASK) == SIMPLE_EDGE){
             // simple edge
             strncpy(p.e.s.m_text, p_text.toUtf8().data(), SIMPLE_EDGE_TEXT_LEN); // strncpy() padds with \0
-            p.e.s.m_text[m1_min(SIMPLE_VERTEX_TEXT_LEN-1, p_text.length())] = 0; // to make sure
+            p.e.s.m_text[m1_min(SIMPLE_EDGE_TEXT_LEN-1, p_text.toUtf8().length())] = 0; // to make sure
         }
         else{ // if((m_flags & ITEM_NATURE_MASK) == SIMPLE_VERTEX){
             // simple vertex (only choice left)
             strncpy(p.v.s.m_text, p_text.toUtf8().data(), SIMPLE_VERTEX_TEXT_LEN);  // strncpy() padds with \0
-            p.v.s.m_text[m1_min(SIMPLE_VERTEX_TEXT_LEN-1, p_text.length())] = 0; // to make sure
+            p.v.s.m_text[m1_min(SIMPLE_VERTEX_TEXT_LEN-1, p_text.toUtf8().length())] = 0; // to make sure
         }
 
         if(p_text.length() > 0) // set ITEM_HAS_LOCAL_STRING if string length > 0. Unset it otherwise
@@ -903,6 +971,7 @@ void M1Store::Item_lv0::setText(const QString& p_text){
             m_flags = m_flags & (~ITEM_HAS_LOCAL_STRING);
     }
 
+    qCDebug(g_cat_lv0_members) << QString("String Stored: %1").arg(text());
     M1_FUNC_EXIT
 }
 /**
@@ -1008,6 +1077,7 @@ void M1Store::Item_lv0::initializeMembers(){
         p.v.f.m_creation_date = QDateTime::currentDateTime().currentMSecsSinceEpoch();
         p.v.f.m_lastmod_date = QDateTime::currentDateTime().currentMSecsSinceEpoch();
         p.v.f.m_first_edge = G_VOID_ITEM_ID;
+        p.v.f.m_auto_edge = G_VOID_ITEM_ID;
         p.v.f.m_first_edge_special = G_VOID_ITEM_ID;
         p.v.f.m_flags_extra = 0;
         p.v.f.m_incoming_edges = 0;
@@ -1114,14 +1184,20 @@ QString M1Store::Item_lv0::dbgString() const{
 QString M1Store::Item_lv0::dbgTypeShort() const{
     if(getType_si_id(0) == G_VOID_SI_ID)
             return "_____";
-    else
-        return Storage::getSpecialItemPointer(getType_si_id(0))->mnemonic();
+    else{
+        QStringList m_type_list;
+            for(int i = 0; i<4; i++)
+            if(getType_si_id(i) != G_VOID_SI_ID)
+                m_type_list.append(Storage::getSpecialItemPointer(getType_si_id(i))->mnemonic());
+
+        return m_type_list.join("/");
+    }
 }
 
 QString M1Store::Item_lv0::dbgShort() const{
     switch(flags() & ITEM_NATURE_MASK){
     case FULL_VERTEX:
-            return QString("ITEM [%1] %2%3")
+            return QString("VRTX [%1] %2%3")
                 .arg(dbgTypeShort())
                 .arg(text())
                 .arg((flags() & IS_SPECIAL) ? QString(" (%1)").arg(M1Store::Storage::getSpecialItemPointer(item_id())->mnemonic()) : "");

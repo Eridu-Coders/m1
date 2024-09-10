@@ -140,6 +140,20 @@ TEST(ItemTest, AppropriateConfig){
     EXPECT_DEATH(l_item.setFirstEdge(2328), "");
     EXPECT_DEATH(w = l_item.firstEdge_item_id(), "");
 
+    qCDebug(g_cat_lv0_test) << QString("setAutoEdge() call / non full vertex inconsistency");
+    // becomes simple edge
+    l_item.setFlags(M1Store::SIMPLE_EDGE);
+    EXPECT_DEATH(l_item.setAutoEdge(2377), "");
+    EXPECT_DEATH(w = l_item.autoEdge_item_id(), "");
+    // becomes simple vertex
+    l_item.setFlags(M1Store::SIMPLE_VERTEX);
+    EXPECT_DEATH(l_item.setAutoEdge(2228), "");
+    EXPECT_DEATH(w = l_item.autoEdge_item_id(), "");
+    // becomes full edge
+    l_item.setFlags(M1Store::FULL_EDGE);
+    EXPECT_DEATH(l_item.setAutoEdge(2428), "");
+    EXPECT_DEATH(w = l_item.autoEdge_item_id(), "");
+
     qCDebug(g_cat_lv0_test) << QString("setFirstEdgeSpecial() call / simples inconsistency");
     // becomes simple edge
     l_item.setFlags(M1Store::SIMPLE_EDGE);
@@ -227,7 +241,7 @@ TEST(ItemTest, ValuesRoundTripFullVertex){
 
         std::random_device l_rd; // obtain a random number from hardware
         std::mt19937 l_gen(l_rd()); // seed the generator
-        std::uniform_int_distribution<int> l_distr_member(1, 18); // define the range for the choice of member
+        std::uniform_int_distribution<int> l_distr_member(1, 19); // define the range for the choice of member
         std::uniform_int_distribution<M1Store::ItemID> l_distr_id(0, 0xffffffffffffffff -1); // define the range for ItemIDs
         std::uniform_int_distribution<M1Store::FlagField> l_distr_flags(0, 0xffffffffffffffff); // define the range for flags
 
@@ -264,6 +278,7 @@ TEST(ItemTest, ValuesRoundTripFullVertex){
         M1Store::ItemCounter l_visible_edges = 0;
 
         M1Store::ItemID l_first_edge = M1Store::G_VOID_ITEM_ID;
+        M1Store::ItemID l_auto_edge = M1Store::G_VOID_ITEM_ID;
         M1Store::ItemID l_first_edge_special = M1Store::G_VOID_ITEM_ID;
 
         M1Store::StringID l_string_id = M1Store::G_VOID_ITEM_ID;
@@ -305,7 +320,7 @@ TEST(ItemTest, ValuesRoundTripFullVertex){
             case 2:
                 // m_type
                 l_type = M1Store::ItemType(l_distr_id(l_gen));
-                l_item.setType_item_id(l_type.getItemIDType());
+                l_item.setType_member_item_id(l_type.getItemIDType());
                 break;
             case 3:
                 // m_flags_extra
@@ -366,7 +381,7 @@ TEST(ItemTest, ValuesRoundTripFullVertex){
                 l_slot = l_distr_slot(l_gen);
                 l_special = l_distr_special(l_gen);
                 l_type.setSpecialType(l_slot, l_special);
-                l_item.setType_si_id(l_slot, l_special);
+                l_item.setType_member_si_id(l_slot, l_special);
                 break;
             case 13:
                 // add to incoming edges
@@ -408,6 +423,11 @@ TEST(ItemTest, ValuesRoundTripFullVertex){
                 l_item.unSetFlagExtra(l_bit);
                 l_flags_extra = l_flags_extra & (~l_bit);
                 break;
+            case 19:
+                // m_auto_edge
+                l_auto_edge = l_distr_id(l_gen);
+                l_item.setAutoEdge(l_auto_edge);
+                break;
             }
             qCDebug(g_cat_lv0_test) << QString("Round: %1 Testing equalities").arg(i);
             EXPECT_EQ(l_item.item_id(), l_id);
@@ -419,11 +439,12 @@ TEST(ItemTest, ValuesRoundTripFullVertex){
             EXPECT_EQ(l_item.incomingEdges(), l_incoming_edges);
             EXPECT_EQ(l_item.visibleEdges(), l_visible_edges);
             EXPECT_EQ(l_item.firstEdge_item_id(), l_first_edge);
+            EXPECT_EQ(l_item.autoEdge_item_id(), l_auto_edge) << "m_auto_edge failure";
+            // Q_ASSERT(l_item.autoEdge_item_id() == l_auto_edge);
             EXPECT_EQ(l_item.firstEdgeSpecial_item_id(), l_first_edge_special);
             EXPECT_EQ(QString(l_item.text()), l_text);
             qCDebug(g_cat_lv0_test) << QString("Round: %1 Testing Done ----------------------------------------------------").arg(i);
         }
-        //qCDebug(g_cat_store_test) << QString("Random: %1").arg(l_distr(l_gen));
     }
     M1_FUNC_EXIT
 }
@@ -435,7 +456,7 @@ TEST(ItemTest, ValuesRoundTripFullEdge){
 
         std::random_device l_rd; // obtain a random number from hardware
         std::mt19937 l_gen(l_rd()); // seed the generator
-        std::uniform_int_distribution<int> l_distr_member(1, 20); // define the range for the choice of member
+        std::uniform_int_distribution<int> l_distr_member(1, 21); // define the range for the choice of member
         std::uniform_int_distribution<M1Store::ItemID> l_distr_id(0, 0xffffffffffffffff -1); // define the range for ItemIDs
         std::uniform_int_distribution<M1Store::FlagField> l_distr_flags(0, 0xffffffffffffffff); // define the range for flags
 
@@ -516,7 +537,7 @@ TEST(ItemTest, ValuesRoundTripFullEdge){
             case 2:
                 // m_type
                 l_type = M1Store::ItemType(l_distr_id(l_gen));
-                l_item.setType_item_id(l_type.getItemIDType());
+                l_item.setType_member_item_id(l_type.getItemIDType());
                 break;
             case 3:
                 // m_flags_extra
@@ -590,7 +611,7 @@ TEST(ItemTest, ValuesRoundTripFullEdge){
                 l_slot = l_distr_slot(l_gen);
                 l_special = l_distr_special(l_gen);
                 l_type.setSpecialType(l_slot, l_special);
-                l_item.setType_si_id(l_slot, l_special);
+                l_item.setType_member_si_id(l_slot, l_special);
                 break;
             case 16:
                 // add to incoming edges
@@ -712,7 +733,7 @@ TEST(ItemTest, ValuesRoundTripSimpleEdge){
             case 2:
                 // m_type
                 l_type = M1Store::ItemType(l_distr_id(l_gen));
-                l_item.setType_item_id(l_type.getItemIDType());
+                l_item.setType_member_item_id(l_type.getItemIDType());
                 break;
             case 3:
                 // m_v_origin
@@ -744,7 +765,7 @@ TEST(ItemTest, ValuesRoundTripSimpleEdge){
                 l_slot = l_distr_slot(l_gen);
                 l_special = l_distr_special(l_gen);
                 l_type.setSpecialType(l_slot, l_special);
-                l_item.setType_si_id(l_slot, l_special);
+                l_item.setType_member_si_id(l_slot, l_special);
                 break;
             case 8:
                 // set flag
@@ -830,7 +851,7 @@ TEST(ItemTest, ValuesRoundTripSimpleVertex){
             case 2:
                 // m_type
                 l_type = M1Store::ItemType(l_distr_id(l_gen));
-                l_item.setType_item_id(l_type.getItemIDType());
+                l_item.setType_member_item_id(l_type.getItemIDType());
                 break;
             case 3:
                 // text below FULL_EDGE_TEXT_LEN
@@ -847,7 +868,7 @@ TEST(ItemTest, ValuesRoundTripSimpleVertex){
                 l_slot = l_distr_slot(l_gen);
                 l_special = l_distr_special(l_gen);
                 l_type.setSpecialType(l_slot, l_special);
-                l_item.setType_si_id(l_slot, l_special);
+                l_item.setType_member_si_id(l_slot, l_special);
                 break;
             case 5:
                 // set flag

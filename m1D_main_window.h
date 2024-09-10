@@ -7,26 +7,37 @@
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QWidget>
+#include <QtWidgets/QSplitter>
+#include <QWebEngineView>
+
+#include "m1D_tree_display.h"
+
+class MainWindow;
 
 class Ui_MainWindow
 {
 public:
-    QWidget *centralwidget;
+    QSplitter *centralwidget;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
     Ui_MainWindow(){}
 
-    void setupUi(QMainWindow *MainWindow);
+    M1UI::TreeDisplay* setupUi(MainWindow *MainWindow);
     void retranslateUi(QMainWindow *MainWindow);
 };
 
 class MainWindow: public QMainWindow {
+    Q_OBJECT
+    friend class Ui_MainWindow;
 private:
     Ui_MainWindow* m_ui;
+    QWebEngineView* m_view;
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+public slots:
+    void htmlReceive(const QString& p_html);
 };
 
 #endif // MAINWINDOW_H

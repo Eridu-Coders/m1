@@ -72,10 +72,12 @@ using namespace M1Env;
         ItemID getItemIDType() const {return t.m_type_item; }
 
         ItemType(const SpecialItemID p_0, const SpecialItemID p_1, const SpecialItemID p_2, const SpecialItemID p_3);
+        ItemType(const SpecialItemID p_0) : ItemType(p_0, G_VOID_SI_ID, G_VOID_SI_ID, G_VOID_SI_ID){}
 
         void setSpecialType(const unsigned int p_index, const SpecialItemID p_si_id);
         SpecialItemID getSpecialType(const unsigned int p_index) const;
         QString dbgString() const;
+        QString dbgStringHr(const bool p_is_item_id = false) const;
     }__attribute__((__packed__));
 
     // ----------------------------------------- Item ----------------------------------------------------
@@ -84,6 +86,7 @@ using namespace M1Env;
      */
     class Item_lv0{
         friend class Storage;
+        friend class Item_lv2;
     private:
         ItemID m_item_id;   ///< Item ID
         FlagField m_flags;  ///< (1) Primary flag field
@@ -103,6 +106,7 @@ using namespace M1Env;
                     ItemCounter m_incoming_edges;               ///< (6) Number of incoming edges
                     ItemCounter m_visible_edges;                ///< (7) Number of visible edges
                     ItemID m_first_edge;                        ///< (8) ID of first edge
+                    ItemID m_auto_edge;                         ///< (8) ID of AUTO edge
                     ItemID m_first_edge_special;                ///< (9) ID of first special edge
                     StringID m_string_id;                       ///< (10) ID of string, if any
                     StringID m_search_string_id;                ///< (11) ID for the sarch string
@@ -135,69 +139,77 @@ using namespace M1Env;
         }p; ///< rest of the payload
 
         // number of bits == 1 in a flag field (for set/unset flags)
-        unsigned short count_1_bits(const FlagField p_flag);
+        static unsigned short count_1_bits(const FlagField p_flag);
         // all methods documented in m1_store.cpp
     public:
         // Does nothing. The class is not supposed to be constructed but cast from an mmap() area pointer
         Item_lv0(){}
         // For testing purposes only
-        Item_lv0(const ItemID p_item_id, const FlagField p_flags, const ItemType p_type);
+        Item_lv0(const ItemID p_item_id,
+                 const FlagField p_flags,
+                 const ItemType p_type);
 
+        // ------------------------ Setters ---------------------------------------------------------
         // to be used in real situations when instantiating from mmap() area pointer
-        void initializeMembers(const ItemID p_item_id, const FlagField p_flags, const ItemType p_type);
+        void initializeMembers(const ItemID p_item_id,
+                               const FlagField p_flags,
+                               const ItemType p_type);
         void initializeMembers();
 
-        ItemID item_id() const;
+        void setFlags(const FlagField p_flags, const bool p_force_init = false);
+        void setFlag(const FlagField p_flag, const bool p_force_init = false);
+        void unSetFlag(const FlagField p_flag, const bool p_force_init = false);
 
-        void setFlags(const FlagField p_flags, bool p_force_init = false);
-        void setFlag(const FlagField p_flag, bool p_force_init = false);
-        void unSetFlag(const FlagField p_flag, bool p_force_init = false);
-        FlagField flags() const;
-
-        void setType_si_id(const unsigned int p_index, const SpecialItemID p_type);
-        SpecialItemID getType_si_id(const unsigned int p_index) const;
-        ItemID getType_item_id() const;
-        void setType_item_id(const ItemID p_type_item_id);
-
-        bool isOfType_member(const ItemID p_type) const;
-        bool isOfType_member(const SpecialItemID p_type) const;
-        bool isOfType_member(const char* p_type) const;
+        void setType_member_si_id(const unsigned int p_index, const SpecialItemID p_type);
+        void setType_member_item_id(const ItemID p_type_item_id);
 
         void setFlagsExtra(const FlagField p_flags);
         void setFlagExtra(const FlagField p_flag);
         void unSetFlagExtra(const FlagField p_flag);
-        FlagField flagsExtra() const;
 
         void setOrigin(const ItemID p_origin);
-        ItemID origin_item_id() const;
         void setTarget(const ItemID p_target);
-        ItemID target_item_id() const;
         void setPrevious(const ItemID p_previous);
-        ItemID previous_item_id() const;
         void setNext(const ItemID p_next);
-        ItemID next_item_id() const;
         void setReciprocal(const ItemID p_reciprocal);
-        ItemID reciprocal_item_id() const;
         void setFirstEdge(const ItemID p_first_edge);
-        ItemID firstEdge_item_id() const;
+        void setAutoEdge(const ItemID p_auto_edge);
         void setFirstEdgeSpecial(const ItemID p_first_edge_special);
-        ItemID firstEdgeSpecial_item_id() const;
-
         void setCreationDate(const QDateTime& p_date);
-        QDateTime creationDate() const;
         void setLastmodDate(const QDateTime& p_date);
-        QDateTime lastmodDate() const;
 
         void setIncomingEdges(const ItemCounter p_incoming_edges);
-        ItemCounter incomingEdges() const;
         void addIncomingEdges(const ItemCounter p_add); // can be negative
 
         void setVisibleEdges(const ItemCounter p_visible_edges);
-        ItemCounter visibleEdges() const;
         void addVisibleEdges(const ItemCounter p_add); // can be negative
 
         void setText(const QString& p_text);
+
+        // ------------------------ Getters ---------------------------------------------------------
+        ItemID item_id() const;
+        FlagField flags() const;
+        SpecialItemID getType_si_id(const unsigned int p_index) const;
+        ItemID getType_item_id() const;
+        FlagField flagsExtra() const;
+        ItemID origin_item_id() const;
+        ItemID target_item_id() const;
+        ItemID previous_item_id() const;
+        ItemID next_item_id() const;
+        ItemID reciprocal_item_id() const;
+        ItemID firstEdge_item_id() const;
+        ItemID autoEdge_item_id() const;
+        ItemID firstEdgeSpecial_item_id() const;
+        QDateTime creationDate() const;
+        QDateTime lastmodDate() const;
+        StringID string_id() const;
+        ItemCounter incomingEdges() const;
+        ItemCounter visibleEdges() const;
         char* text() const;
+
+        bool isOfType_member(const ItemID p_type) const;
+        bool isOfType_member(const SpecialItemID p_type) const;
+        bool isOfType_member(const char* p_type) const;
 
         QString dbgString() const;
         QString dbgTypeShort() const;
@@ -220,6 +232,7 @@ using namespace M1Env;
         SpecialItemID m_si_id_reciprocal;   ///< [2] 16 bit special item id of the reciprocal type (for edge types only, SI_HAS_RECIPROCAL must be set)
         char m_extra[7];                    ///< [7] extra data storage field (len = 7 to make total 32)
     public:
+        static SpecialItem* cm_dummy;
         /**
          * @brief SpecialItem default constructor.
          * Never called normally bc class resides in mmap() area
@@ -230,15 +243,16 @@ using namespace M1Env;
          * Never called normally bc class resides in mmap() area
          */
         ~SpecialItem(){}
+        SpecialItem(const char* p_mnemo);
 
-        void setAttr(
-            const ItemID p_item_id, const SpecialItemID p_si_id, const FlagField p_flags, const char* p_mnemonic);
+        void setAttr(const ItemID p_item_id, const SpecialItemID p_si_id,
+                     const FlagField p_flags, const char* p_mnemonic);
 
         /// reciprocal ID setter
         void setReciprocal(const SpecialItemID p_si_id){m_si_id_reciprocal = p_si_id;}
 
         SpecialItemID specialId() const {return m_si_id;}               ///< special ID getter
-        SpecialItemID reciprocalId() const {return m_si_id_reciprocal;} ///< reciprocal ID getter
+        SpecialItemID reciprocalSpecialId() const {return m_si_id_reciprocal;} ///< reciprocal SI ID getter
         ItemID itemId() const {return m_item_id;}                       ///< ItemID getter
         FlagField flags() const {return m_flags;}                       ///< flags getter
         const char* mnemonic_raw() const {return m_mnemonic;}           ///< raw mnemonic pointer getter (!! NOT a \0 terminated string)

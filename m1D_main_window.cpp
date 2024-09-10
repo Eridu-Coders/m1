@@ -2,56 +2,35 @@
 #include <boost/filesystem.hpp>
 
 #include "m1D_main_window.h"
-
-#include "m1B_lv2_item.h"
 #include "m1D_tree_display.h"
 
-void loadWords(){
-    qDebug() << "opening file";
-    QString l_path("../Enoch-words.txt");
-    int l_count = 0;
-    if(boost::filesystem::exists(l_path.toStdString())){
-        boost::filesystem::ifstream fileHandler(l_path.toStdString());
-        std::string line;
-        while(getline(fileHandler, line)){
-            /*
-                QLoggingCategory::setFilterRules("*.debug=false\n"
-                                                 "dump.debug=true");
-                M1Store::ItemWrapper::recurGraphStart(M1Store::Storage::getSpecial("ROOT_")->itemId());
-                QLoggingCategory::setFilterRules("*.debug=true");
-                */
-            qDebug() << line;
-            M1Store::Item_lv2* l_word = M1Store::Item_lv2::getNew(
-                // category & attributes
-                M1Store::FULL_VERTEX,
-                // type
-                M1Store::ItemType(
-                    M1Store::TEXT_WORD_SPECIAL_ID,
-                    M1Store::G_VOID_SI_ID,
-                    M1Store::G_VOID_SI_ID,
-                    M1Store::G_VOID_SI_ID),
-                // label
-                line.c_str()
-                );
-            delete l_word;
-            // if(l_count == 3) break;
-            l_count += 1;
-        }
-    }
-    else
-        qDebug() << "can't open";
+#include <QSplitter>
+#include <QWebEngineView>
+#include <QUrl>
 
-    M1_FUNC_EXIT
-}
+// g_cat_main_window
+Q_LOGGING_CATEGORY(g_cat_main_window, "main_window")
 
-void Ui_MainWindow::setupUi(QMainWindow *MainWindow){
+void loadWords(){}
+
+M1UI::TreeDisplay* Ui_MainWindow::setupUi(MainWindow *MainWindow){
     if (MainWindow->objectName().isEmpty())
         MainWindow->setObjectName("MainWindow");
-    MainWindow->resize(800, 600);
+    MainWindow->resize(1700, 800);
     //centralwidget = new QWidget(MainWindow);
-    centralwidget = new M1UI::TreeDisplay(MainWindow);
+    centralwidget = new QSplitter(MainWindow);
     centralwidget->setObjectName("centralwidget");
     MainWindow->setCentralWidget(centralwidget);
+
+    M1UI::TreeDisplay* l_tree_display = new M1UI::TreeDisplay(centralwidget);
+    centralwidget->addWidget(l_tree_display);
+
+    MainWindow->m_view = new QWebEngineView(centralwidget);
+    MainWindow->m_view->load(QUrl("https://www.lefigaro.fr"));
+    MainWindow->m_view->resize(600, 800);
+    MainWindow->m_view->show();
+    centralwidget->addWidget(MainWindow->m_view);
+
     menubar = new QMenuBar(MainWindow);
     menubar->setObjectName("menubar");
     menubar->setGeometry(QRect(0, 0, 800, 20));
@@ -64,24 +43,28 @@ void Ui_MainWindow::setupUi(QMainWindow *MainWindow){
 
     QMetaObject::connectSlotsByName(MainWindow);
 
-    M1_FUNC_EXIT
+    return l_tree_display;
 } // setupUi
 
 void Ui_MainWindow::retranslateUi(QMainWindow *MainWindow){
     MainWindow->setWindowTitle(QCoreApplication::translate("m1 Main", "m1 Main", nullptr));
-
-    M1_FUNC_EXIT
 } // retranslateUi
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     m_ui = new Ui_MainWindow();
-    m_ui->setupUi(this);
+    M1UI::TreeDisplay* l_tree_display = m_ui->setupUi(this);
+    QObject::connect(l_tree_display, &M1UI::TreeDisplay::emitHtml,
+                     this, &MainWindow::htmlReceive);
+}
 
-    M1_FUNC_EXIT
+void MainWindow::htmlReceive(const QString& p_html){
+    printf("%s\n", p_html.toUtf8().constData());
+    if(p_html.left(4) == "http")
+        m_view->setUrl(QUrl(p_html));
+    else
+        m_view->setHtml(p_html);
 }
 
 MainWindow::~MainWindow(){
     delete m_ui;
-
-    M1_FUNC_EXIT
 }

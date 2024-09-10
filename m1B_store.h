@@ -35,8 +35,10 @@ namespace M1Store{
         static char *cm_item_mmap_base;             ///< base address of the mmapped space for items (char* to make pointer arithmetic possible)
         static unsigned long cm_item_map_length;    ///< length of mmap() area for items
         static unsigned long cm_special_length;     ///< length of mmap() area for special items
+
+        static QVector<QIcon> cm_type_icon;
     public:
-        static void storeSetUp();
+        static void storeSetUp(bool p_reset = false);
         static void mmapSync();
         static void storeShutDown();
 
@@ -54,7 +56,10 @@ namespace M1Store{
         /// without corresponding item
         static SpecialItem* getNewSpecialNoItem(const FlagField p_flags, const char* p_mnemonic);
         /// without corresponding item and reciprocal type
-        static void getNewSpecialWithReciprocal(const FlagField p_flags, const char* p_mnemonic_1, const char* p_mnemonic_2);
+        static void getNewSpecialWithReciprocal(const FlagField p_flags,
+                                                const char* p_mnemonic_1,
+                                                const char* p_mnemonic_2,
+                                                const FlagField p_flags_2);
 
         /// increment the current version counter
         static void incrementCurrentVersion(){cm_current_version += 1;}
@@ -71,9 +76,13 @@ namespace M1Store{
         /// for testing purposes only
         static StringID dbg_get_string_id(Item_lv0& p_item) {return p_item.p.v.f.m_string_id;}
 
+        static QIcon& getIcon(SpecialItemID p_si_id);
+
         static void setConstants();
+        static void loadIcons();
         static void version_0_to_1();
         static void version_1_to_2();
+        static void version_2_to_3();
     };
 
 } // end namespace M1Store
