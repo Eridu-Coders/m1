@@ -157,9 +157,9 @@ void M1Store::SpecialItem::setAttr(const ItemID p_item_id, const SpecialItemID p
  * @return the debug string
  */
 QString M1Store::SpecialItem::dbgString() const {
-    QString l_item_dbg;
+    QString l_item_dbg = QString(" %1").arg(M1Store::Storage::cm_icon_path[m_si_id], 25);
     if(M1Store::Item_lv2* l_item = M1Store::Item_lv2::getExisting(m_item_id)){
-        l_item_dbg = " --ITEM--> " + l_item->dbgShort();
+        l_item_dbg += " --ITEM--> " + l_item->dbgShort();
     }
 
     return QString("0x%1 %2 0x%3 0b%4%5%6")
@@ -167,10 +167,10 @@ QString M1Store::SpecialItem::dbgString() const {
         .arg(mnemonic())
         .arg(m_item_id, 16, 16, QLatin1Char('0'))
         .arg(m_flags, 64, 2, QLatin1Char('0'))
+        .arg(l_item_dbg)
         .arg(m_flags & SI_HAS_RECIPROCAL ?
                  QString(" --RECIPROCAL--> ") + M1Store::Storage::getSpecialItemPointer(m_si_id_reciprocal)->mnemonic():
-                 "")
-        .arg(l_item_dbg);
+                 "");
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -310,8 +310,9 @@ M1Store::SpecialItemID M1Store::Item_lv0::getType_si_id(const unsigned int p_ind
     M1_FUNC_ENTRY(g_cat_lv0_members, QString("get special type %1 --> %2").arg(p_index).arg(m_type.getSpecialType(p_index)))
     Q_ASSERT(p_index < 4);
 
+    M1Store::SpecialItemID l_ret = m_type.getSpecialType(p_index);
     M1_FUNC_EXIT
-    return m_type.getSpecialType(p_index);
+    return l_ret;
 }
 /**
  * @brief as a single ItemID type value
@@ -385,8 +386,9 @@ bool M1Store::Item_lv0::isOfType_member(const char* p_mnemonic) const{
     SpecialItem* pi = Storage::getSpecialItemPointer(p_mnemonic);
     M1_FUNC_ENTRY(g_cat_lv0_members, QString("Checking whether is of type (mnemonic) %1 ...").arg(p_mnemonic))
 
+    bool l_ret = M1Store::Item_lv0::isOfType_member(pi->specialId());
     M1_FUNC_EXIT
-    return M1Store::Item_lv0::isOfType_member(pi->specialId());
+    return l_ret;
 }
 /** @} end group IOT0*/
 
@@ -519,6 +521,9 @@ void M1Store::Item_lv0::setTarget(const M1Store::ItemID p_target){
                "accessing the target of an item that is not a full edge");
 
     p.e.f.m_v_target = p_target;
+    // increase target's incoming edges counter
+    M1Store::Item_lv0* l_target_pointer = M1Store::Storage::getItemPointer_lv0(p_target);
+    l_target_pointer->setIncomingEdges(l_target_pointer->incomingEdges() + 1);
 
     M1_FUNC_EXIT
 }
@@ -854,53 +859,6 @@ void M1Store::Item_lv0::addIncomingEdges(M1Store::ItemCounter p_add){
     M1_FUNC_EXIT
 }
 
-// ---------------------------------------------------------------------------------------------------------
-// visible edges count (for full vertex only)
-/**
- * @brief set the visible edges counter (only for full vertex)
- * @param p_visible_edges the counter value
- */
-void M1Store::Item_lv0::setVisibleEdges(M1Store::ItemCounter p_visible_edges){
-    M1_FUNC_ENTRY(g_cat_lv0_members, QString("setting visible edges count to %1").arg(p_visible_edges))
-    Q_ASSERT_X((m_flags & ITEM_NATURE_MASK) == FULL_VERTEX,
-               "Item::setVisibleEdges()",
-               "accessing the visible edges counter on a non-full vertex or edge");
-
-    p.v.f.m_visible_edges = p_visible_edges;
-
-    M1_FUNC_EXIT
-}
-/**
- * @brief get the visible edges counter (only for full vertex)
- * @return the counter value
- */
-M1Store::ItemCounter M1Store::Item_lv0::visibleEdges() const {
-    M1_FUNC_ENTRY(g_cat_lv0_members, QString("Getting visible edges count ..."))
-    Q_ASSERT_X((m_flags & ITEM_NATURE_MASK) == FULL_VERTEX,
-               "Item::visibleEdges()",
-               "accessing the visible edges counter on a non-full vertex or edge");
-
-    ItemCounter l_ret;
-    l_ret = p.v.f.m_visible_edges;
-    qCDebug(g_cat_lv0_members) << QString("--> %1").arg(l_ret);
-
-    M1_FUNC_EXIT
-    return l_ret;
-}
-/**
- * @brief increment visible edge counter (only full vertex)
- * @param p_add the increment
- */
-void M1Store::Item_lv0::addVisibleEdges(M1Store::ItemCounter p_add){
-    M1_FUNC_ENTRY(g_cat_lv0_members, QString("incrementing incoming edges by %1").arg(p_add))
-    Q_ASSERT_X((m_flags & ITEM_NATURE_MASK) == FULL_VERTEX,
-               "Item::addVisibleEdges()",
-               "accessing the visible edges counter on a non-full vertex or edge");
-
-    p.v.f.m_visible_edges += p_add;
-
-    M1_FUNC_EXIT
-}
 
 // ---------------------------------------------------------------------------------------------------------
 // text value (for all union branches)
@@ -912,14 +870,14 @@ void M1Store::Item_lv0::setText(const QString& p_text){
     M1_FUNC_ENTRY(g_cat_lv0_members, QString("setting text to [%1] (Utf8 len = %2)").arg(p_text).arg(p_text.toUtf8().length()))
     Q_ASSERT_X(((m_flags & ITEM_NATURE_MASK) == FULL_EDGE) ? (p_text.toUtf8().length() <= FULL_EDGE_TEXT_LEN-1) : true,
                "Item::setText()", "full edge --> length must be < FULL_EDGE_TEXT_LEN");
-    Q_ASSERT_X(((m_flags & ITEM_NATURE_MASK) == SIMPLE_EDGE) ? (p_text.toUtf8().length() <= SIMPLE_EDGE_TEXT_LEN-1) : true,
-               "Item::setText()", "simple edge --> length must be < SIMPLE_EDGE_TEXT_LEN");
+    // Q_ASSERT_X(((m_flags & ITEM_NATURE_MASK) == SIMPLE_EDGE) ? (p_text.toUtf8().length() <= SIMPLE_EDGE_TEXT_LEN-1) : true,
+    //            "Item::setText()", "simple edge --> length must be < SIMPLE_EDGE_TEXT_LEN");
     Q_ASSERT_X(((m_flags & ITEM_NATURE_MASK) == SIMPLE_VERTEX) ? (p_text.toUtf8().length() <= SIMPLE_VERTEX_TEXT_LEN-1) : true,
                "Item::setText()", "simple vertex --> length must be < SIMPLE_VERTEX_TEXT_LEN");
     // for full vertices, the length can be arbitrary (goes into string table)
 
     if((m_flags & ITEM_NATURE_MASK) == FULL_VERTEX){
-        // full vertex
+        // full vertex =============================
         if( p.v.f.m_string_id != G_VOID_ITEM_ID){
             // in all cases free string id if there is one
             M1Store::Storage::freeString(p.v.f.m_string_id);
@@ -948,16 +906,36 @@ void M1Store::Item_lv0::setText(const QString& p_text){
             p.v.f.m_string_id = M1Store::Storage::storeString(p_text);
         }
     }
-    else{ // not full vertex
+    else
+    if((m_flags & ITEM_NATURE_MASK) == SIMPLE_EDGE){
+        // simple edge =============================
+        if( p.e.s.m_string_id != G_VOID_ITEM_ID){
+            // in all cases free string id if there is one
+            M1Store::Storage::freeString(p.e.s.m_string_id);
+            p.e.s.m_string_id = G_VOID_ITEM_ID;
+        }
+
+        if(p_text.toUtf8().length() <= SIMPLE_EDGE_TEXT_LEN-1){ // 0 < length < SIMPLE_EDGE_TEXT_LEN-1
+            qCDebug(g_cat_lv0_members) << QString("storing into local string");
+            strncpy(p.e.s.m_text, p_text.toUtf8().data(), SIMPLE_EDGE_TEXT_LEN); // strncpy() padds with \0
+            p.e.s.m_text[m1_min(SIMPLE_EDGE_TEXT_LEN-1, p_text.toUtf8().length())] = 0; // to make sure
+            // set ITEM_HAS_LOCAL_STRING
+            m_flags = m_flags | ITEM_HAS_LOCAL_STRING;
+        }
+        else{ // length over FULL_VERTEX_TEXT_LEN-1
+            qCDebug(g_cat_lv0_members) << QString("storing into LMDB string DB");
+            // unset ITEM_HAS_LOCAL_STRING
+            m_flags = m_flags & (~ITEM_HAS_LOCAL_STRING);
+            // stores the string in the LMDB string db
+            p.e.s.m_string_id = M1Store::Storage::storeString(p_text);
+        }
+    }
+    else{
+        // not full vertex nor simple edge ===========
         if((m_flags & ITEM_NATURE_MASK) == FULL_EDGE){
             // full edge
             strncpy(p.e.f.m_text, p_text.toUtf8().data(), FULL_EDGE_TEXT_LEN); // strncpy() padds with \0
             p.e.f.m_text[m1_min(FULL_EDGE_TEXT_LEN-1, p_text.toUtf8().length())] = 0; // to make sure
-        }
-        else if((m_flags & ITEM_NATURE_MASK) == SIMPLE_EDGE){
-            // simple edge
-            strncpy(p.e.s.m_text, p_text.toUtf8().data(), SIMPLE_EDGE_TEXT_LEN); // strncpy() padds with \0
-            p.e.s.m_text[m1_min(SIMPLE_EDGE_TEXT_LEN-1, p_text.toUtf8().length())] = 0; // to make sure
         }
         else{ // if((m_flags & ITEM_NATURE_MASK) == SIMPLE_VERTEX){
             // simple vertex (only choice left)
@@ -975,8 +953,10 @@ void M1Store::Item_lv0::setText(const QString& p_text){
     M1_FUNC_EXIT
 }
 /**
- * @brief M1Store::Item::text get item text
+ * @brief get item text
  * @return text, as a char*
+ *
+ * Both full vertices and simple edges can have m_string_id. Otheres have only their local m_text
  */
 char* M1Store::Item_lv0::text() const {
     M1_FUNC_ENTRY(g_cat_lv0_members, QString("getting text ..."))
@@ -988,12 +968,15 @@ char* M1Store::Item_lv0::text() const {
     if((m_flags & ITEM_NATURE_MASK) == FULL_EDGE)
         // full edge
         l_ret = (char *)p.e.f.m_text;
-    else if((m_flags & ITEM_NATURE_MASK) == SIMPLE_EDGE)
-        // simple edge
-        l_ret = (char *)p.e.s.m_text;
     else if((m_flags & ITEM_NATURE_MASK) == SIMPLE_VERTEX)
         // simple vertex
         l_ret = (char *)p.v.s.m_text;
+    else if((m_flags & ITEM_NATURE_MASK) == SIMPLE_EDGE)
+        // simple edge
+        if((m_flags & ITEM_HAS_LOCAL_STRING) > 0) l_ret = (char *)p.e.s.m_text;
+        else
+            if(p.e.s.m_string_id == G_VOID_ITEM_ID) l_ret = l_empty_string;
+            else l_ret = M1Store::Storage::retrieveString(p.e.s.m_string_id);
     else {
         // only possibility here: full vertex
         if((m_flags & ITEM_HAS_LOCAL_STRING) > 0) l_ret = (char *)p.v.f.m_text;
@@ -1015,7 +998,7 @@ char* M1Store::Item_lv0::text() const {
  * @param p_flags flags
  * @param p_type type
  */
-M1Store::Item_lv0::Item_lv0(const ItemID p_item_id, const FlagField p_flags, const ItemType p_type){
+M1Store::Item_lv0::Item_lv0(const ItemID p_item_id, const FlagField p_flags, const ItemType& p_type){
     initializeMembers(p_item_id, p_flags, p_type);
 }
 
@@ -1026,12 +1009,11 @@ M1Store::Item_lv0::Item_lv0(const ItemID p_item_id, const FlagField p_flags, con
  * @param p_flags flags
  * @param p_type type
  */
-void M1Store::Item_lv0::initializeMembers(M1Store::ItemID p_item_id, M1Store::FlagField p_flags, M1Store::ItemType p_type){
-    M1_FUNC_ENTRY(g_cat_lv0_members, QString("Item initialization p_id: 0x%1, p_flags: %2 (0b%3), p_type: %4")
-                                .arg(p_item_id, 16, 16, QLatin1Char('0'))    // %1
-                                .arg(p_flags)                           // %2
-                                .arg(p_flags, 64, 2, QLatin1Char('0'))  // %3
-                                .arg(p_type.dbgString()))               // %4
+void M1Store::Item_lv0::initializeMembers(const M1Store::ItemID p_item_id, const M1Store::FlagField p_flags, const M1Store::ItemType& p_type){
+    M1_FUNC_ENTRY(g_cat_lv0_members, QString("Item initialization p_id: 0x%1, p_flags: 0b%2, p_type: %3")
+                                .arg(p_item_id, 16, 16, QLatin1Char('0'))   // %1
+                                .arg(p_flags, 64, 2, QLatin1Char('0'))      // %2
+                                .arg(p_type.dbgStringHr()))                 // %3
 
     m_item_id = p_item_id;
     m_flags = p_flags;
@@ -1069,6 +1051,7 @@ void M1Store::Item_lv0::initializeMembers(){
         p.e.s.m_e_next = G_VOID_ITEM_ID;
         p.e.s.m_e_previous = G_VOID_ITEM_ID;
         p.e.s.m_v_origin = G_VOID_ITEM_ID;
+        p.e.s.m_string_id = G_VOID_ITEM_ID;
         p.e.s.m_text[0] = 0; // ""
     }
     else if((m_flags & ITEM_NATURE_MASK) == FULL_VERTEX){
@@ -1083,7 +1066,6 @@ void M1Store::Item_lv0::initializeMembers(){
         p.v.f.m_incoming_edges = 0;
         p.v.f.m_search_string_id = G_VOID_ITEM_ID;
         p.v.f.m_string_id = G_VOID_ITEM_ID;
-        p.v.f.m_visible_edges = 0;
         p.v.f.m_text[0] = 0; // ""
     }
     else {
@@ -1127,7 +1109,6 @@ QString M1Store::Item_lv0::dbgString() const{
                            .arg(QString("m_creation_date      : %1").arg(creationDate().toString("dd/MM/yyyy hh:mm:ss")))
                            .arg(QString("m_lastmod_date       : %1").arg(lastmodDate().toString("dd/MM/yyyy hh:mm:ss")))
                            .arg(QString("m_incoming_edges     : %1").arg(incomingEdges()))
-                           .arg(QString("m_visible_edges      : %1").arg(visibleEdges()))
                            .arg(QString("m_first_edge         : 0x%1 %2").arg(firstEdge_item_id(), 16, 16, QLatin1Char('0')).arg(firstEdge_item_id()))
                            .arg(QString("m_first_edge_special : 0x%1 %2").arg(firstEdgeSpecial_item_id(), 16, 16, QLatin1Char('0')).arg(firstEdgeSpecial_item_id()))
                            .arg(QString("text                 : [%1] %2%3")

@@ -11,8 +11,8 @@ namespace M1Store{
 
 using namespace M1Env;
     /**
-         * @brief The Item lv1 class - trapping and logging updates for undo and crash recovery
-         */
+     * @brief The Item lv1 class - trapping and logging updates for undo and crash recovery
+     */
     class Item_lv1 : public Item_lv0 {
     private:
     public:
@@ -55,11 +55,7 @@ using namespace M1Env;
         void setIncomingEdges(const ItemCounter p_incoming_edges);
         void addIncomingEdges(const ItemCounter p_add); // can be negative
 
-        void setVisibleEdges(const ItemCounter p_visible_edges);
-        void addVisibleEdges(const ItemCounter p_add); // can be negative
-
         void setText(const QString& p_text);
-
     };
 } // end namespace M1Store
 

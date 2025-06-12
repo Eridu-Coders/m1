@@ -4,6 +4,7 @@
 
 #include "m1D_tree_display.h"
 #include "m1A_env.h"
+#include "m1B_graph_init.h"
 #include "m1B_lv2_item.h"
 
 Q_LOGGING_CATEGORY(g_cat_tree_display, "tree_display")
@@ -83,24 +84,33 @@ M1MidPlane::Interp* M1UI::TreeDisplay::addTestInterpRecur(
     QVBoxLayout* p_vb,
     QVector<int>& p_alrady_seen)
 {
+    M1_FUNC_ENTRY(g_cat_tree_display, QString("current p_root: %1").arg(p_root->dbgShort()));
     M1MidPlane::Interp* l_auto_edge = nullptr;
     for(M1Store::Item_lv2_iterator it = p_root->getIteratorTop(); !it.beyondEnd(); it.next()){
         M1MidPlane::Interp* l_ti = nullptr;
-        if(it.at()->isOfType(M1Env::AUTO_SPECIAL_ID)){
+        // instantiate the line for this edge
+        if(it.at()->isOfType(M1Env::AUTO_SIID)){
+            qCDebug(g_cat_tree_display) << "current edge (auto) : " << it.at()->dbgShort() << " Auto? " << it.at()->isOfType(M1Env::AUTO_SIID);
             if(p_depth == 0){
                 l_ti = M1MidPlane::Interp::getInterp(it.at(), this, p_depth);
                 l_auto_edge = l_ti;
             }
             else continue;
         }
-        else
+        else {
+            qCDebug(g_cat_tree_display) << "current edge (regular) : " << it.at()->dbgShort();
             l_ti = M1MidPlane::Interp::getInterp(it.at(), this, p_depth);
+        }
+
         QObject::connect(l_ti, &M1MidPlane::Interp::gotoVertex,
                          this, &M1UI::TreeDisplay::gotoVertex);
         QObject::connect(l_ti, &M1MidPlane::Interp::emitHtml,
                          this, &M1UI::TreeDisplay::htmlReceive);
         p_vb->addWidget(l_ti);
+
+        // recur if this edge is open
         if(it.at()->flags() & M1Env::EDGE_IS_OPEN && !p_alrady_seen.contains(it.at()->item_id())){
+            qCDebug(g_cat_tree_display) << "current edge (open) : " << it.at()->dbgShort();
             p_alrady_seen.append(it.at()->item_id());
             if(it.at()->isOfType(M1Env::TW_SECTION_2_OCC_BEGIN_SIID) || it.at()->isOfType(M1Env::TW_SECTION_2_OCC_END_SIID))
                 addTestInterpRecur(it.at()->getTarget_lv2()->getTarget_lv2(), p_depth+1, p_vb, p_alrady_seen);
@@ -108,10 +118,12 @@ M1MidPlane::Interp* M1UI::TreeDisplay::addTestInterpRecur(
                 addTestInterpRecur(it.at()->getTarget_lv2(), p_depth+1, p_vb, p_alrady_seen);
         }
     }
+    M1_FUNC_EXIT
     return l_auto_edge;
 }
 
 void M1UI::TreeDisplay::addTestInterp(M1Store::Item_lv2* p_root){
+    M1_FUNC_ENTRY(g_cat_tree_display, QString("p_root: %1").arg(p_root->dbgShort()));
     m_root = p_root;
     QVBoxLayout* l_vb = new QVBoxLayout();
     l_vb->setSpacing(0);
@@ -133,6 +145,7 @@ void M1UI::TreeDisplay::addTestInterp(M1Store::Item_lv2* p_root){
     qCDebug(g_cat_tree_display) << "Font family : " << this->fontInfo().family();
     qCDebug(g_cat_tree_display) << "Font style  : " << this->fontInfo().style();
     qCDebug(g_cat_tree_display) << "Font height : " << this->fontMetrics().height();
+    M1_FUNC_EXIT
 }
 
 M1UI::TreeDisplay::TreeDisplay(QWidget *p_parent) : QScrollArea{p_parent}{
@@ -149,7 +162,7 @@ M1UI::TreeDisplay::TreeDisplay(QWidget *p_parent) : QScrollArea{p_parent}{
     this->setPalette(p);
     this->setBackgroundRole(QPalette::Window);
     this->setAutoFillBackground(true);
-    addTestInterp(M1Store::Item_lv2::getExisting(M1Env::ROOT_SPECIAL_ID));
+    addTestInterp(M1Store::Item_lv2::getExisting(M1Env::ROOT_SIID));
     M1_FUNC_EXIT
 }
 

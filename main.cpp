@@ -8,25 +8,49 @@
 #include "m1B_lv2_item.h"
 #include "m1C_interp.h"
 
+#include <boost/program_options.hpp>
+#include <iostream>
+
+namespace po = boost::program_options;
+
 Q_LOGGING_CATEGORY(g_cat_main, "m1_main")
 
 QRegularExpression g_re_punc(R"(^(\W*)(\w+)(\W*))");
 QRegularExpression g_re_space(R"(\s+)");
 
+M1Env::SpecialItemID TEXT_WFW_PRABUPADA_SIID = M1Env::G_VOID_SI_ID; // subtype of TEXT_WFW_TRANSL_SIID
+M1Env::SpecialItemID TEXT_WFW_SIVANANDA_SIID = M1Env::G_VOID_SI_ID; // subtype of TEXT_WFW_TRANSL_SIID
+M1Env::SpecialItemID TEXT_WFW_GAMBIRANANDA_SIID = M1Env::G_VOID_SI_ID; // subtype of TEXT_WFW_TRANSL_SIID
+
 void loadEnoch();
-void loadGita();
+int loadGita();
 
 int main(int argc, char *argv[])
 {
+    po::options_description l_desc("Allowed options");
+    l_desc.add_options()
+        ("help,h", "produce help message")
+        ("load-gita,g", "Load Bhagavad Gita test data")
+        ("reset,r", "Reset (empty) storage")
+    ;
+
+    po::variables_map l_program_options_vm;
+    po::store(po::parse_command_line(argc, argv, l_desc), l_program_options_vm);
+    po::notify(l_program_options_vm);
+
     M1Env::M1EnvStatic::init();
     M1Env::M1EnvStatic::setNormalFilter("*.debug=true\n"
-                                        "store.*=false\n"
                                         "lv0.*=false\n"
                                         "lv1.*=false\n"
-                                        "lv2.*=false\n"
+                                        "lv2.g_cat_lv2_constructors=true\n"
                                         "qt.*.debug=false");
 
     M1_FUNC_ENTRY(g_cat_main, QString("App starts"))
+
+    if(l_program_options_vm.count("help")) {
+        std::cout << l_desc << "\n";
+        return 1;
+    }
 
     // screen logging excluded categories
     M1Store::M1EnvStatic::addExcludeCatergoryForScreen("lv0.item_type");
@@ -39,11 +63,20 @@ int main(int argc, char *argv[])
     M1Store::M1EnvStatic::addExcludeCatergoryForScreen("lv2.test");
     M1Store::M1EnvStatic::addExcludeCatergoryForScreen("store.storage");
 
-    M1Store::Storage::storeSetUp(true);
+    if(l_program_options_vm.count("reset")) M1Store::Storage::storeSetUp(true);
+    else M1Store::Storage::storeSetUp(false);
+
+    M1Env::M1EnvStatic::setNormalFilter("*.debug=true\n"
+                                        "store.*=false\n"
+                                        "lv0.*=false\n"
+                                        "lv1.*=false\n"
+                                        "lv2.*=false\n"
+                                        "qt.*.debug=false");
 
     M1MidPlane::Interp::init();
+
     // loadEnoch();
-    loadGita();
+    if(l_program_options_vm.count("load-gita")) loadGita();
 
     QApplication a(argc, argv);
     MainWindow w;
@@ -59,13 +92,71 @@ int main(int argc, char *argv[])
     return l_ret;
 }
 
-void loadGita(){
+int loadGita(){
     M1_FUNC_ENTRY(g_cat_main, QString("Loading Gita passage"))
 
+    /*
+    // perform the load only if not already done
+    if(M1Store::Storage::menmonic_exists("SIVAN")) return 0;
+
+    // TODO create icons together with special items (also for PPRAB, PSIVA and PGAMB below)
+    M1Store::Storage::getNewSpecialNoItem(M1Env::SI_IS_TYPE, "PRABH", NULL, NULL);
+    M1Store::Storage::appendDefaultIcon();
+    M1Store::Storage::getNewSpecialNoItem(M1Env::SI_IS_TYPE, "SIVAN", NULL, NULL);
+    M1Store::Storage::appendDefaultIcon();
+    M1Store::Storage::getNewSpecialNoItem(M1Env::SI_IS_TYPE, "GAMBI", NULL, NULL);
+    M1Store::Storage::appendDefaultIcon();
+
+    TEXT_WFW_PRABUPADA_SIID = M1Store::Storage::getSpecialID("SIVAN");
+    TEXT_WFW_SIVANANDA_SIID = M1Store::Storage::getSpecialID("PRABH");
+    TEXT_WFW_GAMBIRANANDA_SIID = M1Store::Storage::getSpecialID("GAMBI");
+
+    M1Store::Item_lv2* l_person_root = M1Store::Item_lv2::getExisting("PERSN");
+
+    M1Store::Item_lv2* l_prabhupada = M1Store::Item_lv2::getNew(
+        // category & attributes
+        M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
+        // type
+        M1Store::ItemType(M1Store::Storage::getSpecialItemPointer("PERSN")->specialId()),
+        // label
+        "His Divine Grace A. C. Bhaktivedanta Swami Prabhupada",
+        0,                      // special item flags
+        "PPRAB",                // special item mnemonic
+        NULL,
+        NULL
+        );
+    l_prabhupada->linkTo(l_person_root, "BLNGS", nullptr, true);
+    M1Store::Item_lv2* l_sivananda = M1Store::Item_lv2::getNew(
+        // category & attributes
+        M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
+        // type
+        M1Store::ItemType(M1Store::Storage::getSpecialItemPointer("PERSN")->specialId()),
+        // label
+        "Swami Sri Sivananda Saraswati",
+        0,                      // special item flags
+        "PSIVA",                // special item mnemonic
+        NULL,
+        NULL
+        );
+    l_sivananda->linkTo(l_person_root, "BLNGS", nullptr, true);
+    M1Store::Item_lv2* l_gambirananda = M1Store::Item_lv2::getNew(
+        // category & attributes
+        M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
+        // type
+        M1Store::ItemType(M1Store::Storage::getSpecialItemPointer("PERSN")->specialId()),
+        // label
+        "Swami Gambirananda",
+        0,                      // special item flags
+        "PGAMB",                // special item mnemonic
+        NULL,
+        NULL
+        );
+    l_gambirananda->linkTo(l_person_root, "BLNGS", nullptr, true);
+
     // lexicon root
-    M1Store::Item_lv2* l_words_root = M1Store::Item_lv2::getExisting(M1Env::TEXT_WORD_SPECIAL_ID);
+    M1Store::Item_lv2* l_words_root = M1Store::Item_lv2::getExisting(M1Env::TEXT_WORD_SIID);
     // texts root
-    M1Store::Item_lv2* l_text_root = M1Store::Item_lv2::getExisting(M1Env::TEXT_SPECIAL_ID);
+    M1Store::Item_lv2* l_text_root = M1Store::Item_lv2::getExisting(M1Env::TEXT_SIID);
     // person roots
     M1Store::Item_lv2* l_prabhupada_person = M1Store::Item_lv2::getExisting("PPRAB");
     M1Store::Item_lv2* l_sivananda_person = M1Store::Item_lv2::getExisting("PSIVA");
@@ -86,16 +177,6 @@ void loadGita(){
     bool l_store_word_request = false;  // true --> next characher token must be stored in l_store_word
     bool l_fresh_sloka = false;         // true --> sloka just created (s tag) so next word encountered must be maked as its begining
 
-    // XMl input file
-    QFile l_fin_gita("../BG12-TEI+.xml");
-    qCDebug(g_cat_main) << "Exists: " << l_fin_gita.exists();
-
-    l_fin_gita.open(QIODeviceBase::ReadOnly);
-    QTextStream l_in_gita(&l_fin_gita);
-    QString l_txt(l_in_gita.readAll());
-
-    // the xml stream parse
-    QXmlStreamReader l_xml_reader(l_txt);
     // the frequency map to determine which key combinations are encountered
     QMap<QString, int> l_freq_map;
 
@@ -116,7 +197,10 @@ void loadGita(){
     // from/to for span-wfw-tu tags
     QString l_wfw_from, l_wfw_to;
     // source and translation for interp-wfw-tr, interp-translation and interp-bhashya tags
-    QString l_source, l_source_txt, l_wfw_prabhupada, l_wfw_sivananda;
+    QString l_source;
+    // QString l_source_txt;
+    QString l_wfw_prabhupada;
+    QString l_wfw_sivananda;
     // url label
     QString l_url_label;
     // dictionary of all created lexical items encounterd so far (to avoid creating duplicates)
@@ -124,6 +208,15 @@ void loadGita(){
     // dictionary of all created occurence edges encounterd so far
     QMap<QString, M1Store::Item_lv2*> l_id_2_occ;
 
+    // XMl input file
+    QFile l_fin_gita("../BG12-TEI+.xml");
+    qCDebug(g_cat_main) << "Exists: " << l_fin_gita.exists();
+
+    // the xml stream parse
+    l_fin_gita.open(QIODeviceBase::ReadOnly);
+    QTextStream l_in_gita(&l_fin_gita);
+    QString l_txt(l_in_gita.readAll());
+    QXmlStreamReader l_xml_reader(l_txt);
 
     // parse XML file
     while (!l_xml_reader.atEnd()) {
@@ -187,14 +280,14 @@ void loadGita(){
                 // Text and its sections vertex
                 l_gita_text = M1Store::Item_lv2::getNew(
                     M1Store::FULL_VERTEX,                      // category & attributes (flags)
-                    M1Store::ItemType(M1Env::TEXT_SPECIAL_ID), // type
+                    M1Store::ItemType(M1Env::TEXT_SIID), // type
                     l_title.toUtf8().constData()               // label
                 );
                 l_gita_text->linkTo(l_text_root, "BLNGS", nullptr, true);
 
                 l_gita_sections = M1Store::Item_lv2::getNew(
                     M1Store::FULL_VERTEX,                            // category & attributes (flags)
-                    M1Store::ItemType(M1Store::FOLDER_SPECIAL_ID),   // type folder
+                    M1Store::ItemType(M1Store::FOLDER_SIID),   // type folder
                     "Gītā Sloka"                                     // label
                 );
                 l_last_edge = l_gita_text->linkTo(l_gita_sections, "OWNS_", nullptr, false);
@@ -205,7 +298,7 @@ void loadGita(){
                 qCDebug(g_cat_main) << QString("Found Sloka Ref [%1] - Creating sloka node").arg(l_sloka_ref);
                 l_current_section = M1Store::Item_lv2::getNew(
                     M1Store::FULL_VERTEX,                               // category & attributes (flags)
-                    M1Store::ItemType(M1Env::TEXT_SECTION_SPECIAL_ID),  // type
+                    M1Store::ItemType(M1Env::TEXT_SECTION_SIID),  // type
                     l_sloka_ref.toUtf8().constData()                    // label
                 );
                 l_sections_last_edge = l_gita_sections->linkTo(l_current_section, "OWNS_", l_sections_last_edge, false);
@@ -254,7 +347,7 @@ void loadGita(){
                     // word creation (inflected form)
                     l_cur_lex_item = M1Store::Item_lv2::getNew(
                         M1Store::FULL_VERTEX,                           // category & attributes (flags)
-                        M1Store::ItemType(M1Env::TEXT_WORD_SPECIAL_ID), // type
+                        M1Store::ItemType(M1Env::TEXT_WORD_SIID), // type
                         l_bare_word.toUtf8().constData()                // label
                     );
                     l_word_2_lex[l_bare_word] = l_cur_lex_item;
@@ -263,7 +356,7 @@ void loadGita(){
                     // lemma creation
                     M1Store::Item_lv2* l_lemma_node = M1Store::Item_lv2::getNew(
                         M1Store::FULL_VERTEX,                       // category & attributes (flags)
-                        M1Store::ItemType(M1Env::TEXT_LEMMA_SSID),  // type
+                        M1Store::ItemType(M1Env::TEXT_LEMMA_SIID),  // type
                         l_lemma.toUtf8().constData()                // label
                     );
                     l_cur_lex_item->linkTo(l_lemma_node, "BLNGS", nullptr, true);
@@ -273,11 +366,15 @@ void loadGita(){
                 // store occurence edge for translation unit reference
                 l_id_2_occ[l_xml_id] = l_last_edge;
                 // store transliteration text
-                l_cur_lex_item->setField(l_transliteration_text, false, M1Store::Storage::getSpecialItemPointer(M1Env::TEXT_WORD_TRANSLIT_SIID));
+                l_cur_lex_item->setField(
+                    l_transliteration_text,
+                    false,
+                    M1Store::Storage::getSpecialItemPointer(M1Env::TEXT_WORD_TRANSLIT_SIID));
                 // store dict-ref, if any
                 if(l_dict_ref_name.length() > 0 && l_dict_ref_name == "INRIA")
                     l_cur_lex_item->setField(
                         QString("%1/%2").arg(l_dict_ref_name).arg(l_dict_ref_string),
+                        false,
                         M1Store::Storage::getSpecialItemPointer(M1Env::TEXT_WORD_DICT_REF_SIID),
                         M1Store::Storage::getSpecialItemPointer(M1Env::TEXT_WORD_DREF_INRIA_SIID));
 
@@ -343,9 +440,9 @@ void loadGita(){
                         l_wfw_sivananda = l_source_txt;
                 }
                 else{
-                    M1Env::SpecialItemID l_source_type = l_source == "prabhupada" ? M1Env::TEXT_WFW_PRABUPADA_SIID :
-                                                             (l_source == "sivananda" ? M1Env::TEXT_WFW_SIVANANDA_SIID :
-                                                                  M1Env::TEXT_WFW_GAMBIRANANDA_SIID);
+                    M1Env::SpecialItemID l_source_type = l_source == "prabhupada" ? TEXT_WFW_PRABUPADA_SIID :
+                                                             (l_source == "sivananda" ? TEXT_WFW_SIVANANDA_SIID :
+                                                                  TEXT_WFW_GAMBIRANANDA_SIID);
                     // sloka translation nodes
                     if(l_last_interp == "translation"){
                         QString l_translation_text = l_source_txt;
@@ -396,21 +493,15 @@ void loadGita(){
                 M1Store::Item_lv2* l_to = l_id_2_occ[l_wfw_to];
 
                 // translation unit label
-                /*
-                QString l_label = l_from == l_to ? l_from->getTarget_lv2()->text() :
-                                      QString("%1 - %2 (%3 - %4)") \
-                                            .arg(l_from->getTarget_lv2()->text())
-                                            .arg(l_to->getTarget_lv2()->text()).arg(l_wfw_from).arg(l_wfw_to);
-                */
                 QString l_label = l_from == l_to ? l_from->getTarget_lv2()->text() :
                                       QString("%1 - %2") \
                                           .arg(l_from->getTarget_lv2()->text())
                                           .arg(l_to->getTarget_lv2()->text());
                 // create translation unit
-                // TEXT_SECTION_SPECIAL_ID TEXT_WFW_UNIT_SIID
+                // TEXT_SECTION_SIID TEXT_WFW_UNIT_SIID
                 M1Store::Item_lv2* l_unit = M1Store::Item_lv2::getNew(
                     M1Store::FULL_VERTEX,                              // category & attributes (flags)
-                    M1Store::ItemType(M1Env::TEXT_SECTION_SPECIAL_ID), // type
+                    M1Store::ItemType(M1Env::TEXT_SECTION_SIID), // type
                     l_label.toUtf8().constData()                       // label
                 );
                 // additional type TEXT_WFW_UNIT_SIID
@@ -423,17 +514,19 @@ void loadGita(){
                 // add Prabhupada translation, if any
                 if(l_wfw_prabhupada.length() > 0){
                     l_unit->setField(
-                        l_wfw_prabhupada, false,
+                        l_wfw_prabhupada,
+                        false,
                         M1Store::Storage::getSpecialItemPointer(M1Env::TEXT_WFW_TRANSL_SIID),
-                        M1Store::Storage::getSpecialItemPointer(M1Env::TEXT_WFW_PRABUPADA_SIID));
+                        M1Store::Storage::getSpecialItemPointer(TEXT_WFW_PRABUPADA_SIID));
                     qCDebug(g_cat_main) << QString("Setting Prabhupada WfW: %1").arg(l_wfw_prabhupada);
                 }
                 // add Sivanande translation, if any
                 if(l_wfw_sivananda.length() > 0){
                     l_unit->setField(
-                        l_wfw_sivananda, true,
+                        l_wfw_sivananda,
+                        true,
                         M1Store::Storage::getSpecialItemPointer(M1Env::TEXT_WFW_TRANSL_SIID),
-                        M1Store::Storage::getSpecialItemPointer(M1Env::TEXT_WFW_SIVANANDA_SIID));
+                        M1Store::Storage::getSpecialItemPointer(TEXT_WFW_SIVANANDA_SIID));
                     qCDebug(g_cat_main) << QString("Setting Sivanande WfW: %1").arg(l_wfw_sivananda);
                 }
                 l_wfw_prabhupada = "";
@@ -452,15 +545,16 @@ void loadGita(){
                 M1Store::Item_lv2* l_new_url = M1Store::Item_lv2::getNew(
                     M1Store::FULL_VERTEX,                          // category & attributes (flags)
                     M1Store::ItemType(M1Env::TEXT_URL_LINK_SIID),  // type
-                    (l_url_label + "##" + l_url).toUtf8().constData()               // label
+                    (l_url_label).toUtf8().constData()             // label
                 );
-                /* TODO: Allow arbirary length fields
+
+                l_current_section->linkTo(l_new_url, M1Env::OWNS_SIID, nullptr, false);
+
                 bool l_res = l_new_url->setField(
-                    l_url, false, M1Store::Storage::getSpecialItemPointer(M1Env::TEXT_URL_LINK_SIID));
+                    l_url,
+                    false,
+                    M1Store::Storage::getSpecialItemPointer(M1Env::TEXT_URL_LINK_SIID));
                 qCDebug(g_cat_main) << QString("Url field created: %1").arg(l_res);
-                */
-                // TODO: find out why this is inserted at the END instead of below the Auto edge
-                l_current_section->linkTo(l_new_url, M1Env::OWNS_SPECIAL_ID, nullptr, false);
             }
         }
     }
@@ -471,7 +565,9 @@ void loadGita(){
     // display key-config frequency list
     for(QMap<QString, int>::ConstIterator l_it = l_freq_map.begin(); l_it != l_freq_map.constEnd(); l_it++)
         qCDebug(g_cat_main) << QString("%1 --> %2").arg(l_it.key(), 25).arg(l_it.value());
+    */
     M1_FUNC_EXIT
+    return 1;
 }
 
 void loadEnoch(){
@@ -481,7 +577,7 @@ void loadEnoch(){
 
     //--------------------------------- words -----------------------------------------------------------
     // lexicon building
-    M1Store::Item_lv2* l_words_root = M1Store::Item_lv2::getExisting(M1Env::TEXT_WORD_SPECIAL_ID);
+    M1Store::Item_lv2* l_words_root = M1Store::Item_lv2::getExisting(M1Env::TEXT_WORD_SIID);
     QFile l_fin_words("../Enoch-words.txt");
     l_fin_words.open(QFile::ReadOnly | QFile::Text);
     QTextStream l_in_words(&l_fin_words);
@@ -492,9 +588,10 @@ void loadEnoch(){
         qCDebug(g_cat_silence) << "Lexical element: " + l_lex;
         M1Store::Item_lv2* l_lex_item = M1Store::Item_lv2::getNew(
             M1Store::FULL_VERTEX,                           // category & attributes (flags)
-            M1Store::ItemType(M1Env::TEXT_WORD_SPECIAL_ID), // type
+            // M1Store::ItemType(M1Env::TEXT_WORD_SIID), // type
             l_lex.toUtf8().constData()                      // label
             );
+        l_lex_item->setType(M1Env::TEXT_WORD_SIID);
         l_lex_item->linkTo(l_words_root, "BLNGS", nullptr, true);
         l_lex_2_word[l_lex] = l_lex_item;
     }
@@ -502,15 +599,16 @@ void loadEnoch(){
     // Text and its sections vertex
     M1Store::Item_lv2* l_enoch_text = M1Store::Item_lv2::getNew(
         M1Store::FULL_VERTEX,                      // category & attributes (flags)
-        M1Store::ItemType(M1Env::TEXT_SPECIAL_ID), // type
+        // M1Store::ItemType(M1Env::TEXT_SIID), // type
         "Book of Enoch, version B"                 // label
         );
-    M1Store::Item_lv2* l_text_root = M1Store::Item_lv2::getExisting(M1Env::TEXT_SPECIAL_ID);
+    l_enoch_text->setType(M1Env::TEXT_SIID);
+    M1Store::Item_lv2* l_text_root = M1Store::Item_lv2::getExisting(M1Env::TEXT_SIID);
     l_enoch_text->linkTo(l_text_root, "BLNGS", nullptr, true);
 
     M1Store::Item_lv2* l_enoch_sections = M1Store::Item_lv2::getNew(
         M1Store::FULL_VERTEX,  // category & attributes (flags)
-        M1Store::ItemType(),   // type (none)
+        //M1Store::ItemType(),   // type (none)
         "Sentences of EB"      // label
         );
     l_enoch_sections->linkTo(l_enoch_text, "BLNGS", nullptr, true);
@@ -547,9 +645,10 @@ void loadEnoch(){
         if(l_current_section == nullptr){
             l_current_section = M1Store::Item_lv2::getNew(
                 M1Store::FULL_VERTEX,                                                 // category & attributes (flags)
-                M1Store::ItemType(M1Env::TEXT_SECTION_SPECIAL_ID),                    // type
+                //M1Store::ItemType(M1Env::TEXT_SECTION_SIID),                    // type
                 QString("EB Sentence %1").arg(l_section_count++).toUtf8().constData() // label
                 );
+            l_current_section->setType(M1Env::TEXT_SECTION_SIID);
             l_sections_last_edge = l_enoch_sections->linkTo(l_current_section, "OWNS_", l_sections_last_edge, false);
             l_cursec_last_edge = l_current_section->linkTo(l_last_edge, M1Store::TW_SECTION_2_OCC_BEGIN_SIID);
         }

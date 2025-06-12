@@ -12,13 +12,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 find_package(GTest REQUIRED)
-find_package(Boost COMPONENTS system filesystem REQUIRED)
+find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
 find_package(Qt6 REQUIRED COMPONENTS WebEngineWidgets)
 
 set(PROJECT_SOURCES
         m1A_constants.h
         m1A_env.h
         m1A_env.cpp
+        m1B_graph_init.h
+        m1B_graph_init.cpp
         m1B_store.h
         m1B_store.cpp
         m1B_lv0_item.h
@@ -59,7 +61,7 @@ else()
     endif()
 endif()
 
-target_link_libraries(m1 PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6::WebEngineWidgets gtest gtest_main lmdb ${Boost_FILESYSTEM_LIBRARY})
+target_link_libraries(m1 PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6::WebEngineWidgets gtest gtest_main lmdb ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an

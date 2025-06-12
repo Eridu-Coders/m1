@@ -1,10 +1,12 @@
 #include "m1C_interp.h"
 #include "m1A_env.h"
+#include "m1B_graph_init.h"
 #include "m1B_store.h"
 #include "m1B_lv2_item.h"
 
 #include <QPainter>
 #include <QResizeEvent>
+#include <QRegularExpression>
 
 // g_cat_interp_base
 Q_LOGGING_CATEGORY(g_cat_interp_base, "interp.base")
@@ -22,19 +24,33 @@ M1MidPlane::InterpStaticConstructor::InterpStaticConstructor(){
 }
 */
 
+extern M1Env::SpecialItemID TEXT_WFW_PRABUPADA_SIID;     // subtype of TEXT_WFW_TRANSL_SIID
+extern M1Env::SpecialItemID TEXT_WFW_SIVANANDA_SIID;     // subtype of TEXT_WFW_TRANSL_SIID
+extern M1Env::SpecialItemID TEXT_WFW_GAMBIRANANDA_SIID;  // subtype of TEXT_WFW_TRANSL_SIID
+
 // ------------------------------------ Interp Base Class -----------------------------------------------------
 void M1MidPlane::Interp::init(){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Init Interp class members"))
     cm_open = QIcon("../Icons/Open.svg");
+    Q_ASSERT_X( !cm_open.isNull(), "Interp::init()", "Open link Icon failed to load");
     cm_closed = QIcon("../Icons/Closed.svg");
+    Q_ASSERT_X( !cm_closed.isNull(), "Interp::init()", "Closed link Icon failed to load");
+
+    if(M1Store::Storage::menmonic_exists("SIVAN")){
+        TEXT_WFW_PRABUPADA_SIID = M1Store::Storage::getSpecialID("SIVAN");
+        TEXT_WFW_SIVANANDA_SIID = M1Store::Storage::getSpecialID("PRABH");
+        TEXT_WFW_GAMBIRANANDA_SIID = M1Store::Storage::getSpecialID("GAMBI");
+    }
     M1_FUNC_EXIT
 }
 
 M1MidPlane::Interp* M1MidPlane::Interp::getInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Getting appropriate Interp from: %1").arg(p_myself->dbgShort()))
     Interp* l_ret = nullptr;
-    if(AutoInterp::wantIt(p_myself))
+    if(AutoInterp::wantIt(p_myself)){
         l_ret = new AutoInterp(p_myself, p_parent, p_depth);
+        qCDebug(g_cat_interp_base) << "grabbed by AutoInterp()";
+    }
     else if(TranslUnit::wantIt(p_myself))
         l_ret = new TranslUnit(p_myself, p_parent, p_depth);
     else if(FieldInterp::wantIt(p_myself))
@@ -49,12 +65,15 @@ M1MidPlane::Interp* M1MidPlane::Interp::getInterp(M1Store::Item_lv2* p_myself, Q
         l_ret = new BhashyaTranslation(p_myself, p_parent, p_depth);
     else if(TextInterp::wantIt(p_myself))
         l_ret = new TextInterp(p_myself, p_parent, p_depth);
-    else
+    else{
+        qCDebug(g_cat_interp_base) << "default Interp()";
         l_ret = new Interp(p_myself, p_parent, p_depth);
+    }
     M1_FUNC_EXIT
     return l_ret;
 }
 
+// ------------------------------------ Interp Base class -----------------------------------------------------
 M1MidPlane::Interp::Interp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth) : QWidget::QWidget(p_parent){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Base Interp Constructor from: %1").arg(p_myself->dbgShort()))
     qCDebug(g_cat_interp_base) << "baseSize()  :" << this->baseSize();
@@ -62,7 +81,6 @@ M1MidPlane::Interp::Interp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p
     qCDebug(g_cat_interp_base) << "font height : " << this->fontMetrics().height();
     qCDebug(g_cat_interp_base) << "font family : " << this->fontInfo().family();
     m_depth = p_depth;
-    // m_active = false;
     m_myself = p_myself;
     m_target_height = (this->fontMetrics().height() * 1300) / 1000;
     m_target_beseline = (m_target_height * 800) / 1000;
@@ -92,9 +110,9 @@ void M1MidPlane::Interp::paintEvent(QPaintEvent* p_event){
     QPainter p(this);
     // QString l_text = m_myself->isFullEdge() ? m_myself->dbgHalf() : m_myself->dbgShort(0);
     QString l_text = m_myself->getTarget_lv2()->text();
-    M1Store::Storage::getIcon(m_myself->getMaxTypeMember()).paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
+    M1Store::Storage::getQIcon(m_myself->getMaxTypeMember())->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
     paintOC(p);
-    M1Store::Storage::getIcon(m_myself->getTarget_lv2()->getMaxTypeMember()).paint(
+    M1Store::Storage::getQIcon(m_myself->getTarget_lv2()->getMaxTypeMember())->paint(
         &p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
     p.setPen(Qt::white);
     p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), l_text);
@@ -109,7 +127,22 @@ void M1MidPlane::Interp::mouseDoubleClickEvent(QMouseEvent *p_event){
 }
 
 QString M1MidPlane::Interp::getHtml(){
-    return QString("<html><Head></Head><body><p>%1</p></body></html>").arg(m_myself->dbgShort());
+    QStringList l_edge_list;
+    l_edge_list.append(QString("<tr><td>ID</td><td>:</td><td>%1</td></tr>\n").arg(m_myself->item_id()));
+    l_edge_list.append(QString("<tr><td>Type</td><td>:</td><td>%1</td></tr>\n").arg(m_myself->dbgTypeShort()));
+    QString l_edge_html = QString("<table>%1</table>\n").arg(l_edge_list.join("\n"));
+    if((m_myself->flags() & M1Env::ITEM_NATURE_MASK) == M1Env::FULL_EDGE){
+        QString l_target_html = m_myself->getTarget_lv2()->dbgStringHtml();
+        qCDebug(g_cat_tree_display) << l_target_html;
+        return QString("<html><Head></Head><body><p style=\"font-weight: bold;\">Edge:</p>\n%1").arg(l_edge_html) +
+               QString("<p style=\"font-weight: bold;\">Target:</p>\n<p>%1</p></body></html>").arg(l_target_html);
+    }else{
+        // Simple Edge
+        QString l_payload_html = m_myself->text();
+        qCDebug(g_cat_tree_display) << l_payload_html;
+        return QString("<html><Head></Head><body><p style=\"font-weight: bold;\">Edge:</p>\n%1").arg(l_edge_html) +
+               QString("<p style=\"font-weight: bold;\">Payload:</p>\n<p>%1</p></body></html>").arg(l_payload_html);
+    }
 }
 
 void M1MidPlane::Interp::focusInEvent(QFocusEvent *p_event){
@@ -141,27 +174,63 @@ M1MidPlane::Interp::~Interp(){
     // qCDebug(g_cat_tree_display) << m_myself->dbgShort() << " deleted";
 }
 
+// ------------------------------------ AutoInterp -----------------------------------------------------
+bool M1MidPlane::AutoInterp::wantIt(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Getting appropriate Interp from: %1").arg(p_myself->dbgShort()))
+    bool l_is_auto = p_myself->isOfType(M1Env::AUTO_SIID);
+    qCDebug(g_cat_interp_base) << QString("p_myself->isOfType(M1Env::AUTO_SIID): %1").arg(l_is_auto ? "True" : "False");
+    qCDebug(g_cat_interp_base) << QString("p_myself->isFullEdge()              : %1").arg(p_myself->isFullEdge() ? "True" : "False");
+    return p_myself->isFullEdge() && p_myself->isOfType(M1Env::AUTO_SIID);
+    M1_FUNC_EXIT
+}
+M1MidPlane::AutoInterp::AutoInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth) : Interp(p_myself, p_parent, p_depth){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("AutoInterp Constructor from: %1").arg(p_myself->dbgShort()))
+    M1_FUNC_EXIT
+}
+void M1MidPlane::AutoInterp::paintEvent(QPaintEvent* p_event){
+    QPainter p(this);
+    QString l_text = m_myself->getTarget_lv2()->text();
+    M1Store::Storage::getQIcon(m_myself->getMaxTypeMember())->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
+    // M1MidPlane::Interp::cm_closed.paint(&p, m_target_padding + m_target_height, m_target_padding, m_icon_size, m_icon_size);
+    M1Store::Storage::getQIcon(m_myself->getTarget_lv2()->getMaxTypeMember())->paint(
+        &p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
+    p.setPen(Qt::white);
+    p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), l_text);
+    p.setPen(Qt::darkGray);
+    p.drawLine(QPoint(0,0), QPoint(this->width(),0));
+    p.drawLine(QPoint(0,m_target_height-1), QPoint(this->width(),m_target_height-1));
+}
+
+// ------------------------------------ FieldInterp -----------------------------------------------------
+bool M1MidPlane::FieldInterp::wantIt(M1Store::Item_lv2* p_myself){
+    return p_myself->isSimpleEdge();
+}
+M1MidPlane::FieldInterp::FieldInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth) : Interp(p_myself, p_parent, p_depth){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("FieldInterp Constructor from: %1").arg(p_myself->dbgShort()))
+    M1_FUNC_EXIT
+}
+void M1MidPlane::FieldInterp::paintEvent(QPaintEvent* p_event){
+    static QIcon ls_field_icon("../Icons/Field.svg");
+
+    QPainter p(this);
+    QString l_text = QString("[%1] ").arg(m_myself->dbgTypeShort()) + m_myself->text();
+    ls_field_icon.paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
+    // M1MidPlane::Interp::cm_closed.paint(&p, m_target_padding + m_target_height, m_target_padding, m_icon_size, m_icon_size);
+    M1Store::Storage::getQIcon(m_myself->getMaxTypeMember())->paint(
+        &p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
+    p.setPen(Qt::white);
+    p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), l_text);
+}
+
 // ------------------------------------ TranslUnit -----------------------------------------------------
 QString g_html_template = "<html><Head></Head><body><div style=\"margin: 1em;\">\n%1</div></body></html>";
 QString g_transl_template = "<tr><td style=\"font-family: 'Noto Sans', Arial, sans-serif; text-align: center;\">%1 (%2)</td></tr>\n";
-/*
-<table class="svInterlinearWord">
-<tr><td class="svGroundGreek">l_ground</td>'</tr>
-<tr><td class="svTranslit">l_translit</td></tr>
-<tr><td><span class="TranslationText">l_translation</span></td></tr>
-</table>
 
-<table style="display: inline-block; margin: 0 .5em 0 0;">
-<tr><td style="font-family: 'Noto Serif', 'Times New Roman', serif; text-align: center;">l_ground</td>'</tr>
-<tr><td style="font-style: italic;">l_translit</td></tr>
-<tr><td style="font-family: 'Noto Sans', Arial, sans-serif;">l_translation</td></tr>
-</table>
-*/
 QString tu_html_fragment(M1Store::Item_lv2* p_tu){
     qCDebug(g_cat_tree_display) << "p_tu         : " << p_tu->dbgShort(2);
-
-    M1Store::Item_lv2* l_begin_word = p_tu->find_edge2(M1Store::TW_SECTION_2_OCC_BEGIN_SIID);
-    M1Store::Item_lv2* l_end_word = p_tu->find_edge2(M1Store::TW_SECTION_2_OCC_END_SIID);
+    
+    M1Store::Item_lv2* l_begin_word = p_tu->find_edge_edge(M1Store::TW_SECTION_2_OCC_BEGIN_SIID);
+    M1Store::Item_lv2* l_end_word = p_tu->find_edge_edge(M1Store::TW_SECTION_2_OCC_END_SIID);
 
     if(l_begin_word != nullptr) l_begin_word = l_begin_word->getTarget_lv2();
     if(l_end_word != nullptr) l_end_word = l_end_word->getTarget_lv2();
@@ -189,8 +258,8 @@ QString tu_html_fragment(M1Store::Item_lv2* p_tu){
     l_ground_text = l_ground_text.trimmed();
     l_translit = l_translit.trimmed();
 
-    QString l_translation_p = p_tu->getField(M1Store::TEXT_WFW_TRANSL_SIID, M1Store::TEXT_WFW_PRABUPADA_SIID);
-    QString l_translation_s = p_tu->getField(M1Store::TEXT_WFW_TRANSL_SIID, M1Store::TEXT_WFW_SIVANANDA_SIID);
+    QString l_translation_p = p_tu->getField(M1Store::TEXT_WFW_TRANSL_SIID, TEXT_WFW_PRABUPADA_SIID);
+    QString l_translation_s = p_tu->getField(M1Store::TEXT_WFW_TRANSL_SIID, TEXT_WFW_SIVANANDA_SIID);
     return "<table style=\"display: inline-block; margin: 0 .5em 0 0;\">\n" +
         QString("<tr><td style=\"font-family: 'Noto Serif', 'Times New Roman', serif; text-align: center; color: maroon;\">%1</td></tr>\n").arg(l_ground_text) +
         QString("<tr><td style=\"font-style: italic; text-align: center;\">%1</td></tr>\n").arg(l_translit) +
@@ -213,9 +282,9 @@ void M1MidPlane::TranslUnit::paintEvent(QPaintEvent* p_event){
     QString l_text = QString("%1 [%2]")
                          .arg(m_myself->getTarget_lv2()->text())
                          .arg(m_myself->getTarget_lv2()->getField(M1Store::TEXT_WFW_TRANSL_SIID, true));
-    M1Store::Storage::getIcon(m_myself->getMaxTypeMember()).paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
+    M1Store::Storage::getQIcon(m_myself->getMaxTypeMember())->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
     paintOC(p);
-    M1Store::Storage::getIcon(m_myself->getTarget_lv2()->getMaxTypeMember()).paint(
+    M1Store::Storage::getQIcon(m_myself->getTarget_lv2()->getMaxTypeMember())->paint(
         &p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
     p.setPen(Qt::white);
     p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), l_text);
@@ -223,50 +292,6 @@ void M1MidPlane::TranslUnit::paintEvent(QPaintEvent* p_event){
 }
 QString M1MidPlane::TranslUnit::getHtml(){
     return g_html_template.arg(tu_html_fragment(m_myself->getTarget_lv2()));
-}
-
-
-// ------------------------------------ FieldInterp -----------------------------------------------------
-bool M1MidPlane::FieldInterp::wantIt(M1Store::Item_lv2* p_myself){
-    return p_myself->isSimpleEdge();
-}
-M1MidPlane::FieldInterp::FieldInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth) : Interp(p_myself, p_parent, p_depth){
-    M1_FUNC_ENTRY(g_cat_interp_base, QString("FieldInterp Constructor from: %1").arg(p_myself->dbgShort()))
-    M1_FUNC_EXIT
-}
-void M1MidPlane::FieldInterp::paintEvent(QPaintEvent* p_event){
-    static QIcon ls_field_icon("../Icons/Field.svg");
-
-    QPainter p(this);
-    QString l_text = QString("[%1] ").arg(m_myself->dbgTypeShort()) + m_myself->text();
-    ls_field_icon.paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
-    // M1MidPlane::Interp::cm_closed.paint(&p, m_target_padding + m_target_height, m_target_padding, m_icon_size, m_icon_size);
-    M1Store::Storage::getIcon(m_myself->getMaxTypeMember()).paint(
-        &p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
-    p.setPen(Qt::white);
-    p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), l_text);
-}
-
-// ------------------------------------ AutoInterp -----------------------------------------------------
-bool M1MidPlane::AutoInterp::wantIt(M1Store::Item_lv2* p_myself){
-    return p_myself->isFullEdge() && p_myself->isOfType(M1Env::AUTO_SPECIAL_ID);
-}
-M1MidPlane::AutoInterp::AutoInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth) : Interp(p_myself, p_parent, p_depth){
-    M1_FUNC_ENTRY(g_cat_interp_base, QString("AutoInterp Constructor from: %1").arg(p_myself->dbgShort()))
-    M1_FUNC_EXIT
-}
-void M1MidPlane::AutoInterp::paintEvent(QPaintEvent* p_event){
-    QPainter p(this);
-    QString l_text = m_myself->getTarget_lv2()->text();
-    M1Store::Storage::getIcon(m_myself->getMaxTypeMember()).paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
-    // M1MidPlane::Interp::cm_closed.paint(&p, m_target_padding + m_target_height, m_target_padding, m_icon_size, m_icon_size);
-    M1Store::Storage::getIcon(m_myself->getTarget_lv2()->getMaxTypeMember()).paint(
-        &p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
-    p.setPen(Qt::white);
-    p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), l_text);
-    p.setPen(Qt::darkGray);
-    p.drawLine(QPoint(0,0), QPoint(this->width(),0));
-    p.drawLine(QPoint(0,m_target_height-1), QPoint(this->width(),m_target_height-1));
 }
 
 // ------------------------------------ SectionBeginEnd -----------------------------------------------------
@@ -284,9 +309,9 @@ void M1MidPlane::SectionBeginEnd::paintEvent(QPaintEvent* p_event){
     QString l_text = QString("%1 [%2]")
                          .arg(m_myself->getTarget_lv2()->getTarget_lv2()->text())
                          .arg(m_myself->getTarget_lv2()->getTarget_lv2()->getField(M1Store::TEXT_WORD_TRANSLIT_SIID));;
-    M1Store::Storage::getIcon(m_myself->getMaxTypeMember()).paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
+    M1Store::Storage::getQIcon(m_myself->getMaxTypeMember())->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
     paintOC(p);
-    M1Store::Storage::getIcon(m_myself->getTarget_lv2()->getTarget_lv2()->getMaxTypeMember()).paint(
+    M1Store::Storage::getQIcon(m_myself->getTarget_lv2()->getTarget_lv2()->getMaxTypeMember())->paint(
         &p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
     p.setPen(Qt::white);
     p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), l_text);
@@ -303,17 +328,19 @@ QString M1MidPlane::UrlInterp::getHtml(){
 M1MidPlane::UrlInterp::UrlInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth) : Interp(p_myself, p_parent, p_depth){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("UrlInterp Constructor from: %1").arg(p_myself->dbgShort()))
 
-    m_label = QString(m_myself->getTarget_lv2()->text()).split("##")[0];
-    m_url = QString(m_myself->getTarget_lv2()->text()).split("##")[1];
+    // m_label = QString(m_myself->getTarget_lv2()->text()).split("##")[0];
+    // m_url = QString(m_myself->getTarget_lv2()->text()).split("##")[1];
+    m_label = m_myself->getTarget_lv2()->text();
+    m_url = m_myself->getTarget_lv2()->getField(M1Env::TEXT_URL_LINK_SIID);
     M1_FUNC_EXIT
 }
 void M1MidPlane::UrlInterp::paintEvent(QPaintEvent* p_event){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("SectionInterp painting"))
     QPainter p(this);
     QString l_text = m_label;
-    M1Store::Storage::getIcon(m_myself->getMaxTypeMember()).paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
+    M1Store::Storage::getQIcon(m_myself->getMaxTypeMember())->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
     paintOC(p);
-    M1Store::Storage::getIcon(m_myself->getTarget_lv2()->getMaxTypeMember()).paint(
+    M1Store::Storage::getQIcon(m_myself->getTarget_lv2()->getMaxTypeMember())->paint(
         &p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
     p.setPen(Qt::white);
     p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), l_text);
@@ -322,7 +349,7 @@ void M1MidPlane::UrlInterp::paintEvent(QPaintEvent* p_event){
 
 //------------------------------------ BhashyaTranslation -----------------------------------------------------
 QString bt_html_fragment(M1Store::Item_lv2* p_bt){
-    M1Store::Item_lv2* l_author_edge = p_bt->find_edge2(M1Store::TEXT_WRITTEN_BY_SIID);
+    M1Store::Item_lv2* l_author_edge = p_bt->find_edge_edge(M1Store::TEXT_WRITTEN_BY_SIID);
     QString l_author = l_author_edge->getTarget_lv2()->text();
     QString l_text = p_bt->text();
     QString l_type = p_bt->isOfType(M1Env::TEXT_SLOKA_BHASHYA_SIID) ? "Bhashya" : "Translation";
@@ -346,9 +373,10 @@ void M1MidPlane::BhashyaTranslation::paintEvent(QPaintEvent* p_event){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("SectionInterp painting"))
     QPainter p(this);
     QString l_text = m_myself->getTarget_lv2()->text();
-    M1Store::Storage::getIcon(m_myself->getMaxTypeMember()).paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
+    // TODO getMaxTypeMember() doesn't work here -- find other method to get most fundamental type
+    M1Store::Storage::getQIcon(m_myself->getMaxTypeMember())->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
     paintOC(p);
-    M1Store::Storage::getIcon(m_myself->getTarget_lv2()->getMaxTypeMember()).paint(
+    M1Store::Storage::getQIcon(m_myself->getTarget_lv2()->getMaxTypeMember())->paint(
         &p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
     p.setPen(Qt::white);
     p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), l_text);
@@ -379,30 +407,9 @@ QString si_html_fragment(M1Store::Item_lv2* p_si){
     return l_html;
 }
 bool M1MidPlane::SectionInterp::wantIt(M1Store::Item_lv2* p_myself){
-    return p_myself->isFullEdge() && p_myself->getTarget_lv2()->isOfType(M1Env::TEXT_SECTION_SPECIAL_ID);
+    return p_myself->isFullEdge() && p_myself->getTarget_lv2()->isOfType(M1Env::TEXT_SECTION_SIID);
 }
 QString M1MidPlane::SectionInterp::getHtml(){
-    /*
-    QString l_html_wfw;
-    QString l_html_lines;
-    QString l_html_translations;
-    QString l_html_bhashyas;
-    for(M1Store::Item_lv2_iterator it = m_myself->getTarget_lv2()->getIteratorTop(); !it.beyondEnd(); it.next()){
-        if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_WFW_UNIT_SIID))
-            l_html_wfw += tu_html_fragment(it.at()->getTarget_lv2());
-        if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_SLOKA_LINE_SIID))
-            l_html_lines += QString("<p style=\"margin: 0; padding: 0;\">%1</p>\n").arg(it.at()->getTarget_lv2()->text());
-        if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_SLOKA_TRANSLATION_SIID))
-            l_html_translations += bt_html_fragment(it.at()->getTarget_lv2());
-        if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_SLOKA_BHASHYA_SIID))
-            l_html_bhashyas += bt_html_fragment(it.at()->getTarget_lv2());
-    }
-    QString l_html = QString("<p style=\"font-weight: bold;\">%1</p>")
-                         .arg(m_myself->getTarget_lv2()->text()) +
-                    QString("<div style=\"margin-bottom: 1em;\">%1</div>\n<div style=\"margin-bottom: 1em;\">%2</div>\n")
-                         .arg(l_html_lines)
-                         .arg(l_html_wfw) + l_html_translations + l_html_bhashyas;
-    */
     QString l_html = si_html_fragment(m_myself->getTarget_lv2());
     return g_html_template.arg(l_html);
 }
@@ -414,9 +421,9 @@ void M1MidPlane::SectionInterp::paintEvent(QPaintEvent* p_event){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("SectionInterp painting"))
     QPainter p(this);
     QString l_text = m_myself->getTarget_lv2()->text();
-    M1Store::Storage::getIcon(m_myself->getMaxTypeMember()).paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
+    M1Store::Storage::getQIcon(m_myself->getMaxTypeMember())->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
     paintOC(p);
-    M1Store::Storage::getIcon(m_myself->getTarget_lv2()->getMaxTypeMember()).paint(
+    M1Store::Storage::getQIcon(m_myself->getTarget_lv2()->getMaxTypeMember())->paint(
         &p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
     p.setPen(Qt::white);
     p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), l_text);
@@ -425,14 +432,14 @@ void M1MidPlane::SectionInterp::paintEvent(QPaintEvent* p_event){
 
 //------------------------------------ TextInterp -----------------------------------------------------
 bool M1MidPlane::TextInterp::wantIt(M1Store::Item_lv2* p_myself){
-    return p_myself->isFullEdge() && p_myself->getTarget_lv2()->isOfType(M1Env::TEXT_SPECIAL_ID);
+    return p_myself->isFullEdge() && p_myself->getTarget_lv2()->isOfType(M1Env::TEXT_SIID);
 }
 QString M1MidPlane::TextInterp::getHtml(){
     QString l_html;
-    M1Store::Item_lv2* l_folder = m_myself->getTarget_lv2()->find_edge3(M1Store::FOLDER_SPECIAL_ID);
+    M1Store::Item_lv2* l_folder = m_myself->getTarget_lv2()->find_edge_target(M1Store::FOLDER_SIID);
     l_folder = l_folder->getTarget_lv2();
     for(M1Store::Item_lv2_iterator it = l_folder->getIteratorTop(); !it.beyondEnd(); it.next()){
-        if(it.at()->getTarget_lv2()->isOfType(M1Store::TEXT_SECTION_SPECIAL_ID))
+        if(it.at()->getTarget_lv2()->isOfType(M1Store::TEXT_SECTION_SIID))
             l_html += si_html_fragment(it.at()->getTarget_lv2());
     }
     return g_html_template.arg(l_html);
@@ -445,9 +452,9 @@ void M1MidPlane::TextInterp::paintEvent(QPaintEvent* p_event){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("TextInterp painting"))
     QPainter p(this);
     QString l_text = m_myself->getTarget_lv2()->text();
-    M1Store::Storage::getIcon(m_myself->getMaxTypeMember()).paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
+    M1Store::Storage::getQIcon(m_myself->getMaxTypeMember())->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
     paintOC(p);
-    M1Store::Storage::getIcon(m_myself->getTarget_lv2()->getMaxTypeMember()).paint(
+    M1Store::Storage::getQIcon(m_myself->getTarget_lv2()->getMaxTypeMember())->paint(
         &p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
     p.setPen(Qt::white);
     p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), l_text);

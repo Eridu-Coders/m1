@@ -215,8 +215,7 @@ void M1Env::M1EnvStatic::setSilentMode(bool p_set){
         QLoggingCategory::setFilterRules("*.debug=false\n"
                                          "dump.debug=true");
     else
-        // restore categories --> all allowed
-        // QLoggingCategory::setFilterRules("*.debug=true");
+        // restore categories --> previous filter restored
         QLoggingCategory::setFilterRules(cm_normal_filter);
 }
 

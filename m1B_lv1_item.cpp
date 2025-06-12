@@ -121,17 +121,6 @@ void M1Store::Item_lv1::addIncomingEdges(const ItemCounter p_add){
     M1_FUNC_EXIT
 } // can be negative
 
-void M1Store::Item_lv1::setVisibleEdges(const ItemCounter p_visible_edges){
-    M1_FUNC_ENTRY(g_cat_lv1_members, "Entry")
-    M1Store::Item_lv0::setVisibleEdges(p_visible_edges);
-    M1_FUNC_EXIT
-}
-void M1Store::Item_lv1::addVisibleEdges(const ItemCounter p_add){
-    M1_FUNC_ENTRY(g_cat_lv1_members, "Entry")
-    M1Store::Item_lv0::addVisibleEdges(p_add);
-    M1_FUNC_EXIT
-} // can be negative
-
 void M1Store::Item_lv1::setText(const QString& p_text){
     M1_FUNC_ENTRY(g_cat_lv1_members, "Entry")
     M1Store::Item_lv0::setText(p_text);

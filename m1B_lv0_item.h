@@ -88,7 +88,7 @@ using namespace M1Env;
         friend class Storage;
         friend class Item_lv2;
     private:
-        ItemID m_item_id;   ///< Item ID
+        ItemID m_item_id;   ///< (0) Item ID
         FlagField m_flags;  ///< (1) Primary flag field
         ItemType m_type;    ///< (2) Item type
 
@@ -101,39 +101,41 @@ using namespace M1Env;
                 }s; ///< simple vertex
                 struct{
                     FlagField m_flags_extra;                    ///< (3) Extra flag field
-                    Date m_creation_date;                       ///< (4) Creation date
-                    Date m_lastmod_date;                        ///< (5) Last Modification date
-                    ItemCounter m_incoming_edges;               ///< (6) Number of incoming edges
-                    ItemCounter m_visible_edges;                ///< (7) Number of visible edges
-                    ItemID m_first_edge;                        ///< (8) ID of first edge
-                    ItemID m_auto_edge;                         ///< (8) ID of AUTO edge
-                    ItemID m_first_edge_special;                ///< (9) ID of first special edge
-                    StringID m_string_id;                       ///< (10) ID of string, if any
-                    StringID m_search_string_id;                ///< (11) ID for the sarch string
-                    char m_text[FULL_VERTEX_TEXT_LEN];          ///< (12) Local string space
+                    ItemCounter m_incoming_edges;               ///< (4) Number of incoming edges
+                    Date m_creation_date;                       ///< (5) Creation date
+                    Date m_lastmod_date;                        ///< (6) Last Modification date
+                    ItemID m_first_edge;                        ///< (7) ID of first edge
+                    ItemID m_first_edge_special;                ///< (8) ID of first special edge
+                    char m_text[FULL_VERTEX_TEXT_LEN];          ///< (9) Local string space
+
+                    ItemID m_auto_edge;                         ///< (10) ID of AUTO edge
+                    StringID m_string_id;                       ///< (11) ID of string, if any
+                    StringID m_search_string_id;                ///< (12) ID for the sarch string
                 }f; ///< full vertex
             }v; ///< vertices
             union{
                 struct{
                     StringID m_search_string_id;                ///< ID for the sarch string
                     ItemID m_v_origin;                          ///< origin
-                    ItemID m_e_previous;                        ///< previou edge
+                    ItemID m_e_previous;                        ///< previous edge
                     ItemID m_e_next;                            ///< next edge
+                    StringID m_string_id;                       ///< ID of string, if any
                     char m_text[SIMPLE_EDGE_TEXT_LEN];          ///< Local string space
                 }s; ///< simple edge
                 struct{
-                    FlagField m_flags_extra;                    ///< Extra flag field
+                    FlagField m_flags_extra;                    ///< (3) Extra flag field
+                    ItemCounter m_incoming_edges;               ///< (4) Number of incoming edges
+                    Date m_creation_date;                       ///< (5) Creation date
+                    Date m_lastmod_date;                        ///< (6) Last Modification date
+                    ItemID m_first_edge;                        ///< (7) ID of first edge
+                    ItemID m_first_edge_special;                ///< (8) ID of first special edge
+                    char m_text[FULL_EDGE_TEXT_LEN];            ///< (9) Local string space
+
                     ItemID m_v_origin;                          ///< origin
                     ItemID m_v_target;                          ///< target
                     ItemID m_e_previous;                        ///< previous edge
                     ItemID m_e_next;                            ///< next edge
                     ItemID m_e_reciprocal;                      ///< ID of reciprocal edge, if any
-                    Date m_creation_date;                       ///< Creation date
-                    Date m_lastmod_date;                        ///< Last Modification date
-                    ItemCounter m_incoming_edges;               ///< Number of incoming edges
-                    ItemID m_first_edge;                        ///< ID of first edge
-                    ItemID m_first_edge_special;                ///< ID of first special edge
-                    char m_text[FULL_EDGE_TEXT_LEN];            ///< Local string space
                 }f; ///< full edge
             }e; ///< edges
         }p; ///< rest of the payload
@@ -147,13 +149,13 @@ using namespace M1Env;
         // For testing purposes only
         Item_lv0(const ItemID p_item_id,
                  const FlagField p_flags,
-                 const ItemType p_type);
+                 const ItemType& p_type);
 
         // ------------------------ Setters ---------------------------------------------------------
         // to be used in real situations when instantiating from mmap() area pointer
         void initializeMembers(const ItemID p_item_id,
                                const FlagField p_flags,
-                               const ItemType p_type);
+                               const ItemType& p_type);
         void initializeMembers();
 
         void setFlags(const FlagField p_flags, const bool p_force_init = false);
@@ -181,9 +183,6 @@ using namespace M1Env;
         void setIncomingEdges(const ItemCounter p_incoming_edges);
         void addIncomingEdges(const ItemCounter p_add); // can be negative
 
-        void setVisibleEdges(const ItemCounter p_visible_edges);
-        void addVisibleEdges(const ItemCounter p_add); // can be negative
-
         void setText(const QString& p_text);
 
         // ------------------------ Getters ---------------------------------------------------------
@@ -204,7 +203,6 @@ using namespace M1Env;
         QDateTime lastmodDate() const;
         StringID string_id() const;
         ItemCounter incomingEdges() const;
-        ItemCounter visibleEdges() const;
         char* text() const;
 
         bool isOfType_member(const ItemID p_type) const;
@@ -230,7 +228,8 @@ using namespace M1Env;
         SpecialItemID m_si_id;              ///< [2] 16 bit special item id
         char m_mnemonic[5];                 ///< [5] menmonic
         SpecialItemID m_si_id_reciprocal;   ///< [2] 16 bit special item id of the reciprocal type (for edge types only, SI_HAS_RECIPROCAL must be set)
-        char m_extra[7];                    ///< [7] extra data storage field (len = 7 to make total 32)
+        StringID m_icon_path;               ///< [4] path to icon (stored in the general string table
+        char m_extra[3];                    ///< [3] extra data storage field (len = 3 to make total 32)
     public:
         static SpecialItem* cm_dummy;
         /**

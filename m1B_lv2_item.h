@@ -21,15 +21,21 @@ class Item_lv2 : public Item_lv1 {
         static void insertEdgeBelow(Item_lv2* p_new_edge, Item_lv2* p_edge_above);
         bool edgeBelongs(Item_lv2* p_edge, bool p_edge_is_special);
         void createTypeEdges();
-        void defaultConnections();
+        void defaultEdges();
+        void loopNextPrevious();
         Item_lv2* findFieldEdge(const SpecialItem* p_field_type_si) const;
-        std::shared_ptr<Item_lv2_iterator_base> getIteratorGeneric(Item_lv2* p_start_edge, const SpecialItemID p_type, const bool p_is_visible) const;
+        std::shared_ptr<Item_lv2_iterator_base> getIteratorGeneric(Item_lv2* p_start_edge, const SpecialItemID p_type) const;
     public:
         // ------------------------------- Static --------------------------------------------------------
-        static Item_lv2* getNew(const FlagField p_flags, const ItemType& p_type);
-        static Item_lv2* getNew(const FlagField p_flags, const ItemType& p_type, const char* p_label);
-        static Item_lv2* getNew(const FlagField p_flags, const ItemType p_type, const char* p_label,
-                                const FlagField p_flags_special, const char* p_mnemonic);
+        static Item_lv2* getNew(const FlagField p_flags,
+                                const ItemType& p_type);
+        static Item_lv2* getNew(const FlagField p_flags,
+                                const char* p_label);
+        static Item_lv2* getNew(const FlagField p_flags,
+                                const char* p_label,
+                                const FlagField p_flags_special,
+                                const char* p_mnemonic,
+                                const char* p_icon_path);
 
         static Item_lv2* getExisting(const char* p_mnemonic);
         static Item_lv2* getExisting(const ItemID p_item_id);
@@ -69,33 +75,36 @@ class Item_lv2 : public Item_lv1 {
         Item_lv2* getTarget_lv2() const;
         Item_lv2* getOrigin_lv2() const;
 
-        Item_lv2* getNext_lv2(const bool p_visible = false) const;
-        Item_lv2* getNext_lv2(const SpecialItemID p_type, const bool p_visible = false) const;
-        Item_lv2* getNext_lv2(const char* p_mnemonic, const bool p_visible = false) const;
+        Item_lv2* getNext_lv2() const;
+        Item_lv2* getNext_lv2(const SpecialItemID p_type) const;
+        Item_lv2* getNext_lv2(const char* p_mnemonic) const;
 
         // prevents other types from being implicitly converted
         template <class T>
-        Item_lv2* getNext_lv2(T, const bool p_visible = false) = delete; // C++11
+        Item_lv2* getNext_lv2(T) = delete; // C++11
 
-        Item_lv2* getPrevious_lv2(const bool p_visible = false) const;
-        Item_lv2* getPrevious_lv2(const SpecialItemID p_type, const bool p_visible = false) const;
-        Item_lv2* getPrevious_lv2(const char* p_mnemonic, const bool p_visible = false) const;
+        Item_lv2* getPrevious_lv2() const;
+        Item_lv2* getPrevious_lv2(const SpecialItemID p_type) const;
+        Item_lv2* getPrevious_lv2(const char* p_mnemonic) const;
 
         // prevents other types from being implicitly converted
         template <class T>
-        Item_lv2* getPrevious_lv2(T, const bool p_visible = false) = delete; // C++11
+        Item_lv2* getPrevious_lv2(T) = delete; // C++11
 
         bool setType(const SpecialItem* p_type_si);
         bool setType(const SpecialItemID p_type_si_id);
         bool setType(const char* p_mnemonic);
 
         bool isOfType(const SpecialItem* p_type_si) const;
-        bool isOfType(const ItemID p_type_item_id) const;
         bool isOfType(const SpecialItemID p_type_si_id) const;
         bool isOfType(const char* p_mnemonic) const;
+        // bool isOfType(const ItemID p_type_item_id) const;
         SpecialItemID getMaxTypeMember();
 
-        bool setField(const QString& p_content, const bool p_force_new, const SpecialItem* p_field_type_si, const SpecialItem* p_field_extra_type_si = nullptr);
+        bool setField(const QString& p_content,
+                      const bool p_force_new,
+                      const SpecialItem* p_field_type_si,
+                      const SpecialItem* p_field_extra_type_si = nullptr);
         QString getField(const SpecialItem* p_field_type_si, const SpecialItem* p_field_type2_si=nullptr, const bool p_all=false) const;
         QString getField(const SpecialItemID p_field_type_si_id, const bool p_all=false) const{
             return this->getField(M1Store::Storage::getSpecialItemPointer(p_field_type_si_id), nullptr, p_all);
@@ -120,35 +129,39 @@ class Item_lv2 : public Item_lv1 {
         template <class V>
         Item_lv2* linkTo(ItemID p_target_id, const V, Item_lv2* p_edge_above = nullptr, const bool p_at_top = false) = delete; // C++11
 
-        Item_lv2* find_edge(const SpecialItemID p_type) const;
-        Item_lv2* find_edge(const char* p_mnemonic) const;
-        Item_lv2* find_edge2(const SpecialItemID p_type) const;
-        Item_lv2* find_edge3(const SpecialItemID p_type) const;
+        Item_lv2* find_edge(const SpecialItemID p_type_edge, const SpecialItemID p_type_target) const;
+        // Item_lv2* find_edge(const char* p_mnemonic) const;
+        Item_lv2* find_edge_edge(const SpecialItemID p_type) const;
+        Item_lv2* find_edge_target(const SpecialItemID p_type) const;
 
         // prevents other types from being implicitly converted
         template <class T>
         Item_lv2* find_edge(T) const = delete; // C++11
 
-        Item_lv2_iterator getIteratorTop(const SpecialItemID p_type = G_VOID_SI_ID, const bool p_is_visible = false) const;
-        Item_lv2_iterator getIteratorAuto(const SpecialItemID p_type = G_VOID_SI_ID, const bool p_is_visible = false) const;
-        Item_lv2_iterator getIteratorSpecial(const SpecialItemID p_type = G_VOID_SI_ID, const bool p_is_visible = false) const;
+        Item_lv2_iterator getIteratorTop(const SpecialItemID p_type = G_VOID_SI_ID) const;
+        Item_lv2_iterator getIteratorAuto(const SpecialItemID p_type = G_VOID_SI_ID) const;
+        Item_lv2_iterator getIteratorSpecial(const SpecialItemID p_type = G_VOID_SI_ID) const;
 
         // prevents other types from being implicitly converted
         template <class T>
-        Item_lv2_iterator getIteratorTop(const T, const bool p_is_visible = false) const = delete; // C++11
+        Item_lv2_iterator getIteratorTop(const T) const = delete; // C++11
         template <class T>
-        Item_lv2_iterator getIteratorAuto(const T, const bool p_is_visible = false) const = delete; // C++11
+        Item_lv2_iterator getIteratorAuto(const T) const = delete; // C++11
         template <class T>
-        Item_lv2_iterator getIteratorSpecial(const T, const bool p_is_visible = false) const = delete; // C++11
+        Item_lv2_iterator getIteratorSpecial(const T) const = delete; // C++11
 
         QString dbgString();
+        QString dbgStringHtml();
         QString dbgShort(int p_depth = 0);
         QString dbgHalf();
 };
 
+/**
+ * @brief Base class --> scans through ALL edges (no filter)
+ */
 class Item_lv2_iterator_base{
         friend class Item_lv2;
-        friend class Item_lv2_iterator_type;
+        friend class Item_lv2_iterator_edge_type;
     private:
         Item_lv2* m_current_edge = nullptr;
         ItemID m_first_edge_item_id = G_VOID_ITEM_ID;
@@ -167,15 +180,18 @@ class Item_lv2_iterator_base{
         virtual QString dbgShort();
 };
 
-class Item_lv2_iterator_type : public Item_lv2_iterator_base{
+/**
+ * @brief Edge type filter iterator --> scans only thoses edges that match the filter
+ */
+class Item_lv2_iterator_edge_type : public Item_lv2_iterator_base{
         friend class Item_lv2;
     private:
         std::vector<Item_lv2*>::iterator m_selection;
         int m_curren_position;
 
-        Item_lv2_iterator_type();
-        Item_lv2_iterator_type(const Item_lv2_iterator_type& p_copiand);
-        Item_lv2_iterator_type(Item_lv2* p_start_edge, const SpecialItemID p_type, const bool p_is_visible);
+        Item_lv2_iterator_edge_type();
+        Item_lv2_iterator_edge_type(const Item_lv2_iterator_edge_type& p_copiand);
+        Item_lv2_iterator_edge_type(Item_lv2* p_start_edge, const SpecialItemID p_type);
     public:
         void next();
         bool beyondEnd() const;
@@ -186,6 +202,10 @@ class Item_lv2_iterator_type : public Item_lv2_iterator_base{
 
 /**
  * @brief Wrapper class for Item_lv2_iterator_base and derived classes
+ *
+ * This wrapper is needed because I want to be able to instantiate iterators as local variables (not pointers), so that
+ * they are automatically deleted (freed) when leaving the block. If Item_lv2_iterator_base classes were directly instantiated
+ * as pointers, using new, a separate delete instruction would be necessary to delete them at the end of the block.
  */
 class Item_lv2_iterator{
         friend class Item_lv2;
@@ -199,10 +219,10 @@ class Item_lv2_iterator{
         ~Item_lv2_iterator();
         Item_lv2_iterator& operator=(const Item_lv2_iterator& p_assignand);
 
-        bool isNull(){return m_it->isNull();}
+        bool isNull() const {return m_it->isNull();}
         void next(){m_it->next();}
         bool beyondEnd() const;
-        Item_lv2* at() const{return m_it->at();}
+        Item_lv2* at() const {return m_it->at();}
 };
 
 } // end namespace M1Store

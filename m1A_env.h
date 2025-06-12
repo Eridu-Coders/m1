@@ -4,12 +4,29 @@
 #include <QTextStream>
 #include <QFile>
 #include <QLoggingCategory>
+
 #include <stack>
+#include <exception>
 
 #define M1_FUNC_ENTRY(a, b) M1Env::M1EnvStatic::entry(a, b, __FILE__, __LINE__, __PRETTY_FUNCTION__, __FUNCTION__);
 #define M1_FUNC_EXIT M1Env::M1EnvStatic::exit(__FILE__, __LINE__, __PRETTY_FUNCTION__, __FUNCTION__);
 
 namespace M1Env{
+
+class M1Exception : public std::exception{
+private:
+    QString m_message;
+    QByteArray m_tmp; // for compatibility with std::exception::what()
+    unsigned long m_code;
+public:
+    M1Exception(QString p_message, unsigned long p_code){m_message = p_message; m_code = p_code; m_tmp = qWhat().toUtf8();}
+
+    QString qWhat() const {return QString("[%1] %2").arg(m_code).arg(m_message);}
+    QString message() const {return m_message;}
+    unsigned long code() const {return m_code;}
+
+    virtual char* what(){return m_tmp.data();}
+};
 
 class M1EnvStatic{
     private:
@@ -50,15 +67,16 @@ class M1EnvStatic{
 
         static void setSilentMode(bool p_set);
         static void setNormalFilter(const QString& p_filter);
-    };
+};
 
-    template <typename T>
-    QString vectorToString(QList<T>& p_list){
-        QStringList l_list;
-        for(T l_element : p_list)
-            l_list.append(l_element->dbgShort());
+template <typename T>
+QString vectorToString(QList<T>& p_list){
+    QStringList l_list;
+    for(T l_element : p_list)
+        l_list.append(l_element->dbgShort());
 
-        return QString("[") + l_list.join(", ") + "]";
-    }
+    return QString("[") + l_list.join(", ") + "]";
 }
+
+}// end namespace M1Env
 #endif // M1_ENV_H
