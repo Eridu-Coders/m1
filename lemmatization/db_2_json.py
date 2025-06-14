@@ -1600,6 +1600,277 @@ def process_cursor_list_gr(p_cursor_list):
     print(f'Phase III - Grouping punctuation into tokens', file=sys.stderr)
     group_punctuation()
 
+
+def print_lemma_2_words():
+    print('================= Lemmas --> words =======================')
+    for l_lem in sorted(g_lemma_form_dict.keys()):
+        print(f'{l_lem:20} {sorted(g_lemma_form_dict[l_lem])}')
+    print()
+
+
+def print_hyphens():
+    print('================= Hyphenated words =======================')
+    for h in g_hyphens:
+        print(h)
+    print()
+
+
+def print_anno():
+    print('================= Annomalies =======================')
+    for k in g_anno.keys():
+        print(f'------------------ {k} [{len(g_anno[k])}] --------------------------')
+        for a in g_anno[k]:
+            print(a)
+        print(f'------------------ {k} [{len(g_anno[k])}] --------------------------')
+        print()
+
+
+def print_entities():
+    print('================= Entities, detailed =======================')
+    for l_k_ent in sorted(g_entities_dict.keys()):
+        print(f'----------- {l_k_ent} --------------')
+        for k_nm in sorted(g_entities_dict[l_k_ent].keys()):
+            print(k_nm)
+            for s_i, s_k, e_i, e_k in g_entities_dict[l_k_ent][k_nm]:
+                print(f'   {s_i:6} {e_i:6} {g_occurences[s_k]}')
+                print(f'                 {g_occurences[e_k]}')
+    print()
+    # dump entities
+    print('================= Entities, summary =======================')
+    for l_k_ent in sorted(g_entities_dict.keys()):
+        l_k_list = sorted(list(set(g_entities_dict[l_k_ent].keys())))
+        print(f'{l_k_ent}: {l_k_list}')
+    print()
+
+
+def print_xpos():
+    print('================= XPOS =======================')
+    for k in sorted(list(g_xpos_dict.keys())):
+        print(f'----------- [{k}] --------------')
+        for n in sorted(list(g_xpos_dict[k])):
+            print('  ', n)
+    print()
+
+
+def print_morph_attr():
+    print('================= Grammar Attributes =======================')
+    for l_key in sorted(list(g_morph_attr.keys())):
+        print(f'{l_key:10}: {sorted(list(g_morph_attr[l_key]))}')
+    print()
+    # l_key_explained = ''
+    #     for l_key in sorted(list(g_morph_attr.keys())):
+    #         if re.search('^M-', l_key):
+    #             l_key_short = l_key.replace('M-', '')
+    #             l_key_explained += f"('{l_key_short}', '{spacy.explain(l_key_short)}')\n"
+    #             print(f"'{l_key}': {[(l_val, spacy.explain(l_val)) for l_val in g_morph_attr[l_key]]},")
+    #     print()
+    #     print(l_key_explained)
+
+
+def print_punctuation_groups():
+    print('================= Punctuation groups (Tokens) =======================')
+    for l_len in sorted(g_punctuation_groups.keys()):
+        print(f'----------------- {l_len} ---------------------')
+        for l_pg in sorted(list(g_punctuation_groups[l_len])):
+            print('  ', l_pg, g_punctuation_group_context[l_pg])
+    print()
+
+
+def print_dash_instances():
+    print('================= Dash regex trial =======================')
+    # — instances
+    l_center_len = 60
+    for l_summary in [True, False]:
+        l_remaining = []
+        for l_rt, l_name_author in zip(g_rt_list, ['Shorey', 'Jowett']):
+            l_context_len = 20 if l_summary else 40
+            print(f'------------------------- {l_name_author} ----------------------------')
+            l_count = 0
+            for l_match in re.finditer(r'(—[^—.?!;:]+[—.?!;:])', l_rt):
+                l_left = l_match.group(1)[:l_center_len]
+                l_right = l_match.group(1)[-l_center_len:]
+
+                l_start = l_match.start() - l_context_len
+                l_start = 0 if l_start < 0 else l_start
+                l_end = l_match.end() + l_context_len
+                l_end = len(l_rt) if l_end > len(l_rt) else l_end
+                if l_summary:
+                    print(f'{l_rt[l_start:l_match.start()]:>{l_context_len}}{l_left:{l_center_len}} ' +
+                          f'...[{l_match.end() - l_match.start():5}]... ' +
+                          f'{l_right:>{l_center_len}}{l_rt[l_match.end():l_end]}')
+                else:
+                    l_old = l_rt[l_start:l_end]
+                    l_top = f'{l_count:4}: {l_rt[l_start:l_match.start()]:>{l_context_len}}' + \
+                            f'∥{l_match.group(0)}∥' + \
+                            f'{l_rt[l_match.end():l_end]}'
+                    print(l_top)
+
+                    l_new = l_old
+                    # Dash transformation , “—
+                    l_new = l_new.replace(', “—', ', “')
+                    # e. —A n? —W
+                    l_new = re.sub(r'(\w)([.?!])\s+—\s*([‘“]*[A-Z])', r'\1\2 \3', l_new)
+                    # capitalize after .?!
+                    l_new = re.sub(r'(\w)([.?!])\s+—\s*([a-z])',
+                                   lambda m: f'{m.group(1)}{m.group(2)} {m.group(3).upper()}', l_new)
+                    # d, —h
+                    l_new = re.sub(r'(\w)([,;])\s+—\s*([‘“]*[a-z])', r'\1\2 \3', l_new)
+                    l_new = re.sub(r'(\w)([,;])\s+—\s*([‘“]*I )', r'\1\2 \3', l_new)
+                    # y—” “I
+                    l_new = re.sub(r'(\w)—”\s+“([A-Z])', r'\1.” “\2', l_new)
+                    # d: —W
+                    l_new = re.sub(r'(\w):\s+—\s*([‘“]*\w)', r'\1: \2', l_new)
+
+                    # canonical replacement as a comma
+                    l_new = re.sub(r'([\w’”])\s*—\s*([a-z‘“])', r'\1, \2', l_new)
+                    # special case of I
+                    l_new = re.sub(r'([\w’”])\s*—\s*I ', r'\1, I ', l_new)
+
+                    for l_left, l_right in g_rep_chunk_list:
+                        l_new = l_new.replace(l_left, l_right)
+
+                    l_mark = '+' if l_new == l_old else ' '
+                    l_bottom = f'   {l_mark}  {l_new}'
+                    print(l_bottom)
+
+                    if l_mark == '+':
+                        l_remaining.append(f'{l_top}\n{l_bottom}')
+                l_count += 1
+            print('Total     :', l_count)
+            print('Dash count:', len(re.findall('—', l_rt)))
+            print()
+        if len(l_remaining) > 0:
+            print(
+                f'--------------------------------- Remaining [{len(l_remaining)}]----------------------------------')
+            for l_item in l_remaining:
+                print(l_item)
+            print()
+            for l_item in l_remaining:
+                l_item = re.sub(r'\s*\d+:\s+', '', l_item).replace('∥', '')
+                print(f"('{l_item[:80]}',")
+                print(f" '{l_item[:80]}'),")
+
+        print()
+
+
+def print_punctuation_groups_re():
+    print('================= Punctuation Groups (re) =======================')
+    l_punctuation_grp_dict = dict()
+    for l_rt, l_name_author in zip(g_rt_list, ['Shorey', 'Jowett']):
+        # !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
+        for l_match in re.findall(f'(\w[{string.punctuation} ‘“’”]+\w)', l_rt):
+            l_match = re.sub(r'\w', '_', l_match)
+            l_punctuation_grp_dict.setdefault(len(l_match), set()).add(l_match)
+
+    for l_len in sorted(l_punctuation_grp_dict.keys()):
+        print(f'{l_len - 2:2}:', end=' ')
+        print('‖'.join([f'{l_pg}' for l_pg in sorted(list(l_punctuation_grp_dict[l_len]))]))
+        print()
+    print()
+    print('Punctuation used: ', ' '.join(sorted(list(g_punctuation_set))))
+    print()
+
+
+def print_apostrophes():
+    print('================= Apostrophes =======================')
+    l_apostrophe_grp_dict = dict()
+    for l_rt, l_name_author in zip(g_rt_list, ['Shorey', 'Jowett']):
+        for l_match in re.findall(f"(\w'\w)", l_rt):
+            l_match = re.sub(r"\w'", "_'", l_match)
+            l_apostrophe_grp_dict[l_match] = l_apostrophe_grp_dict.setdefault(l_match, 0) + 1
+    print(''.join([f'{l_pg}: {l_apostrophe_grp_dict[l_pg]}\n' for l_pg in sorted(list(l_apostrophe_grp_dict.keys()))]))
+
+
+def print_dep_2_pos():
+    # dump dep_ --> POS
+    print('================= dep_ --> POS =======================')
+    for k in sorted(g_dep_to_pos.keys()):
+        print(f'{k:10}: {sorted(list(g_dep_to_pos[k]))}')
+    print()
+
+
+def print_pos_2_lemma():
+    # POS to Lemma
+    print('================= POS --> Lemmas =======================')
+    l_pos_length = [(len(g_pos_to_lemma[l_pos_key]), l_pos_key) for l_pos_key in sorted(g_pos_to_lemma.keys())]
+    for l_len, l_pos_key in sorted(l_pos_length):
+        l_words = sorted(list(g_pos_to_lemma[l_pos_key]))
+        print(f"{l_pos_key:7} {l_len:8,} {l_words[:50]}{'...' if l_len > 50 else ''}")
+    print()
+    # TAG to forms
+    print('================= TAG --> Forms =======================')
+    l_tag_length = [(len(g_tag_to_form[l_tag_key]), l_tag_key) for l_tag_key in sorted(g_tag_to_form.keys())]
+    for l_len, l_tag_key in sorted(l_tag_length):
+        l_words = sorted(list(g_tag_to_form[l_tag_key]))
+        print(
+            f"{l_tag_key:7} {spacy.explain(l_tag_key).strip()[:40]:40} {l_len:6,} {l_words[:50]}{'...' if l_len > 50 else ''}")
+    print()
+
+
+def print_missing():
+    print('================= Missing sections =======================')
+    l_current_prefix = None
+    l_last_section = None
+    l_section_set = set()
+    l_notes_list = []
+    l_notes_key_list = []
+    l_notes_section_list = []
+    g_occur_restricted['Z-ZZZ-000000'] = {'NewSection': '', 'NoteKey': []}
+    for l_tok_key in sorted(g_occur_restricted.keys()):
+        l_tok = g_occur_restricted[l_tok_key]
+
+        l_section = l_tok['NewSection']
+        l_note_key = l_tok['NoteKey']
+        l_prefix = l_tok_key.split('-')[1]
+        if l_prefix != l_current_prefix:
+            if l_current_prefix:
+                # print(f'{l_current_prefix}: {sorted(list(l_section_set))}')
+                if l_section_set == g_sections_set:
+                    print(f'No missing sections in [{l_current_prefix}] ({len(l_section_set)}/{len(g_sections_set)})')
+                else:
+                    l_missing_list = sorted(list(g_sections_set.difference(l_section_set)))
+                    print(f'Missing sections in [{l_current_prefix}]: {len(l_missing_list)} {l_missing_list}')
+
+                if l_notes_list == g_notes_list:
+                    print(f'No missing notes in [{l_current_prefix}] ({len(l_notes_list)}/{len(g_notes_list)})')
+                else:
+                    for l_is, l_key_is, l_sec_is, l_should in zip(l_notes_list, l_notes_key_list, l_notes_section_list,
+                                                                  g_notes_list):
+                        if l_is != l_should:
+                            print(f'Notes discrepancy [{l_current_prefix}] {l_sec_is}: [{l_key_is}]{l_is}/{l_should}')
+                            break
+                        else:
+                            print(f'Notes consistency {l_sec_is}: [{l_key_is}]{l_is}')
+                l_section_set = set()
+                l_notes_list = []
+            l_current_prefix = l_prefix
+
+        # print(f'{l_tok_key}: {l_section}')
+        if len(l_note_key) > 0:
+            l_notes_list += [n for n in g_notes_dict[l_note_key]]
+            l_notes_key_list += [l_note_key for n in g_notes_dict[l_note_key]]
+            l_notes_section_list += [l_last_section for n in g_notes_dict[l_note_key]]
+        if len(l_section) > 0:
+            l_last_section = l_section
+            l_section_set.add(l_section)
+
+    del g_occur_restricted['Z-ZZZ-000000']
+
+
+# print()
+# print(re.sub(r"([A-Za-z])['’]([a-z])", r'\1⏅\2', g_raw_text_without_notes_or_markup))
+
+def print_remaining_dashes():
+    print('================= Remaining dashes =======================')
+    for l_txt_code, l_idx, l_context in g_dashes_remaining:
+        print(f'{l_txt_code} {l_idx:8} {l_context}')
+    print()
+    for l_txt_code, l_idx, l_context in g_dashes_remaining:
+        l_context = l_context.replace('∥', '').strip()
+        print(f"('{l_context}',")
+        print(f"r'{l_context}'),")
+    print()
+
 # ------------- main() -------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     # punctuation categories
@@ -1736,261 +2007,10 @@ if __name__ == '__main__':
         print('********** Processing Ancient Greek text', file=sys.stderr)
         process_cursor_list_gr(l_cursor_list_greek)
 
-    def print_lemma_2_words():
-        print('================= Lemmas --> words =======================')
-        for l_lem in sorted(g_lemma_form_dict.keys()):
-            print(f'{l_lem:20} {sorted(g_lemma_form_dict[l_lem])}')
-        print()
-
-    def print_hyphens():
-        print('================= Hyphenated words =======================')
-        for h in g_hyphens:
-            print(h)
-        print()
-
-    def print_anno():
-        print('================= Annomalies =======================')
-        for k in g_anno.keys():
-            print(f'------------------ {k} [{len(g_anno[k])}] --------------------------')
-            for a in g_anno[k]:
-                print(a)
-            print(f'------------------ {k} [{len(g_anno[k])}] --------------------------')
-            print()
-
-
-    def print_entities():
-        print('================= Entities, detailed =======================')
-        for l_k_ent in sorted(g_entities_dict.keys()):
-            print(f'----------- {l_k_ent} --------------')
-            for k_nm in sorted(g_entities_dict[l_k_ent].keys()):
-                print(k_nm)
-                for s_i, s_k, e_i, e_k in g_entities_dict[l_k_ent][k_nm]:
-                    print(f'   {s_i:6} {e_i:6} {g_occurences[s_k]}')
-                    print(f'                 {g_occurences[e_k]}')
-        print()
-        # dump entities
-        print('================= Entities, summary =======================')
-        for l_k_ent in sorted(g_entities_dict.keys()):
-            l_k_list = sorted(list(set(g_entities_dict[l_k_ent].keys())))
-            print(f'{l_k_ent}: {l_k_list}')
-        print()
-
-
-    def print_xpos():
-        print('================= XPOS =======================')
-        for k in sorted(list(g_xpos_dict.keys())):
-            print(f'----------- [{k}] --------------')
-            for n in sorted(list(g_xpos_dict[k])):
-                print('  ', n)
-        print()
-
-    def print_morph_attr():
-        print('================= Grammar Attributes =======================')
-        for k in sorted(list(g_morph_attr.keys())):
-            print(f'{k:10}: {sorted(list(g_morph_attr[k]))}')
-        print()
-
-    def print_punctuation_groups():
-        print('================= Punctuation groups (Tokens) =======================')
-        for l_len in sorted(g_punctuation_groups.keys()):
-            print(f'----------------- {l_len} ---------------------')
-            for l_pg in sorted(list(g_punctuation_groups[l_len])):
-                print('  ', l_pg, g_punctuation_group_context[l_pg])
-        print()
-
-
-    def print_dash_instances():
-        print('================= Dash regex trial =======================')
-        # — instances
-        l_center_len = 60
-        for l_summary in [True, False]:
-            l_remaining = []
-            for l_rt, l_name_author in zip(g_rt_list, ['Shorey', 'Jowett']):
-                l_context_len = 20 if l_summary else 40
-                print(f'------------------------- {l_name_author} ----------------------------')
-                l_count = 0
-                for l_match in re.finditer(r'(—[^—.?!;:]+[—.?!;:])', l_rt):
-                    l_left = l_match.group(1)[:l_center_len]
-                    l_right = l_match.group(1)[-l_center_len:]
-
-                    l_start = l_match.start() - l_context_len
-                    l_start = 0 if l_start < 0 else l_start
-                    l_end = l_match.end() + l_context_len
-                    l_end = len(l_rt) if l_end > len(l_rt) else l_end
-                    if l_summary:
-                        print(f'{l_rt[l_start:l_match.start()]:>{l_context_len}}{l_left:{l_center_len}} ' +
-                              f'...[{l_match.end() - l_match.start():5}]... ' +
-                              f'{l_right:>{l_center_len}}{l_rt[l_match.end():l_end]}')
-                    else:
-                        l_old = l_rt[l_start:l_end]
-                        l_top = f'{l_count:4}: {l_rt[l_start:l_match.start()]:>{l_context_len}}' + \
-                                f'∥{l_match.group(0)}∥' + \
-                                f'{l_rt[l_match.end():l_end]}'
-                        print(l_top)
-
-                        l_new = l_old
-                        # Dash transformation , “—
-                        l_new = l_new.replace(', “—', ', “')
-                        # e. —A n? —W
-                        l_new = re.sub(r'(\w)([.?!])\s+—\s*([‘“]*[A-Z])', r'\1\2 \3', l_new)
-                        # capitalize after .?!
-                        l_new = re.sub(r'(\w)([.?!])\s+—\s*([a-z])',
-                                       lambda m: f'{m.group(1)}{m.group(2)} {m.group(3).upper()}', l_new)
-                        # d, —h
-                        l_new = re.sub(r'(\w)([,;])\s+—\s*([‘“]*[a-z])', r'\1\2 \3', l_new)
-                        l_new = re.sub(r'(\w)([,;])\s+—\s*([‘“]*I )', r'\1\2 \3', l_new)
-                        # y—” “I
-                        l_new = re.sub(r'(\w)—”\s+“([A-Z])', r'\1.” “\2', l_new)
-                        # d: —W
-                        l_new = re.sub(r'(\w):\s+—\s*([‘“]*\w)', r'\1: \2', l_new)
-
-                        # canonical replacement as a comma
-                        l_new = re.sub(r'([\w’”])\s*—\s*([a-z‘“])', r'\1, \2', l_new)
-                        # special case of I
-                        l_new = re.sub(r'([\w’”])\s*—\s*I ', r'\1, I ', l_new)
-
-                        for l_left, l_right in g_rep_chunk_list:
-                            l_new = l_new.replace(l_left, l_right)
-
-                        l_mark = '+' if l_new == l_old else ' '
-                        l_bottom = f'   {l_mark}  {l_new}'
-                        print(l_bottom)
-
-                        if l_mark == '+':
-                            l_remaining.append(f'{l_top}\n{l_bottom}')
-                    l_count += 1
-                print('Total     :', l_count)
-                print('Dash count:', len(re.findall('—', l_rt)))
-                print()
-            if len(l_remaining) > 0:
-                print(
-                    f'--------------------------------- Remaining [{len(l_remaining)}]----------------------------------')
-                for l_item in l_remaining:
-                    print(l_item)
-                print()
-                for l_item in l_remaining:
-                    l_item = re.sub(r'\s*\d+:\s+', '', l_item).replace('∥', '')
-                    print(f"('{l_item[:80]}',")
-                    print(f" '{l_item[:80]}'),")
-
-            print()
-
-    def print_punctuation_groups_re():
-        print('================= Punctuation Groups (re) =======================')
-        l_punctuation_grp_dict = dict()
-        for l_rt, l_name_author in zip(g_rt_list, ['Shorey', 'Jowett']):
-            # !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
-            for l_match in re.findall(f'(\w[{string.punctuation} ‘“’”]+\w)', l_rt):
-                l_match = re.sub(r'\w', '_', l_match)
-                l_punctuation_grp_dict.setdefault(len(l_match), set()).add(l_match)
-
-        for l_len in sorted(l_punctuation_grp_dict.keys()):
-            print(f'{l_len-2:2}:', end=' ')
-            print('‖'.join([f'{l_pg}' for l_pg in sorted(list(l_punctuation_grp_dict[l_len]))]))
-            print()
-        print()
-        print('Punctuation used: ', ' '.join(sorted(list(g_punctuation_set))))
-        print()
-
-    def print_apostrophes():
-        print('================= Apostrophes =======================')
-        l_apostrophe_grp_dict = dict()
-        for l_rt, l_name_author in zip(g_rt_list, ['Shorey', 'Jowett']):
-            for l_match in re.findall(f"(\w'\w)", l_rt):
-                l_match = re.sub(r"\w'", "_'", l_match)
-                l_apostrophe_grp_dict[l_match] = l_apostrophe_grp_dict.setdefault(l_match, 0) + 1
-        print(''.join([f'{l_pg}: {l_apostrophe_grp_dict[l_pg]}\n' for l_pg in sorted(list(l_apostrophe_grp_dict.keys()))]))
-
-    def print_dep_2_pos():
-        # dump dep_ --> POS
-        print('================= dep_ --> POS =======================')
-        for k in sorted(g_dep_to_pos.keys()):
-            print(f'{k:10}: {sorted(list(g_dep_to_pos[k]))}')
-        print()
-
-    def print_pos_2_lemma():
-        # POS to Lemma
-        print('================= POS --> Lemmas =======================')
-        l_pos_length = [(len(g_pos_to_lemma[l_pos_key]), l_pos_key) for l_pos_key in sorted(g_pos_to_lemma.keys())]
-        for l_len, l_pos_key in sorted(l_pos_length):
-            l_words = sorted(list(g_pos_to_lemma[l_pos_key]))
-            print(f"{l_pos_key:7} {l_len:8,} {l_words[:50]}{'...' if l_len > 50 else ''}")
-        print()
-        # TAG to forms
-        print('================= TAG --> Forms =======================')
-        l_tag_length = [(len(g_tag_to_form[l_tag_key]), l_tag_key) for l_tag_key in sorted(g_tag_to_form.keys())]
-        for l_len, l_tag_key in sorted(l_tag_length):
-            l_words = sorted(list(g_tag_to_form[l_tag_key]))
-            print(f"{l_tag_key:7} {spacy.explain(l_tag_key).strip()[:40]:40} {l_len:6,} {l_words[:50]}{'...' if l_len > 50 else ''}")
-        print()
-
-    def print_missing():
-        print('================= Missing sections =======================')
-        l_current_prefix = None
-        l_last_section = None
-        l_section_set = set()
-        l_notes_list = []
-        l_notes_key_list = []
-        l_notes_section_list = []
-        g_occur_restricted['Z-ZZZ-000000'] = {'NewSection': '', 'NoteKey': []}
-        for l_tok_key in sorted(g_occur_restricted.keys()):
-            l_tok = g_occur_restricted[l_tok_key]
-
-            l_section = l_tok['NewSection']
-            l_note_key = l_tok['NoteKey']
-            l_prefix = l_tok_key.split('-')[1]
-            if l_prefix != l_current_prefix:
-                if l_current_prefix:
-                    # print(f'{l_current_prefix}: {sorted(list(l_section_set))}')
-                    if l_section_set == g_sections_set:
-                        print(f'No missing sections in [{l_current_prefix}] ({len(l_section_set)}/{len(g_sections_set)})')
-                    else:
-                        l_missing_list = sorted(list(g_sections_set.difference(l_section_set)))
-                        print(f'Missing sections in [{l_current_prefix}]: {len(l_missing_list)} {l_missing_list}')
-
-                    if l_notes_list == g_notes_list:
-                        print(f'No missing notes in [{l_current_prefix}] ({len(l_notes_list)}/{len(g_notes_list)})')
-                    else:
-                        for l_is, l_key_is, l_sec_is, l_should in zip(l_notes_list, l_notes_key_list, l_notes_section_list, g_notes_list):
-                            if l_is != l_should:
-                                print(f'Notes discrepancy [{l_current_prefix}] {l_sec_is}: [{l_key_is}]{l_is}/{l_should}')
-                                break
-                            else:
-                                print(f'Notes consistency {l_sec_is}: [{l_key_is}]{l_is}')
-                    l_section_set = set()
-                    l_notes_list = []
-                l_current_prefix = l_prefix
-
-            # print(f'{l_tok_key}: {l_section}')
-            if len(l_note_key) > 0:
-                l_notes_list += [n for n in g_notes_dict[l_note_key]]
-                l_notes_key_list += [l_note_key for n in g_notes_dict[l_note_key]]
-                l_notes_section_list += [l_last_section for n in g_notes_dict[l_note_key]]
-            if len(l_section) > 0:
-                l_last_section = l_section
-                l_section_set.add(l_section)
-
-        del g_occur_restricted['Z-ZZZ-000000']
-
-    # print()
-    # print(re.sub(r"([A-Za-z])['’]([a-z])", r'\1⏅\2', g_raw_text_without_notes_or_markup))
-
-    def print_remaining_dashes():
-        print('================= Remaining dashes =======================')
-        for l_txt_code, l_idx, l_context in g_dashes_remaining:
-            print(f'{l_txt_code} {l_idx:8} {l_context}')
-        print()
-        for l_txt_code, l_idx, l_context in g_dashes_remaining:
-            l_context = l_context.replace('∥', '').strip()
-            print(f"('{l_context}',")
-            print(f"r'{l_context}'),")
-        print()
-
     print('********** Control tables', file=sys.stderr)
     # print_lemma_2_words()
     # print_hyphens()
     # print_xpos()
-    # print_morph_attr()
     # print_entities()
 
     print_punctuation_groups()
@@ -2000,6 +2020,8 @@ if __name__ == '__main__':
     print_pos_2_lemma()
     print_missing()
     print_remaining_dashes()
+    print_morph_attr()
+    print_entities()
 
     print('********** Dumping JSON files', file=sys.stderr)
     with open('base_tok.json', 'w') as f:
