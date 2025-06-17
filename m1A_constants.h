@@ -90,8 +90,13 @@ namespace M1Env{
     static const char* OWNS_ICON_PATH = "../Icons/OWNS.svg";                            // *
     static const char* BLNGS_ICON_PATH = "../Icons/BLNGS.svg";                          // *
     static const char* TEXT_ICON_PATH = "../Icons/Text.svg";                            // *
-    static const char* TEXT_WORD_ICON_PATH = "../Icons/Word.svg";                       // *
-    static const char* TEXT_LEMMA_ICON_PATH = "../Icons/Lemma.svg";                     // *
+    static const char* OCCURRENCE_ICON_PATH = "../Icons/Occurrence.svg";                // *
+    static const char* FORM_ICON_PATH = "../Icons/Word.svg";                            // *
+    static const char* LEMMA_ICON_PATH = "../Icons/Lemma.svg";                          // *
+    static const char* ENTITY_ICON_PATH = "../Icons/Entity.svg";                        // *
+    static const char* POS_ICON_PATH = "../Icons/Nlp-Pos.svg";                          // *
+    static const char* TAG_ICON_PATH = "../Icons/Nlp-Tag.svg";                          // *
+
     static const char* TEXT_SECTION_ICON_PATH = "../Icons/Section.svg";                 // *
     static const char* TW_SECTION_2_OCC_BEGIN_ICON_PATH = "../Icons/Sec-Begin.svg";     // *
     static const char* TW_SECTION_2_OCC_END_ICON_PATH = "../Icons/Sec-End.svg";         // *

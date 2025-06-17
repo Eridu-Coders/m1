@@ -3,30 +3,318 @@
 
 __author__ = 'fi11222'
 
-g_special_vertices = [
-    ['FOLDR', 'SI_IS_TYPE',                      'FOLDER_ICON_PATH', 'FOLDER_SIID', None, 'Special Vertex ID (Vertex type) of folders (ordinary vertices with no special role)'],
-    ['AUTO_', 'SI_IS_TYPE',                      'AUTO_ICON_PATH', 'AUTO_SIID', None, 'Special Vertex ID (Edge type) of AUTO edges'],
-    # --------------------------- OWNS / BLNGS ---------------------------
-    ['OWNS_', 'SI_IS_TYPE',                      'OWNS_ICON_PATH', 'OWNS_SIID',
-    ('BLNGS', 'SI_IS_TYPE | SI_INSERT_AT_TOP',   'BLNGS_ICON_PATH', 'BLNGS_SIID'), 'Special Vertex ID (Edge type) of ownership edges'],
-    # --------------------------- ISA / ITO ---------------------------
-    ['_ISA_', 'SI_IS_TYPE | SI_IS_SPECIAL_EDGE', 'ISA_ICON_PATH', 'ISA_SIID',
-    ('_ITO_', 'SI_IS_TYPE'                     , 'ITO_ICON_PATH', 'ITO_SIID'), 'Special Vertex ID (Edge type) of type edges']
+import re
+
+# downloaded from https://universaldependencies.org/u/feat/index.html and formated with dnl_morph_attr.py
+g_attr_values = [
+    ('PronType', 'pronominal type',
+     [('Art', 'PTART', 'article'),
+      ('Dem', 'PTDEM', 'demonstrative pronoun, determiner, numeral or adverb'),
+      ('Emp', 'PTEMP', 'emphatic determiner'),
+      ('Exc', 'PTEXC', 'exclamative determiner'),
+      ('Ind', 'PTIND', 'indefinite pronoun, determiner, numeral or adverb'),
+      ('Int', 'PTINT', 'interrogative pronoun, determiner, numeral or adverb'),
+      ('Neg', 'PTNEG', 'negative pronoun, determiner or adverb'),
+      ('Prs', 'PTPRS', 'personal or possessive personal pronoun or determiner'),
+      ('Rcp', 'PTRCP', 'reciprocal pronoun'),
+      ('Rel', 'PTREL', 'relative pronoun, determiner, numeral or adverb'),
+      ('Tot', 'PTTOT', 'total (collective) pronoun, determiner or adverb')]),
+    ('Gender', 'gender',
+     [('Com', 'GNCOM', 'common gender'),
+      ('Fem', 'GNFEM', 'feminine gender'),
+      ('Masc', 'GNMSC', 'masculine gender'),
+      ('Neut', 'GNDNT', 'neuter gender')]),
+    ('VerbForm', 'form of verb or deverbative',
+     [('Conv', 'VFCNV', 'converb, transgressive, adverbial participle, verbal adverb'),
+      ('Fin', 'VFFIN', 'finite verb'),
+      ('Gdv', 'VFGDV', 'gerundive'),
+      ('Ger', 'VFGER', 'gerund'),
+      ('Inf', 'VFINF', 'infinitive'),
+      ('Part', 'VFPRT', 'participle, verbal adjective'),
+      ('Sup', 'VFSUP', 'supine'),
+      ('Vnoun', 'VFVNN', 'verbal noun, masdar')]),
+    ('NumType', 'numeral type',
+     [('Card', 'NTCRD', 'cardinal number or corresponding interrogative / relative / indefinite / demonstrative word'),
+      ('Dist', 'NTDST', 'distributive numeral'),
+      ('Frac', 'NTFRC', 'fraction'),
+      ('Mult', 'NTMLT', 'multiplicative numeral or corresponding interrogative / relative / indefinite / demonstrative word'),
+      ('Ord', 'NTORD', 'ordinal number or corresponding interrogative / relative / indefinite / demonstrative word'),
+      ('Range', 'NTRNG', 'range of values'),
+      ('Sets', 'NTSTS', 'number of sets of things; collective numeral')]),
+    ('Animacy', 'animacy', [('Anim', 'ANANM', 'animate'),
+                            ('Hum', 'ANHUM', 'human'),
+                            ('Inan', 'ANINN', 'inanimate'),
+                            ('Nhum', 'ANNHM', 'non-human')]),
+    ('Mood', 'mood', [('Adm', 'MDADM', 'admirative'),
+                      ('Cnd', 'MDCND', 'conditional'),
+                      ('Des', 'MDDES', 'desiderative'),
+                      ('Imp', 'MDIMP', 'imperative'),
+                      ('Ind', 'MDIND', 'indicative or realis'),
+                      ('Int', 'MDINT', 'interrogative'),
+                      ('Irr', 'MDIRR', 'irrealis'),
+                      ('Jus', 'MDJUS', 'jussive / injunctive'),
+                      ('Nec', 'MDNEC', 'necessitative'),
+                      ('Opt', 'MDOPT', 'optative'),
+                      ('Pot', 'MDPOT', 'potential'),
+                      ('Prp', 'MDPRP', 'purposive'),
+                      ('Qot', 'MDQOT', 'quotative'),
+                      ('Sub', 'MDSUB', 'subjunctive / conjunctive')]),
+    ('Poss', 'possessive', [('Yes', 'PSYES', 'it is possessive')]),
+    ('NounClass', 'noun class', [('Bantu1', 'NCBN1', 'singular, persons'),
+                                 ('Bantu2', 'NCBN2', 'plural, persons'),
+                                 ('Bantu3', 'NCBN3', 'singular, plants, thin objects'),
+                                 ('Bantu4', 'NCBN4', 'plural, plants, thin objects'),
+                                 ('Bantu5', 'NCBN5', 'singular, fruits, round objects, paired things'),
+                                 ('Bantu6', 'NCBN6', 'plural, fruits, round objects, paired things'),
+                                 ('Bantu7', 'NCBN7', 'singular, things, diminutives'),
+                                 ('Bantu8', 'NCBN8', 'plural, things, diminutives'),
+                                 ('Bantu9', 'NCBN9', 'singular, animals, things'),
+                                 ('Bantu10', 'NCB10', 'plural, animals, things'),
+                                 ('Bantu11', 'NCB11', 'long thin objects, natural phenomena, abstracts'),
+                                 ('Bantu12', 'NCB12', 'singular, small things, diminutives'),
+                                 ('Bantu13', 'NCB13', 'plural or mass, small amount of mass'),
+                                 ('Bantu14', 'NCB14', 'plural, diminutives'),
+                                 ('Bantu15', 'NCB15', 'verbal nouns, infinitives'),
+                                 ('Bantu16', 'NCB16', 'definite location, close to something'),
+                                 ('Bantu17', 'NCB17', 'indefinite location, direction, movement'),
+                                 ('Bantu18', 'NCB18', 'definite location, inside something'),
+                                 ('Bantu19', 'NCB19', 'little bit of, pejorative plural'),
+                                 ('Bantu20', 'NCB20', 'singular, augmentatives'),
+                                 ('Bantu21', 'NCB21', 'singular, augmentatives, derogatives'),
+                                 ('Bantu22', 'NCB22', 'plural, augmentatives'),
+                                 ('Bantu23', 'NCB23', 'location with place names'),
+                                 ('Wol1', 'NCWL1', 'Wolof noun class 1/k (singular human)'),
+                                 ('Wol2', 'NCWL2', 'Wolof noun class 2/ñ (plural human)'),
+                                 ('Wol3', 'NCWL3', 'Wolof noun class 3/g (singular)'),
+                                 ('Wol4', 'NCWL4', 'Wolof noun class 4/j (singular)'),
+                                 ('Wol5', 'NCWL5', 'Wolof noun class 5/b (singular)'),
+                                 ('Wol6', 'NCWL6', 'Wolof noun class 6/m (singular)'),
+                                 ('Wol7', 'NCWL7', 'Wolof noun class 7/l (singular)'),
+                                 ('Wol8', 'NCWL8', 'Wolof noun class 8/y (plural non-human)'),
+                                 ('Wol9', 'NCWL9', 'Wolof noun class 9/s (singular)'),
+                                 ('Wol10', 'NCW10', 'Wolof noun class 10/w (singular)'),
+                                 ('Wol11', 'NCW11', 'Wolof noun class 11/f (location)'),
+                                 ('Wol12', 'NCW12', 'Wolof noun class 12/n (manner)')]),
+    ('Tense', 'tense', [('Fut', 'TNFUT', 'future tense'),
+                        ('Imp', 'TNIMP', 'imperfect'),
+                        ('Past', 'TNPST', 'past tense / preterite / aorist'),
+                        ('Pqp', 'TNPQP', 'pluperfect'),
+                        ('Pres', 'TNPRS', 'present / non-past tense / aorist')]),
+    ('Reflex', 'reflexive', [('Yes', 'RFYES', 'it is reflexive')]),
+    ('Number', 'number', [('Coll', 'NMCLL', 'collective / mass / singulare tantum'),
+                          ('Count', 'NMCNT', 'count plural'),
+                          ('Dual', 'NMBDL', 'dual number'),
+                          ('Grpa', 'NMGRP', 'greater paucal number'),
+                          ('Grpl', 'NMGRL', 'greater plural number'),
+                          ('Inv', 'NMINV', 'inverse number'),
+                          ('Pauc', 'NMBPC', 'paucal number'),
+                          ('Plur', 'NMPLR', 'plural number'),
+                          ('Ptan', 'NMPTN', 'plurale tantum'),
+                          ('Sing', 'NMSNG', 'singular number'),
+                          ('Tri', 'NMTRI', 'trial number')]),
+    ('Aspect', 'aspect', [('Hab', 'ASHAB', 'habitual aspect'),
+                          ('Imp', 'ASIMP', 'imperfect aspect'),
+                          ('Iter', 'ASITR', 'iterative / frequentative aspect'),
+                          ('Perf', 'ASPRF', 'perfect aspect'),
+                          ('Prog', 'ASPRG', 'progressive aspect'),
+                          ('Prosp', 'ASPRS', 'prospective aspect')]),
+    ('Case', 'case',
+     [('Abe', 'CSABE', 'abessive / caritive / privative'),
+      ('Ben', 'CSBEN', 'benefactive / destinative'),
+      ('Cau', 'CSCAU', 'causative / motivative / purposive'),
+      ('Cmp', 'CSCMP', 'comparative'),
+      ('Cns', 'CSCNS', 'considerative'),
+      ('Com', 'CSCOM', 'comitative / associative'),
+      ('Dat', 'CSDAT', 'dative'),
+      ('Dis', 'CSDIS', 'distributive'),
+      ('Equ', 'CSEQU', 'equative'),
+      ('Gen', 'CSGEN', 'genitive'),
+      ('Ins', 'CSINS', 'instrumental / instructive'),
+      ('Par', 'CSPAR', 'partitive'),
+      ('Tem', 'CSTEM', 'temporal'),
+      ('Abl', 'CSABL', 'ablative / adelative'),
+      ('Add', 'CSADD', 'additive'),
+      ('Ade', 'CSADE', 'adessive'),
+      ('All', 'CSALL', 'allative / adlative'),
+      ('Del', 'CSDEL', 'delative / superelative'),
+      ('Ela', 'CSELA', 'elative / inelative'),
+      ('Ess', 'CSESS', 'essive / prolative'),
+      ('Ill', 'CSILL', 'illative / inlative'),
+      ('Ine', 'CSINE', 'inessive'),
+      ('Lat', 'CSLAT', 'lative / directional allative'),
+      ('Loc', 'CSLOC', 'locative'),
+      ('Per', 'CSPER', 'perlative'),
+      ('Sbe', 'CSSBE', 'subelative'),
+      ('Sbl', 'CSSBL', 'sublative'),
+      ('Spl', 'CSSPL', 'superlative'),
+      ('Sub', 'CSSUB', 'subessive'),
+      ('Sup', 'CSSUP', 'superessive'),
+      ('Ter', 'CSTER', 'terminative / terminal allative')]),
+    ('Voice', 'voice', [('Act', 'VCACT', 'active or actor-focus voice'),
+                        ('Antip', 'VCANT', 'antipassive voice'),
+                        ('Bfoc', 'VCBFC', 'beneficiary-focus voice'),
+                        ('Cau', 'VCCAU', 'causative voice'),
+                        ('Dir', 'VCDIR', 'direct voice'),
+                        ('Inv', 'VCINV', 'inverse voice'),
+                        ('Lfoc', 'VCLFC', 'location-focus voice'),
+                        ('Mid', 'VCMID', 'middle voice'),
+                        ('Pass', 'VCPSS', 'passive or patient-focus voice'),
+                        ('Rcp', 'VCRCP', 'reciprocal voice')]),
+    ('Abbr', 'abbreviation', [('Yes', 'ABYES', 'it is abbreviation')]),
+    ('Definite', 'definiteness or state',
+     [('Com', 'DFCOM', 'complex'),
+      ('Cons', 'DFCNS', 'construct state / reduced definiteness'),
+      ('Def', 'DFDEF', 'definite'),
+      ('Ind', 'DFIND', 'indefinite'),
+      ('Spec', 'DFSPC', 'specific indefinite')]),
+    ('Evident', 'evidentiality', [('Fh', 'EVDFH', 'firsthand'), ('Nfh', 'EVNFH', 'non-firsthand')]),
+    ('Typo', 'is this a misspelled word?', [('Yes', 'TYYES', 'it is typo')]),
+    ('Deixis', 'relative location encoded in demonstratives',
+     [('Abv', 'DXABV', 'above the reference point'),
+      ('Bel', 'DXBEL', 'below the reference point'),
+      ('Even', 'DXEVN', 'at the same level as the reference point'),
+      ('Med', 'DXMED', 'medial'),
+      ('Nvis', 'DXNVS', 'not visible'),
+      ('Prox', 'DXPRX', 'proximate'),
+      ('Remt', 'DXRMT', 'remote, distal')]),
+    ('Polarity', 'polarity', [('Neg', 'PLNEG', 'negative'), ('Pos', 'PLPOS', 'positive, affirmative')]),
+    ('Foreign', 'is this a foreign word?', [('Yes', 'FRYES', 'it is foreign')]),
+    ('DeixisRef', 'person to which deixis is relative',
+     [('1', 'DRXS1', 'deixis relative to the first person participant (speaker)'),
+      ('2', 'DRXS2', 'deixis relative to the second person participant (hearer)')]),
+    ('Person', 'person',
+     [('0', 'PRSN0', 'zero person'),
+      ('1', 'PRSN1', 'first person'),
+      ('2', 'PRSN2', 'second person'),
+      ('3', 'PRSN3', 'third person'),
+      ('4', 'PRSN4', 'fourth person')]),
+    ('ExtPos', 'external part of speech',
+     [('ADJ', 'EPADJ', 'adjective-like expression'),
+      ('ADP', 'EPADP', 'adposition-like expression'),
+      ('ADV', 'EPADV', 'adverb-like expression'),
+      ('AUX', 'EPAUX', 'auxiliary-like expression'),
+      ('CCONJ', 'CCONJ', 'coordinating conjunction-like expression'),
+      ('DET', 'EPDET', 'determiner-like expression'),
+      ('INTJ', 'EINTJ', 'interjection-like expression'),
+      ('PRON', 'EPRON', 'pronoun-like expression'),
+      ('PROPN', 'PROPN', 'proper noun-like expression'),
+      ('SCONJ', 'SCONJ', 'subordinator-like expression')]),
+    ('Degree', 'degree', [('Abs', 'DGABS', 'absolute superlative'),
+                          ('Aug', 'DGAUG', 'augmentative'),
+                          ('Cmp', 'DGCMP', 'comparative, second degree'),
+                          ('Dim', 'DGDIM', 'diminutive'),
+                          ('Equ', 'DGEQU', 'equative'),
+                          ('Pos', 'DGPOS', 'positive, first degree'),
+                          ('Sup', 'DGSUP', 'superlative, third degree')]),
+    ('Polite', 'politeness', [('Elev', 'PLELV', 'referent elevating'),
+                              ('Form', 'PLFRM', 'formal register'),
+                              ('Humb', 'PLHMB', 'speaker humbling'),
+                              ('Infm', 'PLINF', 'informal register')]),
+    # l_name      l_label      l_val_list
+    ('Clusivity', 'clusivity', [('Ex', 'CLSEX', 'exclusive'), ('In', 'CLSIN', 'inclusive')]),
 ]
 
-g_vertices = [ #
-#     ['ROOT_', ['FULL_VERTEX', 'IS_SPECIAL'], ['FOLDR'], None,                     'ROOT_SIID',         'Global graph root', None],
-#     ['HOME_', ['FULL_VERTEX', 'IS_SPECIAL'], ['FOLDR'], None,                     'HOME_SIID',         'Home', [('BLNGS', 'ROOT_')]],
-#     ['TYPE_', ['FULL_VERTEX', 'IS_SPECIAL'], ['TYPE_'], 'TYPE_NODE_ICON_PATH',    'TYPE_NODE_SIID',    'Root of all types', [('BLNGS', 'ROOT_')]],
-#     ['PERSN', ['FULL_VERTEX', 'IS_SPECIAL'], ['TYPE_'], 'PERSON_ICON_PATH',       'PERS_TYPE_SIID',    'Person (type)', None],
-#     ['ORGN_', ['FULL_VERTEX', 'IS_SPECIAL'], ['TYPE_'], 'ORGANIZATION_ICON_PATH', 'ORG_TYPE_SIID',     'Organization (type)', None],
-#     ['ME___', ['FULL_VERTEX', 'IS_SPECIAL'], ['PERSN'], None,                     'ME_SIID',           'Me', [('BLNGS', 'HOME')]],
-#     ['_MSG_', ['FULL_VERTEX', 'IS_SPECIAL'], ['TYPE_'], None,                     'MSG_TYPE_SIID',     'Inboxes / Message Root Type', None],
-#     ['EMAIL', ['FULL_VERTEX', 'IS_SPECIAL'], ['TYPE_'], None,                     'EMAIL_TYPE_SIID',   'Email Inbox', [('BLNGS', '_MSG_')]],
-#     ['WHTSP', ['FULL_VERTEX', 'IS_SPECIAL'], ['TYPE_'], None,                     'WHTSP_TYPE_SIID',   'Whatsapp Inbox', [('BLNGS', '_MSG_')]],
-#     ['DSCRD', ['FULL_VERTEX', 'IS_SPECIAL'], ['TYPE_'], None,                     'DSCRD_TYPE_SIID',   'Discord Inbox', [('BLNGS', '_MSG_')]],
-#     ['GCHAT', ['FULL_VERTEX', 'IS_SPECIAL'], ['TYPE_'], None,                     'GCHAT_TYPE_SIID',   'GChat Inbox', [('BLNGS', '_MSG_')]],
-#     ['SMS__', ['FULL_VERTEX', 'IS_SPECIAL'], ['TYPE_'], None,                     'SMS_TYPE_SIID',     'SMS Inbox', [('BLNGS', '_MSG_')]],
+g_nlp_pos_list = [
+    ('NPADJ', 'ADJ', 'adjective'),
+    ('NPADP', 'ADP', 'adposition'),
+    ('NPADV', 'ADV', 'adverb'),
+    ('NPAUX', 'AUX', 'auxiliary'),
+    ('NPCNJ', 'CCONJ', 'coordinating conjunction'),
+    ('NPDET', 'DET', 'determiner'),
+    ('NPINT', 'INTJ', 'interjection'),
+    ('NPNON', 'NOUN', 'noun'),
+    ('NPNUM', 'NUM', 'numeral'),
+    ('NPPRT', 'PART', 'particle'),
+    ('NPPRN', 'PRON', 'pronoun'),
+    ('NPPPN', 'PROPN', 'proper noun'),
+    ('NPPCT', 'PUNCT', 'punctuation'),
+    ('NPSCJ', 'SCONJ', 'subordinating conjunction'),
+    ('NPSYM', 'SYM', 'symbol'),
+    ('NPVRB', 'VERB', 'verb'),
+    ('NPXXX', 'X', 'other')
+]
+
+g_nlp_tag_list = [
+    ('NTGSE', '.', 'punctuation mark, sentence closer'),
+    ('NTGCM', ',', 'punctuation mark, comma'),
+    ('NTLRB', '-LRB-', 'left round bracket'),
+    ('NTRRB', '-RRB-', 'right round bracket'),
+    ('NTOQM', '``', 'opening quotation mark'),
+    ('NTCQM', '""', 'closing quotation mark'),
+    ("NTCRM", "''", 'closing quotation mark'),
+    ('NTGCL', ':', 'punctuation mark, colon or ellipsis'),
+    ('NTDOL', '$', 'symbol, currency'),
+    ('NTSRP', '#', 'symbol, number sign'),
+    ('NTAFX', 'AFX', 'affix'),
+    ('NTGCC', 'CC', 'conjunction, coordinating'),
+    ('NTGCD', 'CD', 'cardinal number'),
+    ('NTGDT', 'DT', 'determiner'),
+    ('NTGEX', 'EX', 'existential there'),
+    ('NTGFW', 'FW', 'foreign word'),
+    ('NTHYP', 'HYPH', 'punctuation mark, hyphen'),
+    ('NTGIN', 'IN', 'conjunction, subordinating or preposition'),
+    ('NTGJJ', 'JJ', 'adjective (English), other noun-modifier (Chinese)'),
+    ('NTJJR', 'JJR', 'adjective, comparative'),
+    ('NTJJS', 'JJS', 'adjective, superlative'),
+    ('NTGLS', 'LS', 'list item marker'),
+    ('NTGMD', 'MD', 'verb, modal auxiliary'),
+    ('NTNIL', 'NIL', 'missing tag'),
+    ('NTGNN', 'NN', 'noun, singular or mass'),
+    ('NTNNP', 'NNP', 'noun, proper singular'),
+    ('NTNPP', 'NNPS', 'noun, proper plural'),
+    ('NTNNS', 'NNS', 'noun, plural'),
+    ('NTPDT', 'PDT', 'predeterminer'),
+    ('NTPOS', 'POS', 'possessive ending'),
+    ('NTPRP', 'PRP', 'pronoun, personal'),
+    ('NTPR$', 'PRP$', 'pronoun, possessive'),
+    ('NTGRB', 'RB', 'adverb'),
+    ('NTRBR', 'RBR', 'adverb, comparative'),
+    ('NTRBS', 'RBS', 'adverb, superlative'),
+    ('NTGRP', 'RP', 'adverb, particle'),
+    ('NTGTO', 'TO', 'infinitival “to”'),
+    ('NTGUH', 'UH', 'interjection'),
+    ('NTGVB', 'VB', 'verb, base form'),
+    ('NTVBD', 'VBD', 'verb, past tense'),
+    ('NTVBG', 'VBG', 'verb, gerund or present participle'),
+    ('NTVBN', 'VBN', 'verb, past participle'),
+    ('NTVBP', 'VBP', 'verb, non-3rd person singular present'),
+    ('NTVBZ', 'VBZ', 'verb, 3rd person singular present'),
+    ('NTWDT', 'WDT', 'wh-determiner'),
+    ('NTGWP', 'WP', 'wh-pronoun, personal'),
+    ('NTWP$', 'WP$', 'wh-pronoun, possessive'),
+    ('NTWRB', 'WRB', 'wh-adverb'),
+    ('NTGSP', 'SP', 'space (English), sentence-final particle (Chinese)'),
+    ('NTADD', 'ADD', 'email'),
+    ('NTNFP', 'NFP', 'superfluous punctuation'),
+    ('NTGGW', 'GW', 'additional word in multi-word expression'),
+    ('NTGXX', 'XX', 'unknown'),
+    ('NTBES', 'BES', 'auxiliary “be”'),
+    ('NTHVS', 'HVS', 'forms of “have”'),
+    ('NT_SP', '_SP', 'whitespace')
+]
+
+g_special_vertices = [
+    ['FOLDR', 'SI_IS_TYPE',                      'FOLDER_ICON_PATH',     'FOLDER_SIID', None, 'Special Vertex ID (Vertex type) of folders (ordinary vertices with no special role)'],
+    ['AUTO_', 'SI_IS_TYPE',                      'AUTO_ICON_PATH',       'AUTO_SIID', None, 'Special Vertex ID (Edge type) of AUTO edges'],
+    # --------------------------- OWNS / BLNGS ---------------------------
+    ['OWNS_', 'SI_IS_TYPE',                      'OWNS_ICON_PATH',       'OWNS_SIID',
+    ('BLNGS', 'SI_IS_TYPE | SI_INSERT_AT_TOP',   'BLNGS_ICON_PATH',      'BLNGS_SIID'), 'Special Vertex ID (Edge type) of ownership edges'],
+    # --------------------------- ISA / ITO ---------------------------
+    ['_ISA_', 'SI_IS_TYPE | SI_IS_SPECIAL_EDGE', 'ISA_ICON_PATH',        'ISA_SIID',
+    ('_ITO_', 'SI_IS_TYPE'                     , 'ITO_ICON_PATH',        'ITO_SIID'), 'Special Vertex ID (Edge type) of type edges'],
+    ['OCCUR', 'SI_IS_TYPE'                     , 'OCCURRENCE_ICON_PATH', 'OCCUR_SIID', None, 'Special Vertex ID (Edge type) of occurrence edges'],
+    ['FORM_', 'SI_IS_TYPE'                     , 'FORM_ICON_PATH',       'FORM_SIID' , None, 'Special Vertex ID (Vertex type) of word form vertices'],
+    ['CAPTL', 'SI_IS_TYPE'                     , None,                   'CAPTL_SIID', None, 'Special Vertex ID (Simple edge type) of Occurrence field capitalization flag'],
+    ['PCTLF', 'SI_IS_TYPE'                     , None,                   'PCTLF_SIID', None, 'Special Vertex ID (Simple edge type) of Occurrence field left punctuation'],
+    ['PCTRT', 'SI_IS_TYPE'                     , None,                   'PCTRT_SIID', None, 'Special Vertex ID (Simple edge type) of Occurrence field right punctuation'],
+    ['MKPLF', 'SI_IS_TYPE'                     , None,                   'MKPLF_SIID', None, 'Special Vertex ID (Simple edge type) of Occurrence field markup left'],
+    ['MKPRT', 'SI_IS_TYPE'                     , None,                   'MKPRT_SIID', None, 'Special Vertex ID (Simple edge type) of Occurrence field markup right'],
+    ['STPOS', 'SI_IS_TYPE'                     , None,                   'STPOS_SIID', None, 'Special Vertex ID (Simple edge type) of Occurrence field sentence position'],
+]
+
+g_vertices = [
+# 0123456789012345678901234567890
+# |---------|---------|---------|---------|---------|---------|               |---------|---------|---------| |---------|---------|---------|      |---------|---------|---------|
 # l_label,                       l_vertex_flag_list,              l_type_list, l_edges               l_mnemo, l_si_flag_list,                      l_icon_path,              l_pseudo_constant
 ['Global graph root',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['FOLDR'],  None,                  'ROOT_', '0',                                 None,                     'ROOT_SIID'],
 ['Home',                         ['FULL_VERTEX',  'IS_SPECIAL'],  ['FOLDR'],  [('BLNGS',  'ROOT_')], 'HOME_', '0',                                 None,                     'HOME_SIID'],
@@ -39,38 +327,17 @@ g_vertices = [ #
 ['Whatsapp Inbox',               ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  '_MSG_')], 'WHTSP', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'WHTSP_TYPE_SIID'],
 ['Discord Inbox',                ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  '_MSG_')], 'DSCRD', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'DSCRD_TYPE_SIID'],
 ['GChat Inbox',                  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  '_MSG_')], 'GCHAT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'GCHAT_TYPE_SIID'],
-['SMS Inbox',                    ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  '_MSG_')], 'SMS__', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'SMS_TYPE_SIID']
-]
-
-# downloaded from https://universaldependencies.org/u/feat/index.html
-g_attr_values = [
-    ('PronType', 'pronominal type', [('Art', 'article'), ('Dem', 'demonstrative pronoun, determiner, numeral or adverb'), ('Emp', 'emphatic determiner'), ('Exc', 'exclamative determiner'), ('Ind', 'indefinite pronoun, determiner, numeral or adverb'), ('Int', 'interrogative pronoun, determiner, numeral or adverb'), ('Neg', 'negative pronoun, determiner or adverb'), ('Prs', 'personal or possessive personal pronoun or determiner'), ('Rcp', 'reciprocal pronoun'), ('Rel', 'relative pronoun, determiner, numeral or adverb'), ('Tot', 'total (collective) pronoun, determiner or adverb')]),
-    ('Gender', 'gender', [('Com', 'common gender'), ('Fem', 'feminine gender'), ('Masc', 'masculine gender'), ('Neut', 'neuter gender')]),
-    ('VerbForm', 'form of verb or deverbative', [('Conv', 'converb, transgressive, adverbial participle, verbal adverb'), ('Fin', 'finite verb'), ('Gdv', 'gerundive'), ('Ger', 'gerund'), ('Inf', 'infinitive'), ('Part', 'participle, verbal adjective'), ('Sup', 'supine'), ('Vnoun', 'verbal noun, masdar')]),
-    ('NumType', 'numeral type', [('Card', 'cardinal number or corresponding interrogative / relative / indefinite / demonstrative word'), ('Dist', 'distributive numeral'), ('Frac', 'fraction'), ('Mult', 'multiplicative numeral or corresponding interrogative / relative / indefinite / demonstrative word'), ('Ord', 'ordinal number or corresponding interrogative / relative / indefinite / demonstrative word'), ('Range', 'range of values'), ('Sets', 'number of sets of things; collective numeral')]),
-    ('Animacy', 'animacy', [('Anim', 'animate'), ('Hum', 'human'), ('Inan', 'inanimate'), ('Nhum', 'non-human')]),
-    ('Mood', 'mood', [('Adm', 'admirative'), ('Cnd', 'conditional'), ('Des', 'desiderative'), ('Imp', 'imperative'), ('Ind', 'indicative or realis'), ('Int', 'interrogative'), ('Irr', 'irrealis'), ('Jus', 'jussive / injunctive'), ('Nec', 'necessitative'), ('Opt', 'optative'), ('Pot', 'potential'), ('Prp', 'purposive'), ('Qot', 'quotative'), ('Sub', 'subjunctive / conjunctive')]),
-    ('Poss', 'possessive', [('Yes', 'it is possessive')]),
-    ('NounClass', 'noun class', [('Bantu1', 'singular, persons'), ('Bantu2', 'plural, persons'), ('Bantu3', 'singular, plants, thin objects'), ('Bantu4', 'plural, plants, thin objects'), ('Bantu5', 'singular, fruits, round objects, paired things'), ('Bantu6', 'plural, fruits, round objects, paired things'), ('Bantu7', 'singular, things, diminutives'), ('Bantu8', 'plural, things, diminutives'), ('Bantu9', 'singular, animals, things'), ('Bantu10', 'plural, animals, things'), ('Bantu11', 'long thin objects, natural phenomena, abstracts'), ('Bantu12', 'singular, small things, diminutives'), ('Bantu13', 'plural or mass, small amount of mass'), ('Bantu14', 'plural, diminutives'), ('Bantu15', 'verbal nouns, infinitives'), ('Bantu16', 'definite location, close to something'), ('Bantu17', 'indefinite location, direction, movement'), ('Bantu18', 'definite location, inside something'), ('Bantu19', 'little bit of, pejorative plural'), ('Bantu20', 'singular, augmentatives'), ('Bantu21', 'singular, augmentatives, derogatives'), ('Bantu22', 'plural, augmentatives'), ('Bantu23', 'location with place names'), ('Wol1', 'Wolof noun class 1/k (singular human)'), ('Wol2', 'Wolof noun class 2/ñ (plural human)'), ('Wol3', 'Wolof noun class 3/g (singular)'), ('Wol4', 'Wolof noun class 4/j (singular)'), ('Wol5', 'Wolof noun class 5/b (singular)'), ('Wol6', 'Wolof noun class 6/m (singular)'), ('Wol7', 'Wolof noun class 7/l (singular)'), ('Wol8', 'Wolof noun class 8/y (plural non-human)'), ('Wol9', 'Wolof noun class 9/s (singular)'), ('Wol10', 'Wolof noun class 10/w (singular)'), ('Wol11', 'Wolof noun class 11/f (location)'), ('Wol12', 'Wolof noun class 12/n (manner)')]),
-    ('Tense', 'tense', [('Fut', 'future tense'), ('Imp', 'imperfect'), ('Past', 'past tense / preterite / aorist'), ('Pqp', 'pluperfect'), ('Pres', 'present / non-past tense / aorist')]),
-    ('Reflex', 'reflexive', [('Yes', 'it is reflexive')]),
-    ('Number', 'number', [('Coll', 'collective / mass / singulare tantum'), ('Count', 'count plural'), ('Dual', 'dual number'), ('Grpa', 'greater paucal number'), ('Grpl', 'greater plural number'), ('Inv', 'inverse number'), ('Pauc', 'paucal number'), ('Plur', 'plural number'), ('Ptan', 'plurale tantum'), ('Sing', 'singular number'), ('Tri', 'trial number')]),
-    ('Aspect', 'aspect', [('Hab', 'habitual aspect'), ('Imp', 'imperfect aspect'), ('Iter', 'iterative / frequentative aspect'), ('Perf', 'perfect aspect'), ('Prog', 'progressive aspect'), ('Prosp', 'prospective aspect')]),
-    ('Case', 'case', [('Abe', 'abessive / caritive / privative'), ('Ben', 'benefactive / destinative'), ('Cau', 'causative / motivative / purposive'), ('Cmp', 'comparative'), ('Cns', 'considerative'), ('Com', 'comitative / associative'), ('Dat', 'dative'), ('Dis', 'distributive'), ('Equ', 'equative'), ('Gen', 'genitive'), ('Ins', 'instrumental / instructive'), ('Par', 'partitive'), ('Tem', 'temporal'), ('Abl', 'ablative / adelative'), ('Add', 'additive'), ('Ade', 'adessive'), ('All', 'allative / adlative'), ('Del', 'delative / superelative'), ('Ela', 'elative / inelative'), ('Ess', 'essive / prolative'), ('Ill', 'illative / inlative'), ('Ine', 'inessive'), ('Lat', 'lative / directional allative'), ('Loc', 'locative'), ('Per', 'perlative'), ('Sbe', 'subelative'), ('Sbl', 'sublative'), ('Spl', 'superlative'), ('Sub', 'subessive'), ('Sup', 'superessive'), ('Ter', 'terminative / terminal allative')]),
-    ('Voice', 'voice', [('Act', 'active or actor-focus voice'), ('Antip', 'antipassive voice'), ('Bfoc', 'beneficiary-focus voice'), ('Cau', 'causative voice'), ('Dir', 'direct voice'), ('Inv', 'inverse voice'), ('Lfoc', 'location-focus voice'), ('Mid', 'middle voice'), ('Pass', 'passive or patient-focus voice'), ('Rcp', 'reciprocal voice')]),
-    ('Abbr', 'abbreviation', [('Yes', 'it is abbreviation')]),
-    ('Definite', 'definiteness or state', [('Com', 'complex'), ('Cons', 'construct state / reduced definiteness'), ('Def', 'definite'), ('Ind', 'indefinite'), ('Spec', 'specific indefinite')]),
-    ('Evident', 'evidentiality', [('Fh', 'firsthand'), ('Nfh', 'non-firsthand')]),
-    ('Typo', 'is this a misspelled word?', [('Yes', 'it is typo')]),
-    ('Deixis', 'relative location encoded in demonstratives', [('Abv', 'above the reference point'), ('Bel', 'below the reference point'), ('Even', 'at the same level as the reference point'), ('Med', 'medial'), ('Nvis', 'not visible'), ('Prox', 'proximate'), ('Remt', 'remote, distal')]),
-    ('Polarity', 'polarity', [('Neg', 'negative'), ('Pos', 'positive, affirmative')]),
-    ('Foreign', 'is this a foreign word?', [('Yes', 'it is foreign')]),
-    ('DeixisRef', 'person to which deixis is relative', [('1', 'deixis relative to the first person participant (speaker)'), ('2', 'deixis relative to the second person participant (hearer)')]),
-    ('Person', 'person', [('0', 'zero person'), ('1', 'first person'), ('2', 'second person'), ('3', 'third person'), ('4', 'fourth person')]),
-    ('ExtPos', 'external part of speech', [('ADJ', 'adjective-like expression'), ('ADP', 'adposition-like expression'), ('ADV', 'adverb-like expression'), ('AUX', 'auxiliary-like expression'), ('CCONJ', 'coordinating conjunction-like expression'), ('DET', 'determiner-like expression'), ('INTJ', 'interjection-like expression'), ('PRON', 'pronoun-like expression'), ('PROPN', 'proper noun-like expression'), ('SCONJ', 'subordinator-like expression')]),
-    ('Degree', 'degree', [('Abs', 'absolute superlative'), ('Aug', 'augmentative'), ('Cmp', 'comparative, second degree'), ('Dim', 'diminutive'), ('Equ', 'equative'), ('Pos', 'positive, first degree'), ('Sup', 'superlative, third degree')]),
-    ('Polite', 'politeness', [('Elev', 'referent elevating'), ('Form', 'formal register'), ('Humb', 'speaker humbling'), ('Infm', 'informal register')]),
-    ('Clusivity', 'clusivity', [('Ex', 'exclusive'), ('In', 'inclusive')])
+['SMS Inbox',                    ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  '_MSG_')], 'SMS__', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'SMS_TYPE_SIID'],
+['Texts Root (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TEXT_', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'TEXT_ICON_PATH',         'TEXT_SIID'],
+['Grammar Attributes (type)',    ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'GRATT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       None],
+['Lemma (type)',                 ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'LEMMA', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'LEMMA_ICON_PATH',        'LEMMA_SIID'],
+['NLP Entity (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'NLENT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'ENTITY_ICON_PATH',       'NLENT_SIID'],
+['NLP Pos code (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'NLPOS', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'POS_ICON_PATH',          'NLPOS_SIID'],
+['NLP Tag code (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'NLTAG', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'TAG_ICON_PATH',          'NLTAG_SIID'],
+['Stephanus Section (type)',     ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'STPSC', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'STPSC_SIID'],
+['Text Version (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TXTVR', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'TXTVR_SIID'],
+['Text Chunk (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TXTCK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'TXTCK_SIID'],
+['Notes (type)',                 ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TXTNT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'TXTNT_SIID'],
 ]
 
 g_declaration_template = """
@@ -111,6 +378,79 @@ void M1Env::GraphInit::init_text(){
 """
 # ------------- main() -------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
+    # Grammar attributes -----------------------------------------------------------------------------------------------
+    for l_name, l_label, l_val_list in g_attr_values:
+        l_mn_class = (re.sub(r'[a-z]', '', l_name) + re.sub(r'[aeiouA-Z]', '', l_name).upper())
+        if len(l_mn_class) < 5:
+            l_mn_class = l_name.upper()
+        l_mn_class = (l_mn_class + '_' * 5)[:5]
+        print(l_mn_class, l_name)
+
+        # ['Email Inbox', ['FULL_VERTEX',  'IS_SPECIAL'], ['TYPE_'], [('BLNGS',  '_MSG_')], 'EMAIL', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], None, 'EMAIL_TYPE_SIID'],
+        l_vertex_label = (f'{l_name}-{l_label}'[:64]
+                          if l_name.lower() != l_label.lower()
+                          else l_name[:64]) + ' (Grammar Attr.)'
+        g_vertices.append([
+            l_vertex_label,
+            ['FULL_VERTEX',  'IS_SPECIAL'],
+            ['GRATT'],
+            None,
+            l_mn_class,
+            ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],
+            'FOLDER_ICON_PATH',
+            None])
+
+        # [('Ex', 'CLSEX', 'exclusive'), ('In', 'CLSIN', 'inclusive')]
+        for l_name_attr, l_mn_attr, l_label_attr in l_val_list:
+            l_vertex_label = (f'{l_name_attr}-{l_label_attr}'[:62]
+                              if l_name_attr.lower() != l_label_attr.lower()
+                              else l_name_attr[:62]) + ' (Gr. Attr. Value)'
+            g_vertices.append([
+                l_vertex_label,
+                ['FULL_VERTEX',  'IS_SPECIAL'],
+                ['TYPE_', l_mn_class],
+                None,
+                l_mn_attr,
+                ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],
+                'FOLDER_ICON_PATH',
+                None])
+
+    l_mnemo_dict = dict()
+    def add_mnemo(p_mn):
+        global l_mnemo_dict
+        l_mnemo_dict[p_mn] = l_mnemo_dict.setdefault(p_mn, 0) + 1
+
+    # Tag & Pos --------------------------------------------------------------------------------------------------------
+    for l_mn, l_pos, l_label in g_nlp_pos_list:
+        # ['NLP Tag code (type)', ['FULL_VERTEX',  'IS_SPECIAL'], ['TYPE_'], [('BLNGS',  'HOME_')], 'NLTAG', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], 'ENTITY_ICON_PATH', 'NLTAG_SIID'],
+        g_vertices.append([
+            f'{l_pos}-{l_label}',
+            ['FULL_VERTEX', 'IS_SPECIAL'],
+            ['TYPE_', 'NLPOS'],
+            None,
+            l_mn,
+            ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],
+            None,
+            f'{l_mn}_SIID'
+        ])
+    for l_mn, l_tag, l_label in g_nlp_tag_list:
+        # ['NLP Tag code (type)', ['FULL_VERTEX',  'IS_SPECIAL'], ['TYPE_'], [('BLNGS',  'HOME_')], 'NLTAG', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], 'ENTITY_ICON_PATH', 'NLTAG_SIID'],
+        g_vertices.append([
+            f'[{l_tag}]-{l_label}',
+            ['FULL_VERTEX', 'IS_SPECIAL'],
+            ['TYPE_', 'NLTAG'],
+            None,
+            l_mn,
+            ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],
+            None,
+            f'{l_mn}_SIID'
+        ])
+
+    # |---------|---------|---------|---------|---------|---------|               |---------|---------|---------| |---------|---------|---------|      |---------|---------|---------|
+    # l_label,                       l_vertex_flag_list,              l_type_list, l_edges               l_mnemo, l_si_flag_list,                      l_icon_path,              l_pseudo_constant
+    for l_label, l_vertex_flag_list, l_type_list, l_edges, l_mnemo, l_si_flag_list, l_icon_path, l_pseudo_constant in g_vertices:
+        print(f'{l_label:80} {str(l_vertex_flag_list):30} {l_type_list} {str(l_edges):25} {l_mnemo} {str(l_si_flag_list):35} {str(l_icon_path):25} {l_pseudo_constant}')
+
     # Ancillaries
     l_initialization = ''
     l_declaration = ''
@@ -119,8 +459,10 @@ if __name__ == '__main__':
         l_extern_declaration += f'// [{l_mnemo}] {l_comment}\nextern M1Env::SpecialItemID {l_pseudo_constant};\n'
         l_declaration += f'// [{l_mnemo}] {l_comment}\nM1Env::SpecialItemID M1Env::{l_pseudo_constant} = G_NONEX_SI_ID;\n'
         l_initialization += f'    M1Env::{l_pseudo_constant} = M1Store::Storage::getSpecialID("{l_mnemo}");\n'
+        add_mnemo(l_mnemo)
         if l_reciprocal:
             l_mnemo_r, l_flags_r, l_icon_path_r, l_pseudo_constant_r = l_reciprocal
+            add_mnemo(l_mnemo_r)
             l_extern_declaration += (f'// [{l_mnemo_r}] {l_comment} (reciprocal of {l_mnemo} above))\n' +
                                      f'extern M1Env::SpecialItemID {l_pseudo_constant_r};\n')
             l_declaration += (f'// [{l_mnemo_r}] {l_comment} (reciprocal of {l_mnemo} above))\n' +
@@ -130,13 +472,15 @@ if __name__ == '__main__':
     l_extern_declaration += '\n'
     l_declaration += '\n'
     for l_label, _, _, _, l_mnemo, _, _, l_pseudo_constant in g_vertices:
-        l_extern_declaration += f'// [{l_mnemo}] Special Vertex ID of "{l_label}"\nextern M1Env::SpecialItemID {l_pseudo_constant};\n'
-        l_declaration += f'M1Env::SpecialItemID M1Env::{l_pseudo_constant} = G_NONEX_SI_ID;\n'
-        l_initialization += f'    M1Env::{l_pseudo_constant} = M1Store::Storage::getSpecialID("{l_mnemo}");\n'
+        add_mnemo(l_mnemo)
+        if l_pseudo_constant:
+            l_extern_declaration += f'// [{l_mnemo}] Special Vertex ID of "{l_label}"\nextern M1Env::SpecialItemID {l_pseudo_constant};\n'
+            l_declaration += f'M1Env::SpecialItemID M1Env::{l_pseudo_constant} = G_NONEX_SI_ID;\n'
+            l_initialization += f'    M1Env::{l_pseudo_constant} = M1Store::Storage::getSpecialID("{l_mnemo}");\n'
 
-    print(l_extern_declaration)
-    print(l_declaration)
-    print(l_initialization)
+    # print(l_extern_declaration)
+    # print(l_declaration)
+    # print(l_initialization)
 
     with open('m1B_graph_init.h', 'w') as l_fout:
         l_fout.write(g_declaration_template.replace('__EXTERN_DECL__', l_extern_declaration))
@@ -145,15 +489,17 @@ if __name__ == '__main__':
     l_base_code = ''
     l_text_code = ''
     for l_mnemo, l_flags, l_icon_path, _, l_reciprocal, l_comment in g_special_vertices:
+        l_icon_path = f'M1Env::{l_icon_path}' if l_icon_path else 'nullptr'
         if l_reciprocal:
             l_mnemo_r, l_flags_r, l_icon_path_r, l_pseudo_constant_r = l_reciprocal
+            l_icon_path_r = f'M1Env::{l_icon_path_r}' if l_icon_path_r else 'nullptr'
             l_base_code += (f'    // {l_comment}\n' +
                             f'    M1Store::Storage::getNewSpecialWithReciprocal({l_flags},\n' +
-                            f'        "{l_mnemo}", M1Env::{l_icon_path},\n' +
-                            f'        "{l_mnemo_r}", M1Env::{l_icon_path_r},\n' +
+                            f'        "{l_mnemo}", {l_icon_path},\n' +
+                            f'        "{l_mnemo_r}", {l_icon_path_r},\n' +
                             f'        {l_flags_r});\n')
         else:
-            l_base_code += f'    // {l_comment}\n    M1Store::Storage::getNewSpecialNoItem({l_flags}, "{l_mnemo}", M1Env::{l_icon_path});\n'
+            l_base_code += f'    // {l_comment}\n    M1Store::Storage::getNewSpecialNoItem({l_flags}, "{l_mnemo}", {l_icon_path});\n'
 
     l_base_code += '\n'
     l_memo_2_var = dict()
@@ -162,7 +508,7 @@ if __name__ == '__main__':
         l_vertex_flag_string = ' | '.join([f'M1Env::{l_flag}' for l_flag in l_vertex_flag_list])
         l_debug_label = f'[{l_mnemo}]-{l_label}' if l_mnemo else f'{l_label}'
         l_base_code += (f'    // creation of "{l_label}"\n' +
-                        f'    qCDebug(g_cat_store) << QString("Creating <{l_debug_label}> item");\n' +
+                        f'    qCDebug(g_cat_silence) << QString("Creating <{l_debug_label}> item");\n' +
                         f'    M1Store::Item_lv2* {l_var_name} = M1Store::Item_lv2::getNew(\n' +
                         f'        // vertex flags\n' +
                         f'        {l_vertex_flag_string},\n' +
@@ -190,10 +536,81 @@ if __name__ == '__main__':
                 l_base_code += f'    {l_var_name}->linkTo({l_memo_2_var[l_dest_mnemo]}, "{l_edge_type}", nullptr, true);\n'
         l_base_code += '\n'
 
-    print(l_base_code)
+    # print(l_base_code)
     with open('m1B_graph_init.cpp', 'w') as l_fout:
         l_fout.write(g_implementation_template
                      .replace('__PSEUDO_DECLARE__', l_declaration.strip())
                      .replace('__PSEUDO_INIT__', l_initialization.strip())
                      .replace('__INIT_BASE__', l_base_code.strip())
                      .replace('__INIT_TEXT__', l_text_code.strip()))
+
+    print('\n================ Duplicate Mnemonics =====================')
+    for l_count, l_mn in sorted([(l_mnemo_dict[l_mn], l_mn) for l_mn in l_mnemo_dict.keys()]):
+        if l_count > 1:
+            print(l_mn, l_count)
+
+    # Tags
+    #     for l_tag_key in g_nlp_tag_dict.keys():
+    #         l_mn = f'NT{l_tag_key.upper()}'
+    #         if len(l_mn) < 5:
+    #             l_mn = f'NTG{l_tag_key.upper()}'
+    #         print(f'{(l_mn, l_tag_key, g_nlp_tag_dict[l_tag_key])},')
+
+    # g_nlp_tag_dict = {
+    #     ".": "punctuation mark, sentence closer",
+    #     ",": "punctuation mark, comma",
+    #     "-LRB-": "left round bracket",
+    #     "-RRB-": "right round bracket",
+    #     "``": "opening quotation mark",
+    #     '""': "closing quotation mark",
+    #     "''": "closing quotation mark",
+    #     ":": "punctuation mark, colon or ellipsis",
+    #     "$": "symbol, currency",
+    #     "#": "symbol, number sign",
+    #     "AFX": "affix",
+    #     "CC": "conjunction, coordinating",
+    #     "CD": "cardinal number",
+    #     "DT": "determiner",
+    #     "EX": "existential there",
+    #     "FW": "foreign word",
+    #     "HYPH": "punctuation mark, hyphen",
+    #     "IN": "conjunction, subordinating or preposition",
+    #     "JJ": "adjective (English), other noun-modifier (Chinese)",
+    #     "JJR": "adjective, comparative",
+    #     "JJS": "adjective, superlative",
+    #     "LS": "list item marker",
+    #     "MD": "verb, modal auxiliary",
+    #     "NIL": "missing tag",
+    #     "NN": "noun, singular or mass",
+    #     "NNP": "noun, proper singular",
+    #     "NNPS": "noun, proper plural",
+    #     "NNS": "noun, plural",
+    #     "PDT": "predeterminer",
+    #     "POS": "possessive ending",
+    #     "PRP": "pronoun, personal",
+    #     "PRP$": "pronoun, possessive",
+    #     "RB": "adverb",
+    #     "RBR": "adverb, comparative",
+    #     "RBS": "adverb, superlative",
+    #     "RP": "adverb, particle",
+    #     "TO": 'infinitival "to"',
+    #     "UH": "interjection",
+    #     "VB": "verb, base form",
+    #     "VBD": "verb, past tense",
+    #     "VBG": "verb, gerund or present participle",
+    #     "VBN": "verb, past participle",
+    #     "VBP": "verb, non-3rd person singular present",
+    #     "VBZ": "verb, 3rd person singular present",
+    #     "WDT": "wh-determiner",
+    #     "WP": "wh-pronoun, personal",
+    #     "WP$": "wh-pronoun, possessive",
+    #     "WRB": "wh-adverb",
+    #     "SP": "space (English), sentence-final particle (Chinese)",
+    #     "ADD": "email",
+    #     "NFP": "superfluous punctuation",
+    #     "GW": "additional word in multi-word expression",
+    #     "XX": "unknown",
+    #     "BES": 'auxiliary "be"',
+    #     "HVS": 'forms of "have"',
+    #     "_SP": "whitespace"
+    # }

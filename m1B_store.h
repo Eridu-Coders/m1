@@ -41,8 +41,9 @@ namespace M1Store{
         static SpecialItemID cm_next_special;       ///< next StringID counter (stored in util table)
         static unsigned int cm_current_version;     ///< current version of the graph
 
-        /// mnemonic --> special id associative array
+        /// mnemonic --> special id and ItemID --> special id associative arrays
         static std::map<QString, SpecialItem*> cm_mnemonic_to_special;
+        static std::map<ItemID, SpecialItem*> cm_item_id_to_special;
         static char *cm_special_mmap_base;                  ///< base address of the mmapped space for special items(char* to make pointer arithmetic possible)
         static char *cm_item_mmap_base;                     ///< base address of the mmapped space for items (char* to make pointer arithmetic possible)
         static unsigned long cm_item_next_upper_excluded;   ///< Excluded upper bound for cm_next_item within this mmap() size

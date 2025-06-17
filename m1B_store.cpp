@@ -50,9 +50,10 @@ char* M1Store::Storage::cm_item_mmap_base;
 
 // Mnemonic --> SpecialItem* associative array
 std::map<QString, M1Store::SpecialItem*> M1Store::Storage::cm_mnemonic_to_special;
+std::map<M1Env::ItemID, M1Store::SpecialItem*> M1Store::Storage::cm_item_id_to_special;
 
 // special item constants initialized in setConstants()
-M1Env::SpecialItemID M1Env::TEXT_SIID = G_NONEX_SI_ID;
+// M1Env::SpecialItemID M1Env::TEXT_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_WORD_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_SECTION_SIID = G_NONEX_SI_ID;
 
@@ -200,31 +201,11 @@ void M1Store::Storage::storeSetUp(bool p_reset){
         qDebug() << QString("mmap() error (special items): [%1]-%2").arg(errno).arg(strerror(errno));
         qFatal("Aborting / mmap() special items");
     }
-
-    qCDebug(g_cat_store) << "Before Specials Dump";
-    // suspend logging for the task below
-    M1Env::M1EnvStatic::setSilentMode(true);
-
-    // pre-load special items associative array (menmonic --> SpecialItem*)
-    for(SpecialItemID i = 0; i<cm_next_special; i++){
-        SpecialItem* l_slot = getSpecialItemPointer(i);
-        qCDebug(g_cat_silence) << QString("Special: [%2] %1 ---> 0x%3 / 0b%4")
-                                      .arg(l_slot->mnemonic())
-                                      .arg(i, 4, 16, QChar('0'))
-                                      .arg(l_slot->itemId(), 16, 16, QChar('0'))
-                                      .arg(l_slot->flags(), 64, 2, QChar('0'));
-        cm_mnemonic_to_special[l_slot->mnemonic()] = l_slot;
-    }
-    dbgSpecialDump();
-
-    // re-allow logging
-    M1Env::M1EnvStatic::setSilentMode(false);
-
     qCDebug(g_cat_store) << "init mmap() storage complete";
 
     // ------------------------------------ rest of init -------------------------------------------------------------------------
     // version updates
-    qCDebug(g_cat_store) << "version updates";
+    qCDebug(g_cat_silence) << "version updates";
     if(cm_current_version == 0)
         version_0_to_1();
     /*
@@ -234,30 +215,51 @@ void M1Store::Storage::storeSetUp(bool p_reset){
         version_2_to_3();
     */
 
-    // special items ID constants
     qCDebug(g_cat_store) << "set SpecialItemID constants";
-    // setConstants();
     M1Env::GraphInit::set_pseudo_constants();
 
-    qCDebug(g_cat_store) << QString("ROOT_SIID            = %1").arg(M1Store::ROOT_SIID);
-    qCDebug(g_cat_store) << QString("HOME_SIID            = %1").arg(M1Store::HOME_SIID);
-    qCDebug(g_cat_store) << QString("AUTO_SIID            = %1").arg(M1Store::AUTO_SIID);
-    qCDebug(g_cat_store) << QString("FOLDER_SIID          = %1").arg(M1Store::FOLDER_SIID);
-    qCDebug(g_cat_store) << QString("ISA_SIID             = %1").arg(M1Store::ISA_SIID);
-    qCDebug(g_cat_store) << QString("ITO_SIID             = %1").arg(M1Store::ITO_SIID);
-    qCDebug(g_cat_store) << QString("OWNS_SIID            = %1").arg(M1Store::OWNS_SIID);
-    qCDebug(g_cat_store) << QString("BLNGS_SIID           = %1").arg(M1Store::BLNGS_SIID);
+    // suspend logging for the task below
+    M1Env::M1EnvStatic::setSilentMode(true);
 
-    qCDebug(g_cat_store) << QString("TEXT_SIID            = %1").arg(M1Store::TEXT_SIID);
-    qCDebug(g_cat_store) << QString("T_WORD_SIID          = %1").arg(M1Store::TEXT_WORD_SIID);
-    qCDebug(g_cat_store) << QString("TEXT_SECTION_SIID    = %1").arg(M1Store::TEXT_SECTION_SIID);
+    // pre-load special items associative arrays (menmonic --> SpecialItem* and ItemID --> SpecialItem*)
+    for(SpecialItemID i = 0; i<cm_next_special; i++){
+        SpecialItem* l_slot = getSpecialItemPointer(i);
+        qCDebug(g_cat_silence) << QString("Special: [%2] %1 ---> 0x%3 / 0b%4")
+                                      .arg(l_slot->mnemonic())
+                                      .arg(i, 4, 16, QChar('0'))
+                                      .arg(l_slot->itemId(), 16, 16, QChar('0'))
+                                      .arg(l_slot->flags(), 64, 2, QChar('0'));
+        cm_mnemonic_to_special[l_slot->mnemonic()] = l_slot;
+        if(l_slot->itemId() != M1Env::G_VOID_ITEM_ID) cm_item_id_to_special[l_slot->itemId()] = l_slot;
+    }
+    dbgSpecialDump();
 
-    qCDebug(g_cat_store) << QString("TW_WORD_OCC                = %1").arg(M1Store::TW_WORD_OCC_SIID);
-    qCDebug(g_cat_store) << QString("TW_REV_WORD_OCC            = %1").arg(M1Store::TW_REV_WORD_OCC_SIID);
-    qCDebug(g_cat_store) << QString("TW_SECTION_2_OCC_BEGIN     = %1").arg(M1Store::TW_SECTION_2_OCC_BEGIN_SIID);
-    qCDebug(g_cat_store) << QString("TW_SECTION_2_OCC_END       = %1").arg(M1Store::TW_SECTION_2_OCC_END_SIID);
-    qCDebug(g_cat_store) << QString("TW_REV_SECTION_2_OCC_BEGIN = %1").arg(M1Store::TW_REV_SECTION_2_OCC_BEGIN_SIID);
-    qCDebug(g_cat_store) << QString("TW_REV_SECTION_2_OCC_END   = %1").arg(M1Store::TW_REV_SECTION_2_OCC_END_SIID);
+
+    // special items ID constants
+    // setConstants();
+
+    qCDebug(g_cat_silence) << QString("ROOT_SIID                  = %1").arg(M1Store::ROOT_SIID);
+    qCDebug(g_cat_silence) << QString("HOME_SIID                  = %1").arg(M1Store::HOME_SIID);
+    qCDebug(g_cat_silence) << QString("AUTO_SIID                  = %1").arg(M1Store::AUTO_SIID);
+    qCDebug(g_cat_silence) << QString("FOLDER_SIID                = %1").arg(M1Store::FOLDER_SIID);
+    qCDebug(g_cat_silence) << QString("ISA_SIID                   = %1").arg(M1Store::ISA_SIID);
+    qCDebug(g_cat_silence) << QString("ITO_SIID                   = %1").arg(M1Store::ITO_SIID);
+    qCDebug(g_cat_silence) << QString("OWNS_SIID                  = %1").arg(M1Store::OWNS_SIID);
+    qCDebug(g_cat_silence) << QString("BLNGS_SIID                 = %1").arg(M1Store::BLNGS_SIID);
+
+    qCDebug(g_cat_silence) << QString("TEXT_SIID                  = %1").arg(M1Store::TEXT_SIID);
+    qCDebug(g_cat_silence) << QString("T_WORD_SIID                = %1").arg(M1Store::TEXT_WORD_SIID);
+    qCDebug(g_cat_silence) << QString("TEXT_SECTION_SIID          = %1").arg(M1Store::TEXT_SECTION_SIID);
+
+    qCDebug(g_cat_silence) << QString("TW_WORD_OCC                = %1").arg(M1Store::TW_WORD_OCC_SIID);
+    qCDebug(g_cat_silence) << QString("TW_REV_WORD_OCC            = %1").arg(M1Store::TW_REV_WORD_OCC_SIID);
+    qCDebug(g_cat_silence) << QString("TW_SECTION_2_OCC_BEGIN     = %1").arg(M1Store::TW_SECTION_2_OCC_BEGIN_SIID);
+    qCDebug(g_cat_silence) << QString("TW_SECTION_2_OCC_END       = %1").arg(M1Store::TW_SECTION_2_OCC_END_SIID);
+    qCDebug(g_cat_silence) << QString("TW_REV_SECTION_2_OCC_BEGIN = %1").arg(M1Store::TW_REV_SECTION_2_OCC_BEGIN_SIID);
+    qCDebug(g_cat_silence) << QString("TW_REV_SECTION_2_OCC_END   = %1").arg(M1Store::TW_REV_SECTION_2_OCC_END_SIID);
+
+    // re-allow logging
+    M1Env::M1EnvStatic::setSilentMode(false);
 
     // icons
     loadIcons();
@@ -403,8 +405,8 @@ M1Store::Item_lv0* M1Store::Storage::getNewItemPointer_lv0(const FlagField p_fla
  * @return the pointer
  */
 M1Store::SpecialItem* M1Store::Storage::getSpecialItemPointer(const char* p_mnemonic){
-    M1_FUNC_ENTRY(g_cat_store, QString("getSpecial from mnemonic: %1").arg(p_mnemonic))
-    Q_ASSERT_X(menmonic_exists(p_mnemonic), "Storage::getSpecial()", (QString("Missing mnemonic: %1").arg(p_mnemonic)).toUtf8());
+    M1_FUNC_ENTRY(g_cat_store, QString("getSpecialItemPointer from mnemonic: %1").arg(p_mnemonic))
+    Q_ASSERT_X(menmonic_exists(p_mnemonic), "Storage::getSpecialItemPointer()", (QString("Missing mnemonic: %1").arg(p_mnemonic)).toUtf8());
 
     M1Store::SpecialItem* l_ret = cm_mnemonic_to_special.at(p_mnemonic);
 
@@ -431,9 +433,16 @@ bool M1Store::Storage::menmonic_exists(const char* p_mnemonic){
  * @param p_item_id the ItemID
  * @return the pointer
  */
+// TODO: Keep cm_dummy?
 M1Store::SpecialItem* M1Store::Storage::getSpecialItemPointer(const ItemID p_item_id){
     M1_FUNC_ENTRY(g_cat_store, QString("getSpecial from ItemID: 0x%1").arg(p_item_id, 16, 16, QChar('0')))
-    SpecialItem* l_ret = nullptr;
+    // SpecialItem* l_ret = nullptr;
+    SpecialItem* l_ret = M1Store::SpecialItem::cm_dummy;
+
+    if(auto l_search = cm_item_id_to_special.find(p_item_id); l_search != cm_item_id_to_special.end())
+        l_ret = l_search->second;
+
+    /*
     // goes through the whole table to find the corresponding SpecialItem, if it exists
     qCDebug(g_cat_store) << QString("cm_next_special: %1").arg(cm_next_special);
     for(SpecialItemID i = 0; i < cm_next_special; i++){
@@ -447,12 +456,14 @@ M1Store::SpecialItem* M1Store::Storage::getSpecialItemPointer(const ItemID p_ite
             return l_special_item;
         }
     }
+    */
 
     // not found --> fatal error
     // qFatal("Aborting / searching in the special items table for an item that is not there");
 
     M1_FUNC_EXIT
-    return M1Store::SpecialItem::cm_dummy;
+    // return M1Store::SpecialItem::cm_dummy;
+    return l_ret;
 }
 
 /**
@@ -482,6 +493,7 @@ M1Store::SpecialItem* M1Store::Storage::getNewSpecialWithItem(
     cm_next_special += 1;
     // update the mnemonic --> SpecialItem* map
     cm_mnemonic_to_special[p_mnemonic] = l_ret;
+    cm_item_id_to_special[p_item_id] = l_ret;
 
     // add icon to cm_type_icon, which is a SpecialItemID --> QIcon array
     if(p_icon_path != nullptr)

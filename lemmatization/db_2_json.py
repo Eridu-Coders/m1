@@ -882,7 +882,7 @@ def process_cursor_list_en(p_cursor_list, p_txt_key, p_phase_ii=True):
                     # Option 2: link entity to its start token only
                     l_ent_i_dict[l_start_tk] = l_ent_key
                     g_entities_dict.setdefault(l_type, dict()).setdefault(l_form_txt, []).append((
-                        l_start_tk, f'{p_txt_key}-{l_start_tk}', l_end_tk , f'{p_txt_key}-{l_end_tk - 1}'))
+                        l_start_tk, f'{p_txt_key}-{l_start_tk:06}', l_end_tk , f'{p_txt_key}-{l_end_tk - 1:06}'))
 
     # current Stephanus section number (normally initialized on first token so default value reveals problem if seen)
     l_current_section = '----'
@@ -1639,7 +1639,8 @@ def print_entities():
     print('================= Entities, summary =======================')
     for l_k_ent in sorted(g_entities_dict.keys()):
         l_k_list = sorted(list(set(g_entities_dict[l_k_ent].keys())))
-        print(f'{l_k_ent}: {l_k_list}')
+        # print(f'{l_k_ent}: {l_k_list}')
+        print('\n'.join([f"'{l_ent}': '{l_k_ent}'," for l_ent in l_k_list]))
     print()
 
 
