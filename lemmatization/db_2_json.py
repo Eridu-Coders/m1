@@ -881,6 +881,7 @@ def process_cursor_list_en(p_cursor_list, p_txt_key, p_phase_ii=True):
 
                     # Option 2: link entity to its start token only
                     l_ent_i_dict[l_start_tk] = l_ent_key
+
                     g_entities_dict.setdefault(l_type, dict()).setdefault(l_form_txt, []).append((
                         l_start_tk, f'{p_txt_key}-{l_start_tk:06}', l_end_tk , f'{p_txt_key}-{l_end_tk - 1:06}'))
 

@@ -15,6 +15,10 @@ extern M1Env::SpecialItemID BLNGS_SIID;
 extern M1Env::SpecialItemID ISA_SIID;
 // [_ITO_] Special Vertex ID (Edge type) of type edges (reciprocal of _ISA_ above))
 extern M1Env::SpecialItemID ITO_SIID;
+// [WROTE] Special Vertex ID (Edge type) wrote / written by
+extern M1Env::SpecialItemID TEXT_WROTE_SIID;
+// [WRTBY] Special Vertex ID (Edge type) wrote / written by (reciprocal of WROTE above))
+extern M1Env::SpecialItemID TEXT_WRITTEN_BY_SIID;
 // [OCCUR] Special Vertex ID (Edge type) of occurrence edges
 extern M1Env::SpecialItemID OCCUR_SIID;
 // [FORM_] Special Vertex ID (Vertex type) of word form vertices
@@ -31,6 +35,28 @@ extern M1Env::SpecialItemID MKPLF_SIID;
 extern M1Env::SpecialItemID MKPRT_SIID;
 // [STPOS] Special Vertex ID (Simple edge type) of Occurrence field sentence position
 extern M1Env::SpecialItemID STPOS_SIID;
+// [PRABH] Special Vertex ID (Vertex type) of Gita translation source: Prabhupada
+extern M1Env::SpecialItemID TEXT_WFW_PRABUPADA_SIID;
+// [SIVAN] Special Vertex ID (Vertex type) of Gita translation source: Sivananda
+extern M1Env::SpecialItemID TEXT_WFW_SIVANANDA_SIID;
+// [GAMBI] Special Vertex ID (Vertex type) of Gita translation source: Gambirananda
+extern M1Env::SpecialItemID TEXT_WFW_GAMBIRANANDA_SIID;
+// [TRSLT] Special Vertex ID (Simple Edge type) of Gita transliteration field
+extern M1Env::SpecialItemID TEXT_WORD_TRANSLIT_SIID;
+// [DCTRF] Special Vertex ID (Simple Edge type) of Gita dictionary ref. field
+extern M1Env::SpecialItemID TEXT_WORD_DICT_REF_SIID;
+// [WFTRN] Special Vertex ID (Simple Edge type) WfW unit Translation field
+extern M1Env::SpecialItemID TEXT_WFW_TRANSL_SIID;
+// [URLNK] Special Vertex ID (Vertex type) Url link
+extern M1Env::SpecialItemID TEXT_URL_LINK_SIID;
+// [HS2OB] Special Vertex ID (Edge type) begin section + reciprocal
+extern M1Env::SpecialItemID TW_SECTION_2_OCC_BEGIN_SIID;
+// [OC2HB] Special Vertex ID (Edge type) begin section + reciprocal (reciprocal of HS2OB above))
+extern M1Env::SpecialItemID TW_REV_SECTION_2_OCC_BEGIN_SIID;
+// [HS2OE] Special Vertex ID (Edge type) end section + reciprocal
+extern M1Env::SpecialItemID TW_SECTION_2_OCC_END_SIID;
+// [OC2HE] Special Vertex ID (Edge type) end section + reciprocal (reciprocal of HS2OE above))
+extern M1Env::SpecialItemID TW_REV_SECTION_2_OCC_END_SIID;
 
 // [ROOT_] Special Vertex ID of "Global graph root"
 extern M1Env::SpecialItemID ROOT_SIID;
@@ -74,6 +100,16 @@ extern M1Env::SpecialItemID TXTVR_SIID;
 extern M1Env::SpecialItemID TXTCK_SIID;
 // [TXTNT] Special Vertex ID of "Notes (type)"
 extern M1Env::SpecialItemID TXTNT_SIID;
+// [SLKLN] Special Vertex ID of "Sloka Lines (type)"
+extern M1Env::SpecialItemID TEXT_SLOKA_LINE_SIID;
+// [INRIA] Special Vertex ID of "INRIA Dictionary Reference (type)"
+extern M1Env::SpecialItemID TEXT_WORD_DREF_INRIA_SIID;
+// [SLTRN] Special Vertex ID of "Sloka Translation (type)"
+extern M1Env::SpecialItemID TEXT_SLOKA_TRANSLATION_SIID;
+// [SLBHS] Special Vertex ID of "Sloka Bhashya (type)"
+extern M1Env::SpecialItemID TEXT_SLOKA_BHASHYA_SIID;
+// [TRLUN] Special Vertex ID of "WfW Translation Unit (type)"
+extern M1Env::SpecialItemID TEXT_WFW_UNIT_SIID;
 // [NPADJ] Special Vertex ID of "ADJ-adjective"
 extern M1Env::SpecialItemID NPADJ_SIID;
 // [NPADP] Special Vertex ID of "ADP-adposition"
@@ -226,7 +262,7 @@ extern M1Env::SpecialItemID NT_SP_SIID;
         public:
             static void set_pseudo_constants();
             static void init_base();
-            static void init_text();
+            static void init_plato();
     };
     
 } // end namespace M1Env

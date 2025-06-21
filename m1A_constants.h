@@ -71,6 +71,7 @@ namespace M1Env{
     const unsigned long long SI_HAS_RECIPROCAL  = 0x0000000000000010; ///< This type's reciprocal type (for edge types only)
     const unsigned long long SI_IS_SPECIAL_EDGE = 0x0000000000000020; ///< When this type is given to an edge it must be added to the special edge list
     const unsigned long long SI_INSERT_AT_TOP   = 0x0000000000000040; ///< insert at top of the ordinary edges ring (for edges that are not special)
+    const unsigned long long SI_IS_ICON_TYPE    = 0x0000000000000080; ///< type for icon choice
 
     // M1Store constants
     // class-level constants holding the names of various things
@@ -97,7 +98,7 @@ namespace M1Env{
     static const char* POS_ICON_PATH = "../Icons/Nlp-Pos.svg";                          // *
     static const char* TAG_ICON_PATH = "../Icons/Nlp-Tag.svg";                          // *
 
-    static const char* TEXT_SECTION_ICON_PATH = "../Icons/Section.svg";                 // *
+    static const char* TEXT_CHUNK_ICON_PATH = "../Icons/Section.svg";                 // *
     static const char* TW_SECTION_2_OCC_BEGIN_ICON_PATH = "../Icons/Sec-Begin.svg";     // *
     static const char* TW_SECTION_2_OCC_END_ICON_PATH = "../Icons/Sec-End.svg";         // *
     static const char* TEXT_WFW_UNIT_ICON_PATH = "../Icons/TranslUnit.svg";             // *
@@ -166,6 +167,8 @@ namespace M1Env{
     extern SpecialItemID BLNGS_SIID;          ///< * Special Vertex ID (Edge type) of BLNGS
     extern SpecialItemID TYPE_NODE_SIID;      ///< * Special Vertex ID (Vertex type) of TYPE_
     */
+
+    /*
     extern SpecialItemID TEXT_SIID;                         ///< * Special Vertex ID (Vertex type) for the root of a text
     extern SpecialItemID TEXT_WORD_SIID;                    ///< * Special Vertex ID (Vertex type) for a word within a text
     extern SpecialItemID TEXT_SECTION_SIID;                 ///< * Special Vertex ID (Vertex type) for a section within a text
@@ -189,6 +192,7 @@ namespace M1Env{
     extern SpecialItemID TEXT_URL_LINK_SIID;            ///< * Special Vertex ID (Vertex type) URL link
     extern SpecialItemID TEXT_WROTE_SIID;               ///< * Special Vertex ID (Edge type) Author --> Work
     extern SpecialItemID TEXT_WRITTEN_BY_SIID;          ///< * Special Vertex ID (Edge type) Work --> Oposite of above
+    */
 } // end of M1Store namespace
 
 // debug categories pre-declarations

@@ -25,6 +25,7 @@ class Interp : public QWidget
     friend class UrlInterp;
     friend class BhashyaTranslation;
     friend class TextInterp;
+    friend class TextOccurrence;
     // friend class InterpStaticConstructor;
 private:
     M1Store::Item_lv2* m_myself;
@@ -41,6 +42,7 @@ private:
 
     void paintOC(QPainter& p);
     virtual QString getHtml();
+    virtual QString displayText();
     // static InterpStaticConstructor cm_the_init;
 public:
     static void init();
@@ -58,18 +60,6 @@ signals:
     void emitHtml(const QString& p_html);
 };
 
-class TranslUnit : public Interp
-{
-    Q_OBJECT
-public:
-    virtual QString getHtml();
-public:
-    static bool wantIt(M1Store::Item_lv2* p_myself);
-
-    TranslUnit(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
-    virtual void paintEvent(QPaintEvent* p_event);
-};
-
 class FieldInterp : public Interp
 {
     Q_OBJECT
@@ -77,6 +67,7 @@ public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
 
     FieldInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
+    virtual QString displayText();
     virtual void paintEvent(QPaintEvent* p_event);
 };
 
@@ -90,14 +81,17 @@ public:
     virtual void paintEvent(QPaintEvent* p_event);
 };
 
-class SectionBeginEnd : public Interp
+class TranslUnit : public Interp
 {
     Q_OBJECT
 public:
+    virtual QString getHtml();
+public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
 
-    SectionBeginEnd(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
-    virtual void paintEvent(QPaintEvent* p_event);
+    TranslUnit(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
+    virtual QString displayText();
+    // virtual void paintEvent(QPaintEvent* p_event);
 };
 
 class SectionInterp : public Interp
@@ -105,9 +99,11 @@ class SectionInterp : public Interp
     Q_OBJECT
 public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
-    virtual QString getHtml();
+
     SectionInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
-    virtual void paintEvent(QPaintEvent* p_event);
+    virtual QString getHtml();
+    // virtual QString displayText();
+    // virtual void paintEvent(QPaintEvent* p_event);
 };
 
 class UrlInterp : public Interp
@@ -118,9 +114,10 @@ private:
     QString m_url;
 public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
-    virtual QString getHtml();
+
     UrlInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
-    virtual void paintEvent(QPaintEvent* p_event);
+    virtual QString getHtml();
+    // virtual void paintEvent(QPaintEvent* p_event);
 };
 
 class BhashyaTranslation : public Interp
@@ -128,9 +125,11 @@ class BhashyaTranslation : public Interp
     Q_OBJECT
 public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
-    virtual QString getHtml();
+
     BhashyaTranslation(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
-    virtual void paintEvent(QPaintEvent* p_event);
+    virtual QString getHtml();
+    virtual QString displayText();
+    // virtual void paintEvent(QPaintEvent* p_event);
 };
 
 
@@ -139,8 +138,31 @@ class TextInterp : public Interp
     Q_OBJECT
 public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
-    virtual QString getHtml();
+
     TextInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
+    virtual QString getHtml();
+    // virtual void paintEvent(QPaintEvent* p_event);
+};
+
+class SectionBeginEnd : public Interp
+{
+    Q_OBJECT
+public:
+    static bool wantIt(M1Store::Item_lv2* p_myself);
+
+    SectionBeginEnd(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
+    virtual QString displayText();
+    virtual void paintEvent(QPaintEvent* p_event);
+};
+
+class TextOccurrence : public Interp
+{
+    Q_OBJECT
+public:
+    static bool wantIt(M1Store::Item_lv2* p_myself);
+
+    TextOccurrence(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
+    virtual QString displayText();
     virtual void paintEvent(QPaintEvent* p_event);
 };
 

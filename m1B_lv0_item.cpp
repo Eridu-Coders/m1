@@ -86,7 +86,7 @@ QString M1Store::ItemType::dbgStringHr(bool p_is_item_id) const{
     if(p_is_item_id)
         return QString("<II %1>").arg(Item_lv2::getExisting(t.m_type_item)->text());
     else
-        return QString("<4SI %1%2%3%4>")
+        return QString("<4SI %1/%2/%3/%4>")
             .arg(t.m_type_short[0] == M1Env::G_VOID_SI_ID ? "" : Storage::getSpecialItemPointer(t.m_type_short[0])->mnemonic())
             .arg(t.m_type_short[1] == M1Env::G_VOID_SI_ID ? "" : Storage::getSpecialItemPointer(t.m_type_short[1])->mnemonic())
             .arg(t.m_type_short[2] == M1Env::G_VOID_SI_ID ? "" : Storage::getSpecialItemPointer(t.m_type_short[2])->mnemonic())

@@ -99,7 +99,7 @@ class Item_lv2 : public Item_lv1 {
         bool isOfType(const SpecialItemID p_type_si_id) const;
         bool isOfType(const char* p_mnemonic) const;
         // bool isOfType(const ItemID p_type_item_id) const;
-        SpecialItemID getMaxTypeMember();
+        SpecialItemID getIconTypeMember();
 
         bool setField(const QString& p_content,
                       const bool p_force_new,

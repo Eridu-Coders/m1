@@ -54,6 +54,8 @@ std::map<M1Env::ItemID, M1Store::SpecialItem*> M1Store::Storage::cm_item_id_to_s
 
 // special item constants initialized in setConstants()
 // M1Env::SpecialItemID M1Env::TEXT_SIID = G_NONEX_SI_ID;
+
+/*
 M1Env::SpecialItemID M1Env::TEXT_WORD_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_SECTION_SIID = G_NONEX_SI_ID;
 
@@ -77,7 +79,7 @@ M1Env::SpecialItemID M1Env::TEXT_WFW_TRANSL_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_URL_LINK_SIID = G_NONEX_SI_ID;
 
 M1Env::SpecialItemID M1Env::TEXT_WROTE_SIID = G_NONEX_SI_ID;
-M1Env::SpecialItemID M1Env::TEXT_WRITTEN_BY_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::TEXT_WRITTEN_BY_SIID = G_NONEX_SI_ID;*/
 
 /**
  * @brief initialize LMDB environment (util + string) and mmap() areas for items and specials.
@@ -215,9 +217,6 @@ void M1Store::Storage::storeSetUp(bool p_reset){
         version_2_to_3();
     */
 
-    qCDebug(g_cat_store) << "set SpecialItemID constants";
-    M1Env::GraphInit::set_pseudo_constants();
-
     // suspend logging for the task below
     M1Env::M1EnvStatic::setSilentMode(true);
 
@@ -236,7 +235,8 @@ void M1Store::Storage::storeSetUp(bool p_reset){
 
 
     // special items ID constants
-    // setConstants();
+    qCDebug(g_cat_store) << "set SpecialItemID constants";
+    M1Env::GraphInit::set_pseudo_constants();
 
     qCDebug(g_cat_silence) << QString("ROOT_SIID                  = %1").arg(M1Store::ROOT_SIID);
     qCDebug(g_cat_silence) << QString("HOME_SIID                  = %1").arg(M1Store::HOME_SIID);
@@ -248,11 +248,10 @@ void M1Store::Storage::storeSetUp(bool p_reset){
     qCDebug(g_cat_silence) << QString("BLNGS_SIID                 = %1").arg(M1Store::BLNGS_SIID);
 
     qCDebug(g_cat_silence) << QString("TEXT_SIID                  = %1").arg(M1Store::TEXT_SIID);
-    qCDebug(g_cat_silence) << QString("T_WORD_SIID                = %1").arg(M1Store::TEXT_WORD_SIID);
-    qCDebug(g_cat_silence) << QString("TEXT_SECTION_SIID          = %1").arg(M1Store::TEXT_SECTION_SIID);
+    qCDebug(g_cat_silence) << QString("T_WORD_SIID                = %1").arg(M1Store::FORM_SIID);
+    qCDebug(g_cat_silence) << QString("TEXT_SECTION_SIID          = %1").arg(M1Store::TXTCK_SIID);
 
-    qCDebug(g_cat_silence) << QString("TW_WORD_OCC                = %1").arg(M1Store::TW_WORD_OCC_SIID);
-    qCDebug(g_cat_silence) << QString("TW_REV_WORD_OCC            = %1").arg(M1Store::TW_REV_WORD_OCC_SIID);
+    qCDebug(g_cat_silence) << QString("TW_WORD_OCC                = %1").arg(M1Store::OCCUR_SIID);
     qCDebug(g_cat_silence) << QString("TW_SECTION_2_OCC_BEGIN     = %1").arg(M1Store::TW_SECTION_2_OCC_BEGIN_SIID);
     qCDebug(g_cat_silence) << QString("TW_SECTION_2_OCC_END       = %1").arg(M1Store::TW_SECTION_2_OCC_END_SIID);
     qCDebug(g_cat_silence) << QString("TW_REV_SECTION_2_OCC_BEGIN = %1").arg(M1Store::TW_REV_SECTION_2_OCC_BEGIN_SIID);
@@ -1045,15 +1044,15 @@ void M1Store::Storage::dbgDump(){
     }
 
     // dump Constants
-    qCDebug(g_cat_silence) << QString("================ COnstants dump ========");
-    qCDebug(g_cat_silence) << QString("ROOT_SIID   = 0x%1").arg(M1Store::ROOT_SIID, 4, 16, QChar('0'));
-    qCDebug(g_cat_silence) << QString("HOME_SIID   = 0x%1").arg(M1Store::HOME_SIID, 4, 16, QChar('0'));
-    qCDebug(g_cat_silence) << QString("ISA_SIID    = 0x%1").arg(M1Store::ISA_SIID, 4, 16, QChar('0'));
-    qCDebug(g_cat_silence) << QString("ITO_SIID    = 0x%1").arg(M1Store::ITO_SIID, 4, 16, QChar('0'));
-    qCDebug(g_cat_silence) << QString("OWNS_SIID   = 0x%1").arg(M1Store::OWNS_SIID, 4, 16, QChar('0'));
-    qCDebug(g_cat_silence) << QString("BLNGS_SIID  = 0x%1").arg(M1Store::BLNGS_SIID, 4, 16, QChar('0'));
-    qCDebug(g_cat_silence) << QString("TEXT_SIID   = 0x%1").arg(M1Store::TEXT_SIID, 4, 16, QChar('0'));
-    qCDebug(g_cat_silence) << QString("T_WORD_SIID = 0x%1").arg(M1Store::TEXT_WORD_SIID, 4, 16, QChar('0'));
+    qCDebug(g_cat_silence) << QString("================ Constants dump ========");
+    qCDebug(g_cat_silence) << QString("ROOT_SIID  = 0x%1").arg(M1Store::ROOT_SIID, 4, 16, QChar('0'));
+    qCDebug(g_cat_silence) << QString("HOME_SIID  = 0x%1").arg(M1Store::HOME_SIID, 4, 16, QChar('0'));
+    qCDebug(g_cat_silence) << QString("ISA_SIID   = 0x%1").arg(M1Store::ISA_SIID, 4, 16, QChar('0'));
+    qCDebug(g_cat_silence) << QString("ITO_SIID   = 0x%1").arg(M1Store::ITO_SIID, 4, 16, QChar('0'));
+    qCDebug(g_cat_silence) << QString("OWNS_SIID  = 0x%1").arg(M1Store::OWNS_SIID, 4, 16, QChar('0'));
+    qCDebug(g_cat_silence) << QString("BLNGS_SIID = 0x%1").arg(M1Store::BLNGS_SIID, 4, 16, QChar('0'));
+    qCDebug(g_cat_silence) << QString("TEXT_SIID  = 0x%1").arg(M1Store::TEXT_SIID, 4, 16, QChar('0'));
+    qCDebug(g_cat_silence) << QString("FORM_SIID  = 0x%1").arg(M1Store::FORM_SIID, 4, 16, QChar('0'));
 
     // dump special items table
     qCDebug(g_cat_silence) << QString("========= Special Items dump ========");

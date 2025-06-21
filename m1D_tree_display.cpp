@@ -162,7 +162,7 @@ M1UI::TreeDisplay::TreeDisplay(QWidget *p_parent) : QScrollArea{p_parent}{
     this->setPalette(p);
     this->setBackgroundRole(QPalette::Window);
     this->setAutoFillBackground(true);
-    addTestInterp(M1Store::Item_lv2::getExisting(M1Env::ROOT_SIID));
+    addTestInterp(M1Store::Item_lv2::getExisting(M1Env::HOME_SIID));
     M1_FUNC_EXIT
 }
 
