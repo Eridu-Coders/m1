@@ -12,7 +12,8 @@ g_lemma_dict = dict()       # lemmas. Key = <lemma>‣POS, with POS = pos_ for S
 g_entities_dict = dict()    # named entities. Key = 'LOC', 'NORP' or 'PERSON'
 g_notes_dict = dict()       # notes (from Shorey). Key = SHR-nnn, same as occurrence key of same toke
 
-g_section_selection = ['327a', '327b', '327c']
+# g_section_selection = ['476c', '476d', '476e', '477a', '477b', '477c', '477d', '477e']
+g_section_selection = ['476c', '476d', '476e']
 
 # ------------- main() -------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
@@ -47,22 +48,22 @@ if __name__ == '__main__':
             l_shorey_cur_sec = l_occ['NewSection'] if len(l_occ['NewSection']) > 0 else l_shorey_cur_sec
             if l_shorey_cur_sec in g_section_selection:
                 l_key_set.add(l_key_occ)
-                l_form_key_list += l_occ['FormKey']
-                l_lemma_key_list+= [g_form_dict[k]['LemmaKey'] for k in l_occ['FormKey']]
+                l_form_key_list.append(l_occ['FormKey'])
+                l_lemma_key_list+= g_form_dict[l_occ['FormKey']]['LemmaKey']
                 l_shorey_occ[l_key_occ] = l_occ
         elif l_key_prefix == 'B-JWT':
             l_jowett_cur_sec = l_occ['NewSection'] if len(l_occ['NewSection']) > 0 else l_jowett_cur_sec
             if l_jowett_cur_sec in g_section_selection:
                 l_key_set.add(l_key_occ)
-                l_form_key_list += l_occ['FormKey']
-                l_lemma_key_list+= [g_form_dict[k]['LemmaKey'] for k in l_occ['FormKey']]
+                l_form_key_list.append(l_occ['FormKey'])
+                l_lemma_key_list+= g_form_dict[l_occ['FormKey']]['LemmaKey']
                 l_jowett_occ[l_key_occ] = l_occ
         elif l_key_prefix == 'Z-GRK':
             l_greek_cur_sec = l_occ['NewSection'] if len(l_occ['NewSection']) > 0 else l_greek_cur_sec
             if l_greek_cur_sec in g_section_selection:
                 l_key_set.add(l_key_occ)
-                l_form_key_list += l_occ['FormKey']
-                l_lemma_key_list+= [g_form_dict[k]['LemmaKey'] for k in l_occ['FormKey']]
+                l_form_key_list.append(l_occ['FormKey'])
+                l_lemma_key_list+= g_form_dict[l_occ['FormKey']]['LemmaKey']
                 l_greek_occ[l_key_occ] = l_occ
 
 

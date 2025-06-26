@@ -88,10 +88,17 @@ void M1Env::M1EnvStatic::sendToLogChannels(QtMsgType p_type,
 
     if(! cm_list_excluded_catergory_for_screen.contains(p_cat)){
         // message for screen debug
+        /*
         QString l_txt_screen = QString("[%1] [%2] %3 (%4 %5:%6) %7")
                                    .arg(l_level, p_cat, QDateTime::currentDateTime().toString("hh:mm:ss.zzz"))
                                    .arg(p_file, p_func_deco)
                                    .arg(p_line).arg(l_msg);
+        */
+        QString l_txt_screen = QString("[%1] [%2] %3 (%4:%5) %6")
+                                   .arg(l_level, p_cat, QDateTime::currentDateTime().toString("hh:mm:ss.zzz"))
+                                   .arg(p_func_deco)
+                                   .arg(p_line)
+                                   .arg(l_msg);
         // screen message to screen
         std::cout << l_txt_screen.toStdString() << std::endl << std::flush;
     }

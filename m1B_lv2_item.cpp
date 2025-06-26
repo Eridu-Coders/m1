@@ -416,7 +416,7 @@ QString M1Store::Item_lv2::dbgStringHtml(){
 
     // string to contain the representation of edges coming off of this item (only for full items)
     QString l_edges;
-    if((flags() & ITEM_NATURE_MASK) == FULL_VERTEX || (flags() & ITEM_NATURE_MASK) == FULL_VERTEX){
+    if((flags() & ITEM_NATURE_MASK) == FULL_VERTEX || (flags() & ITEM_NATURE_MASK) == FULL_EDGE){
         QStringList l_edge_list;
         // list of edges construction : same logic as recurGraph() above, minus the recursiveness
         // special edges
@@ -492,8 +492,8 @@ QString M1Store::Item_lv2::dbgStringHtml(){
                        .arg(QString("<tr><td>m_e_previous</td><td>:</td><td>0x%1 %2</td></tr>\n").arg(previous_item_id(), 16, 16, QLatin1Char('0')).arg(previous_item_id()))
                        .arg(QString("<tr><td>m_e_next</td><td>:</td><td>0x%1 %2</td></tr>\n").arg(next_item_id(), 16, 16, QLatin1Char('0')).arg(next_item_id()))
                        .arg(QString("<tr><td>m_e_reciprocal</td><td>:</td><td>0x%1 %2</td></tr>\n").arg(reciprocal_item_id(), 16, 16, QLatin1Char('0')).arg(reciprocal_item_id()))
-                       .arg(QString("<p style=\"margin: 0;\">%1</p>").arg(text()))
-                       .arg(QString("<p style=\"margin: 0;\">%1</p>").arg(this->dbgShort())) + l_edges;
+                       .arg(QString("<p style=\"margin: 0;\">Text: %1</p>\n").arg(text()))
+                       .arg(QString("<p style=\"margin: 0;\">Dbg : %1</p>\n").arg(this->dbgShort())) + l_edges;
     }
     break;
     case SIMPLE_EDGE:{
@@ -704,31 +704,30 @@ M1Store::Item_lv2* M1Store::Item_lv2::getOrigin_lv2() const{
  */
 bool M1Store::Item_lv2::setType(const SpecialItem* p_type_si){
     M1_FUNC_ENTRY(g_cat_lv2_members, QString("Set type to: %1").arg(p_type_si->mnemonic()))
+    Q_ASSERT_X(M1Env::SKIP_HEAVY_CHECKING || (! this->isOfType(p_type_si)), "Item_lv2::setType()", "Already of above type");
 
     bool l_ret = true;
-    if(! this->isOfType(p_type_si)){
-        // index of first free slot (or -1 if none)
-        int l_free_slot = \
-            getType_si_id(0) == G_VOID_SI_ID ? 0 :
-                (getType_si_id(1) == G_VOID_SI_ID ? 1 :
-                    (getType_si_id(2) == G_VOID_SI_ID ? 2 :
-                        getType_si_id(3) == G_VOID_SI_ID ? 3 : -1));
+    // index of first free slot (or -1 if none)
+    int l_free_slot = \
+        getType_si_id(0) == G_VOID_SI_ID ? 0 :
+            (getType_si_id(1) == G_VOID_SI_ID ? 1 :
+                (getType_si_id(2) == G_VOID_SI_ID ? 2 :
+                    getType_si_id(3) == G_VOID_SI_ID ? 3 : -1));
 
-        // store the special item id in m_type if possible
-        if(l_free_slot >= 0)
-            setType_member_si_id(l_free_slot, p_type_si->specialId());
+    // store the special item id in m_type if possible
+    if(l_free_slot >= 0)
+        setType_member_si_id(l_free_slot, p_type_si->specialId());
 
-        // cannot go any further for simple edges and simple verices (may return false if no slot was available)
-        if(isSimpleEdge() || isSimpleVertex()){
-            l_ret = (l_free_slot >= 0);
-        }
-        else {
-            // full items only from this point onwards
-            // create an ISA edge if required (no slot available or SI_REQUIRES_EDGE is set)
-            if((l_free_slot < 0) || (p_type_si->flags() & SI_REQUIRES_EDGE))
-                linkTo(p_type_si->itemId(), "_ISA_");
-            // will always succeed for full edges and vertices (always possible to materialyse type with an ISA edge) so l_ret is always true
-        }
+    // cannot go any further for simple edges and simple verices (may return false if no slot was available)
+    if(isSimpleEdge() || isSimpleVertex()){
+        l_ret = (l_free_slot >= 0);
+    }
+    else {
+        // full items only from this point onwards
+        // create an ISA edge if required (no slot available or SI_REQUIRES_EDGE is set)
+        if((l_free_slot < 0) || (p_type_si->flags() & SI_REQUIRES_EDGE))
+            linkTo(p_type_si->itemId(), "_ISA_");
+        // will always succeed for full edges and vertices (always possible to materialyse type with an ISA edge) so l_ret is always true
     }
     M1_FUNC_EXIT
     return l_ret;
@@ -960,6 +959,9 @@ bool M1Store::Item_lv2::setField(const QString& p_content, const bool p_force_ne
     M1_FUNC_EXIT
     return true;
 }
+bool M1Store::Item_lv2::setField(const QString& p_content, const bool p_force_new, const M1Env::SpecialItemID p_field_type_siid){
+    return setField(p_content, p_force_new, M1Store::Storage::getSpecialItemPointer(p_field_type_siid));
+}
 
 /**
  * @brief M1Store::Item_lv2::getField
@@ -1052,7 +1054,7 @@ void M1Store::Item_lv2::installFullEdge(Item_lv2* p_new_edge, const SpecialItemI
             // p_new_edge->setNext(l_new_edge_id);
         }
         else{
-            // determine DEFAULT edge above (needed bc p_edge_above is null here) based on situation ..
+            // determine DEFAULT edge above (needed bc p_edge_above is null here) based on the following situations ..
             M1Store::Item_lv2* l_edge_above;
             if(p_new_edge->getOrigin_lv2()->isFullVertex() && !l_edge_is_special  && !p_at_top){
                 // .. BELOW the AUTO edge if the origin is a full vertex (and the edge type does not require a special edge)
@@ -1073,7 +1075,7 @@ void M1Store::Item_lv2::installFullEdge(Item_lv2* p_new_edge, const SpecialItemI
         qCDebug(g_cat_lv2_members) << QString("[%1] Edge above was provided").arg(this->dbgShort());
         Q_ASSERT_X(l_first_edge_id != G_VOID_ITEM_ID,
                    "Item_lv2::installFullEdge()", "Cannot install an edge into an empty ring if edge above provided");
-        Q_ASSERT_X(this->edgeBelongs(p_edge_above, l_edge_is_special),
+        Q_ASSERT_X(M1Env::SKIP_HEAVY_CHECKING || this->edgeBelongs(p_edge_above, l_edge_is_special),
                    "Item_lv2::installFullEdge()",
                    "the given edge above does not belong to this ring");
 
@@ -1105,8 +1107,7 @@ void M1Store::Item_lv2::installFullEdge(Item_lv2* p_new_edge, const SpecialItemI
  */
 void M1Store::Item_lv2::insertEdgeBelow(Item_lv2* p_new_edge, Item_lv2* p_edge_above){
     M1_FUNC_ENTRY(g_cat_lv2_members, QString("inserting in (non empty) edge ring"))
-    Q_ASSERT_X(p_edge_above != nullptr,
-               "Item_lv2::insertEdgeBelow()", "p_edge_above is nullptr");
+    Q_ASSERT_X(p_edge_above != nullptr, "Item_lv2::insertEdgeBelow()", "p_edge_above is nullptr");
     M1Store::Item_lv2* l_next_edge = p_edge_above->getNext_lv2();
 
     // appropriate next/previous hookups
@@ -1216,19 +1217,22 @@ bool M1Store::Item_lv2::edgeBelongs(Item_lv2* p_edge, bool p_edge_is_special){
  * @param p_type_target
  * @return
  */
-M1Store::Item_lv2* M1Store::Item_lv2::find_edge(const SpecialItemID p_type_edge, const SpecialItemID p_type_target) const{
+M1Store::Item_lv2* M1Store::Item_lv2::find_edge(const SpecialItemID p_type_edge, const SpecialItemID p_type_target, bool p_special) const{
     M1_FUNC_ENTRY(g_cat_lv2_members,
                   QString("Finding edge of type [%1] and with target of type [%2]")
                       .arg(p_type_edge == M1Env::G_VOID_SI_ID ? "None" : M1Store::Storage::getSpecialItemPointer(p_type_edge)->mnemonic() )
                       .arg(p_type_target == M1Env::G_VOID_SI_ID ? "None" : M1Store::Storage::getSpecialItemPointer(p_type_target)->mnemonic()))
 
     M1Store::Item_lv2* l_ret = nullptr;
-    for(Item_lv2_iterator it = this->getIteratorTop(); !it.beyondEnd(); it.next()){
-        bool l_success_condition_edge = p_type_edge == M1Env::G_VOID_SI_ID || it.at()->isOfType(p_type_edge);
-        bool l_success_condition_target = p_type_target == M1Env::G_VOID_SI_ID || it.at()->getTarget_lv2()->isOfType(p_type_target);
-        if(l_success_condition_edge && l_success_condition_target){
-            l_ret = it.at();
-            break;
+    for(Item_lv2_iterator it = p_special ? this->getIteratorSpecial() : this->getIteratorTop(); !it.beyondEnd(); it.next()){
+        if(it.at()->isFullEdge()){
+            qCDebug(g_cat_interp_base) << "it.at():\n" << it.at()->dbgShort();
+            bool l_success_condition_edge = p_type_edge == M1Env::G_VOID_SI_ID || it.at()->isOfType(p_type_edge);
+            bool l_success_condition_target = p_type_target == M1Env::G_VOID_SI_ID || it.at()->getTarget_lv2()->isOfType(p_type_target);
+            if(l_success_condition_edge && l_success_condition_target){
+                l_ret = it.at();
+                break;
+            }
         }
     }
     M1_FUNC_EXIT
@@ -1330,7 +1334,7 @@ M1Store::Item_lv2_iterator_base::Item_lv2_iterator_base(Item_lv2* p_start_edge){
  * @return
  */
 QString M1Store::Item_lv2_iterator_base::dbgShort(){
-    return QString("Item_lv2_iterator_base - current position: ") + m_current_edge->dbgShort();
+    return QString("Item_lv2_iterator_base - current position: ") + (m_current_edge != nullptr ? m_current_edge->dbgShort() : "nullptr");
 }
 /**
  * @brief M1Store::Item_lv2_iterator_base::isNull

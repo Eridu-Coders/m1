@@ -248,8 +248,8 @@ void M1Store::Storage::storeSetUp(bool p_reset){
     qCDebug(g_cat_silence) << QString("BLNGS_SIID                 = %1").arg(M1Store::BLNGS_SIID);
 
     qCDebug(g_cat_silence) << QString("TEXT_SIID                  = %1").arg(M1Store::TEXT_SIID);
-    qCDebug(g_cat_silence) << QString("T_WORD_SIID                = %1").arg(M1Store::FORM_SIID);
-    qCDebug(g_cat_silence) << QString("TEXT_SECTION_SIID          = %1").arg(M1Store::TXTCK_SIID);
+    qCDebug(g_cat_silence) << QString("FORM_SIID                  = %1").arg(M1Store::FORM_SIID);
+    qCDebug(g_cat_silence) << QString("TEXT_CHUNK_SIID            = %1").arg(M1Store::TEXT_CHUNK_SIID);
 
     qCDebug(g_cat_silence) << QString("TW_WORD_OCC                = %1").arg(M1Store::OCCUR_SIID);
     qCDebug(g_cat_silence) << QString("TW_SECTION_2_OCC_BEGIN     = %1").arg(M1Store::TW_SECTION_2_OCC_BEGIN_SIID);

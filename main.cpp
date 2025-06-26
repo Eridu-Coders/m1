@@ -19,12 +19,6 @@ Q_LOGGING_CATEGORY(g_cat_main, "m1_main")
 QRegularExpression g_re_punc(R"(^(\W*)(\w+)(\W*))");
 QRegularExpression g_re_space(R"(\s+)");
 
-/*
-M1Env::SpecialItemID TEXT_WFW_PRABUPADA_SIID = M1Env::G_VOID_SI_ID; // subtype of TEXT_WFW_TRANSL_SIID
-M1Env::SpecialItemID TEXT_WFW_SIVANANDA_SIID = M1Env::G_VOID_SI_ID; // subtype of TEXT_WFW_TRANSL_SIID
-M1Env::SpecialItemID TEXT_WFW_GAMBIRANANDA_SIID = M1Env::G_VOID_SI_ID; // subtype of TEXT_WFW_TRANSL_SIID
-*/
-
 void loadEnoch();
 int loadGita();
 
@@ -44,9 +38,11 @@ int main(int argc, char *argv[])
 
     M1Env::M1EnvStatic::init();
     M1Env::M1EnvStatic::setNormalFilter("*.debug=true\n"
+                                        "store.*=false\n"
                                         "lv0.*=false\n"
                                         "lv1.*=false\n"
-                                        "lv2.g_cat_lv2_constructors=true\n"
+                                        "lv2.*=false\n"
+                                        // "lv2.g_cat_lv2_constructors=true\n"
                                         "qt.*.debug=false");
 
     M1_FUNC_ENTRY(g_cat_main, QString("App starts"))
@@ -258,7 +254,7 @@ int loadGita(){
                     // M1Store::ItemType(M1Env::TEXT_SECTION_SIID),  // type
                     l_sloka_ref.toUtf8().constData()                    // label
                 );
-                l_current_section->setType(M1Env::TXTCK_SIID);
+                l_current_section->setType(M1Env::TEXT_CHUNK_SIID);
                 l_sections_last_edge = l_gita_sections->linkTo(l_current_section, "OWNS_", l_sections_last_edge, false);
                 l_cursec_last_edge = nullptr;
                 l_fresh_sloka = true;
@@ -467,7 +463,7 @@ int loadGita(){
                     // M1Store::ItemType(M1Env::TEXT_SECTION_SIID), // type
                     l_label.toUtf8().constData()                       // label
                 );
-                l_unit->setType(M1Env::TXTCK_SIID);
+                l_unit->setType(M1Env::TEXT_CHUNK_SIID);
                 // additional type TEXT_WFW_UNIT_SIID
                 l_unit->setType(M1Env::TEXT_WFW_UNIT_SIID);
                 // connect to begin/end occurence edges
@@ -612,7 +608,7 @@ void loadEnoch(){
                 //M1Store::ItemType(M1Env::TEXT_SECTION_SIID),                    // type
                 QString("EB Sentence %1").arg(l_section_count++).toUtf8().constData() // label
                 );
-            l_current_section->setType(M1Env::TXTCK_SIID);
+            l_current_section->setType(M1Env::TEXT_CHUNK_SIID);
             l_sections_last_edge = l_enoch_sections->linkTo(l_current_section, "OWNS_", l_sections_last_edge, false);
             l_cursec_last_edge = l_current_section->linkTo(l_last_edge, M1Store::TW_SECTION_2_OCC_BEGIN_SIID);
         }

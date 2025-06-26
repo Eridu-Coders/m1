@@ -26,6 +26,8 @@ class Interp : public QWidget
     friend class BhashyaTranslation;
     friend class TextInterp;
     friend class TextOccurrence;
+    friend class SentenceInterp;
+    friend class BookInterp;
     // friend class InterpStaticConstructor;
 private:
     M1Store::Item_lv2* m_myself;
@@ -164,6 +166,26 @@ public:
     TextOccurrence(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
     virtual QString displayText();
     virtual void paintEvent(QPaintEvent* p_event);
+};
+
+class SentenceInterp : public SectionInterp
+{
+    Q_OBJECT
+public:
+    static bool wantIt(M1Store::Item_lv2* p_myself);
+
+    SentenceInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
+    virtual QString getHtml();
+};
+
+class BookInterp : public SectionInterp
+{
+    Q_OBJECT
+public:
+    static bool wantIt(M1Store::Item_lv2* p_myself);
+
+    BookInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
+    virtual QString getHtml();
 };
 
 }

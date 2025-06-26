@@ -93,13 +93,17 @@ extern M1Env::SpecialItemID NLPOS_SIID;
 // [NLTAG] Special Vertex ID of "NLP Tag code (type)"
 extern M1Env::SpecialItemID NLTAG_SIID;
 // [STPSC] Special Vertex ID of "Stephanus Section (type)"
-extern M1Env::SpecialItemID STPSC_SIID;
+extern M1Env::SpecialItemID STEPHANUS_SIID;
 // [TXTVR] Special Vertex ID of "Text Version (type)"
 extern M1Env::SpecialItemID TXTVR_SIID;
-// [TXTCK] Special Vertex ID of "Text Chunk (type)"
-extern M1Env::SpecialItemID TXTCK_SIID;
 // [TXTNT] Special Vertex ID of "Notes (type)"
 extern M1Env::SpecialItemID TXTNT_SIID;
+// [TXTCK] Special Vertex ID of "Text Chunk (type)"
+extern M1Env::SpecialItemID TEXT_CHUNK_SIID;
+// [TXTBK] Special Vertex ID of "Book (type)"
+extern M1Env::SpecialItemID TEXT_BOOK_SIID;
+// [TXSNT] Special Vertex ID of "Sentence (type)"
+extern M1Env::SpecialItemID TEXT_SENTENCE_SIID;
 // [SLKLN] Special Vertex ID of "Sloka Lines (type)"
 extern M1Env::SpecialItemID TEXT_SLOKA_LINE_SIID;
 // [INRIA] Special Vertex ID of "INRIA Dictionary Reference (type)"

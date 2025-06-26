@@ -42,8 +42,8 @@ g_all_punctuation = None
 g_header_line_en = '------+------------------------+------------+----------+----------------------+------------+-----------------+--------+-------+-------+----------+------------------------------------------+---------------------------------------'
 g_header_titl_en = ' sec  | word                   | POS CG     | POS FG   | lemma                | Dep        | Father          | i      | end   | start | Type     | Note                                     | Morphology'
 
-g_header_line_gr = '------+--------+-----------------+-------+-----------------+------------+------------+-----------------+---------------------------------------'
-g_header_titl_gr = ' sec  | idx    | word            | POS   | lemma           | xpos       | Dep        | Father          | Morphology'
+g_header_line_gr = '------+---------+-----------------+-------+-----------------+------------+------------+-----------------+---------------------------------------'
+g_header_titl_gr = ' sec  | idx     | word            | POS   | lemma           | xpos       | Dep        | Father          | Morphology'
 
 # monitoring collections
 g_lemma_form_dict = dict()
@@ -1090,7 +1090,7 @@ def process_cursor_list_en(p_cursor_list, p_txt_key, p_phase_ii=True):
         # print the table row for the current token
         print(
             f'{l_prefix_section}{l_current_section:4} | {l_form_txt:22} | {l_new_pos:10} | {l_tag:8} | {l_lemma_txt:20} | {t.dep_:10} | {l_father:15} | {t.i:6} | ' +
-            f'{l_is_sent_end:5} | {l_is_sent_start:5} | {t.ent_type_:8} | {str(l_notes)[:40]:40} | {l_grammar_dict}')
+            f'{l_is_sent_end:5} | {l_is_sent_start:5} | {t.ent_type_:8} | {str(l_notes)[:40]:40} | {l_grammar_dict} {l_tok_key}')
 
         # store data for the current occurrence, form and lemma
         add_data(l_current_section, l_tok_key,
@@ -1098,7 +1098,7 @@ def process_cursor_list_en(p_cursor_list, p_txt_key, p_phase_ii=True):
                     'Text': l_txt_cap,
                     'Pos': l_new_pos,
                     'Tag': l_tag,
-                    'FormKey': [l_form_key],
+                    'FormKey': l_form_key,
                     'NewSection': l_new_current_section,
                     'BookNumber': l_section_2_book[l_new_current_section] if len(l_new_current_section) > 0 else -1,
                     'BookTitle': l_book_heading,
@@ -1109,7 +1109,7 @@ def process_cursor_list_en(p_cursor_list, p_txt_key, p_phase_ii=True):
                     'NoteKey': l_tok_key if len(l_notes) > 0 else '',
                     'SentencePos': ('SS' if t.is_sent_start else ('SE' if t.is_sent_end else ''))
                  },
-                 l_form_key, {'Text': l_form_txt, 'Tag': l_tag, 'LemmaKey': l_lemma_key},
+                 l_form_key, {'Text': l_form_txt, 'Tag': l_tag, 'LemmaKey': [l_lemma_key]},
                  l_lemma_key, {'Text': l_lemma_txt, 'Pos': l_new_pos, 'EntType': t.ent_type_}
          )
 
@@ -1172,13 +1172,15 @@ def process_cursor_list_en(p_cursor_list, p_txt_key, p_phase_ii=True):
     print()
 
     # ==================================================== Phase III ===================================================
-    print('Phase III - Grouping punctuation into tokens', file=sys.stderr)
-    group_punctuation()
+    # print('Phase III - Grouping punctuation into tokens', file=sys.stderr)
+    # group_punctuation()
 
 def group_punctuation(p_en=True):
     class HyphenatedWordException(Exception):
         pass
 
+    # first pass for punctuation fields creation in each token
+    l_occur_restricted_tmp_list = []
     for l_tok_index in range(len(g_base_tokens)):
         l_tok_key, l_tok = g_base_tokens[l_tok_index]
         l_tok_form = l_tok['Text'].lower()
@@ -1222,13 +1224,13 @@ def group_punctuation(p_en=True):
                 # create lemma and form records
                 add_data(None,
                          None, None,
-                         l_new_form_key, {'Text': l_tok_form, 'Tag': l_new_pos, 'LemmaKey': l_new_lemma_key},
+                         l_new_form_key, {'Text': l_tok_form, 'Tag': l_new_pos, 'LemmaKey': [l_new_lemma_key]},
                          l_new_lemma_key, {'Text': l_lemma_text, 'Pos': l_new_pos, 'EntType': ''}
                          )
                 l_new_data_added = ' New Data'
             else: # use existing lemma
                 for l_fk in g_form_dict.keys():
-                    if g_form_dict[l_fk]['LemmaKey'] == l_new_lemma_key and l_fk.split('‣')[0] == l_tok_form:
+                    if g_form_dict[l_fk]['LemmaKey'][0] == l_new_lemma_key and l_fk.split('‣')[0] == l_tok_form:
                         l_new_form_key = l_fk
                         break
 
@@ -1237,65 +1239,83 @@ def group_punctuation(p_en=True):
 
             l_tok['Pos'] = l_new_pos
             l_tok['Tag'] = l_new_form_key.split('‣')[1]
-            l_tok['FormKey'] = [l_new_form_key]
+            l_tok['FormKey'] = l_new_form_key
             g_anno.setdefault('PUNCT', []).append(f'Correction {l_tok_key} {l_tok_form:15} PUNCT --> {l_new_form_key}/{l_new_lemma_key}{l_new_data_added}')
 
-        if l_tok['Pos'] != 'PUNCT': # get punctuation on both side of non-punctuation token
-            try: # eliminate hyphenated word cases when a hyphen is present before or after (treated below)
-                l_new_sent_pos = l_tok['SentencePos']
-                l_punctuation_left = ''
-                l_new_s_left = ''
-                if l_tok_index > 0:
-                    l_fin_left = False
-                    l_i_left = l_tok_index - 1
-                    if g_base_tokens[l_i_left][1]['Text'] == '-':
-                        raise HyphenatedWordException # Hyphen before
+        if l_tok['Pos'] != 'PUNCT' and l_tok['Text'] != '-': # get punctuation on both side of non-punctuation token
+            # try: # eliminate hyphenated word cases when a hyphen is present before or after (treated below)
+            l_new_sent_pos = l_tok['SentencePos']
+            l_punctuation_left = ''
+            l_new_s_left = ''
+            if l_tok_index > 0:
+                l_fin_left = False
+                l_i_left = l_tok_index - 1
+                # if g_base_tokens[l_i_left][1]['Text'] == '-':
+                #     raise HyphenatedWordException # Hyphen before
 
-                    while not l_fin_left:
-                        l_tok_left = g_base_tokens[l_i_left][1]
-                        if l_tok_left['Pos'] != 'PUNCT' or l_tok_left['Grammar']['PunctSide'] != 'Left':
+                while not l_fin_left:
+                    l_tok_left = g_base_tokens[l_i_left][1]
+                    if l_tok_left['Pos'] != 'PUNCT' or l_tok_left['Grammar']['PunctSide'] != 'Left':
+                        l_fin_left = True
+                    else:
+                        l_punctuation_left = l_tok_left['Text'] + l_punctuation_left
+                        l_new_sent_pos = l_tok_left['SentencePos'] if len(l_tok_left['SentencePos']) > 0 else l_new_sent_pos
+                        l_new_s_left = l_tok_left['NewSection']
+                        if l_i_left == 0:
                             l_fin_left = True
                         else:
-                            l_punctuation_left = l_tok_left['Text'] + l_punctuation_left
-                            l_new_sent_pos = l_tok_left['SentencePos'] if len(l_tok_left['SentencePos']) > 0 else l_new_sent_pos
-                            l_new_s_left = l_tok_left['NewSection']
-                            if l_i_left == 0:
-                                l_fin_left = True
-                            else:
-                                l_i_left -= 1
-                l_punctuation_right = ''
-                if l_tok_index < len(g_base_tokens) - 1:
-                    l_fin_right = False
-                    l_i_right = l_tok_index + 1
-                    if g_base_tokens[l_i_right][1]['Text'] == '-':
-                        raise HyphenatedWordException # Hyphen after
+                            l_i_left -= 1
+            l_punctuation_right = ''
+            if l_tok_index < len(g_base_tokens) - 1:
+                l_fin_right = False
+                l_i_right = l_tok_index + 1
+                # if g_base_tokens[l_i_right][1]['Text'] == '-':
+                #     raise HyphenatedWordException # Hyphen after
 
-                    while not l_fin_right:
-                        l_tok_right = g_base_tokens[l_i_right][1]
-                        if l_tok_right['Pos'] != 'PUNCT' or l_tok_right['Grammar']['PunctSide'] != 'Right':
+                while not l_fin_right:
+                    l_tok_right = g_base_tokens[l_i_right][1]
+                    if l_tok_right['Pos'] != 'PUNCT' or l_tok_right['Grammar']['PunctSide'] != 'Right':
+                        l_fin_right = True
+                    else:
+                        l_punctuation_right = l_punctuation_right + l_tok_right['Text']
+                        l_new_sent_pos = l_tok_right['SentencePos'] if len(l_tok_right['SentencePos']) > 0 else l_new_sent_pos
+                        if l_i_right == len(g_base_tokens) - 1:
                             l_fin_right = True
                         else:
-                            l_punctuation_right = l_punctuation_right + l_tok_right['Text']
-                            l_new_sent_pos = l_tok_right['SentencePos'] if len(l_tok_right['SentencePos']) > 0 else l_new_sent_pos
-                            if l_i_right == len(g_base_tokens) - 1:
-                                l_fin_right = True
-                            else:
-                                l_i_right += 1
-                l_tok['PunctLeft'] = l_punctuation_left
-                l_tok['PunctRight'] = l_punctuation_right
-                l_tok['SentencePos'] = l_new_sent_pos
-                # g_tokens_no_punctuation[l_tok_key] = l_tok
-                l_form_key = l_tok['FormKey'][0]
-                l_form = g_form_dict[l_form_key]
-                l_lemma_key = l_form['LemmaKey']
-                l_lemma_text = g_lemma_dict[l_lemma_key]
-                if len(l_new_s_left) > 0:
-                    l_tok['NewSection'] = l_new_s_left
-                add_data_restricted(l_tok_key, l_tok, l_form_key, l_form, l_lemma_key, l_lemma_text)
-            except HyphenatedWordException:
-                pass # nothing to do - Hyphenated words treated below
-        elif l_tok['Text'] == '-': # Hyphenated words
-            if l_tok_index == 0 or l_tok_index == len(g_base_tokens) - 1:
+                            l_i_right += 1
+            l_tok['PunctLeft'] = l_punctuation_left
+            l_tok['PunctRight'] = l_punctuation_right
+            l_tok['SentencePos'] = l_new_sent_pos
+            # g_tokens_no_punctuation[l_tok_key] = l_tok
+            # l_form_key = l_tok['FormKey'][0]
+            # l_form = g_form_dict[l_form_key]
+            # l_lemma_key = l_form['LemmaKey']
+            # l_lemma_text = g_lemma_dict[l_lemma_key]
+            if len(l_new_s_left) > 0:
+                l_tok['NewSection'] = l_new_s_left
+            l_occur_restricted_tmp_list.append((l_tok_key, l_tok))
+            # g_occur_restricted_tmp[l_tok_key] = l_tok
+            # except HyphenatedWordException:
+            #     pass # nothing to do - Hyphenated words treated below
+        elif l_tok['Text'] == '-':
+            l_occur_restricted_tmp_list.append((l_tok_key, l_tok))
+
+    # second pass to take care of hyphenated words
+    l_prev_text = ''
+    for l_tok_index in range(len(l_occur_restricted_tmp_list)):
+        l_tok_key, l_tok = l_occur_restricted_tmp_list[l_tok_index]
+        l_cur_text = l_tok['Text']
+        l_next_text = l_occur_restricted_tmp_list[l_tok_index + 1][1]['Text'] if l_tok_index < len(l_occur_restricted_tmp_list) -1 else ''
+        if l_prev_text != '-' and l_cur_text != '-' and l_next_text != '-':
+            # Non-hyphenated words (and ignore tokens adjacent to a dash)
+            l_form_key = l_tok['FormKey']
+            l_form = g_form_dict[l_form_key]
+            l_lemma_key = l_form['LemmaKey'][0]
+            l_lemma = g_lemma_dict[l_lemma_key]
+            add_data_restricted(l_tok_key, l_tok, l_form_key, l_form, l_lemma_key, l_lemma)
+        elif l_cur_text == '-':
+            # Hyphenated words (tokens adjacent to a dash are taken care of here)
+            if l_tok_index == 0 or l_tok_index == len(l_occur_restricted_tmp_list) - 1:
                 print(f'Error: first or last token cannot be a hyphen [{l_tok_index}]', file=sys.stderr)
                 sys.exit(0)
 
@@ -1318,15 +1338,16 @@ def group_punctuation(p_en=True):
             # 1) the hyphenated word
             # 2) the left-hand half (_before below) of the hyphenated word
             # 3) the right-hand half (_after below) of the hyphenated word
-            _, l_tok_before = g_base_tokens[l_tok_index-1]
-            _, l_tok_after = g_base_tokens[l_tok_index+1]
+            _, l_tok_before = l_occur_restricted_tmp_list[l_tok_index-1]
+            _, l_tok_after = l_occur_restricted_tmp_list[l_tok_index+1]
             l_new_text = f"{l_tok_before['Text']}-{l_tok_after['Text']}"
             l_new_form_key = f"{l_new_text}‣{l_tok_before['Tag']}"
             l_new_tok = {
                 'Text': l_new_text,
                 'Pos': l_tok_before['Pos'],
                 'Tag': l_tok_before['Tag'],
-                'FormKey': l_tok_before['FormKey'] + l_tok_after['FormKey'] + [l_new_form_key],
+                # 'FormKey': l_tok_before['FormKey'] + l_tok_after['FormKey'] + [l_new_form_key],
+                'FormKey': l_new_form_key,
                 'NewSection': l_tok_before['NewSection'],
                 'BookTitle': l_tok_before['BookTitle'],
                 'BookNumber': l_tok_before['BookNumber'],
@@ -1335,26 +1356,32 @@ def group_punctuation(p_en=True):
                 'MarkupBefore': l_tok_before['MarkupBefore'],
                 'MarkupAfter': l_tok_after['MarkupAfter'],
                 'NoteKey': l_tok_before['NoteKey'] if len(l_tok_before['NoteKey']) > 0 else l_tok_after['NoteKey'],
-                'SentencePos': ('SS' if l_tok_before['SentencePos'] == 'SS' else ('SE' if l_tok_after['SentencePos'] == 'SE' else ''))
+                'SentencePos': ('SS' if l_tok_before['SentencePos'] == 'SS' else ('SE' if l_tok_after['SentencePos'] == 'SE' else '')),
+                'PunctLeft': l_tok_before['PunctLeft'],
+                'PunctRight': l_tok_after['PunctRight']
             }
-            l_form_key_before = l_tok_before['FormKey'][0]
-            l_form_key_after = l_tok_after['FormKey'][0]
+            l_form_key_before = l_tok_before['FormKey']
+            l_form_key_after = l_tok_after['FormKey']
             l_form_before = g_form_dict[l_form_key_before]
             l_form_after = g_form_dict[l_form_key_after]
-            l_lemma_before = g_lemma_dict[l_form_before['LemmaKey']]
-            l_lemma_after = g_lemma_dict[l_form_after['LemmaKey']]
+            l_lemma_key_before = l_form_before['LemmaKey'][0]
+            l_lemma_key_after = l_form_after['LemmaKey'][0]
+            l_lemma_before = g_lemma_dict[l_lemma_key_before]
+            l_lemma_after = g_lemma_dict[l_lemma_key_after]
             l_new_lemma_txt = f"{l_lemma_before['Text']}-{l_lemma_after['Text']}"
-            l_new_lemma_key = f"{l_tok_before['Pos']}‣{l_new_lemma_txt}"
+            l_new_lemma_key = f"{l_new_lemma_txt}‣{l_tok_before['Pos']}"
             l_new_form = {'Text': f"{l_form_before['Text']}-{l_form_after['Text']}",
                           'Tag': l_tok_before['Tag'],
-                          'LemmaKey': l_new_lemma_key}
+                          'LemmaKey': [l_lemma_key_before, l_new_lemma_key, l_lemma_key_after] }
             l_new_lemma = {'Text': l_new_lemma_txt,
                            'Pos': l_tok_before['Pos'],
                            'EntType': composite_value(l_lemma_before['EntType'], l_lemma_after['EntType'])}
             # g_tokens_no_punctuation[l_tok_key] = l_new_tok
             add_data_restricted(l_tok_key, l_new_tok, l_new_form_key, l_new_form, l_new_lemma_key, l_new_lemma)
-            add_data_restricted(None, None, l_form_key_before, l_form_before, l_form_before['LemmaKey'], l_lemma_before)
-            add_data_restricted(None, None, l_form_key_after, l_form_after, l_form_after['LemmaKey'], l_lemma_after)
+            add_data_restricted(None, None, None, None, l_lemma_key_before, l_lemma_before)
+            add_data_restricted(None, None, None, None, l_lemma_key_after, l_lemma_after)
+
+        l_prev_text = l_cur_text
 
 def process_cursor_list_gr(p_cursor_list):
     """
@@ -1553,7 +1580,7 @@ def process_cursor_list_gr(p_cursor_list):
                          'Text': l_txt_cap,
                          'Pos': l_pos,
                          'Tag': l_pos,
-                         'FormKey': [l_form_key],
+                         'FormKey': l_form_key,
                          'NewSection': (l_current_section if l_new_cur_section else ''),
                          'BookTitle': '',
                          'BookNumber': l_new_book_number,
@@ -1564,8 +1591,8 @@ def process_cursor_list_gr(p_cursor_list):
                          'NoteKey': '',
                          'SentencePos': ('SS' if l_is_sent_start else ('SE' if l_is_sent_end else ''))
                      },
-                     l_form_key, {'Text':l_form_txt, 'Tag':l_tag, 'LemmaKey':l_lemma_key},
-                     l_lemma_key, {'Text':l_lemma_txt, 'Pos':l_pos, 'EntType':l_ent_type}
+                     l_form_key, {'Text': l_form_txt, 'Tag': l_tag, 'LemmaKey': [l_lemma_key]},
+                     l_lemma_key, {'Text': l_lemma_txt, 'Pos': l_pos, 'EntType': l_ent_type}
             )
             # increment token number used in token id above
             l_token_id += 1
@@ -1598,8 +1625,8 @@ def process_cursor_list_gr(p_cursor_list):
         print(g_header_line_gr)
         print()
 
-    print(f'Phase III - Grouping punctuation into tokens', file=sys.stderr)
-    group_punctuation()
+    # print(f'Phase III - Grouping punctuation into tokens', file=sys.stderr)
+    # group_punctuation()
 
 
 def print_lemma_2_words():
@@ -2009,23 +2036,7 @@ if __name__ == '__main__':
         print('********** Processing Ancient Greek text', file=sys.stderr)
         process_cursor_list_gr(l_cursor_list_greek)
 
-    print('********** Control tables', file=sys.stderr)
-    # print_lemma_2_words()
-    # print_hyphens()
-    # print_xpos()
-    # print_entities()
-
-    print_punctuation_groups()
-    print_punctuation_groups_re()
-    print_apostrophes()
-    print_anno()
-    print_pos_2_lemma()
-    print_missing()
-    print_remaining_dashes()
-    print_morph_attr()
-    print_entities()
-
-    print('********** Dumping JSON files', file=sys.stderr)
+    print('********** Dumping unrestricted JSON files', file=sys.stderr)
     with open('base_tok.json', 'w') as f:
         json.dump({'Base_Tok': g_base_tokens}, f, indent=4, ensure_ascii=False)
 
@@ -2050,10 +2061,30 @@ if __name__ == '__main__':
     with open('notes.json', 'w') as f:
         json.dump(g_notes_dict, f, indent=4, ensure_ascii=False)
 
+    # ==================================================== Phase III ===================================================
+    print('Phase III - Grouping punctuation into tokens', file=sys.stderr)
+    group_punctuation()
+
+    print('********** Control tables', file=sys.stderr)
+    # print_lemma_2_words()
+    # print_hyphens()
+    # print_xpos()
+    # print_entities()
+
+    print_punctuation_groups()
+    print_punctuation_groups_re()
+    print_apostrophes()
+    print_anno()
+    print_pos_2_lemma()
+    print_missing()
+    print_remaining_dashes()
+    print_morph_attr()
+
     # g_tokens_no_punctuation
     # with open('occ_no_punc.json', 'w') as f:
     #     json.dump(g_tokens_no_punctuation, f, indent=4, ensure_ascii=False)
 
+    print('********** Dumping restricted JSON files', file=sys.stderr)
     with open('occ_restricted.json', 'w') as f:
         json.dump(g_occur_restricted, f, indent=4, ensure_ascii=False)
 

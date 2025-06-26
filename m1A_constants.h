@@ -98,7 +98,7 @@ namespace M1Env{
     static const char* POS_ICON_PATH = "../Icons/Nlp-Pos.svg";                          // *
     static const char* TAG_ICON_PATH = "../Icons/Nlp-Tag.svg";                          // *
 
-    static const char* TEXT_CHUNK_ICON_PATH = "../Icons/Section.svg";                 // *
+    static const char* TEXT_CHUNK_ICON_PATH = "../Icons/Section.svg";                   // *
     static const char* TW_SECTION_2_OCC_BEGIN_ICON_PATH = "../Icons/Sec-Begin.svg";     // *
     static const char* TW_SECTION_2_OCC_END_ICON_PATH = "../Icons/Sec-End.svg";         // *
     static const char* TEXT_WFW_UNIT_ICON_PATH = "../Icons/TranslUnit.svg";             // *
@@ -111,89 +111,11 @@ namespace M1Env{
     static const char* TEXT_URL_LINK_ICON_PATH = "../Icons/Url.svg";                    // *
     static const char* TEXT_WROTE_ICON_PATH = "../Icons/Wrote.svg";                     // *
     static const char* TEXT_WRITTEN_BY_ICON_PATH = "../Icons/WrittenBy.svg";            // *
+    static const char* BOOK_ICON_PATH = "../Icons/Book.svg";                            // *
+    static const char* SENTENCE_ICON_PATH = "../Icons/Sentence.svg";                    // *
 
-    // pseudo constants set by the Storage class after loading the special items table
-    /*
-    // [FOLDR] Special Vertex ID (Vertex type) of folders (ordinary vertices with no special role)
-    extern SpecialItemID FOLDER_SIID;
-    // [AUTO_] Special Vertex ID (Edge type) of AUTO edges
-    extern SpecialItemID AUTO_SIID;
-    // [OWNS_] Special Vertex ID (Edge type) of ownership edges
-    extern SpecialItemID OWNS_SIID;
-    // [BLNGS] Special Vertex ID (Edge type) of ownership edges (reciprocal of OWNS_ above))
-    extern SpecialItemID BLNGS_SIID;
-    // [_ISA_] Special Vertex ID (Edge type) of type edges
-    extern SpecialItemID ISA_SIID;
-    // [_ITO_] Special Vertex ID (Edge type) of type edges (reciprocal of _ISA_ above))
-    extern SpecialItemID ITO_SIID;
-
-    // [ROOT_] Special Vertex ID of "Global graph root"
-    extern SpecialItemID ROOT_SIID;
-    // [HOME_] Special Vertex ID of "Home"
-    extern SpecialItemID HOME_SIID;
-    // [TYPE_] Special Vertex ID of "Root of all types"
-    extern SpecialItemID TYPE_NODE_SIID;
-    // [PERSN] Special Vertex ID of "Person (type)"
-    extern SpecialItemID PERS_TYPE_SIID;
-    // [ORGN_] Special Vertex ID of "Organization (type)"
-    extern SpecialItemID ORG_TYPE_SIID;
-    // [ME___] Special Vertex ID of "Me"
-    extern SpecialItemID ME_SIID;
-    // [_MSG_] Special Vertex ID of "Inboxes / Message Root Type"
-    extern SpecialItemID MSG_TYPE_SIID;
-    // [EMAIL] Special Vertex ID of "Email Inbox"
-    extern SpecialItemID EMAIL_TYPE_SIID;
-    // [WHTSP] Special Vertex ID of "Whatsapp Inbox"
-    extern SpecialItemID WHTSP_TYPE_SIID;
-    // [DSCRD] Special Vertex ID of "Discord Inbox"
-    extern SpecialItemID DSCRD_TYPE_SIID;
-    // [GCHAT] Special Vertex ID of "GChat Inbox"
-    extern SpecialItemID GCHAT_TYPE_SIID;
-    // [SMS__] Special Vertex ID of "SMS Inbox"
-    extern SpecialItemID SMS_TYPE_SIID;
-    */
-    /*
-    extern SpecialItemID SMS_TYPE_SIID;
-    extern SpecialItemID FOLDER_SIID;         ///< * Special Vertex ID (Vertex type) of folders
-    extern SpecialItemID PERSON_SIID;         ///< * Special Vertex ID (Vertex type) of persons
-    extern SpecialItemID ORGANIZATION_SIID;   ///< * Special Vertex ID (Vertex type) of persons
-    extern SpecialItemID AUTO_SIID;           ///< * Special Vertex ID (Edge type) of AUTO edges
-    extern SpecialItemID ROOT_SIID;           ///< * Special Vertex ID (Vertex type) of root
-    extern SpecialItemID HOME_SIID;           ///< * Special Vertex ID (Vertex type) of home
-    extern SpecialItemID ME_SIID;             ///< * Special Vertex ID (Vertex type) of ME___
-    extern SpecialItemID ISA_SIID;            ///< * Special Vertex ID (Edge type) of _ISA_
-    extern SpecialItemID ITO_SIID;            ///< * Special Vertex ID (Edge type) of _ITO_
-    extern SpecialItemID OWNS_SIID;           ///< * Special Vertex ID (Edge type) of _OWNS
-    extern SpecialItemID BLNGS_SIID;          ///< * Special Vertex ID (Edge type) of BLNGS
-    extern SpecialItemID TYPE_NODE_SIID;      ///< * Special Vertex ID (Vertex type) of TYPE_
-    */
-
-    /*
-    extern SpecialItemID TEXT_SIID;                         ///< * Special Vertex ID (Vertex type) for the root of a text
-    extern SpecialItemID TEXT_WORD_SIID;                    ///< * Special Vertex ID (Vertex type) for a word within a text
-    extern SpecialItemID TEXT_SECTION_SIID;                 ///< * Special Vertex ID (Vertex type) for a section within a text
-    extern SpecialItemID TW_WORD_OCC_SIID;                  ///< * Special Vertex ID (Edge type) for a word occurence edge
-    extern SpecialItemID TW_REV_WORD_OCC_SIID;              ///< * Special Vertex ID (Edge type) opposite of above (TW_WORD_OCC_SIID)
-    extern SpecialItemID TW_SECTION_2_OCC_BEGIN_SIID;       ///< * Special Vertex ID (Edge type) for a the begining of a section (points to an occurence edge)
-    extern SpecialItemID TW_REV_SECTION_2_OCC_BEGIN_SIID;   ///< * Special Vertex ID (Edge type) opposite of above (TW_SECTION_2_OCC_BEGIN_SIID)
-    extern SpecialItemID TW_SECTION_2_OCC_END_SIID;         ///< * Special Vertex ID (Edge type) for a the end of a section (points to an occurence edge)
-    extern SpecialItemID TW_REV_SECTION_2_OCC_END_SIID;     ///< * Special Vertex ID (Edge type) opposite of above (TW_SECTION_2_OCC_END_SIID)
-
-    extern SpecialItemID TEXT_SLOKA_BHASHYA_SIID;       ///< * Special Vertex ID (Vertex type) Bhashya on a sloka
-    extern SpecialItemID TEXT_SLOKA_TRANSLATION_SIID;   ///< * Special Vertex ID (Vertex type) Translation of an entire sloka
-    extern SpecialItemID TEXT_SLOKA_LINE_SIID;          ///< * Special Vertex ID (Vertex type) Half-sloka line (in Sanskrit/Devanagari)
-    extern SpecialItemID TEXT_WORD_TRANSLIT_SIID;       ///< * Special Vertex ID (Vertex field type) Sanskrit word transliteration
-    extern SpecialItemID TEXT_WORD_DICT_REF_SIID;       ///< * Special Vertex ID (Vertex field type) Reference to outside dictionary
-    extern SpecialItemID TEXT_LEMMA_SIID;               ///< * Special Vertex ID (Vertex type) Word lemma node
-    extern SpecialItemID TEXT_WORD_DREF_INRIA_SIID;     ///< * Special Vertex ID (Vertex field type) Reference to outside dictionary (INRIA/Gérard Huet)
-
-    extern SpecialItemID TEXT_WFW_UNIT_SIID;            ///< * Special Vertex ID (Vertex type) for a WfW translation unit (subtype of TEXT_SECTION_SIID)
-    extern SpecialItemID TEXT_WFW_TRANSL_SIID;          ///< * Special Vertex ID (Vertex type) for a WfW translation (of a TEXT_WFW_UNIT_SIID)
-    extern SpecialItemID TEXT_URL_LINK_SIID;            ///< * Special Vertex ID (Vertex type) URL link
-    extern SpecialItemID TEXT_WROTE_SIID;               ///< * Special Vertex ID (Edge type) Author --> Work
-    extern SpecialItemID TEXT_WRITTEN_BY_SIID;          ///< * Special Vertex ID (Edge type) Work --> Oposite of above
-    */
-} // end of M1Store namespace
+    static const bool SKIP_HEAVY_CHECKING = true; ///< true --> skip time-consuming Q_ASSERT in setType() and linkTo()
+} // end of M1Env namespace
 
 // debug categories pre-declarations
 Q_DECLARE_LOGGING_CATEGORY(g_cat_store)                 ///< for Storage class (static functions)
@@ -213,8 +135,5 @@ Q_DECLARE_LOGGING_CATEGORY(g_cat_tree_display)          ///< TreeDisplay widget 
 Q_DECLARE_LOGGING_CATEGORY(g_cat_interp_base)           ///< Base class of the Interp hierarchy
 Q_DECLARE_LOGGING_CATEGORY(g_cat_main_window)           ///< MainWindow widget class
 Q_DECLARE_LOGGING_CATEGORY(g_cat_main)                  ///< messages from main of complete (non-test) build (including XML loaders)
-
-// BUG: 1-Restart app with anything loaded, even just the bare structure
-// BUG: 2-Restart app with Gita loaded and edge to text root node open (different cause of crash)
 
 #endif // M1_CONSTANTS_H

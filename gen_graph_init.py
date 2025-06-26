@@ -338,10 +338,12 @@ g_vertices = [
 ['NLP Entity (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'NLENT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'ENTITY_ICON_PATH',       'NLENT_SIID'],
 ['NLP Pos code (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'NLPOS', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'POS_ICON_PATH',          'NLPOS_SIID'],
 ['NLP Tag code (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'NLTAG', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'TAG_ICON_PATH',          'NLTAG_SIID'],
-['Stephanus Section (type)',     ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'STPSC', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'STPSC_SIID'],
+['Stephanus Section (type)',     ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'STPSC', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'STEPHANUS_SIID'],
 ['Text Version (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TXTVR', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'TXTVR_SIID'],
-['Text Chunk (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TXTCK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'TEXT_CHUNK_ICON_PATH',       'TXTCK_SIID'],
 ['Notes (type)',                 ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TXTNT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'TXTNT_SIID'],
+['Text Chunk (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TXTCK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'TEXT_CHUNK_ICON_PATH',   'TEXT_CHUNK_SIID'],
+['Book (type)',                  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TXTBK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'BOOK_ICON_PATH',         'TEXT_BOOK_SIID'],
+['Sentence (type)',              ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TXSNT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'SENTENCE_ICON_PATH',     'TEXT_SENTENCE_SIID'],
 ]
 
 g_special_vertices_gita = [
@@ -658,14 +660,13 @@ if __name__ == '__main__':
         l_lemma_id += 1
 
     # forms
-    l_plato_code += f'    M1Store::Item_lv2* l_form_array[{len(l_republic["Forms"])}];\n'
+    l_plato_code += f'    M1Store::Item_lv2* l_form_array[{len(l_republic["Forms"].keys())}];\n'
     l_form_id = 0
     l_form_key_2_id = dict()
-    for l_form_key in l_republic["Forms"]:
+    for l_form_key in l_republic["Forms"].keys():
         l_form_key_2_id[l_form_key] = l_form_id
         l_form_txt = l_republic["Forms"][l_form_key]['Text']
         l_form_tag = l_republic["Forms"][l_form_key]['Tag']
-        l_lemma_id = l_lemma_key_2_id[l_republic["Forms"][l_form_key]['LemmaKey']]
         l_plato_code += (f'    // creation of form <{l_form_key}>\n' +
                          f'    qCDebug(g_cat_silence) << QString("Creating form <{l_form_key}>");\n' +
                          f'    l_form_array[{l_form_id}] = M1Store::Item_lv2::getNew(\n' +
@@ -676,8 +677,12 @@ if __name__ == '__main__':
         l_plato_code +=  f'    l_form_array[{l_form_id}]->setType("FORM_");\n'
         l_tag_mn = l_tag_2_mn[l_form_tag] if l_form_tag in l_tag_2_mn.keys() else l_pos_2_mn[l_form_tag]
         l_plato_code +=  f'    l_form_array[{l_form_id}]->setType("{l_tag_mn}");\n'
-        l_plato_code +=  f'    l_form_array[{l_form_id}]->linkTo(l_lemma_array[{l_lemma_id}], "BLNGS");\n\n'
+        for l_lemma_key in l_republic["Forms"][l_form_key]['LemmaKey']:
+            l_lemma_id = l_lemma_key_2_id[l_lemma_key]
+            l_plato_code +=  f'    l_form_array[{l_form_id}]->linkTo(l_lemma_array[{l_lemma_id}], "BLNGS");\n'
+
         l_form_id += 1
+        l_plato_code += "\n"
 
     # Sections and books
     l_plato_code += (f'    // creation of Republic books node\n' +
@@ -698,7 +703,7 @@ if __name__ == '__main__':
                          f'        M1Env::FULL_VERTEX,\n' +
                          f'        // label\n' +
                          f'        "Book {l_book_num}");\n')
-        l_plato_code +=  f'    l_book[{l_book_num - 1}]->setType("TXTCK");\n'
+        l_plato_code +=  f'    l_book[{l_book_num - 1}]->setType("TXTBK");\n'
         l_plato_code +=  f'    l_republic_books->linkTo(l_book[{l_book_num - 1}], "OWNS_");\n\n'
 
     l_plato_code += (f'    // creation of Republic sections node\n' +
@@ -737,19 +742,23 @@ if __name__ == '__main__':
                      f'        "Versions");\n')
     l_plato_code +=   '    l_republic_versions->setType("FOLDR");\n'
     l_plato_code +=   '    l_republic->linkTo(l_republic_versions, "OWNS_");\n\n'
+
     l_plato_code +=   '    M1Store::Item_lv2* l_cur_occ;\n'
     l_plato_code +=   '    M1Store::Item_lv2* l_cur_ver_occ = nullptr;\n'
+    l_plato_code +=   '    M1Store::Item_lv2* l_cur_book_sentence = nullptr;\n'
+    l_plato_code +=   '    M1Store::Item_lv2* l_cur_sentence_occ = nullptr;\n'
+    l_plato_code +=   '    M1Store::Item_lv2* l_cur_sentence = nullptr;\n'
     for l_version in l_republic['Versions'].keys():
         l_mnemo_ver = f'RV{re.sub("[aeiou]", "", l_version).upper()}'[:5]
         l_plato_code += (f'    // creation of Republic version {l_version} node\n' +
                          f'    qCDebug(g_cat_silence) << QString("Creating Republic version {l_version} node");\n' +
                          f'    M1Store::Item_lv2* l_version_{l_version.lower()} = M1Store::Item_lv2::getNew(\n' +
                          f'        // vertex flags\n' +
-                         f'        M1Env::FULL_VERTEX,\n' +
+                         f'        M1Env::FULL_VERTEX  | M1Env::IS_SPECIAL,\n' +
                          f'        // label\n' +
                          f'        "{l_version} (version)",\n' +
                          f'        // Special Item flags\n' +
-                         f'        SI_IS_TYPE,\n' +
+                         f'        SI_IS_TYPE  | M1Env::SI_REQUIRES_EDGE,\n' +
                          f'        // mnemonic\n' +
                          f'        "{l_mnemo_ver}",\n' +
                          f'        // icon path\n' +
@@ -759,18 +768,61 @@ if __name__ == '__main__':
         l_plato_code +=  f'    l_republic_versions->linkTo(l_version_{l_version.lower()}, "OWNS_");\n\n'
 
         l_plato_code += '    l_cur_ver_occ = nullptr;\n'
+        # l_plato_code += '    l_cur_book_sentence = nullptr;\n'
+        l_plato_code += '    l_cur_sentence_occ = nullptr;\n'
+        l_plato_code += '    l_cur_sentence = nullptr;\n'
+
+        l_cur_bknum = 0
+        l_cur_sent = 0
         for l_occ_key in l_republic['Versions'][l_version].keys():
             l_occ = l_republic['Versions'][l_version][l_occ_key]
-            for l_form_key in l_occ['FormKey']:
-                l_plato_code += (f'    // creation of Republic occurrence {l_occ_key} node\n' +
-                                 f'    qCDebug(g_cat_silence) << QString("Creating Republic occurrence {l_occ_key} node");\n' +
-                                 f'    l_cur_occ = l_republic->linkTo(l_republic_versions, "OCCUR");\n')
-                l_plato_code +=  f'    l_cur_occ->setText("{l_occ_key[:15]}");\n'
-                l_plato_code +=  f'    l_cur_occ->setType("{l_mnemo_ver}");\n'
-                # setTarget
-                l_form_id = l_form_key_2_id[l_form_key]
-                l_plato_code += f'    l_cur_occ->setTarget(l_form_array[{l_form_id}]->item_id());\n'
-                l_plato_code += f'    l_cur_ver_occ = l_version_{l_version.lower()}->linkTo(l_cur_occ, "OWNS_", l_cur_ver_occ, false);\n\n'
+            l_form_key = l_occ['FormKey']
+            l_form_id = l_form_key_2_id[l_form_key]
+            l_plato_code += (f'    // creation of Republic occurrence {l_occ_key} node\n' +
+                             f'    qCDebug(g_cat_silence) << QString("Creating Republic occurrence {l_occ_key} node");\n' +
+                             f'    l_cur_occ = l_republic->linkTo(l_form_array[{l_form_id}]->item_id(), "OCCUR");\n')
+            l_plato_code +=  f'    l_cur_occ->setText("{l_occ_key[:15]}");\n'
+            l_plato_code +=  f'    l_cur_occ->setType("{l_mnemo_ver}");\n'
+            # setTarget
+            # l_plato_code += f'    l_cur_occ->setTarget(l_form_array[{l_form_id}]->item_id());\n'
+            l_occ_text = l_occ['Text']
+            if re.search('[A-Z]', l_occ_text):
+                l_plato_code +=  f'    l_cur_occ->setField("true", false, M1Env::CAPTL_SIID);\n'
+            l_occ_pctl = l_occ['PunctLeft']
+            if len(l_occ_pctl) > 0:
+                l_plato_code += f'    l_cur_occ->setField("{l_occ_pctl}", false, M1Env::PCTLF_SIID);\n'
+            l_occ_pctr = l_occ['PunctRight']
+            if len(l_occ_pctr) > 0:
+                l_plato_code += f'    l_cur_occ->setField("{l_occ_pctr}", false, M1Env::PCTRT_SIID);\n'
+            l_occ_section = l_occ['NewSection']
+            if len(l_occ_section) > 0:
+                l_plato_code += f'    l_stephanus_array[{l_stephanus_2_id[l_occ_section]}]->linkTo(l_cur_occ, "OWNS_");\n'
+
+            l_occ_bknum = int(l_occ['BookNumber'])
+            if l_occ_bknum > 0:
+                l_cur_bknum = l_occ_bknum
+            l_occ_spos = l_occ['SentencePos']
+            if len(l_occ_spos) > 0:
+                l_plato_code += f'    l_cur_occ->setField("{l_occ_spos}", false, M1Env::STPOS_SIID);\n'
+            if l_occ_spos == 'SS':
+                l_sentence_name = f'{l_version} - Sentence {l_cur_sent + 1}'
+                l_cur_sent += 1
+                l_plato_code += (f'    // creation of Republic sentence <{l_sentence_name}> node\n' +
+                                 f'    qCDebug(g_cat_silence) << QString("Creating Republic sentence <{l_sentence_name}> node");\n' +
+                                 f'    l_cur_sentence = M1Store::Item_lv2::getNew(\n' +
+                                 f'        // vertex flags\n' +
+                                 f'        M1Env::FULL_VERTEX,\n' +
+                                 f'        // label\n' +
+                                 f'        "{l_sentence_name}");\n')
+                l_plato_code += f'    l_cur_sentence->setType("TXSNT");\n'
+                l_plato_code += f'    l_cur_sentence->setType("{l_mnemo_ver}");\n'
+                l_plato_code += f'    l_cur_book_sentence = l_book[{l_cur_bknum - 1}]->linkTo(l_cur_sentence, "OWNS_", l_cur_book_sentence, false);\n'
+                l_plato_code +=  '    l_cur_sentence_occ = nullptr;\n'
+
+            # l_plato_code += f'    l_cur_ver_occ = l_version_{l_version.lower()}->linkTo(l_cur_occ, "OWNS_", l_cur_ver_occ, false);\n'
+            l_plato_code += f'    l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);\n'
+
+            l_plato_code += "\n"
 
     with open('m1B_graph_init.cpp', 'w') as l_fout:
         l_fout.write(g_implementation_template

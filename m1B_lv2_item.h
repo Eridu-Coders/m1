@@ -105,6 +105,8 @@ class Item_lv2 : public Item_lv1 {
                       const bool p_force_new,
                       const SpecialItem* p_field_type_si,
                       const SpecialItem* p_field_extra_type_si = nullptr);
+        bool setField(const QString& p_content, const bool p_force_new, const SpecialItemID p_field_type_siid);
+
         QString getField(const SpecialItem* p_field_type_si, const SpecialItem* p_field_type2_si=nullptr, const bool p_all=false) const;
         QString getField(const SpecialItemID p_field_type_si_id, const bool p_all=false) const{
             return this->getField(M1Store::Storage::getSpecialItemPointer(p_field_type_si_id), nullptr, p_all);
@@ -129,7 +131,7 @@ class Item_lv2 : public Item_lv1 {
         template <class V>
         Item_lv2* linkTo(ItemID p_target_id, const V, Item_lv2* p_edge_above = nullptr, const bool p_at_top = false) = delete; // C++11
 
-        Item_lv2* find_edge(const SpecialItemID p_type_edge, const SpecialItemID p_type_target) const;
+        Item_lv2* find_edge(const SpecialItemID p_type_edge, const SpecialItemID p_type_target, bool p_special = false) const;
         // Item_lv2* find_edge(const char* p_mnemonic) const;
         Item_lv2* find_edge_edge(const SpecialItemID p_type) const;
         Item_lv2* find_edge_target(const SpecialItemID p_type) const;
