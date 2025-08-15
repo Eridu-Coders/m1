@@ -12,8 +12,8 @@ g_lemma_dict = dict()       # lemmas. Key = <lemma>‣POS, with POS = pos_ for S
 g_entities_dict = dict()    # named entities. Key = 'LOC', 'NORP' or 'PERSON'
 g_notes_dict = dict()       # notes (from Shorey). Key = SHR-nnn, same as occurrence key of same toke
 
-# g_section_selection = ['476c', '476d', '476e', '477a', '477b', '477c', '477d', '477e']
-g_section_selection = ['476c', '476d', '476e']
+g_section_selection = ['476c', '476d', '476e', '477a', '477b', '477c', '477d', '477e']
+# g_section_selection = ['476c', '476d', '476e']
 
 # ------------- main() -------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
@@ -76,7 +76,7 @@ if __name__ == '__main__':
         'Sections': g_section_selection,
         'Notes': dict([(l_note_key, g_notes_dict[l_note_key]) for l_note_key in g_notes_dict if l_note_key in l_key_set]),
         'Forms': dict([(l_form_key, g_form_dict[l_form_key]) for l_form_key in l_form_key_list]),
-        'Lemmas': dict([(l_lemma_key, g_lemma_dict[l_lemma_key]) for l_lemma_key in l_lemma_key_list]),
+        'Lemmas': dict([(l_lemma_key, g_lemma_dict[l_lemma_key]) for l_lemma_key in sorted(l_lemma_key_list)]),
         'Versions': {
             'Shorey': l_shorey_occ,
             'Jowett': l_jowett_occ,
@@ -85,4 +85,4 @@ if __name__ == '__main__':
     }
 
     with open('republic.json', 'w') as f:
-        json.dump(l_republic, f, indent=4, ensure_ascii=False)
+        json.dump(l_republic, f, indent=4, ensure_ascii=False, sort_keys=True)

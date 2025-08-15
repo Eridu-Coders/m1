@@ -8,8 +8,13 @@
 #include <stack>
 #include <exception>
 
+#ifndef QT_NO_DEBUG_OUTPUT
 #define M1_FUNC_ENTRY(a, b) M1Env::M1EnvStatic::entry(a, b, __FILE__, __LINE__, __PRETTY_FUNCTION__, __FUNCTION__);
 #define M1_FUNC_EXIT M1Env::M1EnvStatic::exit(__FILE__, __LINE__, __PRETTY_FUNCTION__, __FUNCTION__);
+#else
+#define M1_FUNC_ENTRY(a, b)
+#define M1_FUNC_EXIT
+#endif
 
 namespace M1Env{
 

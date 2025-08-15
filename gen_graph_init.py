@@ -547,7 +547,7 @@ if __name__ == '__main__':
             l_base_code += f'    // {l_comment}\n    M1Store::Storage::getNewSpecialNoItem({l_flags}, "{l_mnemo}", {l_icon_path});\n'
 
     l_base_code += '\n'
-    l_memo_2_var = dict()
+    l_mnemo_2_var = dict()
     for l_label, l_vertex_flag_list, l_type_list, l_edges, l_mnemo, l_si_flag_list, l_icon_path, l_pseudo_constant in g_vertices:
         l_var_name = 'l_' + l_mnemo.replace('_', '').lower()
         l_vertex_flag_string = ' | '.join([f'M1Env::{l_flag}' for l_flag in l_vertex_flag_list])
@@ -563,7 +563,7 @@ if __name__ == '__main__':
             l_base_code += ');\n'
         else:
             l_base_code += ',\n'
-            l_memo_2_var[l_mnemo] = l_var_name
+            l_mnemo_2_var[l_mnemo] = l_var_name
             l_si_flag_string = '0' if l_si_flag_list == '0' else ' | '.join([f'M1Env::{l_flag}' for l_flag in l_si_flag_list])
             l_icon_path = f'M1Env::{l_icon_path}' if l_icon_path else 'nullptr'
             l_base_code += (
@@ -578,7 +578,7 @@ if __name__ == '__main__':
             l_base_code += f'    {l_var_name}->setType("{l_type_mnemo}");\n'
         if l_edges:
             for l_edge_type, l_dest_mnemo in l_edges:
-                l_base_code += f'    {l_var_name}->linkTo({l_memo_2_var[l_dest_mnemo]}, "{l_edge_type}", nullptr, true);\n'
+                l_base_code += f'    {l_var_name}->linkTo({l_mnemo_2_var[l_dest_mnemo]}, "{l_edge_type}", nullptr, true);\n'
         l_base_code += '\n'
 
     # Plato ------------------------------------------------------------------------------------------------------------
@@ -610,7 +610,7 @@ if __name__ == '__main__':
                      f'        M1Env::FULL_VERTEX,\n' +
                      f'        // label\n' +
                      f'        "Plato, son of Ariston of Collytus");\n')
-    l_plato_code +=   '    l_plato->setType("PERSN");\n\n'
+    l_plato_code +=   '    l_plato->setType("PERSN");\n'
     l_plato_code +=   '    l_republic->linkTo(l_plato, "WRTBY");\n\n'
 
     # Notes
@@ -621,7 +621,7 @@ if __name__ == '__main__':
                      f'        M1Env::FULL_VERTEX,\n' +
                      f'        // label\n' +
                      f'        "Notes");\n')
-    l_plato_code +=   '    l_republic_notes->setType("FOLDR");\n\n'
+    l_plato_code +=   '    l_republic_notes->setType("FOLDR");\n'
     # l_plato_code +=   '    l_republic_notes->linkTo(l_republic, "BLNGS");\n\n'
     l_plato_code += '    l_republic->linkTo(l_republic_notes, "OWNS_");\n\n'
 
@@ -644,7 +644,7 @@ if __name__ == '__main__':
     l_plato_code += f'    M1Store::Item_lv2* l_lemma_array[{len(l_republic["Lemmas"])}];\n'
     l_lemma_id = 0
     l_lemma_key_2_id = dict()
-    for l_lemma_key in l_republic["Lemmas"]:
+    for l_lemma_key in sorted(l_republic["Lemmas"].keys(), reverse=True):
         l_lemma_key_2_id[l_lemma_key] = l_lemma_id
         l_lemma_txt = l_republic["Lemmas"][l_lemma_key]['Text']
         l_lemma_pos = l_republic["Lemmas"][l_lemma_key]['Pos']
@@ -774,7 +774,7 @@ if __name__ == '__main__':
 
         l_cur_bknum = 0
         l_cur_sent = 0
-        for l_occ_key in l_republic['Versions'][l_version].keys():
+        for l_occ_key in sorted(l_republic['Versions'][l_version].keys()):
             l_occ = l_republic['Versions'][l_version][l_occ_key]
             l_form_key = l_occ['FormKey']
             l_form_id = l_form_key_2_id[l_form_key]
@@ -783,6 +783,7 @@ if __name__ == '__main__':
                              f'    l_cur_occ = l_republic->linkTo(l_form_array[{l_form_id}]->item_id(), "OCCUR");\n')
             l_plato_code +=  f'    l_cur_occ->setText("{l_occ_key[:15]}");\n'
             l_plato_code +=  f'    l_cur_occ->setType("{l_mnemo_ver}");\n'
+            l_plato_code +=  f'    l_form_array[{l_form_id}]->linkTo(l_cur_occ, "OWNS_");\n'
             # setTarget
             # l_plato_code += f'    l_cur_occ->setTarget(l_form_array[{l_form_id}]->item_id());\n'
             l_occ_text = l_occ['Text']

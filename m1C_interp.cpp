@@ -14,21 +14,6 @@ Q_LOGGING_CATEGORY(g_cat_interp_base, "interp.base")
 QIcon M1MidPlane::Interp::cm_open;
 QIcon M1MidPlane::Interp::cm_closed;
 
-/*
-M1MidPlane::InterpStaticConstructor M1MidPlane::Interp::cm_the_init;
-
-M1MidPlane::InterpStaticConstructor::InterpStaticConstructor(){
-    printf("M1MidPlane::InterpStaticConstructor::InterpStaticConstructor()\n");
-    M1MidPlane::Interp::cm_open = QIcon("../Icons/Open-inv.svg");
-    M1MidPlane::Interp::cm_closed = QIcon("../Icons/Closed-inv.svg");
-}
-*/
-
-/*
-extern M1Env::SpecialItemID TEXT_WFW_PRABUPADA_SIID;     // subtype of TEXT_WFW_TRANSL_SIID
-extern M1Env::SpecialItemID TEXT_WFW_SIVANANDA_SIID;     // subtype of TEXT_WFW_TRANSL_SIID
-extern M1Env::SpecialItemID TEXT_WFW_GAMBIRANANDA_SIID;  // subtype of TEXT_WFW_TRANSL_SIID
-*/
 
 // ------------------------------------ Interp Base Class -----------------------------------------------------
 void M1MidPlane::Interp::init(){
@@ -38,12 +23,6 @@ void M1MidPlane::Interp::init(){
     cm_closed = QIcon("../Icons/Closed.svg");
     Q_ASSERT_X( !cm_closed.isNull(), "Interp::init()", "Closed link Icon failed to load");
 
-    /*
-    if(M1Store::Storage::menmonic_exists("SIVAN")){
-        TEXT_WFW_PRABUPADA_SIID = M1Store::Storage::getSpecialID("SIVAN");
-        TEXT_WFW_SIVANANDA_SIID = M1Store::Storage::getSpecialID("PRABH");
-        TEXT_WFW_GAMBIRANANDA_SIID = M1Store::Storage::getSpecialID("GAMBI");
-    }*/
     M1_FUNC_EXIT
 }
 
@@ -139,7 +118,7 @@ void M1MidPlane::Interp::mouseDoubleClickEvent(QMouseEvent *p_event){
 }
 
 QString base_html_fragment(M1Store::Item_lv2* p_myself){
-    M1_FUNC_ENTRY(g_cat_interp_base, QString("base_html_fragment").arg(p_myself->getTarget_lv2()->text()))
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("base_html_fragment: %1").arg(p_myself->getTarget_lv2()->text()))
     QStringList l_edge_list;
     l_edge_list.append(QString("<tr><td>ID</td><td>:</td><td>%1</td></tr>\n").arg(p_myself->item_id()));
     l_edge_list.append(QString("<tr><td>Type</td><td>:</td><td>%1</td></tr>\n").arg(p_myself->dbgTypeShort()));
@@ -166,12 +145,32 @@ QString M1MidPlane::Interp::getHtml(){
     return QString("<html>\n<Head></Head>\n<body>\n%1</body>\n</html>\n").arg(base_html_fragment(m_myself));
 }
 
+#include <QGraphicsSimpleTextItem>
+#include <QGraphicsView>
+
+QWidget *M1MidPlane::Interp::get_edit_widget(){
+    qCDebug(g_cat_td_signals) << "Emitting <emitEdit> for" << m_myself->text();
+    qCDebug(g_cat_td_signals) << QString("text: %1").arg(m_myself->dbgShort());
+
+    QGraphicsScene* l_scene = new QGraphicsScene();
+
+    QGraphicsSimpleTextItem* l_item = new QGraphicsSimpleTextItem(QString(m_myself->dbgShort()));
+    static QFont f("Noto Mono", 12);
+    l_item->setFont(f);
+    l_scene->addItem(l_item);
+    l_scene->setBackgroundBrush(Qt::white);
+
+    return new QGraphicsView(l_scene);
+}
+
 void M1MidPlane::Interp::focusInEvent(QFocusEvent *p_event){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Interp::focusInEvent()"))
     qCDebug(g_cat_tree_display) << m_myself->dbgShort() << " focus in: " << p_event->reason();
     qCDebug(g_cat_tree_display) << m_myself->dbgShort() << " Background color: " << this->palette().color(QPalette::Window);
-    QString l_html = getHtml();
-    emit emitHtml(l_html);
+
+    emit emitHtml(getHtml());
+    emit emitEdit(get_edit_widget());
+
     this->setAutoFillBackground(true);
     this->repaint();
     M1_FUNC_EXIT
@@ -308,22 +307,6 @@ QString M1MidPlane::TranslUnit::displayText(){
         .arg(m_myself->getTarget_lv2()->text())
         .arg(m_myself->getTarget_lv2()->getField(M1Store::TEXT_WFW_TRANSL_SIID, true));
 }
-/*
-void M1MidPlane::TranslUnit::paintEvent(QPaintEvent* p_event){
-    M1_FUNC_ENTRY(g_cat_interp_base, QString("TranslUnit painting"))
-    QPainter p(this);
-    QString l_text = QString("%1 [%2]")
-                         .arg(m_myself->getTarget_lv2()->text())
-                         .arg(m_myself->getTarget_lv2()->getField(M1Store::TEXT_WFW_TRANSL_SIID, true));
-    M1Store::Storage::getQIcon(m_myself->getIconTypeMember())->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
-    paintOC(p);
-    M1Store::Storage::getQIcon(m_myself->getTarget_lv2()->getIconTypeMember())->paint(
-        &p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
-    p.setPen(Qt::white);
-    p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), l_text);
-    M1_FUNC_EXIT
-}
-*/
 QString M1MidPlane::TranslUnit::getHtml(){
     return g_html_template.arg(tu_html_fragment(m_myself->getTarget_lv2()));
 }
@@ -345,11 +328,6 @@ QString M1MidPlane::SectionBeginEnd::displayText(){
 void M1MidPlane::SectionBeginEnd::paintEvent(QPaintEvent* p_event){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("TranslUnit painting"))
     QPainter p(this);
-    /*
-    QString l_text = QString("%1 [%2]")
-                         .arg(m_myself->getTarget_lv2()->getTarget_lv2()->text())
-                         .arg(m_myself->getTarget_lv2()->getTarget_lv2()->getField(M1Store::TEXT_WORD_TRANSLIT_SIID));;
-    */
     M1Store::Storage::getQIcon(m_myself->getIconTypeMember())->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
     paintOC(p);
     M1Store::Storage::getQIcon(m_myself->getTarget_lv2()->getTarget_lv2()->getIconTypeMember())->paint(
@@ -368,26 +346,11 @@ QString M1MidPlane::UrlInterp::getHtml(){
 M1MidPlane::UrlInterp::UrlInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth) : Interp(p_myself, p_parent, p_depth){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("UrlInterp Constructor from: %1").arg(p_myself->dbgShort()))
 
-    // m_label = QString(m_myself->getTarget_lv2()->text()).split("##")[0];
-    // m_url = QString(m_myself->getTarget_lv2()->text()).split("##")[1];
     m_label = m_myself->getTarget_lv2()->text();
     m_url = m_myself->getTarget_lv2()->getField(M1Env::TEXT_URL_LINK_SIID);
     M1_FUNC_EXIT
 }
-/*
-void M1MidPlane::UrlInterp::paintEvent(QPaintEvent* p_event){
-    M1_FUNC_ENTRY(g_cat_interp_base, QString("SectionInterp painting"))
-    QPainter p(this);
-    QString l_text = m_label;
-    M1Store::Storage::getQIcon(m_myself->getIconTypeMember())->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
-    paintOC(p);
-    M1Store::Storage::getQIcon(m_myself->getTarget_lv2()->getIconTypeMember())->paint(
-        &p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
-    p.setPen(Qt::white);
-    p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), l_text);
-    M1_FUNC_EXIT
-}
-*/
+
 //------------------------------------ BhashyaTranslation -----------------------------------------------------
 QString bt_html_fragment(M1Store::Item_lv2* p_bt){
     M1Store::Item_lv2* l_author_edge = p_bt->find_edge_edge(M1Store::TEXT_WRITTEN_BY_SIID);
@@ -454,11 +417,11 @@ M1MidPlane::SectionInterp::SectionInterp(M1Store::Item_lv2* p_myself, QWidget* p
 }
 
 //------------------------------------ SentenceInterp -----------------------------------------------------
-QString toText(M1Store::Item_lv2* p_myself){
-    QString l_text(p_myself->getTarget_lv2()->text());
-    if(p_myself->getField(M1Store::CAPTL_SIID) == "true")
+QString toText(M1Store::Item_lv2* p_occur_edge){
+    QString l_text(p_occur_edge->getTarget_lv2()->text());
+    if(p_occur_edge->getField(M1Store::CAPTL_SIID) == "true")
         l_text.front() = l_text.front().toUpper();
-    return p_myself->getField(M1Store::PCTLF_SIID) + l_text + p_myself->getField(M1Store::PCTRT_SIID);
+    return p_occur_edge->getField(M1Store::PCTLF_SIID) + l_text + p_occur_edge->getField(M1Store::PCTRT_SIID);
 }
 QString st_html_fragment(M1Store::Item_lv2* p_si){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("p_si: %1").arg(p_si->text()))
@@ -468,7 +431,7 @@ QString st_html_fragment(M1Store::Item_lv2* p_si){
             QString l_text = toText(it.at()->getTarget_lv2());
             qCDebug(g_cat_interp_base) << "l_text" << l_text << it.at()->getTarget_lv2()->dbgShort();
             if(M1Store::Item_lv2* l_section = it.at()->getTarget_lv2()->find_edge(M1Env::BLNGS_SIID, M1Env::STEPHANUS_SIID); l_section != nullptr){
-                l_word_list.append(QString("<span style=\"font-size: smaller; color: maroon;\">%1</span> %2")
+                l_word_list.append(QString("<span style=\"font-size: smaller; color: maroon; font-weight: bold;\">%1</span> %2")
                                        .arg(l_section->getTarget_lv2()->text())
                                        .arg(l_text));
             }
@@ -476,8 +439,6 @@ QString st_html_fragment(M1Store::Item_lv2* p_si){
                 l_word_list.append(l_text);
             }
         }
-        //if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::STEPHANUS_SIID))
-        //    l_word_list.append(toText(it.at()->getTarget_lv2()));
     }
     M1_FUNC_EXIT
     return QString("<p>%1</p>").arg(l_word_list.join(" "));
@@ -498,6 +459,192 @@ QString M1MidPlane::SentenceInterp::getHtml(){
     l_html += base_html_fragment(m_myself);
     M1_FUNC_EXIT
     return g_html_template.arg(l_html);
+}
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#include <QGraphicsLinearLayout>
+#include <QGraphicsWidget>
+#include <QTextEdit>
+#include <QGraphicsProxyWidget>
+#include <QVBoxLayout>
+#include <QPushButton>
+
+namespace M1UI{
+// QGraphicsLayoutItem
+class WordItem: public QGraphicsLayoutItem, public QGraphicsSimpleTextItem{
+public:
+    WordItem(const QString& p_txt): QGraphicsSimpleTextItem(p_txt), QGraphicsLayoutItem(){}
+protected:
+    virtual QSizeF sizeHint(Qt::SizeHint p_which, const QSizeF &p_constraint) const {
+        qCDebug(g_cat_td_signals) << QString("WordItem::sizeHint") << p_which << this->text();
+        qCDebug(g_cat_td_signals) << QString("WordItem boundingRect") << QGraphicsSimpleTextItem::boundingRect();
+        return QGraphicsSimpleTextItem::boundingRect().size();
+    }
+    virtual void setGeometry(const QRectF &p_rect){
+        QGraphicsLayoutItem::setGeometry(p_rect);
+        QGraphicsSimpleTextItem::setPos(p_rect.topLeft());
+        qCDebug(g_cat_td_signals) << QString("WordItem::setGeometry") << p_rect << this->text();
+    }
+    virtual void paint(QPainter *p_painter,
+                       const QStyleOptionGraphicsItem *p_option,
+                       QWidget *p_widget){
+        QGraphicsSimpleTextItem::paint(p_painter, p_option, p_widget);
+        p_painter->drawRect(boundingRect());
+    }
+};
+
+class StephanusItem: public WordItem{
+public:
+    StephanusItem(const QString& p_txt): WordItem(p_txt){}
+protected:
+    virtual void paint(QPainter *p_painter,
+                       const QStyleOptionGraphicsItem *p_option,
+                       QWidget *p_widget){
+
+        WordItem::paint(p_painter, p_option, p_widget);
+        p_painter->setPen(Qt::red);
+        p_painter->drawRect(boundingRect());
+    }
+};
+
+class WordForm: public QGraphicsWidget{
+public:
+    WordForm(QGraphicsItem *p_parent=nullptr): QGraphicsWidget(p_parent){}
+protected:
+    virtual void paint(QPainter *p_painter,
+                       const QStyleOptionGraphicsItem *p_option,
+                       QWidget *p_widget){
+        p_painter->setPen(Qt::green);
+        p_painter->drawRect(boundingRect());
+    }
+    virtual QVariant itemChange(GraphicsItemChange p_change, const QVariant &p_value){
+        // qCDebug(g_cat_td_signals) << QString("WordForm Change:") << p_change << p_value;
+
+        if(p_change == QGraphicsItem::GraphicsItemChange::ItemVisibleChange){
+            prepareGeometryChange();
+            qCDebug(g_cat_td_signals) << QString("WordForm sceneRect:") << scene()->sceneRect();
+            setPos(scene()->sceneRect().topLeft());
+        }
+
+        return QGraphicsItem::itemChange(p_change, p_value);
+    }
+    virtual void setGeometry(const QRectF &p_rect){
+        // qCDebug(g_cat_td_signals) << QString("WordForm setGeometry:") << p_rect;
+        QGraphicsWidget::setGeometry(p_rect);
+    }
+    virtual bool sceneEvent(QEvent *p_event){
+        // qCDebug(g_cat_td_signals) << QString("WordForm sceneEvent:") << p_event;
+        return QGraphicsWidget::sceneEvent(p_event);
+    }
+};
+
+class Scene: public QGraphicsScene{
+public:
+    Scene():QGraphicsScene(){}
+protected:
+    virtual bool event(QEvent *p_event){
+        // qCDebug(g_cat_td_signals) << QString("Scene event:") << p_event;
+        return QGraphicsScene::event(p_event);
+    }
+};
+
+class View: public QGraphicsView{
+public:
+    View(QGraphicsScene *p_scene):QGraphicsView(p_scene){}
+protected:
+    virtual bool event(QEvent *p_event){
+        // qCDebug(g_cat_td_signals) << QString("View event:") << p_event;
+        return QGraphicsView::event(p_event);
+    }
+    virtual void resizeEvent(QResizeEvent *p_event){
+        qCDebug(g_cat_td_signals) << QString("View resizeEvent:") << p_event->size();
+        scene()->setSceneRect(QRect(QPoint(0, 0), p_event->size()));
+        QGraphicsView::resizeEvent(p_event);
+    }
+};
+
+}
+
+QWidget *M1MidPlane::SentenceInterp::get_edit_widget(){
+    /*
+    QGraphicsWidget *l_form = new QGraphicsWidget();
+    QGraphicsLinearLayout* l_layout = new QGraphicsLinearLayout(Qt::Orientation::Vertical, l_form);
+
+    QTextEdit *l_text_edit_1 = new QTextEdit();
+    l_text_edit_1->setText(m_myself->dbgShort());
+    QTextEdit *l_text_edit_2 = new QTextEdit();
+    l_text_edit_2->setText(m_myself->getTarget_lv2()->dbgShort());
+
+    QGraphicsProxyWidget *l_text_edit_proxy_1 = new QGraphicsProxyWidget(l_form);
+    l_text_edit_proxy_1->setWidget(l_text_edit_1);
+    QGraphicsProxyWidget *l_text_edit_proxy_2 = new QGraphicsProxyWidget(l_form);
+    l_text_edit_proxy_2->setWidget(l_text_edit_2);
+
+    l_text_edit_proxy_1->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding));
+    l_text_edit_proxy_2->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding));
+
+    l_layout->addItem(l_text_edit_proxy_1);
+    l_layout->addItem(l_text_edit_proxy_2);
+    */
+    QWidget* l_form = new QWidget();
+    QVBoxLayout* l_form_layout = new QVBoxLayout();
+    l_form->setLayout(l_form_layout);
+
+    QWidget* l_button_bar = new QWidget(l_form);
+    l_form_layout->addWidget(l_button_bar);
+    QHBoxLayout* l_bar_layout = new QHBoxLayout();
+    l_button_bar->setLayout(l_bar_layout);
+
+    QPushButton* l_btn1 = new QPushButton("Button 1", l_button_bar);
+    QPushButton* l_btn2 = new QPushButton("Button 2", l_button_bar);
+
+    qCDebug(g_cat_td_signals) << QString("l_btn1 sizePolicy") << l_btn1->sizePolicy();
+    qCDebug(g_cat_td_signals) << QString("l_btn1 sizeHint") << l_btn1->sizeHint();
+
+    //l_btn1->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
+    l_bar_layout->addWidget(l_btn1);
+    l_bar_layout->addWidget(l_btn2);
+    l_bar_layout->addStretch(1);
+
+    M1UI::Scene* l_scene = new M1UI::Scene();
+    l_scene->setBackgroundBrush(Qt::white);
+
+    M1UI::WordForm *l_form_item = new M1UI::WordForm();
+    QGraphicsLinearLayout* l_layout = new QGraphicsLinearLayout(Qt::Orientation::Vertical, l_form_item);
+    l_form_item->setLayout(l_layout);
+
+    static QFont f("Noto Mono", 12);
+    /*
+    M1UI::WordItem* l_item_1 = new M1UI::WordItem(QString(m_myself->dbgShort()));
+    M1UI::WordItem* l_item_2 = new M1UI::WordItem(QString(m_myself->getTarget_lv2()->dbgShort()));
+    l_item_1->setFont(f);
+    l_item_2->setFont(f);
+    l_scene->addItem(l_item_1);
+    l_scene->addItem(l_item_2);
+    l_layout->addItem(l_item_1);
+    l_layout->addItem(l_item_2);
+    */
+    for(M1Store::Item_lv2_iterator it = m_myself->getTarget_lv2()->getIteratorTop(); !it.beyondEnd(); it.next())
+        if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::OCCUR_SIID)){
+            QString l_text = toText(it.at()->getTarget_lv2());
+            qCDebug(g_cat_td_signals) << QString("Adding word") << l_text;
+            if(M1Store::Item_lv2* l_section = it.at()->getTarget_lv2()->find_edge(M1Env::BLNGS_SIID, M1Env::STEPHANUS_SIID); l_section != nullptr){
+                //StephanusItem
+                M1UI::StephanusItem* l_steph_number_item = new M1UI::StephanusItem(l_section->getTarget_lv2()->text());
+                l_steph_number_item->setFont(f);
+                l_scene->addItem(l_steph_number_item);
+                l_layout->addItem(l_steph_number_item);
+            }
+            M1UI::WordItem* l_item = new M1UI::WordItem(l_text);
+            l_item->setFont(f);
+            l_scene->addItem(l_item);
+            l_layout->addItem(l_item);
+        }
+    l_scene->addItem(l_form_item);
+    M1UI::View* l_view = new M1UI::View(l_scene);
+    l_form_layout->addWidget(l_view);
+    // l_form_layout->addStretch(1);
+
+    return l_form;
 }
 
 //------------------------------------ BookInterp -----------------------------------------------------

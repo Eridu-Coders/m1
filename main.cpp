@@ -71,6 +71,8 @@ int main(int argc, char *argv[])
                                         "lv0.*=false\n"
                                         "lv1.*=false\n"
                                         "lv2.*=false\n"
+                                        "interp.*=false\n"
+                                        "tree_display=false\n"
                                         "qt.*.debug=false");
 
     M1MidPlane::Interp::init();
@@ -80,7 +82,7 @@ int main(int argc, char *argv[])
     if(l_program_options_vm.count("load-plato")) M1Store::GraphInit::init_plato();
 
     QApplication a(argc, argv);
-    MainWindow w;
+    M1UI::MainWindow w;
     w.show();
     int l_ret = a.exec();
 

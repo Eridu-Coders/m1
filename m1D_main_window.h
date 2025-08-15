@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtCore/QVariant>
+#include <QVariant>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
@@ -9,35 +9,28 @@
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QSplitter>
 #include <QWebEngineView>
+#include <QTabWidget>
 
-#include "m1D_tree_display.h"
 
-class MainWindow;
-
-class Ui_MainWindow
-{
-public:
-    QSplitter *centralwidget;
-    QMenuBar *menubar;
-    QStatusBar *statusbar;
-
-    Ui_MainWindow(){}
-
-    M1UI::TreeDisplay* setupUi(MainWindow *MainWindow);
-    void retranslateUi(QMainWindow *MainWindow);
-};
+namespace M1UI{
 
 class MainWindow: public QMainWindow {
     Q_OBJECT
-    friend class Ui_MainWindow;
 private:
-    Ui_MainWindow* m_ui;
-    QWebEngineView* m_view;
+    QWebEngineView* m_web_view;
+    QSplitter *m_central_widget;
+    QMenuBar *m_menubar;
+    QStatusBar *m_statusbar;
+
+    QTabWidget *m_tab_widget;
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(QWidget *p_parent = nullptr);
     ~MainWindow();
 public slots:
     void htmlReceive(const QString& p_html);
+    void editReceive(QWidget *p_edit_widget);
 };
+
+}
 
 #endif // MAINWINDOW_H

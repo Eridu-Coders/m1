@@ -61,6 +61,8 @@ g_tag_to_form = dict()
 g_sections_set = set()
 g_notes_list = []
 g_dashes_remaining = []
+g_sent_pos = dict()
+g_sent_pos_2 = dict()
 
 # output collections
 g_occurences = dict()       # word occurrences. Key = XXX-nnn, with XXX = 'SHR' (Shorey), 'JWT' (Jowett) or 'GRC' (Greek)
@@ -413,6 +415,7 @@ def process_cursor_list_en(p_cursor_list, p_txt_key, p_phase_ii=True):
     global g_sections_set
     global g_notes_list
     global g_dashes_remaining
+    global g_sent_pos
 
     print(f'[{p_txt_key}] English Cursor length: {len(p_cursor_list)}', file=sys.stderr)
 
@@ -1089,12 +1092,25 @@ def process_cursor_list_en(p_cursor_list, p_txt_key, p_phase_ii=True):
         g_lemma_form_dict.setdefault(l_lemma_key, set()).add(l_form_key)
         # print the table row for the current token
         print(
-            f'{l_prefix_section}{l_current_section:4} | {l_form_txt:22} | {l_new_pos:10} | {l_tag:8} | {l_lemma_txt:20} | {t.dep_:10} | {l_father:15} | {t.i:6} | ' +
+            f'{l_prefix_section}{l_current_section:4} | {l_txt_cap:22} | {l_new_pos:10} | {l_tag:8} | {l_lemma_txt:20} | {t.dep_:10} | {l_father:15} | {t.i:6} | ' +
             f'{l_is_sent_end:5} | {l_is_sent_start:5} | {t.ent_type_:8} | {str(l_notes)[:40]:40} | {l_grammar_dict} {l_tok_key}')
+
+        l_sentence_pos = ('SX' if t.is_sent_start and t.is_sent_end else
+                          ('SS' if t.is_sent_start else
+                           ('SE' if t.is_sent_end else '')))
+        if len(l_sentence_pos) > 0:
+            l_sp_key = f'{l_txt_cap}/{l_tag}' if l_new_pos == 'PUNCT' else '<CAP>' if re.search('[A-Z]', l_txt_cap[:1]) else '<NCAP>'
+            g_sent_pos[l_sentence_pos][l_sp_key] = g_sent_pos.setdefault(l_sentence_pos, dict()).setdefault(l_sp_key, 0) + 1
+
+        # context width
+        l_idx_before = t.idx - 50
+        l_idx_before = 0 if l_idx_before < 0 else l_idx_before
+        l_context = f'{l_republic_txt[l_idx_before:t.idx]}|{l_republic_txt[t.idx:t.idx + len(l_txt_cap)]}|{l_republic_txt[t.idx + len(l_txt_cap):t.idx + 50]}'
 
         # store data for the current occurrence, form and lemma
         add_data(l_current_section, l_tok_key,
                  {
+                    'Context': l_context,
                     'Text': l_txt_cap,
                     'Pos': l_new_pos,
                     'Tag': l_tag,
@@ -1107,7 +1123,7 @@ def process_cursor_list_en(p_cursor_list, p_txt_key, p_phase_ii=True):
                     'MarkupBefore': l_markup_before,
                     'MarkupAfter': l_markup_after,
                     'NoteKey': l_tok_key if len(l_notes) > 0 else '',
-                    'SentencePos': ('SS' if t.is_sent_start else ('SE' if t.is_sent_end else ''))
+                    'SentencePos': l_sentence_pos
                  },
                  l_form_key, {'Text': l_form_txt, 'Tag': l_tag, 'LemmaKey': [l_lemma_key]},
                  l_lemma_key, {'Text': l_lemma_txt, 'Pos': l_new_pos, 'EntType': t.ent_type_}
@@ -1118,6 +1134,7 @@ def process_cursor_list_en(p_cursor_list, p_txt_key, p_phase_ii=True):
         l_punctuation_problems = ['‣_SP', '’‣PRP', "'‣PRP", "'‣VBP", '-‣JJ', '-‣NN', '-‣NNS',
                             '-‣SYM', '-‣VB', '-‣VBG', '.‣NN', '.‣NNP']
         l_anomaly_reason = ''
+        # l_anomaly_reason = 'SPOS' if len(l_sentence_pos) > 0 and
         l_anomaly_reason = 'NUMR' if re.search(r'\d+', l_form_txt) else l_anomaly_reason
         l_anomaly_reason = 'UNKN' if t.pos_ == 'X' and t.tag_ != 'FW' else l_anomaly_reason
         l_anomaly_reason = 'FRWD' if t.pos_ == 'X' and t.tag_ == 'FW' else l_anomaly_reason
@@ -1129,12 +1146,8 @@ def process_cursor_list_en(p_cursor_list, p_txt_key, p_phase_ii=True):
                 l_anomaly_reason = ''
                 # also store 'abnormal' (but somewhat normal bc same tag_) hyphenated words for further analysis
                 g_hyphens.append(
-                    f'{l_current_section} {l_tag_p:5} {t.tag_:5} {l_tag_n:5} {l_txt_p}{l_form_txt}{l_txt_n}/{l_lem_p}{l_lemma_txt}{l_lem_n}')
+                    f'{l_current_section} {l_tok_key} {l_tag_p:5} {t.tag_:5} {l_tag_n:5} {l_txt_p}{l_form_txt}{l_txt_n}/{l_lem_p}{l_lemma_txt}{l_lem_n}')
 
-        # context width
-        l_idx_before = t.idx - 50
-        l_idx_before = 0 if l_idx_before < 0 else l_idx_before
-        l_context = f'{l_republic_txt[l_idx_before:t.idx]}|{l_republic_txt[t.idx:t.idx + 50]}'
         # anomaly message generation and storage
         if len(l_anomaly_reason) > 0:
             # anno message
@@ -1184,6 +1197,9 @@ def group_punctuation(p_en=True):
     for l_tok_index in range(len(g_base_tokens)):
         l_tok_key, l_tok = g_base_tokens[l_tok_index]
         l_tok_form = l_tok['Text'].lower()
+        _, l_n_tok = g_base_tokens[l_tok_index + 1] if l_tok_index + 1 < len(g_base_tokens) - 1 else (None, None)
+        _, l_nn_tok = g_base_tokens[l_tok_index + 2] if l_tok_index + 2 < len(g_base_tokens) - 1 else (None, None)
+        _, l_nnn_tok = g_base_tokens[l_tok_index + 3] if l_tok_index + 3 < len(g_base_tokens) - 1 else (None, None)
 
         # preprocessing of words misidentified as punctuation
         if l_tok['Pos'] == 'PUNCT' and re.search(r'\w+', l_tok_form):
@@ -1242,7 +1258,68 @@ def group_punctuation(p_en=True):
             l_tok['FormKey'] = l_new_form_key
             g_anno.setdefault('PUNCT', []).append(f'Correction {l_tok_key} {l_tok_form:15} PUNCT --> {l_new_form_key}/{l_new_lemma_key}{l_new_data_added}')
 
-        if l_tok['Pos'] != 'PUNCT' and l_tok['Text'] != '-': # get punctuation on both side of non-punctuation token
+        # Sentence position anomalies
+        if l_tok_key[:5] in ['A-SHR', 'B-JWT']:
+            l_sentence_pos = l_tok['SentencePos']
+            l_context = l_tok['Context']
+            del l_tok['Context']
+            if len(l_sentence_pos) > 0:
+                l_txt_cap = l_tok['Text']
+                l_pos = l_tok['Pos']
+                l_tag = l_tok['Tag']
+
+                # SE - SX - SS correction
+                if (l_n_tok and l_nn_tok and
+                        l_sentence_pos == 'SE' and
+                        l_n_tok['SentencePos'] == 'SX' and
+                        l_nn_tok['SentencePos'] == 'SS'):
+                    l_sentence_pos = ''
+                    l_tok['SentencePos'] = ''
+                    g_base_tokens[l_tok_index + 1][1]['SentencePos'] = 'SE'
+
+                # SE - SX - SX - SS correction
+                if (l_n_tok and l_nn_tok and l_nnn_tok and
+                        l_sentence_pos == 'SE' and
+                        l_n_tok['SentencePos'] == 'SX' and
+                        l_nn_tok['SentencePos'] == 'SX' and
+                        l_nnn_tok['SentencePos'] == 'SS'):
+                    l_sentence_pos = ''
+                    l_tok['SentencePos'] = ''
+                    g_base_tokens[l_tok_index + 1][1]['SentencePos'] = ''
+                    g_base_tokens[l_tok_index + 2][1]['SentencePos'] = 'SE'
+
+                l_sp_key = f'{l_txt_cap}/{l_tag}' if l_pos == 'PUNCT' else '<CAP>' if re.search('[A-Z]', l_txt_cap[:1]) else '<NCAP>'
+
+                # SE - SS <NCAP> correction --> capitalize next word
+                if l_n_tok and l_sentence_pos == 'SE' and l_sp_key in ['./.', '”/\'\'', '?/.', '!/.', ':/:', ';/:', ';/.', '’/\'\''] and \
+                    l_n_tok['SentencePos'] == 'SS' and not re.search('[A-Z]', l_n_tok['Text'][:1]):
+                    g_base_tokens[l_tok_index + 1][1]['Text'] = l_n_tok['Text'][:1].upper() + l_n_tok['Text'][1:]
+
+                # SE - SS but no punctuation or comma/semicolon
+                if l_n_tok and l_sentence_pos == 'SE' and l_pos != 'PUNCT' and l_n_tok['SentencePos'] == 'SS' and (l_n_tok['Pos'] != 'PUNCT' or l_n_tok['Text'] in [',', ';', ':']):
+                    l_sentence_pos = ''
+                    l_tok['SentencePos'] = ''
+                    g_base_tokens[l_tok_index + 1][1]['SentencePos'] = ''
+
+                # SE Comma - SS word
+                if l_n_tok and l_sentence_pos == 'SE' and l_tok['Text'] == ',' and l_n_tok['SentencePos'] == 'SS' and not re.search('[A-Z]', l_n_tok['Text'][:1]):
+                    l_sentence_pos = ''
+                    l_tok['SentencePos'] = ''
+                    g_base_tokens[l_tok_index + 1][1]['SentencePos'] = ''
+
+                g_sent_pos_2[l_sentence_pos][l_sp_key] = g_sent_pos_2.setdefault(l_sentence_pos, dict()).setdefault(l_sp_key,0) + 1
+                l_form_key = l_tok['FormKey']
+
+                l_anno_txt = f'{l_tok_key}: {l_form_key:20} [{l_pos:5}] {l_context}'
+                if l_sentence_pos == 'SX':
+                    g_anno.setdefault('SPSX', []).append(l_anno_txt)
+                if l_sentence_pos == 'SS' and l_sp_key not in ['<CAP>', '“/``', '‘/``', '(/-LRB-']:
+                    g_anno.setdefault('SPSS', []).append(l_anno_txt)
+                if l_sentence_pos == 'SE' and l_sp_key not in ['./.', '”/\'\'', '?/.', '!/.', ':/:', ';/:', ';/.', '’/\'\'', ')/-RRB-']:
+                    g_anno.setdefault('SPSE', []).append(l_anno_txt)
+
+        # get punctuation on both side of non-punctuation token
+        if l_tok['Pos'] != 'PUNCT' and l_tok['Text'] != '-':
             # try: # eliminate hyphenated word cases when a hyphen is present before or after (treated below)
             l_new_sent_pos = l_tok['SentencePos']
             l_punctuation_left = ''
@@ -1900,6 +1977,13 @@ def print_remaining_dashes():
         print(f"r'{l_context}'),")
     print()
 
+def print_sp_stats(p_sent_pos):
+    for l_sp in p_sent_pos.keys():
+        print(f'------------- {l_sp} -----------------')
+        for l_sp_key in p_sent_pos[l_sp].keys():
+            print(f'{l_sp_key:6}: {p_sent_pos[l_sp][l_sp_key]}')
+    print()
+
 # ------------- main() -------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     # punctuation categories
@@ -2074,11 +2158,13 @@ if __name__ == '__main__':
     print_punctuation_groups()
     print_punctuation_groups_re()
     print_apostrophes()
-    print_anno()
     print_pos_2_lemma()
     print_missing()
     print_remaining_dashes()
     print_morph_attr()
+    print_sp_stats(g_sent_pos)
+    print_sp_stats(g_sent_pos_2)
+    print_anno()
 
     # g_tokens_no_punctuation
     # with open('occ_no_punc.json', 'w') as f:

@@ -264,7 +264,7 @@ void M1Store::Item_lv2::dbgRecurGraph(const ItemID p_item_id, std::set<ItemID>& 
 
         Item_lv2* l_current = getExisting(p_item_id);
         // print an item debug one-liner
-        qDebug(g_cat_silence) << p_left + l_current->dbgShort();
+        qCDebug(g_cat_silence) << p_left + l_current->dbgShort();
 
         // go through special edges of current item (if any) ...
         if(Item_lv2* l_edge = l_current->getFirstEdgeSpecial_lv2()){
@@ -274,7 +274,7 @@ void M1Store::Item_lv2::dbgRecurGraph(const ItemID p_item_id, std::set<ItemID>& 
             do{
                 Item_lv2* l_next_edge = l_edge->getNext_lv2();
                 // debug one liner of current edge ("S" = "special")
-                qDebug(g_cat_silence) << p_left + "+--S" + (l_edge->isFullEdge() ? l_edge->dbgHalf() : l_edge->dbgShort(1));
+                qCDebug(g_cat_silence) << p_left + "+--S" + (l_edge->isFullEdge() ? l_edge->dbgHalf() : l_edge->dbgShort(1));
                 // recursive call to recurGraph on the target of the current edge  (may not be a full edge bc of fields)
                 if(l_edge->isFullEdge())
                     dbgRecurGraph(l_edge->target_item_id(), p_already_expanded,
@@ -291,7 +291,7 @@ void M1Store::Item_lv2::dbgRecurGraph(const ItemID p_item_id, std::set<ItemID>& 
             // loop through all ordinary edges
             do{
                 // debug one liner of current edge ("O" = "ordinary")
-                qDebug(g_cat_silence) << p_left + "+--O" + (l_edge->isFullEdge() ? l_edge->dbgHalf() : l_edge->dbgShort(1));
+                qCDebug(g_cat_silence) << p_left + "+--O" + (l_edge->isFullEdge() ? l_edge->dbgHalf() : l_edge->dbgShort(1));
                 Item_lv2* l_next_edge = l_edge->getNext_lv2();
                 // recursive call to recurGraph on the target of the current edge (may not be a full edge bc of fields)
                 if(l_edge->isFullEdge())

@@ -4,6 +4,7 @@
 #include "m1B_lv2_item.h"
 
 #include <QWidget>
+#include <QGraphicsScene>
 
 namespace M1MidPlane{
 
@@ -56,10 +57,13 @@ public:
     virtual void mousePressEvent(QMouseEvent *p_event);
     virtual void focusOutEvent(QFocusEvent *p_event);
     virtual void focusInEvent(QFocusEvent *p_event);
+
+    virtual QWidget *get_edit_widget();
     ~Interp();
 signals:
     void gotoVertex(M1Store::Item_lv2* p_new_vertex);
     void emitHtml(const QString& p_html);
+    void emitEdit(QWidget *p_edit_widget);
 };
 
 class FieldInterp : public Interp
@@ -176,6 +180,7 @@ public:
 
     SentenceInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
     virtual QString getHtml();
+    virtual QWidget *get_edit_widget();
 };
 
 class BookInterp : public SectionInterp
