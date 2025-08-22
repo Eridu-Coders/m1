@@ -472,7 +472,7 @@ namespace M1UI{
 // QGraphicsLayoutItem
 class WordItem: public QGraphicsLayoutItem, public QGraphicsSimpleTextItem{
 public:
-    WordItem(const QString& p_txt): QGraphicsSimpleTextItem(p_txt), QGraphicsLayoutItem(){}
+    WordItem(const QString& p_txt, QGraphicsItem *p_parent = nullptr): QGraphicsSimpleTextItem(p_txt, p_parent), QGraphicsLayoutItem(){}
     virtual QSizeF sizeHint(Qt::SizeHint p_which, const QSizeF &p_constraint = QSizeF()) const {
         QSizeF l_ret = QGraphicsSimpleTextItem::boundingRect().size();
         qCDebug(g_cat_td_signals) << QString("WordItem::sizeHint [") << p_which << p_constraint << QString("] %1 -->").arg(this->text()) << l_ret;
@@ -498,7 +498,7 @@ protected:
 
 class StephanusItem: public WordItem{
 public:
-    StephanusItem(const QString& p_txt): WordItem(p_txt){}
+    StephanusItem(const QString& p_txt, QGraphicsItem *p_parent = nullptr): WordItem(p_txt, p_parent){}
 protected:
     virtual void paint(QPainter *p_painter,
                        const QStyleOptionGraphicsItem *p_option,
@@ -522,13 +522,16 @@ public:
 
         QGraphicsWidget::paint(p_painter, p_option, p_widget);
         p_painter->setPen(Qt::green);
-        p_painter->drawRect(m_rect);
-        p_painter->setPen(Qt::red);
-        QRectF l_scene_rect = scene()->sceneRect();
-        l_scene_rect = QRectF(l_scene_rect.topLeft(), QSize(l_scene_rect.size().width()-1, l_scene_rect.size().height()-1));
-        p_painter->drawRect(l_scene_rect);
+        p_painter->drawRect(layout()->contentsRect());
         qCDebug(g_cat_td_signals) << QString("WordForm m_rect") << m_rect.topLeft() << m_rect.bottomRight();
-        qCDebug(g_cat_td_signals) << QString("WordForm l_scene_rect") << l_scene_rect.topLeft() << l_scene_rect.bottomRight();
+        p_painter->setPen(Qt::blue);
+        p_painter->drawRect(QRectF(QPointF(0, 0), size()));
+    }
+    virtual void setGeometry(const QRectF &p_rect){
+        qCDebug(g_cat_td_signals) << QString("WordForm setGeometry START +++++++++++++++++:") << p_rect;
+        m_rect = p_rect;
+        QGraphicsWidget::setGeometry(p_rect);
+        qCDebug(g_cat_td_signals) << QString("WordForm setGeometry END +++++++++++++++++++:") << layout()->contentsRect();
     }
     virtual QVariant itemChange(GraphicsItemChange p_change, const QVariant &p_value){
         qCDebug(g_cat_td_signals) << QString("WordForm itemChange:") << p_change << p_value;
@@ -539,11 +542,6 @@ public:
         }
 
         return QGraphicsItem::itemChange(p_change, p_value);
-    }
-    virtual void setGeometry(const QRectF &p_rect){
-        qCDebug(g_cat_td_signals) << QString("WordForm setGeometry START +++++++++++++++++:") << p_rect;
-        m_rect = p_rect;
-        qCDebug(g_cat_td_signals) << QString("WordForm setGeometry END +++++++++++++++++++:") << p_rect;
     }
     virtual bool sceneEvent(QEvent *p_event){
         qCDebug(g_cat_td_signals) << QString("WordForm sceneEvent:") << p_event;
@@ -565,29 +563,43 @@ class FlowLayout;
 
 class View: public QGraphicsView{
 private:
-    FlowLayout* m_layout;
-    int m_margin_view;
+    QGraphicsLayout* m_layout = nullptr;
+    QGraphicsWidget* m_form = nullptr;
+    int m_margin_view = 20;
 public:
-    View(QGraphicsScene *p_scene):QGraphicsView(p_scene){m_margin_view = 40;}
-    void set_layout(FlowLayout* p_layout){m_layout = p_layout;}
+    View(QGraphicsScene *p_scene):QGraphicsView(p_scene){}
+    void set_layout(QGraphicsLayout* p_layout){m_layout = p_layout;}
+    void set_form(QGraphicsWidget* p_form){m_form = p_form;}
 protected:
     virtual bool event(QEvent *p_event){
         qCDebug(g_cat_td_signals) << QString("View event:") << p_event;
         return QGraphicsView::event(p_event);
     }
     virtual void resizeEvent(QResizeEvent *p_event);
+    virtual void paintEvent(QPaintEvent *p_event){
+        QRectF l_scene_rect = scene()->sceneRect();
+        l_scene_rect = QRectF(l_scene_rect.topLeft(), QSize(l_scene_rect.size().width()-1, l_scene_rect.size().height()-1));
+        qCDebug(g_cat_td_signals) << QString("View paintEvent l_scene_rect") << l_scene_rect.topLeft() << l_scene_rect.bottomRight();
+
+        QGraphicsView::paintEvent(p_event);
+    }
 };
 
 class DummyLayout: public QGraphicsLinearLayout{
+private:
+    int m_margin_view = 60;
 public:
-    DummyLayout(Qt::Orientation p_orientation, QGraphicsLayoutItem *p_parent = nullptr): QGraphicsLinearLayout(p_orientation, p_parent){}
+    DummyLayout(Qt::Orientation p_orientation, QGraphicsLayoutItem *p_parent = nullptr): QGraphicsLinearLayout(p_orientation, p_parent){
+        setContentsMargins(m_margin_view, m_margin_view, m_margin_view, m_margin_view);
+    }
     virtual void setGeometry(const QRectF &p_rect){
         qCDebug(g_cat_td_signals) << QString("DummyLayout setGeometry:") << p_rect;
         QGraphicsLinearLayout::setGeometry(p_rect);
     }
     QSizeF sizeHint(Qt::SizeHint p_which, const QSizeF &p_constraint = QSizeF()) const {
-        qCDebug(g_cat_td_signals) << QString("DummyLayout sizeHint:") << p_which << p_constraint;
-        return QGraphicsLinearLayout::sizeHint(p_which, p_constraint);
+        QSizeF l_sh = QGraphicsLinearLayout::sizeHint(p_which, p_constraint);
+        qCDebug(g_cat_td_signals) << QString("DummyLayout sizeHint:") << p_which << p_constraint << "-->" << l_sh;
+        return l_sh;
     }
     virtual void widgetEvent(QEvent *p_event){
         qCDebug(g_cat_td_signals) << QString("DummyLayout widgetEvent:") << p_event;
@@ -603,15 +615,17 @@ class FlowLayout: public QGraphicsLayout{
 private:
     QList<WordItem*> m_item_list;
     QSizeF m_inner_size;
-    View* m_view;
-    WordForm* m_form;
+    // View* m_view;
+    QGraphicsWidget* m_form;
     int m_margin;
 public:
-    FlowLayout(QGraphicsLayoutItem *p_parent = nullptr): QGraphicsLayout(p_parent){
+    FlowLayout(QGraphicsWidget *p_parent = nullptr): QGraphicsLayout(p_parent){
         m_margin = 10;
+        set_form(p_parent);
     }
-    void set_view(View* p_view){m_view = p_view;}
-    void set_Form(WordForm* p_form){m_form = p_form;}
+    // void set_view(View* p_view){m_view = p_view;}
+    QSizeF innerSize(){return m_inner_size;}
+    void set_form(QGraphicsWidget* p_form){m_form = p_form;}
     void addItem(WordItem* p_new_item){ m_item_list.append(p_new_item);}
     void setGeometry(const QRectF &p_rect){
         qCDebug(g_cat_td_signals) << QString("FlowLayout setGeometry:") << p_rect;
@@ -646,7 +660,7 @@ public:
 
             l_x += l_size_hint.width() + m_margin;
         }
-        m_form->setGeometry(QRectF(p_rect.topLeft(), m_inner_size));
+        // m_form->setGeometry(QRectF(p_rect.topLeft(), m_inner_size));
         qCDebug(g_cat_td_signals) << QString("do_layout m_inner_size:") << m_inner_size;
     }
     virtual void widgetEvent(QEvent *p_event){
@@ -683,12 +697,18 @@ public:
 };
 
 void View::resizeEvent(QResizeEvent *p_event){
-    qCDebug(g_cat_td_signals) << QString("View resizeEvent:") << p_event->size();
-    scene()->setSceneRect(QRect(QPoint(0, 0), p_event->size()));
-    QGraphicsView::resizeEvent(p_event);
+    QRectF l_scene_rect = QRect(QPoint(0, 0), p_event->size());
+    qCDebug(g_cat_td_signals) << QString("View resizeEvent l_scene_rect:") << l_scene_rect;
+    scene()->setSceneRect(l_scene_rect);
+
     QRectF l_layout_rect(QPoint(m_margin_view, m_margin_view), p_event->size().shrunkBy(QMargins(m_margin_view, m_margin_view, m_margin_view, m_margin_view)));
     qCDebug(g_cat_td_signals) << QString("View resizeEvent l_layout_rect:") << l_layout_rect;
-    m_layout->setGeometry(l_layout_rect);
+
+    // if(m_layout != nullptr)
+    //     m_layout->setGeometry(l_layout_rect);
+    if(m_form != nullptr)
+        m_form->setGeometry(l_layout_rect);
+    QGraphicsView::resizeEvent(p_event);
 }
 
 }
@@ -742,38 +762,28 @@ QWidget *M1MidPlane::SentenceInterp::get_edit_widget(){
     M1UI::FlowLayout* l_layout = new M1UI::FlowLayout(l_form_item);
     l_scene->addItem(l_form_item);
     l_form_item->setLayout(l_layout);
+    // l_layout->addItem(l_form_item);
 
-    static QFont f("Noto Mono", 12);
-    /*
-    M1UI::WordItem* l_item_1 = new M1UI::WordItem(QString(m_myself->dbgShort()));
-    M1UI::WordItem* l_item_2 = new M1UI::WordItem(QString(m_myself->getTarget_lv2()->dbgShort()));
-    l_item_1->setFont(f);
-    l_item_2->setFont(f);
-    l_scene->addItem(l_item_1);
-    l_scene->addItem(l_item_2);
-    l_layout->addItem(l_item_1);
-    l_layout->addItem(l_item_2);
-    */
+    static QFont l_font("Noto Mono", 12);
     for(M1Store::Item_lv2_iterator it = m_myself->getTarget_lv2()->getIteratorTop(); !it.beyondEnd(); it.next())
         if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::OCCUR_SIID)){
             QString l_text = toText(it.at()->getTarget_lv2());
             qCDebug(g_cat_td_signals) << QString("Adding word") << l_text;
             if(M1Store::Item_lv2* l_section = it.at()->getTarget_lv2()->find_edge(M1Env::BLNGS_SIID, M1Env::STEPHANUS_SIID); l_section != nullptr){
-                //StephanusItem
-                M1UI::StephanusItem* l_steph_number_item = new M1UI::StephanusItem(l_section->getTarget_lv2()->text());
-                l_steph_number_item->setFont(f);
-                l_scene->addItem(l_steph_number_item);
+                // StephanusItem
+                M1UI::StephanusItem* l_steph_number_item = new M1UI::StephanusItem(l_section->getTarget_lv2()->text(), l_form_item);
+                l_steph_number_item->setFont(l_font);
+                //l_scene->addItem(l_steph_number_item);
                 l_layout->addItem(l_steph_number_item);
             }
-            M1UI::WordItem* l_item = new M1UI::WordItem(l_text);
-            l_item->setFont(f);
-            l_scene->addItem(l_item);
+            M1UI::WordItem* l_item = new M1UI::WordItem(l_text, l_form_item);
+            l_item->setFont(l_font);
+            //l_scene->addItem(l_item);
             l_layout->addItem(l_item);
         }
     M1UI::View* l_view = new M1UI::View(l_scene);
     l_view->set_layout(l_layout);
-    l_layout->set_view(l_view);
-    l_layout->set_Form(l_form_item);
+    l_view->set_form(l_form_item);
     l_form_layout->addWidget(l_view);
 
     return l_form;
