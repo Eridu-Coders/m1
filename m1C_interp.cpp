@@ -274,7 +274,7 @@ QString tu_html_fragment(M1Store::Item_lv2* p_tu){
         else{
             l_ground_text = "";
             l_translit = "";
-            for(M1Store::Item_lv2* l_occ = l_begin_word; true; l_occ = l_occ->getNext_lv2()){
+            for(M1Store::Item_lv2* l_occ = l_begin_word; true; l_occ = l_occ->get_next_lv2()){
                 l_ground_text += QString("%1 ").arg(l_occ->getTarget_lv2()->text());
                 l_translit += QString("%1 ").arg(l_occ->getTarget_lv2()->getField(M1Store::TEXT_WORD_TRANSLIT_SIID));
                 if(l_occ == l_end_word) break;
@@ -489,7 +489,7 @@ protected:
                        QWidget *p_widget){
         QGraphicsSimpleTextItem::paint(p_painter, p_option, p_widget);
         QRectF l_br = boundingRect();
-        p_painter->drawRect(l_br);
+        // p_painter->drawRect(l_br);
         l_br = QGraphicsLayoutItem::geometry();
         qCDebug(g_cat_td_signals) << QString("WordItem paint") <<
             this->text() << l_br.topLeft() << l_br.bottomRight() << QGraphicsLayoutItem::geometry();
@@ -510,42 +510,340 @@ protected:
     }
 };
 
-class WordForm: public QGraphicsWidget{
+class FlowLayout: public QGraphicsLayout{
 private:
-    QRectF m_rect;
+    QList<WordItem*> m_item_list;
+    QRectF m_outer_geometry;
+    QGraphicsWidget* m_form;
+    QString m_id_form;
+    int m_margin = 20;
+    int m_spacing = 10;
 public:
-    WordForm(QGraphicsItem *p_parent=nullptr): QGraphicsWidget(p_parent){}
+    FlowLayout(const QString& p_id, QGraphicsWidget *p_parent = nullptr): QGraphicsLayout(p_parent){
+        set_form(p_parent);
+        m_id_form = p_id;
+    }
+    QRectF do_layout(const QRectF &p_rect){
+        qCDebug(g_cat_td_signals) << QString("do_layout p_rect:") << m_id_form << p_rect;
+        // QSizeF l_inner_size = QSizeF(0, 0);
+        int l_init_x = p_rect.topLeft().x() + m_margin;
+        int l_init_y = p_rect.topLeft().y() + m_margin;
+        int l_x = l_init_x;
+        int l_y = l_init_y;
+
+        int max_x = 0;
+        int max_y = 0;
+        for(WordItem *l_item : std::as_const(m_item_list)){
+            QSizeF l_size_hint = l_item->sizeHint(Qt::SizeHint::MinimumSize);
+            qCDebug(g_cat_td_signals) << QString("SizeHint:") << l_item->text() << l_size_hint;
+
+            if( l_x + l_size_hint.width() > p_rect.topRight().x() - m_margin){
+                l_x = l_init_x;
+                l_y += l_size_hint.height() + m_spacing;
+            }
+
+            if(l_x + l_size_hint.width() > max_x) max_x = l_x + l_size_hint.width();
+            if(l_y + l_size_hint.height() > max_y) max_y = l_y + l_size_hint.height();
+
+            // l_item->setGeometry(QRectF(QPointF(l_x, l_y), l_size_hint));
+            l_item->setPos(l_x, l_y);
+            qCDebug(g_cat_td_signals) << QString("item rec: (%1, %2) (%3, %4)")
+                                             .arg(l_x).arg(l_y).arg(l_x + l_size_hint.width()-1).arg(l_y + l_size_hint.height()-1);
+
+            /*
+            int l_total_width = l_x - p_rect.topLeft().x() + l_size_hint.width() + m_margin;
+            if(l_inner_size.width() < l_total_width) l_inner_size.setWidth(l_total_width);
+            int l_total_height = l_y - p_rect.topLeft().y() + l_size_hint.height() + m_margin;
+            if(l_inner_size.height () < l_total_height) l_inner_size.setHeight(l_total_height);
+            */
+
+            l_x += l_size_hint.width() + m_spacing;
+        }
+        // l_inner_size = QSizeF(max_x - l_init_x, l_last_item->geometry().bottom() - l_first_item->geometry().top());
+
+        m_outer_geometry = QRectF(p_rect.topLeft(), QSizeF(p_rect.size().width(), max_y - l_init_y + 2*m_margin));
+        qCDebug(g_cat_td_signals) << QString("do_layout m_outer_geometry:") << m_id_form << m_outer_geometry;
+        return m_outer_geometry;
+    }
+    void set_form(QGraphicsWidget* p_form){m_form = p_form;}
+    void addItem(WordItem* p_new_item){ m_item_list.append(p_new_item);}
+    void setGeometry(const QRectF &p_rect){
+        qCDebug(g_cat_td_signals) << QString("FlowLayout setGeometry:") << m_id_form << p_rect;
+        QGraphicsLayout::setGeometry(p_rect);
+    }
+    virtual void widgetEvent(QEvent *p_event){
+        qCDebug(g_cat_td_signals) << QString("FlowLayout widgetEvent:") << m_id_form << p_event;
+        QGraphicsLayout::widgetEvent(p_event);
+    }
+    void updateGeometry(){
+        qCDebug(g_cat_td_signals) << QString("FlowLayout updateGeometry:") << m_id_form;
+        QGraphicsLayout::updateGeometry();
+    }
+    QSizeF sizeHint(Qt::SizeHint p_which, const QSizeF &p_constraint = QSizeF()) const{
+        QSizeF l_sh = m_outer_geometry.size();
+        qCDebug(g_cat_td_signals) << QString("FlowLayout::sizeHint [") << p_which << p_constraint << QString("] -->") << l_sh << m_id_form;
+        return l_sh;
+    }
+    int count() const {
+        qCDebug(g_cat_td_signals) << QString("Count:") << m_id_form << m_item_list.count();
+        return m_item_list.count();
+    }
+    QGraphicsLayoutItem *itemAt(int p_index) const {
+        Q_ASSERT_X( p_index >= 0 && p_index < count(), "FlowLayout::itemAt()", QString("p_index [%1] out of bounds").arg(p_index).toUtf8());
+        qCDebug(g_cat_td_signals) << QString("itemAt:") << m_id_form << p_index << m_item_list.at(p_index)->text() << m_item_list.at(p_index)->geometry();
+        return m_item_list.at(p_index);
+    }
+    void removeAt(int p_index){
+        Q_ASSERT_X( p_index >= 0 && p_index < count(), "FlowLayout::removeAt()", QString("p_index [%1] out of bounds").arg(p_index).toUtf8());
+        m_item_list.removeAt(p_index);
+    }
+};
+
+class PassageEditor: public QGraphicsWidget{
+private:
+    FlowLayout* m_editor_layout;
+    static QFont cm_font;
+    QString m_id;
+    QRectF m_outer_rect;
 public:
+    QString& id(){return m_id;}
+    /*
+    PassageEditor(M1Store::Item_lv2* p_sentence, const QString& p_id, QGraphicsWidget *p_parent): QGraphicsWidget(p_parent){
+        qCDebug(g_cat_td_signals) << QString("PassageEditor") << p_id << p_sentence->text();
+        m_editor_layout = new FlowLayout(p_id, this);
+        this->setLayout(m_editor_layout);
+        m_id = p_id;
+        static_cast<QGraphicsLinearLayout*>(p_parent->layout())->addItem(this);
+
+        //M1Store::Item_lv2* l_cur_occur = p_occur_start;
+        for(M1Store::Item_lv2_iterator it = p_sentence->getIteratorTop(); !it.beyondEnd(); it.next()) {
+            qCDebug(g_cat_td_signals) << QString("Current edge") << m_id << it.at()->dbgShort();
+            if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::OCCUR_SIID)){
+                QString l_text = toText(it.at()->getTarget_lv2());
+                qCDebug(g_cat_td_signals) << QString("Adding word") << m_id << l_text;
+                if(M1Store::Item_lv2* l_section = it.at()->getTarget_lv2()->find_edge(M1Env::BLNGS_SIID, M1Env::STEPHANUS_SIID); l_section != nullptr){
+                    // StephanusItem
+                    M1UI::StephanusItem* l_steph_number_item = new M1UI::StephanusItem(l_section->getTarget_lv2()->text(), this);
+                    l_steph_number_item->setFont(cm_font);
+                    m_editor_layout->addItem(l_steph_number_item);
+                }
+                M1UI::WordItem* l_item = new M1UI::WordItem(l_text, this);
+                l_item->setFont(cm_font);
+                m_editor_layout->addItem(l_item);
+            }
+        }
+
+        qCDebug(g_cat_td_signals) << QString("Count:") << m_id << m_editor_layout->count();
+    }
+    */
+    // PassageEditor(M1Store::Item_lv2* p_sentence, const QString& p_id, QGraphicsWidget *p_parent): QGraphicsWidget(p_parent){
+    PassageEditor(M1Store::Item_lv2* p_occur_start, const QString& p_id, QGraphicsWidget *p_parent=nullptr): QGraphicsWidget(p_parent){
+        qCDebug(g_cat_td_signals) << QString("PassageEditor") << p_id << p_occur_start->text();
+        m_editor_layout = new FlowLayout(p_id, this);
+        this->setLayout(m_editor_layout);
+        m_id = p_id;
+        static_cast<QGraphicsLinearLayout*>(p_parent->layout())->addItem(this);
+
+        M1Store::Item_lv2* l_cur_occur = p_occur_start;
+        for(int l_count_words = 0; l_count_words < 100 && l_cur_occur->next_item_id() != M1Env::G_VOID_ITEM_ID; l_count_words++){
+            qCDebug(g_cat_td_signals) << QString("Current edge") << m_id << l_cur_occur->dbgShort();
+            if(l_cur_occur->isFullEdge() && l_cur_occur->isOfType(M1Env::OCCUR_SIID)){
+                QString l_text = toText(l_cur_occur);
+                qCDebug(g_cat_td_signals) << QString("Adding word") << m_id << l_text;
+                if(M1Store::Item_lv2* l_section = l_cur_occur->find_edge(M1Env::BLNGS_SIID, M1Env::STEPHANUS_SIID); l_section != nullptr){
+                    // StephanusItem
+                    M1UI::StephanusItem* l_steph_number_item = new M1UI::StephanusItem(l_section->getTarget_lv2()->text(), this);
+                    l_steph_number_item->setFont(cm_font);
+                    m_editor_layout->addItem(l_steph_number_item);
+                }
+                M1UI::WordItem* l_item = new M1UI::WordItem(l_text, this);
+                l_item->setFont(cm_font);
+                m_editor_layout->addItem(l_item);
+            }
+
+            l_cur_occur = l_cur_occur->get_next_lv2();
+        }
+        /*
+        for(M1Store::Item_lv2_iterator it = p_sentence->getIteratorTop(); !it.beyondEnd(); it.next()) {
+            qCDebug(g_cat_td_signals) << QString("Current edge") << m_id << it.at()->dbgShort();
+            if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::OCCUR_SIID)){
+                QString l_text = toText(it.at()->getTarget_lv2());
+                qCDebug(g_cat_td_signals) << QString("Adding word") << m_id << l_text;
+                if(M1Store::Item_lv2* l_section = it.at()->getTarget_lv2()->find_edge(M1Env::BLNGS_SIID, M1Env::STEPHANUS_SIID); l_section != nullptr){
+                    // StephanusItem
+                    M1UI::StephanusItem* l_steph_number_item = new M1UI::StephanusItem(l_section->getTarget_lv2()->text(), this);
+                    l_steph_number_item->setFont(cm_font);
+                    m_editor_layout->addItem(l_steph_number_item);
+                }
+                M1UI::WordItem* l_item = new M1UI::WordItem(l_text, this);
+                l_item->setFont(cm_font);
+                m_editor_layout->addItem(l_item);
+            }
+        }*/
+
+        qCDebug(g_cat_td_signals) << QString("Count:") << m_id << m_editor_layout->count();
+    }
     virtual void paint(QPainter *p_painter,
                        const QStyleOptionGraphicsItem *p_option,
                        QWidget *p_widget){
 
         QGraphicsWidget::paint(p_painter, p_option, p_widget);
+
+        /* QRectF l_contents = layout()->contentsRect();
         p_painter->setPen(Qt::green);
-        p_painter->drawRect(layout()->contentsRect());
-        qCDebug(g_cat_td_signals) << QString("WordForm m_rect") << m_rect.topLeft() << m_rect.bottomRight();
+        p_painter->drawRect(l_contents);
+        qCDebug(g_cat_td_signals) << QString("PassageEditor l_contents") << m_id << l_contents.topLeft() << l_contents.bottomRight();*/
+        QRectF l_outline(QPointF(0, 0), size());
         p_painter->setPen(Qt::blue);
-        p_painter->drawRect(QRectF(QPointF(0, 0), size()));
+        p_painter->drawRect(l_outline);
+        qCDebug(g_cat_td_signals) << QString("PassageEditor l_outline") << m_id << l_outline.topLeft() << l_outline.bottomRight();
     }
     virtual void setGeometry(const QRectF &p_rect){
-        qCDebug(g_cat_td_signals) << QString("WordForm setGeometry START +++++++++++++++++:") << p_rect;
-        m_rect = p_rect;
+        qCDebug(g_cat_td_signals) << QString("PassageEditor setGeometry()") << m_id << p_rect;
         QGraphicsWidget::setGeometry(p_rect);
-        qCDebug(g_cat_td_signals) << QString("WordForm setGeometry END +++++++++++++++++++:") << layout()->contentsRect();
     }
     virtual QVariant itemChange(GraphicsItemChange p_change, const QVariant &p_value){
-        qCDebug(g_cat_td_signals) << QString("WordForm itemChange:") << p_change << p_value;
-
-        if(p_change == QGraphicsItem::GraphicsItemChange::ItemVisibleChange){
-            qCDebug(g_cat_td_signals) << QString("WordForm ItemVisibleChange sceneRect:") << scene()->sceneRect();
-            // setPos(scene()->sceneRect().topLeft());
-        }
-
+        qCDebug(g_cat_td_signals) << QString("PassageEditor itemChange:") << m_id << p_change << p_value;
         return QGraphicsItem::itemChange(p_change, p_value);
     }
     virtual bool sceneEvent(QEvent *p_event){
-        qCDebug(g_cat_td_signals) << QString("WordForm sceneEvent:") << p_event;
+        qCDebug(g_cat_td_signals) << QString("PassageEditor sceneEvent:") << m_id << p_event;
         return QGraphicsWidget::sceneEvent(p_event);
+    }
+    QSizeF sizeHint(Qt::SizeHint p_which, const QSizeF &p_constraint = QSizeF()) const {
+        QSizeF l_sh = m_outer_rect.size();
+        qCDebug(g_cat_td_signals) << QString("PassageEditor sizeHint:") << m_id << p_which << p_constraint << "-->" << l_sh;
+        return l_sh;
+    }
+    void updateGeometry(){
+        QGraphicsWidget::updateGeometry();
+        qCDebug(g_cat_td_signals) << QString("PassageEditor updateGeometry:") << m_id << this->maximumWidth();
+        // m_editor_layout->force_layout();
+    }
+    QRectF get_outer_rect(int p_view_width){
+        m_outer_rect = m_editor_layout->do_layout(QRectF(QPointF(0, 0), QSizeF(p_view_width, 0)));
+        qCDebug(g_cat_td_signals) << QString("PassageEditor get_outer_rect:") << m_id << m_outer_rect;
+        return m_outer_rect;
+    }
+};
+
+QFont PassageEditor::cm_font = QFont("Noto Mono", 12);
+
+class VericalLayout: public QGraphicsLinearLayout{
+private:
+    int m_margin_vl = 10;
+    QSizeF m_outer_size;
+public:
+    VericalLayout(QGraphicsLayoutItem *p_parent = nullptr): QGraphicsLinearLayout(Qt::Orientation::Vertical, p_parent){
+        setContentsMargins(m_margin_vl, m_margin_vl, m_margin_vl, m_margin_vl);
+        setSpacing(m_margin_vl);
+    }
+    virtual void setGeometry(const QRectF &p_rect) override {
+        qCDebug(g_cat_td_signals) << QString("VericalLayout setGeometry:") << p_rect;
+        // invalidate();
+        QGraphicsLinearLayout::setGeometry(p_rect);
+    }
+    QSizeF sizeHint(Qt::SizeHint p_which, const QSizeF &p_constraint = QSizeF()) const {
+        qCDebug(g_cat_td_signals) << QString("VericalLayout sizeHint:") << p_which << p_constraint << "-->" << m_outer_size;
+        return m_outer_size;
+    }
+    virtual void widgetEvent(QEvent *p_event) override {
+        qCDebug(g_cat_td_signals) << QString("VericalLayout widgetEvent:") << p_event << p_event->type();
+        /*
+        if(p_event->type() == QEvent::LayoutRequest || p_event->type() == QEvent::WindowActivate || p_event->type() == QEvent::GraphicsSceneResize){
+            qCDebug(g_cat_td_signals) << QString("VericalLayout invalidate request:");
+            // invalidate();
+            // qCDebug(g_cat_td_signals) << QString("VericalLayout activate request:");
+            // activate();
+        }*/
+        return QGraphicsLinearLayout::widgetEvent(p_event);
+    }
+    virtual void invalidate() override {
+        qCDebug(g_cat_td_signals) << QString("VericalLayout invalidate:");
+        // for(int i = 0; i < count(); i++) static_cast<QGraphicsWidget*>(itemAt(i))->layout()->invalidate();
+        for(int i = 0; i < count(); i++) qCDebug(g_cat_td_signals) << static_cast<PassageEditor*>(itemAt(i))->id();
+        // QGraphicsLinearLayout::invalidate();
+    }
+    virtual void updateGeometry() override {
+        qCDebug(g_cat_td_signals) << QString("VericalLayout updateGeometry:");
+        QGraphicsLinearLayout::updateGeometry();
+    }
+    QRectF get_outer_rect(int p_view_width){
+        qCDebug(g_cat_td_signals) << QString("VericalLayout get_outer_rect:") << p_view_width;
+        QRectF l_outer_rect;
+        for(int i = 0; i < count(); i++){
+            PassageEditor* l_pe = static_cast<PassageEditor*>(itemAt(i));
+            QRectF l_rect = l_pe->get_outer_rect(p_view_width - 2*m_margin_vl);
+            l_rect += QMarginsF(0, 0, 2*m_margin_vl, 0);
+            qCDebug(g_cat_td_signals) << QString("VericalLayout pe:") << l_pe->id() << "--> outer rect:" << l_rect;
+            if(l_outer_rect.isNull()) l_outer_rect = l_rect;
+            else{
+                l_outer_rect += QMarginsF(0, 0, 0, m_margin_vl);
+                l_outer_rect = l_outer_rect.united(QRectF(QPointF(0, l_outer_rect.bottom()), l_rect.size()));
+            }
+        }
+        l_outer_rect += QMarginsF(0, m_margin_vl, 0, m_margin_vl);
+        m_outer_size = l_outer_rect.size();
+        return l_outer_rect;
+    }
+};
+
+class PassagesPanel: public QGraphicsWidget{
+private:
+    VericalLayout* m_outer_layout;
+    int m_view_width = -1;
+    QRectF m_outer_rect;
+public:
+    PassagesPanel(QGraphicsWidget *p_parent=nullptr): QGraphicsWidget(p_parent){
+        m_outer_layout = new VericalLayout(this);
+        this->setLayout(m_outer_layout);
+    }
+    virtual void paint(QPainter *p_painter,
+                       const QStyleOptionGraphicsItem *p_option,
+                       QWidget *p_widget) override{
+
+        // QRectF l_contents = layout()->contentsRect();
+        /*
+        p_painter->setPen(Qt::GlobalColor::cyan);
+        p_painter->drawRect(m_outer_rect);
+        qCDebug(g_cat_td_signals) << QString("PassagesPanel m_outer_rect") << m_outer_rect.topLeft() << m_outer_rect.bottomRight(); */
+        QRectF l_outline(QPointF(0, 0), size());
+        p_painter->setPen(Qt::GlobalColor::darkYellow);
+        p_painter->drawRect(l_outline);
+        qCDebug(g_cat_td_signals) << QString("PassagesPanel l_outline") << l_outline.topLeft() << l_outline.bottomRight();
+    }
+    virtual void setGeometry(const QRectF &p_rect) override {
+        qCDebug(g_cat_td_signals) << QString("PassagesPanel setGeometry:") << p_rect << " m_view_width:" << m_view_width;
+        // m_outer_layout->invalidate();
+        // m_outer_layout->activate();
+        // m_outer_layout->updateGeometry();
+        if(m_view_width != -1)
+            QGraphicsWidget::setGeometry(p_rect);
+    }
+    void addLayout(QGraphicsWidget* p_widget){
+        m_outer_layout->addItem(p_widget);
+    }
+    void add_stretch(){
+        m_outer_layout->addStretch(1);
+    }
+    virtual bool event(QEvent *p_event) override{
+        qCDebug(g_cat_td_signals) << QString("PassagesPanel event:") << p_event << " m_view_width:" << m_view_width;
+        return QGraphicsWidget::event(p_event);
+    }
+    void updateGeometry() override {
+        QGraphicsWidget::updateGeometry();
+        qCDebug(g_cat_td_signals) << QString("PassagesPanel updateGeometry:") << " m_view_width:" << m_view_width;
+    }
+    QSizeF sizeHint(Qt::SizeHint p_which, const QSizeF &p_constraint = QSizeF()) const override {
+        QSizeF l_sh = m_outer_rect.size();
+        qCDebug(g_cat_td_signals) << QString("PassagesPanel sizeHint:") << p_which << p_constraint << "-->" << l_sh;
+        return l_sh;
+    }
+    QRectF set_panel_width(int p_width){
+        qCDebug(g_cat_td_signals) << QString("PassagesPanel set_view_width:") << p_width;
+        m_view_width = p_width;
+        m_outer_rect = m_outer_layout->get_outer_rect(p_width);
+        return m_outer_rect;
     }
 };
 
@@ -559,23 +857,18 @@ protected:
     }
 };
 
-class FlowLayout;
-
 class View: public QGraphicsView{
 private:
-    QGraphicsLayout* m_layout = nullptr;
-    QGraphicsWidget* m_form = nullptr;
-    int m_margin_view = 20;
+    PassagesPanel* m_outer_panel = nullptr;
+    int m_margin_view = 10;
 public:
     View(QGraphicsScene *p_scene):QGraphicsView(p_scene){}
-    void set_layout(QGraphicsLayout* p_layout){m_layout = p_layout;}
-    void set_form(QGraphicsWidget* p_form){m_form = p_form;}
+    void set_panel(PassagesPanel* p_outer_panel){m_outer_panel = p_outer_panel;}
 protected:
     virtual bool event(QEvent *p_event){
         qCDebug(g_cat_td_signals) << QString("View event:") << p_event;
         return QGraphicsView::event(p_event);
     }
-    virtual void resizeEvent(QResizeEvent *p_event);
     virtual void paintEvent(QPaintEvent *p_event){
         QRectF l_scene_rect = scene()->sceneRect();
         l_scene_rect = QRectF(l_scene_rect.topLeft(), QSize(l_scene_rect.size().width()-1, l_scene_rect.size().height()-1));
@@ -583,163 +876,71 @@ protected:
 
         QGraphicsView::paintEvent(p_event);
     }
-};
+    virtual void resizeEvent(QResizeEvent *p_event){
+        qCDebug(g_cat_td_signals) << QString("View resizeEvent p_event:") << p_event;
 
-class DummyLayout: public QGraphicsLinearLayout{
-private:
-    int m_margin_view = 60;
-public:
-    DummyLayout(Qt::Orientation p_orientation, QGraphicsLayoutItem *p_parent = nullptr): QGraphicsLinearLayout(p_orientation, p_parent){
-        setContentsMargins(m_margin_view, m_margin_view, m_margin_view, m_margin_view);
-    }
-    virtual void setGeometry(const QRectF &p_rect){
-        qCDebug(g_cat_td_signals) << QString("DummyLayout setGeometry:") << p_rect;
-        QGraphicsLinearLayout::setGeometry(p_rect);
-    }
-    QSizeF sizeHint(Qt::SizeHint p_which, const QSizeF &p_constraint = QSizeF()) const {
-        QSizeF l_sh = QGraphicsLinearLayout::sizeHint(p_which, p_constraint);
-        qCDebug(g_cat_td_signals) << QString("DummyLayout sizeHint:") << p_which << p_constraint << "-->" << l_sh;
-        return l_sh;
-    }
-    virtual void widgetEvent(QEvent *p_event){
-        qCDebug(g_cat_td_signals) << QString("DummyLayout widgetEvent:") << p_event;
-        return QGraphicsLinearLayout::widgetEvent(p_event);
-    }
-    void updateGeometry(){
-        qCDebug(g_cat_td_signals) << QString("DummyLayout updateGeometry:");
-        QGraphicsLinearLayout::updateGeometry();
+        // QRectF l_form_rect(QPoint(m_margin_view, m_margin_view), p_event->size().shrunkBy(QMargins(m_margin_view, m_margin_view, m_margin_view, m_margin_view)));
+        // qCDebug(g_cat_td_signals) << QString("View resizeEvent l_form_rect:") << l_form_rect;
+
+        qCDebug(g_cat_td_signals) << QString("View resizeEvent START") << "######################################### before set_view_width";
+        QRectF l_panel_rect = m_outer_panel->set_panel_width(p_event->size().width() - 2*m_margin_view);
+
+        int l_panel_size = l_panel_rect.size().height() + 2*m_margin_view;
+        QRectF l_scene_rect = QRectF(QPoint(0, 0), QSizeF(p_event->size().width(), l_panel_size > p_event->size().height() ? l_panel_size : p_event->size().height()));
+        scene()->setSceneRect(l_scene_rect);
+        // qCDebug(g_cat_td_signals) << QString("View resizeEvent invalidate request:") << l_scene_rect << "+++++++++ ";
+        // m_outer_panel->layout()->invalidate();
+        m_outer_panel->setGeometry(QRectF(QPoint(m_margin_view, m_margin_view), l_panel_rect.size()));
+        // qCDebug(g_cat_td_signals) << QString("View resizeEvent activate:") << l_scene_rect << "xxxxxxxxxx ";
+        // m_outer_panel->layout()->activate();
+        qCDebug(g_cat_td_signals) << QString("View resizeEvent l_scene_rect:") << l_scene_rect << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% after set_view_width";
+
+        QGraphicsView::resizeEvent(p_event);
+        qCDebug(g_cat_td_signals) << QString("View resizeEvent m_outer_panel->rect():") << p_event << m_outer_panel->rect() << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ END";
     }
 };
-
-class FlowLayout: public QGraphicsLayout{
-private:
-    QList<WordItem*> m_item_list;
-    QSizeF m_inner_size;
-    // View* m_view;
-    QGraphicsWidget* m_form;
-    int m_margin;
-public:
-    FlowLayout(QGraphicsWidget *p_parent = nullptr): QGraphicsLayout(p_parent){
-        m_margin = 10;
-        set_form(p_parent);
-    }
-    // void set_view(View* p_view){m_view = p_view;}
-    QSizeF innerSize(){return m_inner_size;}
-    void set_form(QGraphicsWidget* p_form){m_form = p_form;}
-    void addItem(WordItem* p_new_item){ m_item_list.append(p_new_item);}
-    void setGeometry(const QRectF &p_rect){
-        qCDebug(g_cat_td_signals) << QString("FlowLayout setGeometry:") << p_rect;
-        QGraphicsLayout::setGeometry(p_rect);
-        do_layout(p_rect);
-    }
-    void do_layout(const QRectF &p_rect){
-        // QSizeF l_view_size = m_view->size();
-        // QRectF l_form_rect = m_form->boundingRect();
-        qCDebug(g_cat_td_signals) << QString("do_layout l_form_rect:") << p_rect;
-        m_inner_size = QSizeF(0, 0);
-        int l_x = p_rect.topLeft().x() + m_margin;
-        int l_y = p_rect.topLeft().y() + m_margin;
-        for(WordItem *l_item : std::as_const(m_item_list)){
-            QSizeF l_size_hint = l_item->sizeHint(Qt::SizeHint::MinimumSize);
-            qCDebug(g_cat_td_signals) << QString("SizeHint:") << l_item->text() << l_size_hint;
-
-            if( l_x + l_size_hint.width() > p_rect.topRight().x() - m_margin){
-                l_x = p_rect.topLeft().x() + m_margin;
-                l_y += l_size_hint.height() + m_margin;
-            }
-
-            // l_item->setPos(l_x, l_y);
-            l_item->setGeometry(QRectF(QPointF(l_x, l_y), l_size_hint));
-            qCDebug(g_cat_td_signals) << QString("item rec: (%1, %2) (%3, %4)")
-                                             .arg(l_x).arg(l_y).arg(l_x + l_size_hint.width()-1).arg(l_y + l_size_hint.height()-1);
-
-            int l_total_width = l_x - p_rect.topLeft().x() + l_size_hint.width() + m_margin;
-            if(m_inner_size.width() < l_total_width) m_inner_size.setWidth(l_total_width);
-            int l_total_height = l_y - p_rect.topLeft().y() + l_size_hint.height() + m_margin;
-            if(m_inner_size.height () < l_total_height) m_inner_size.setHeight(l_total_height);
-
-            l_x += l_size_hint.width() + m_margin;
-        }
-        // m_form->setGeometry(QRectF(p_rect.topLeft(), m_inner_size));
-        qCDebug(g_cat_td_signals) << QString("do_layout m_inner_size:") << m_inner_size;
-    }
-    virtual void widgetEvent(QEvent *p_event){
-        qCDebug(g_cat_td_signals) << QString("FlowLayout widgetEvent:") << p_event;
-        if(p_event->type() == QEvent::Polish)
-            qCDebug(g_cat_td_signals) << QString("Polish");
-        else if(p_event->type() == QEvent::WindowActivate){
-            qCDebug(g_cat_td_signals) << QString("WindowActivate");
-            // do_layout();
-        }
-        QGraphicsLayout::widgetEvent(p_event);
-    }
-    void updateGeometry(){
-        qCDebug(g_cat_td_signals) << QString("FlowLayout updateGeometry:");
-        // QGraphicsLayout::updateGeometry();
-    }
-    QSizeF sizeHint(Qt::SizeHint p_which, const QSizeF &p_constraint = QSizeF()) const {
-        // QSizeF l_ret = m_inner_size.grownBy(QMarginsF(m_margin, m_margin, m_margin, m_margin));
-        QSizeF l_ret = m_inner_size;
-        qCDebug(g_cat_td_signals) << QString("FlowLayout::sizeHint [") << p_which << p_constraint << QString("] -->") << l_ret;
-        return l_ret;
-    }
-    int count() const {
-        return m_item_list.count();
-    }
-    QGraphicsLayoutItem *itemAt(int p_index) const {
-        Q_ASSERT_X( p_index > 0 && p_index < count(), "FlowLayout::itemAt()", QString("p_index [%1] out of bounds").arg(p_index).toUtf8());
-        return m_item_list.at(p_index);
-    }
-    void removeAt(int p_index){
-        Q_ASSERT_X( p_index > 0 && p_index < count(), "FlowLayout::removeAt()", QString("p_index [%1] out of bounds").arg(p_index).toUtf8());
-        m_item_list.removeAt(p_index);
-    }
-};
-
-void View::resizeEvent(QResizeEvent *p_event){
-    QRectF l_scene_rect = QRect(QPoint(0, 0), p_event->size());
-    qCDebug(g_cat_td_signals) << QString("View resizeEvent l_scene_rect:") << l_scene_rect;
-    scene()->setSceneRect(l_scene_rect);
-
-    QRectF l_layout_rect(QPoint(m_margin_view, m_margin_view), p_event->size().shrunkBy(QMargins(m_margin_view, m_margin_view, m_margin_view, m_margin_view)));
-    qCDebug(g_cat_td_signals) << QString("View resizeEvent l_layout_rect:") << l_layout_rect;
-
-    // if(m_layout != nullptr)
-    //     m_layout->setGeometry(l_layout_rect);
-    if(m_form != nullptr)
-        m_form->setGeometry(l_layout_rect);
-    QGraphicsView::resizeEvent(p_event);
-}
 
 }
 
 QWidget *M1MidPlane::SentenceInterp::get_edit_widget(){
-    /*
-    QGraphicsWidget *l_form = new QGraphicsWidget();
-    QGraphicsLinearLayout* l_layout = new QGraphicsLinearLayout(Qt::Orientation::Vertical, l_form);
+    // find previous Stephanus Number
+    M1Store::Item_lv2* l_current_edge = m_myself->getTarget_lv2()->find_edge(M1Env::OWNS_SIID, M1Env::OCCUR_SIID)->getTarget_lv2();
+    qCDebug(g_cat_td_signals) << QString("l_current_edge") << l_current_edge->dbgShort();
+    M1Store::Item_lv2* l_section;
+    while(true){
+        qCDebug(g_cat_td_signals) << QString("l_current_edge") << l_current_edge->dbgShort();
+        qCDebug(g_cat_td_signals) << QString("   previous") << l_current_edge->getPrevious_lv2()->dbgShort();
+        qCDebug(g_cat_td_signals) << QString("   next    ") << l_current_edge->get_next_lv2()->dbgShort();
+        l_section = l_current_edge->find_edge(M1Env::BLNGS_SIID, M1Env::STEPHANUS_SIID);
+        if(l_section != nullptr){
+            l_section = l_section->getTarget_lv2();
+            break;
+        }
+        l_current_edge = l_current_edge->getPrevious_lv2();
+        // l_current_edge = l_current_edge->getNext_lv2();
+    }
+    qCDebug(g_cat_td_signals) << QString("Previous section") << l_section->dbgShort();
+    M1Store::Item_lv2* l_greek_start = nullptr;
+    M1Store::Item_lv2* l_jowett_start = nullptr;
+    M1Store::Item_lv2* l_shorey_start = nullptr;
+    for(M1Store::Item_lv2_iterator it = l_section->getIteratorTop(); !it.beyondEnd(); it.next())
+        if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::OCCUR_SIID)){
+            qCDebug(g_cat_td_signals) << QString("section occur") << it.at()->getTarget_lv2()->dbgShort();
+            if(it.at()->getTarget_lv2()->isOfType("RVGRK")) l_greek_start = it.at()->getTarget_lv2();
+            if(it.at()->getTarget_lv2()->isOfType("RVJWT")) l_jowett_start = it.at()->getTarget_lv2();
+            if(it.at()->getTarget_lv2()->isOfType("RVSHR")) l_shorey_start = it.at()->getTarget_lv2();
+        }
+    qCDebug(g_cat_td_signals) << QString("greek  start") << l_greek_start->dbgShort();
+    qCDebug(g_cat_td_signals) << QString("jowett start") << l_jowett_start->dbgShort();
+    qCDebug(g_cat_td_signals) << QString("shorey start") << l_shorey_start->dbgShort();
 
-    QTextEdit *l_text_edit_1 = new QTextEdit();
-    l_text_edit_1->setText(m_myself->dbgShort());
-    QTextEdit *l_text_edit_2 = new QTextEdit();
-    l_text_edit_2->setText(m_myself->getTarget_lv2()->dbgShort());
+    // Set up UI
+    QWidget* l_panel_widget = new QWidget();
+    QVBoxLayout* l_panel_layout = new QVBoxLayout();
+    l_panel_widget->setLayout(l_panel_layout);
 
-    QGraphicsProxyWidget *l_text_edit_proxy_1 = new QGraphicsProxyWidget(l_form);
-    l_text_edit_proxy_1->setWidget(l_text_edit_1);
-    QGraphicsProxyWidget *l_text_edit_proxy_2 = new QGraphicsProxyWidget(l_form);
-    l_text_edit_proxy_2->setWidget(l_text_edit_2);
-
-    l_text_edit_proxy_1->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding));
-    l_text_edit_proxy_2->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding));
-
-    l_layout->addItem(l_text_edit_proxy_1);
-    l_layout->addItem(l_text_edit_proxy_2);
-    */
-    QWidget* l_form = new QWidget();
-    QVBoxLayout* l_form_layout = new QVBoxLayout();
-    l_form->setLayout(l_form_layout);
-
-    QWidget* l_button_bar = new QWidget(l_form);
-    l_form_layout->addWidget(l_button_bar);
+    QWidget* l_button_bar = new QWidget(l_panel_widget);
+    l_panel_layout->addWidget(l_button_bar);
     QHBoxLayout* l_bar_layout = new QHBoxLayout();
     l_button_bar->setLayout(l_bar_layout);
 
@@ -749,7 +950,6 @@ QWidget *M1MidPlane::SentenceInterp::get_edit_widget(){
     qCDebug(g_cat_td_signals) << QString("l_btn1 sizePolicy") << l_btn1->sizePolicy();
     qCDebug(g_cat_td_signals) << QString("l_btn1 sizeHint") << l_btn1->sizeHint();
 
-    //l_btn1->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
     l_bar_layout->addWidget(l_btn1);
     l_bar_layout->addWidget(l_btn2);
     l_bar_layout->addStretch(1);
@@ -757,36 +957,29 @@ QWidget *M1MidPlane::SentenceInterp::get_edit_widget(){
     M1UI::Scene* l_scene = new M1UI::Scene();
     l_scene->setBackgroundBrush(Qt::white);
 
-    M1UI::WordForm *l_form_item = new M1UI::WordForm();
+    M1UI::PassagesPanel* l_passages_panel = new M1UI::PassagesPanel();
+    l_scene->addItem(l_passages_panel);
+
+    // M1UI::PassageEditor *l_passage_editor_1 = new M1UI::PassageEditor(m_myself->getTarget_lv2());
+    // M1UI::PassageEditor *l_passage_editor_1 = new M1UI::PassageEditor(l_shorey_start, "A", l_passages_panel);
+    // M1UI::PassageEditor *l_passage_editor_2 = new M1UI::PassageEditor(l_jowett_start, "B", l_passages_panel);
+    // M1UI::PassageEditor *l_passage_editor_1 = new M1UI::PassageEditor(m_myself->getTarget_lv2(), "A", l_passages_panel);
+    // M1UI::PassageEditor *l_passage_editor_2 = new M1UI::PassageEditor(m_myself->getTarget_lv2(), "B", l_passages_panel);
+    M1UI::PassageEditor *l_passage_editor_1 = new M1UI::PassageEditor(l_jowett_start, "A", l_passages_panel);
+    M1UI::PassageEditor *l_passage_editor_2 = new M1UI::PassageEditor(l_shorey_start, "B", l_passages_panel);
+    M1UI::PassageEditor *l_passage_editor_3 = new M1UI::PassageEditor(l_greek_start, "C", l_passages_panel);
+    l_passages_panel->add_stretch();
     // M1UI::DummyLayout* l_layout = new M1UI::DummyLayout(Qt::Orientation::Vertical, l_form_item);
-    M1UI::FlowLayout* l_layout = new M1UI::FlowLayout(l_form_item);
-    l_scene->addItem(l_form_item);
-    l_form_item->setLayout(l_layout);
-    // l_layout->addItem(l_form_item);
+    // M1UI::FlowLayout* l_passage_layout = new M1UI::FlowLayout(l_passage_editor_1);
+    //l_scene->addItem(l_passage_editor_1);
+    //l_scene->addItem(l_passage_editor_2);
+    l_passages_panel->add_stretch();
 
-    static QFont l_font("Noto Mono", 12);
-    for(M1Store::Item_lv2_iterator it = m_myself->getTarget_lv2()->getIteratorTop(); !it.beyondEnd(); it.next())
-        if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::OCCUR_SIID)){
-            QString l_text = toText(it.at()->getTarget_lv2());
-            qCDebug(g_cat_td_signals) << QString("Adding word") << l_text;
-            if(M1Store::Item_lv2* l_section = it.at()->getTarget_lv2()->find_edge(M1Env::BLNGS_SIID, M1Env::STEPHANUS_SIID); l_section != nullptr){
-                // StephanusItem
-                M1UI::StephanusItem* l_steph_number_item = new M1UI::StephanusItem(l_section->getTarget_lv2()->text(), l_form_item);
-                l_steph_number_item->setFont(l_font);
-                //l_scene->addItem(l_steph_number_item);
-                l_layout->addItem(l_steph_number_item);
-            }
-            M1UI::WordItem* l_item = new M1UI::WordItem(l_text, l_form_item);
-            l_item->setFont(l_font);
-            //l_scene->addItem(l_item);
-            l_layout->addItem(l_item);
-        }
     M1UI::View* l_view = new M1UI::View(l_scene);
-    l_view->set_layout(l_layout);
-    l_view->set_form(l_form_item);
-    l_form_layout->addWidget(l_view);
+    l_view->set_panel(l_passages_panel);
+    l_panel_layout->addWidget(l_view);
 
-    return l_form;
+    return l_panel_widget;
 }
 
 //------------------------------------ BookInterp -----------------------------------------------------

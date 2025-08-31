@@ -743,7 +743,7 @@ if __name__ == '__main__':
     l_plato_code +=   '    l_republic_versions->setType("FOLDR");\n'
     l_plato_code +=   '    l_republic->linkTo(l_republic_versions, "OWNS_");\n\n'
 
-    l_plato_code +=   '    M1Store::Item_lv2* l_cur_occ;\n'
+    l_plato_code +=   '    M1Store::Item_lv2* l_cur_occ = nullptr;\n'
     l_plato_code +=   '    M1Store::Item_lv2* l_cur_ver_occ = nullptr;\n'
     l_plato_code +=   '    M1Store::Item_lv2* l_cur_book_sentence = nullptr;\n'
     l_plato_code +=   '    M1Store::Item_lv2* l_cur_sentence_occ = nullptr;\n'
@@ -780,7 +780,7 @@ if __name__ == '__main__':
             l_form_id = l_form_key_2_id[l_form_key]
             l_plato_code += (f'    // creation of Republic occurrence {l_occ_key} node\n' +
                              f'    qCDebug(g_cat_silence) << QString("Creating Republic occurrence {l_occ_key} node");\n' +
-                             f'    l_cur_occ = l_republic->linkTo(l_form_array[{l_form_id}]->item_id(), "OCCUR");\n')
+                             f'    l_cur_occ = l_republic->linkTo(l_form_array[{l_form_id}]->item_id(), "OCCUR", l_cur_occ, false);\n')
             l_plato_code +=  f'    l_cur_occ->setText("{l_occ_key[:15]}");\n'
             l_plato_code +=  f'    l_cur_occ->setType("{l_mnemo_ver}");\n'
             l_plato_code +=  f'    l_form_array[{l_form_id}]->linkTo(l_cur_occ, "OWNS_");\n'

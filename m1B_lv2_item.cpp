@@ -272,7 +272,7 @@ void M1Store::Item_lv2::dbgRecurGraph(const ItemID p_item_id, std::set<ItemID>& 
             ItemID l_stop_id = l_edge->item_id(); // this id is the first AND last edge bc edges are arranged in a doubly linked ring
             // loop through all special edges
             do{
-                Item_lv2* l_next_edge = l_edge->getNext_lv2();
+                Item_lv2* l_next_edge = l_edge->get_next_lv2();
                 // debug one liner of current edge ("S" = "special")
                 qCDebug(g_cat_silence) << p_left + "+--S" + (l_edge->isFullEdge() ? l_edge->dbgHalf() : l_edge->dbgShort(1));
                 // recursive call to recurGraph on the target of the current edge  (may not be a full edge bc of fields)
@@ -292,7 +292,7 @@ void M1Store::Item_lv2::dbgRecurGraph(const ItemID p_item_id, std::set<ItemID>& 
             do{
                 // debug one liner of current edge ("O" = "ordinary")
                 qCDebug(g_cat_silence) << p_left + "+--O" + (l_edge->isFullEdge() ? l_edge->dbgHalf() : l_edge->dbgShort(1));
-                Item_lv2* l_next_edge = l_edge->getNext_lv2();
+                Item_lv2* l_next_edge = l_edge->get_next_lv2();
                 // recursive call to recurGraph on the target of the current edge (may not be a full edge bc of fields)
                 if(l_edge->isFullEdge())
                     dbgRecurGraph(l_edge->target_item_id(), p_already_expanded,
@@ -332,7 +332,7 @@ QString M1Store::Item_lv2::dbgString(){
                 ItemID l_stop_id = l_current_edge->item_id();
                 do {
                     l_edges += "\n" + l_current_edge->dbgShort();
-                Item_lv2* l_next_edge = l_current_edge->getNext_lv2();
+                Item_lv2* l_next_edge = l_current_edge->get_next_lv2();
                     l_current_edge = l_next_edge;
                 } while (l_current_edge->item_id() != l_stop_id);
             }
@@ -342,7 +342,7 @@ QString M1Store::Item_lv2::dbgString(){
                 ItemID l_stop_id = l_current_edge->item_id();
                 do {
                     l_edges += "\n" + l_current_edge->dbgShort();
-                    Item_lv2* l_next_edge = l_current_edge->getNext_lv2();
+                    Item_lv2* l_next_edge = l_current_edge->get_next_lv2();
                     l_current_edge = l_next_edge;
                 } while (l_current_edge->item_id() != l_stop_id);
             }
@@ -426,7 +426,7 @@ QString M1Store::Item_lv2::dbgStringHtml(){
             do {
                 l_edge_list.append(QString("<p style=\"margin: 0;\">%1</p>\n").arg(l_current_edge->dbgShort()));
                 // l_edges += "\n" + l_current_edge->dbgShort();
-                Item_lv2* l_next_edge = l_current_edge->getNext_lv2();
+                Item_lv2* l_next_edge = l_current_edge->get_next_lv2();
                 l_current_edge = l_next_edge;
             } while (l_current_edge->item_id() != l_stop_id);
         }
@@ -440,7 +440,7 @@ QString M1Store::Item_lv2::dbgStringHtml(){
             do {
                 l_edge_list.append(QString("<p style=\"margin: 0;\">%1</p>\n").arg(l_current_edge->dbgShort()));
                 // l_edges += "\n" + l_current_edge->dbgShort();
-                Item_lv2* l_next_edge = l_current_edge->getNext_lv2();
+                Item_lv2* l_next_edge = l_current_edge->get_next_lv2();
                 l_current_edge = l_next_edge;
             } while (l_current_edge->item_id() != l_stop_id);
         }
@@ -618,7 +618,7 @@ M1Store::Item_lv2* M1Store::Item_lv2::getFirstEdgeSpecial_lv2() const{
  * @brief (only for edges, full and simple) Item_lv2* for next edge. Does NOT ever return a nullptr
  * @return
  */
-M1Store::Item_lv2* M1Store::Item_lv2::getNext_lv2() const{
+M1Store::Item_lv2* M1Store::Item_lv2::get_next_lv2() const{
     M1_FUNC_ENTRY(g_cat_lv2_members, QString("Get the next edge lv2 item pointer"))
     Q_ASSERT_X(next_item_id() != G_VOID_ITEM_ID,
                "Item_lv2::getNext_lv2()", "next_item_id() == G_VOID_ITEM_ID");
@@ -794,7 +794,7 @@ bool M1Store::Item_lv2::isOfType(const SpecialItemID p_type_si_id) const{
             // loop through special edges ...
             for(Item_lv2* l_current_edge = this->getFirstEdgeSpecial_lv2();
                  !(l_not_first && (l_current_edge->item_id() == this->firstEdgeSpecial_item_id()));
-                 l_current_edge = l_current_edge->getNext_lv2()){
+                 l_current_edge = l_current_edge->get_next_lv2()){
 
                 // ... until an edge of the from ---ISA---> (expected ItemID) is found
                 if(l_current_edge->isOfType_member("_ISA_") && l_current_edge->target_item_id() == l_expected_target_id){
@@ -1108,7 +1108,7 @@ void M1Store::Item_lv2::installFullEdge(Item_lv2* p_new_edge, const SpecialItemI
 void M1Store::Item_lv2::insertEdgeBelow(Item_lv2* p_new_edge, Item_lv2* p_edge_above){
     M1_FUNC_ENTRY(g_cat_lv2_members, QString("inserting in (non empty) edge ring"))
     Q_ASSERT_X(p_edge_above != nullptr, "Item_lv2::insertEdgeBelow()", "p_edge_above is nullptr");
-    M1Store::Item_lv2* l_next_edge = p_edge_above->getNext_lv2();
+    M1Store::Item_lv2* l_next_edge = p_edge_above->get_next_lv2();
 
     // appropriate next/previous hookups
     p_new_edge->setPrevious(p_edge_above->item_id());
@@ -1349,7 +1349,7 @@ bool M1Store::Item_lv2_iterator_base::isNull(){
 void M1Store::Item_lv2_iterator_base::next(){
     M1_FUNC_ENTRY(g_cat_lv2_iterators, QString("move to next edge"))
     if(m_current_edge != nullptr )
-        m_current_edge = m_current_edge->getNext_lv2();
+        m_current_edge = m_current_edge->get_next_lv2();
     m_not_first = true;
     M1_FUNC_EXIT
 }
