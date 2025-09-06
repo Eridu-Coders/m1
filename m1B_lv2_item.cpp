@@ -633,7 +633,7 @@ M1Store::Item_lv2* M1Store::Item_lv2::get_next_lv2() const{
  * @brief (only for edges, full and simple) Item_lv2* for previous edge. Does NOT ever return a nullptr
  * @return
  */
-M1Store::Item_lv2* M1Store::Item_lv2::getPrevious_lv2() const{
+M1Store::Item_lv2* M1Store::Item_lv2::get_previous_lv2() const{
     M1_FUNC_ENTRY(g_cat_lv2_members, QString("Get the reciprocal edge lv2 item pointer"))
     Q_ASSERT_X(previous_item_id() != G_VOID_ITEM_ID,
                "Item_lv2::getPrevious_lv2()", "previous_item_id() == G_VOID_ITEM_ID");
@@ -1062,7 +1062,7 @@ void M1Store::Item_lv2::installFullEdge(Item_lv2* p_new_edge, const SpecialItemI
                 l_at_top = false; // just to be sure
             } else {
                 // .. ABOVE the current first edge (of the appropriate ring) otherwise (including p_at_top set)
-                l_edge_above = this->getExisting(l_first_edge_id)->getPrevious_lv2();
+                l_edge_above = this->getExisting(l_first_edge_id)->get_previous_lv2();
                 // this would in fact insert the new edge at the BOTTOM because "above the first edge" is also the last (bc it is a ring)
                 // however, the flag below will make sure that the new edge becomes the first edge and so it will indeed be at top
                 l_at_top = true;

@@ -83,7 +83,7 @@ class Item_lv2 : public Item_lv1 {
         template <class T>
         Item_lv2* getNext_lv2(T) = delete; // C++11
 
-        Item_lv2* getPrevious_lv2() const;
+        Item_lv2* get_previous_lv2() const;
         Item_lv2* getPrevious_lv2(const SpecialItemID p_type) const;
         Item_lv2* getPrevious_lv2(const char* p_mnemonic) const;
 

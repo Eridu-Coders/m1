@@ -417,7 +417,7 @@ M1MidPlane::SectionInterp::SectionInterp(M1Store::Item_lv2* p_myself, QWidget* p
 }
 
 //------------------------------------ SentenceInterp -----------------------------------------------------
-QString toText(M1Store::Item_lv2* p_occur_edge){
+QString M1MidPlane::SentenceInterp::occur_to_text(M1Store::Item_lv2* p_occur_edge){
     QString l_text(p_occur_edge->getTarget_lv2()->text());
     if(p_occur_edge->getField(M1Store::CAPTL_SIID) == "true")
         l_text.front() = l_text.front().toUpper();
@@ -428,7 +428,7 @@ QString st_html_fragment(M1Store::Item_lv2* p_si){
     QStringList l_word_list;
     for(M1Store::Item_lv2_iterator it = p_si->getIteratorTop(); !it.beyondEnd(); it.next()){
         if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::OCCUR_SIID)){
-            QString l_text = toText(it.at()->getTarget_lv2());
+            QString l_text = M1MidPlane::SentenceInterp::occur_to_text(it.at()->getTarget_lv2());
             qCDebug(g_cat_interp_base) << "l_text" << l_text << it.at()->getTarget_lv2()->dbgShort();
             if(M1Store::Item_lv2* l_section = it.at()->getTarget_lv2()->find_edge(M1Env::BLNGS_SIID, M1Env::STEPHANUS_SIID); l_section != nullptr){
                 l_word_list.append(QString("<span style=\"font-size: smaller; color: maroon; font-weight: bold;\">%1</span> %2")
@@ -461,277 +461,10 @@ QString M1MidPlane::SentenceInterp::getHtml(){
     return g_html_template.arg(l_html);
 }
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#include <QGraphicsLinearLayout>
-#include <QGraphicsWidget>
-#include <QTextEdit>
-#include <QGraphicsProxyWidget>
 #include <QVBoxLayout>
 #include <QPushButton>
 
-namespace M1UI{
-// QGraphicsLayoutItem
-class WordItem: public QGraphicsSimpleTextItem{
-public:
-    WordItem(const QString& p_txt, QGraphicsItem *p_parent = nullptr): QGraphicsSimpleTextItem(p_txt, p_parent){}
-    virtual QSizeF sizeHint(Qt::SizeHint p_which, const QSizeF &p_constraint = QSizeF()) const {
-        QSizeF l_ret = QGraphicsSimpleTextItem::boundingRect().size();
-        qCDebug(g_cat_td_signals) << QString("WordItem::sizeHint [") << p_which << p_constraint << QString("] %1 -->").arg(this->text()) << l_ret;
-        return l_ret;
-    }
-    virtual void setGeometry(const QRectF &p_rect){
-        QGraphicsSimpleTextItem::setPos(p_rect.topLeft());
-        qCDebug(g_cat_td_signals) << QString("WordItem::setGeometry") << p_rect << this->text();
-    }
-protected:
-    virtual void paint(QPainter *p_painter,
-                       const QStyleOptionGraphicsItem *p_option,
-                       QWidget *p_widget){
-        QGraphicsSimpleTextItem::paint(p_painter, p_option, p_widget);
-        QRectF l_br = boundingRect();
-        // p_painter->drawRect(l_br);
-        qCDebug(g_cat_td_signals) << QString("WordItem paint") << this->text() << l_br.topLeft() << l_br.bottomRight() << l_br;
-    }
-};
-
-class StephanusItem: public WordItem{
-public:
-    StephanusItem(const QString& p_txt, QGraphicsItem *p_parent = nullptr): WordItem(p_txt, p_parent){}
-protected:
-    virtual void paint(QPainter *p_painter,
-                       const QStyleOptionGraphicsItem *p_option,
-                       QWidget *p_widget){
-
-        WordItem::paint(p_painter, p_option, p_widget);
-        p_painter->setPen(Qt::red);
-        p_painter->drawRect(boundingRect());
-    }
-};
-
-class PassageEditor: public QGraphicsItem{
-private:
-    static QFont cm_font;
-    QString m_id;
-    QList<WordItem*> m_item_list;
-    QSizeF m_editor_size;
-    int m_margin_pe = 5;
-    int m_spacing = 10;
-public:
-    QString& id(){return m_id;}
-    /*
-    PassageEditor(M1Store::Item_lv2* p_sentence, const QString& p_id, QGraphicsWidget *p_parent): QGraphicsWidget(p_parent){
-        qCDebug(g_cat_td_signals) << QString("PassageEditor") << p_id << p_sentence->text();
-        m_editor_layout = new FlowLayout(p_id, this);
-        this->setLayout(m_editor_layout);
-        m_id = p_id;
-        static_cast<QGraphicsLinearLayout*>(p_parent->layout())->addItem(this);
-
-        //M1Store::Item_lv2* l_cur_occur = p_occur_start;
-        for(M1Store::Item_lv2_iterator it = p_sentence->getIteratorTop(); !it.beyondEnd(); it.next()) {
-            qCDebug(g_cat_td_signals) << QString("Current edge") << m_id << it.at()->dbgShort();
-            if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::OCCUR_SIID)){
-                QString l_text = toText(it.at()->getTarget_lv2());
-                qCDebug(g_cat_td_signals) << QString("Adding word") << m_id << l_text;
-                if(M1Store::Item_lv2* l_section = it.at()->getTarget_lv2()->find_edge(M1Env::BLNGS_SIID, M1Env::STEPHANUS_SIID); l_section != nullptr){
-                    // StephanusItem
-                    M1UI::StephanusItem* l_steph_number_item = new M1UI::StephanusItem(l_section->getTarget_lv2()->text(), this);
-                    l_steph_number_item->setFont(cm_font);
-                    m_editor_layout->addItem(l_steph_number_item);
-                }
-                M1UI::WordItem* l_item = new M1UI::WordItem(l_text, this);
-                l_item->setFont(cm_font);
-                m_editor_layout->addItem(l_item);
-            }
-        }
-
-        qCDebug(g_cat_td_signals) << QString("Count:") << m_id << m_editor_layout->count();
-    }
-    */
-    // PassageEditor(M1Store::Item_lv2* p_sentence, const QString& p_id, QGraphicsWidget *p_parent): QGraphicsWidget(p_parent){
-    PassageEditor(M1Store::Item_lv2* p_occur_start, const QString& p_id, QGraphicsItem *p_parent=nullptr): QGraphicsItem(p_parent){
-        qCDebug(g_cat_td_signals) << QString("PassageEditor") << p_id << p_occur_start->text();
-        m_id = p_id;
-
-        M1Store::Item_lv2* l_cur_occur = p_occur_start;
-        for(int l_count_words = 0; l_count_words < 100 && l_cur_occur->next_item_id() != M1Env::G_VOID_ITEM_ID; l_count_words++){
-            qCDebug(g_cat_td_signals) << QString("Current edge") << m_id << l_cur_occur->dbgShort();
-            if(l_cur_occur->isFullEdge() && l_cur_occur->isOfType(M1Env::OCCUR_SIID)){
-                QString l_text = toText(l_cur_occur);
-                qCDebug(g_cat_td_signals) << QString("Adding word") << m_id << l_text;
-                if(M1Store::Item_lv2* l_section = l_cur_occur->find_edge(M1Env::BLNGS_SIID, M1Env::STEPHANUS_SIID); l_section != nullptr){
-                    // StephanusItem
-                    M1UI::StephanusItem* l_steph_number_item = new M1UI::StephanusItem(l_section->getTarget_lv2()->text(), this);
-                    l_steph_number_item->setFont(cm_font);
-                    m_item_list.append(l_steph_number_item);
-                }
-                M1UI::WordItem* l_item = new M1UI::WordItem(l_text, this);
-                l_item->setFont(cm_font);
-                m_item_list.append(l_item);
-            }
-
-            l_cur_occur = l_cur_occur->get_next_lv2();
-        }
-
-        qCDebug(g_cat_td_signals) << QString("Count:") << m_id << m_item_list.count();
-    }
-    QRectF do_layout(const QRectF& p_rect){
-        qCDebug(g_cat_td_signals) << QString("do_layout p_rect:") << m_id << p_rect;
-        int l_init_x = m_margin_pe;
-        int l_init_y = m_margin_pe;
-        int l_x = l_init_x;
-        int l_y = l_init_y;
-
-        int max_x = 0;
-        int max_y = 0;
-        for(WordItem *l_item : std::as_const(m_item_list)){
-            QSizeF l_size_hint = l_item->sizeHint(Qt::SizeHint::MinimumSize);
-            qCDebug(g_cat_td_signals) << QString("SizeHint:") << l_item->text() << l_size_hint;
-
-            int l_x_right = l_x + l_size_hint.width();
-            if( l_x_right > p_rect.width() - m_margin_pe){
-                l_x = l_init_x;
-                l_y += l_size_hint.height() + m_spacing;
-            }
-
-            if(l_x_right > max_x) max_x = l_x_right;
-            if(l_y + l_size_hint.height() > max_y) max_y = l_y + l_size_hint.height();
-
-            l_item->setPos(l_x, l_y);
-            qCDebug(g_cat_td_signals) << QString("item rec: (%1, %2) (%3, %4)")
-                                             .arg(l_x).arg(l_y).arg(l_x + l_size_hint.width()-1).arg(l_y + l_size_hint.height()-1);
-
-            l_x += l_size_hint.width() + m_spacing;
-        }
-
-        QRectF l_outer_geometry = QRectF(p_rect.topLeft(), QSizeF(p_rect.size().width(), max_y - l_init_y + 2*m_margin_pe));
-        qCDebug(g_cat_td_signals) << QString("do_layout m_outer_geometry:") << m_id << l_outer_geometry;
-        m_editor_size = l_outer_geometry.size();
-        return l_outer_geometry;
-    }
-    virtual QRectF boundingRect() const override {
-        QRectF l_br(QPoint(0, 0), m_editor_size);
-        qCDebug(g_cat_td_signals) << QString("PassageEditor boundingRect()") << m_id << l_br.topLeft() << l_br.bottomRight();
-        return l_br;
-    }
-    virtual void paint(QPainter *p_painter,
-                       const QStyleOptionGraphicsItem *p_option,
-                       QWidget *p_widget) override {
-
-        // QGraphicsItem::paint(p_painter, p_option, p_widget);
-        QRectF l_outline(QPoint(0, 0), m_editor_size);
-        p_painter->setPen(Qt::blue);
-        p_painter->drawRect(l_outline);
-        qCDebug(g_cat_td_signals) << QString("PassageEditor l_outline") << m_id << l_outline.topLeft() << l_outline.bottomRight();
-    }
-    virtual QVariant itemChange(GraphicsItemChange p_change, const QVariant &p_value) override {
-        qCDebug(g_cat_td_signals) << QString("PassageEditor itemChange:") << m_id << p_change << p_value;
-        return QGraphicsItem::itemChange(p_change, p_value);
-    }
-    virtual bool sceneEvent(QEvent *p_event) override {
-        qCDebug(g_cat_td_signals) << QString("PassageEditor sceneEvent:") << m_id << p_event;
-        return QGraphicsItem::sceneEvent(p_event);
-    }
-    QRectF get_outer_rect(const QPointF& p_top_left, int p_editor_width){
-        qCDebug(g_cat_td_signals) << QString("PassageEditor get_outer_rect:") << p_editor_width;
-        prepareGeometryChange();
-        QRectF l_outer_geometry = do_layout(QRectF(p_top_left, QSize(p_editor_width, 0)));
-        setPos(p_top_left);
-        qCDebug(g_cat_td_signals) << QString("PassageEditor get_outer_rect:") << m_id << l_outer_geometry;
-        return l_outer_geometry;
-    }
-};
-
-QFont PassageEditor::cm_font = QFont("Noto Mono", 12);
-
-class PassagesPanel: public QGraphicsItem{
-private:
-    int m_view_width = -1;
-    QSizeF m_size_panel;
-    int m_margin_pp = 30;
-    QList<PassageEditor*> m_pe_list;
-public:
-    PassagesPanel(QGraphicsWidget *p_parent=nullptr): QGraphicsItem(p_parent){}
-    void add_passage_editor(PassageEditor* p_pe){m_pe_list.append(p_pe);}
-    virtual QRectF boundingRect() const override {
-        QRectF l_br(QPoint(0, 0), m_size_panel);
-        qCDebug(g_cat_td_signals) << QString("PassagesPanel boundingRect()") << l_br.topLeft() << l_br.bottomRight();
-        return l_br;
-    }
-    virtual void paint(QPainter *p_painter,
-                       const QStyleOptionGraphicsItem *p_option,
-                       QWidget *p_widget) override {
-
-        QRectF l_outline(QPoint(0, 0), m_size_panel);
-        p_painter->setPen(Qt::GlobalColor::darkYellow);
-        p_painter->drawRect(l_outline);
-        qCDebug(g_cat_td_signals) << QString("PassagesPanel l_outline") << l_outline.topLeft() << l_outline.bottomRight();
-    }
-    QSizeF set_panel_width(const QPointF& p_top_left, int p_panel_width){
-        qCDebug(g_cat_td_signals) << QString("PassagesPanel set_view_width:") << p_panel_width;
-        m_view_width = p_panel_width;
-        QRectF l_inner_rect(QPointF(m_margin_pp, m_margin_pp), QSizeF(p_panel_width - 2*m_margin_pp, 0));
-        for(int i = 0; i < m_pe_list.count(); i++){
-            PassageEditor* l_pe = m_pe_list.at(i);
-            QRectF l_rect = l_pe->get_outer_rect(l_inner_rect.bottomLeft(), l_inner_rect.width());
-            qCDebug(g_cat_td_signals) << QString("PassagesPanel pe:") << l_pe->id() << "--> outer rect:" << l_rect;
-            l_inner_rect = l_inner_rect.united(l_rect);
-            l_inner_rect += QMarginsF(0, 0, 0, m_margin_pp);
-        }
-        qCDebug(g_cat_td_signals) << QString("PassagesPanel get_outer_rect l_inner_geometry:") << l_inner_rect;
-        prepareGeometryChange();
-        m_size_panel = (l_inner_rect + QMarginsF(m_margin_pp, m_margin_pp, m_margin_pp, 0)).size();
-        setPos(p_top_left);
-        qCDebug(g_cat_td_signals) << QString("PassagesPanel get_outer_rect m_outer_geometry:") << m_size_panel;
-        return m_size_panel;
-    }
-};
-
-class Scene: public QGraphicsScene{
-public:
-    Scene():QGraphicsScene(){}
-protected:
-    virtual bool event(QEvent *p_event){
-        qCDebug(g_cat_td_signals) << QString("Scene event:") << p_event;
-        return QGraphicsScene::event(p_event);
-    }
-};
-
-class View: public QGraphicsView{
-private:
-    PassagesPanel* m_outer_panel = nullptr;
-    int m_margin_view = 10;
-public:
-    View(QGraphicsScene *p_scene):QGraphicsView(p_scene){}
-    void set_panel(PassagesPanel* p_outer_panel){m_outer_panel = p_outer_panel;}
-protected:
-    virtual bool event(QEvent *p_event){
-        qCDebug(g_cat_td_signals) << QString("View event:") << p_event;
-        return QGraphicsView::event(p_event);
-    }
-    virtual void paintEvent(QPaintEvent *p_event){
-        QRectF l_scene_rect = scene()->sceneRect();
-        l_scene_rect = QRectF(l_scene_rect.topLeft(), QSize(l_scene_rect.size().width()-1, l_scene_rect.size().height()-1));
-        qCDebug(g_cat_td_signals) << QString("View paintEvent l_scene_rect") << l_scene_rect.topLeft() << l_scene_rect.bottomRight();
-
-        QGraphicsView::paintEvent(p_event);
-    }
-    virtual void resizeEvent(QResizeEvent *p_event){
-        qCDebug(g_cat_td_signals) << QString("View resizeEvent p_event:") << p_event;
-
-        qCDebug(g_cat_td_signals) << QString("View resizeEvent START") << "######################################### before set_panel_width";
-        QSizeF l_panel_size = m_outer_panel->set_panel_width(QPointF(m_margin_view, m_margin_view), p_event->size().width() - 2*m_margin_view);
-        qCDebug(g_cat_td_signals) << QString("View resizeEvent") << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% after set_panel_width";
-
-        int l_panel_height = l_panel_size.height() + 2*m_margin_view;
-        QRectF l_scene_rect = QRectF(QPoint(0, 0), QSizeF(p_event->size().width(), l_panel_height > p_event->size().height() ? l_panel_height : p_event->size().height()));
-        scene()->setSceneRect(l_scene_rect);
-        qCDebug(g_cat_td_signals) << QString("View resizeEvent l_scene_rect:") << l_scene_rect;
-
-        QGraphicsView::resizeEvent(p_event);
-        qCDebug(g_cat_td_signals) << QString("View resizeEvent m_outer_panel->rect():") << p_event << m_outer_panel->boundingRect() << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ END";
-    }
-};
-
-}
+#include "m1D_passages_panel.h"
 
 QWidget *M1MidPlane::SentenceInterp::get_edit_widget(){
     // find previous Stephanus Number
@@ -740,14 +473,14 @@ QWidget *M1MidPlane::SentenceInterp::get_edit_widget(){
     M1Store::Item_lv2* l_section;
     while(true){
         qCDebug(g_cat_td_signals) << QString("l_current_edge") << l_current_edge->dbgShort();
-        qCDebug(g_cat_td_signals) << QString("   previous") << l_current_edge->getPrevious_lv2()->dbgShort();
+        qCDebug(g_cat_td_signals) << QString("   previous") << l_current_edge->get_previous_lv2()->dbgShort();
         qCDebug(g_cat_td_signals) << QString("   next    ") << l_current_edge->get_next_lv2()->dbgShort();
         l_section = l_current_edge->find_edge(M1Env::BLNGS_SIID, M1Env::STEPHANUS_SIID);
         if(l_section != nullptr){
             l_section = l_section->getTarget_lv2();
             break;
         }
-        l_current_edge = l_current_edge->getPrevious_lv2();
+        l_current_edge = l_current_edge->get_previous_lv2();
         // l_current_edge = l_current_edge->getNext_lv2();
     }
     qCDebug(g_cat_td_signals) << QString("Previous section") << l_section->dbgShort();
@@ -775,14 +508,18 @@ QWidget *M1MidPlane::SentenceInterp::get_edit_widget(){
     QHBoxLayout* l_bar_layout = new QHBoxLayout();
     l_button_bar->setLayout(l_bar_layout);
 
-    QPushButton* l_btn1 = new QPushButton("Button 1", l_button_bar);
-    QPushButton* l_btn2 = new QPushButton("Button 2", l_button_bar);
+    QPushButton* l_btn0 = new QPushButton("< 10", l_button_bar);
+    QPushButton* l_btn1 = new QPushButton("< 1", l_button_bar);
+    QPushButton* l_btn2 = new QPushButton("> 1", l_button_bar);
+    QPushButton* l_btn3 = new QPushButton("> 10", l_button_bar);
 
     qCDebug(g_cat_td_signals) << QString("l_btn1 sizePolicy") << l_btn1->sizePolicy();
     qCDebug(g_cat_td_signals) << QString("l_btn1 sizeHint") << l_btn1->sizeHint();
 
+    l_bar_layout->addWidget(l_btn0);
     l_bar_layout->addWidget(l_btn1);
     l_bar_layout->addWidget(l_btn2);
+    l_bar_layout->addWidget(l_btn3);
     l_bar_layout->addStretch(1);
 
     M1UI::Scene* l_scene = new M1UI::Scene();
@@ -794,6 +531,15 @@ QWidget *M1MidPlane::SentenceInterp::get_edit_widget(){
     l_passages_panel->add_passage_editor(new M1UI::PassageEditor(l_jowett_start, "A", l_passages_panel));
     l_passages_panel->add_passage_editor(new M1UI::PassageEditor(l_shorey_start, "B", l_passages_panel));
     l_passages_panel->add_passage_editor(new M1UI::PassageEditor(l_greek_start, "C", l_passages_panel));
+
+    QObject::connect(l_btn0, &QPushButton::clicked,
+                     l_passages_panel, &M1UI::PassagesPanel::move_backwards_ten);
+    QObject::connect(l_btn1, &QPushButton::clicked,
+                     l_passages_panel, &M1UI::PassagesPanel::move_backwards_one);
+    QObject::connect(l_btn2, &QPushButton::clicked,
+                     l_passages_panel, &M1UI::PassagesPanel::move_forward_one);
+    QObject::connect(l_btn3, &QPushButton::clicked,
+                     l_passages_panel, &M1UI::PassagesPanel::move_forward_ten);
 
     M1UI::View* l_view = new M1UI::View(l_scene);
     l_view->set_panel(l_passages_panel);
@@ -867,7 +613,7 @@ M1MidPlane::TextOccurrence::TextOccurrence(M1Store::Item_lv2* p_myself, QWidget*
     M1_FUNC_EXIT
 }
 QString M1MidPlane::TextOccurrence::displayText(){
-    return toText(m_myself->getTarget_lv2());
+    return M1MidPlane::SentenceInterp::occur_to_text(m_myself->getTarget_lv2());
 }
 void M1MidPlane::TextOccurrence::paintEvent(QPaintEvent* p_event){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("TranslUnit painting"))

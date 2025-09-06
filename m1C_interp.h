@@ -177,6 +177,7 @@ class SentenceInterp : public SectionInterp
     Q_OBJECT
 public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
+    static QString occur_to_text(M1Store::Item_lv2* p_occur_edge);
 
     SentenceInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
     virtual QString getHtml();
