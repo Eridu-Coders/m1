@@ -799,6 +799,18 @@ if __name__ == '__main__':
             if len(l_occ_section) > 0:
                 l_plato_code += f'    l_stephanus_array[{l_stephanus_2_id[l_occ_section]}]->linkTo(l_cur_occ, "OWNS_");\n'
 
+            l_occ_pos = l_occ['Pos']
+            if len(l_occ_pos) > 0:
+                l_mn_pos = l_pos_2_mn[l_occ_pos]
+                l_plato_code +=  f'    l_cur_occ->setType("{l_mn_pos}");\n'
+            l_occ_tag = l_occ['Tag']
+            if len(l_occ_tag) > 0:
+                try:
+                    l_mn_tag = l_tag_2_mn[l_occ_tag]
+                    l_plato_code +=  f'    l_cur_occ->setType("{l_mn_tag}");\n'
+                except KeyError:
+                    pass
+
             l_occ_bknum = int(l_occ['BookNumber'])
             if l_occ_bknum > 0:
                 l_cur_bknum = l_occ_bknum

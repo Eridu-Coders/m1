@@ -417,7 +417,7 @@ M1MidPlane::SectionInterp::SectionInterp(M1Store::Item_lv2* p_myself, QWidget* p
 }
 
 //------------------------------------ SentenceInterp -----------------------------------------------------
-QString M1MidPlane::SentenceInterp::occur_to_text(M1Store::Item_lv2* p_occur_edge){
+QString M1MidPlane::SentenceInterp::occur_to_text(const M1Store::Item_lv2* p_occur_edge){
     QString l_text(p_occur_edge->getTarget_lv2()->text());
     if(p_occur_edge->getField(M1Store::CAPTL_SIID) == "true")
         l_text.front() = l_text.front().toUpper();

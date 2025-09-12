@@ -15,6 +15,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 find_package(GTest REQUIRED)
 find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
 find_package(Qt6 REQUIRED COMPONENTS WebEngineWidgets)
+find_package(Qt6 REQUIRED COMPONENTS Core)
 
 set(PROJECT_SOURCES
         m1A_constants.h
@@ -43,6 +44,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(m1
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        m1D_passages_panel.h m1D_passages_panel.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET m1 APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -63,6 +65,7 @@ else()
 endif()
 
 target_link_libraries(m1 PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6::WebEngineWidgets gtest gtest_main lmdb ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(m1 PRIVATE Qt6::Core)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an

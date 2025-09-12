@@ -11,29 +11,69 @@
 
 namespace M1UI{
 
-class WordItem: public QGraphicsSimpleTextItem{
+class PassageEditor;
+
+class BasePassageItem: public QGraphicsSimpleTextItem{
+private:
+    int m_id = -1;
+    int m_height = -1;
+    bool m_start_selection = false;
+    bool m_end_selection = false;
+    bool m_in_selection = false;
+    bool m_start_line = false;
+    bool m_end_line = false;
+    PassageEditor* m_editor = nullptr;
 public:
-    WordItem(const QString& p_txt, QGraphicsItem *p_parent = nullptr): QGraphicsSimpleTextItem(p_txt, p_parent){}
+    BasePassageItem(const int p_id, PassageEditor *p_parent = nullptr);
     virtual QSizeF sizeHint(Qt::SizeHint p_which, const QSizeF &p_constraint = QSizeF()) const;
-    virtual void setGeometry(const QRectF &p_rect);
+    int id(){return m_id;}
+    void set_selection(){m_in_selection = true;}
+    void set_start_selection(){m_start_selection = true;}
+    void set_end_selection(){m_end_selection = true;}
+    void set_start_line(const bool p_state){m_start_line = p_state;}
+    void set_end_line(const bool p_state){m_end_line = p_state;}
+    void reset_selection_flags(){
+        m_start_selection = false;
+        m_end_selection = false;
+        m_in_selection = false;
+    }
 protected:
+    static QFont cm_base_font;
+
+    virtual QRectF boundingRect() const;
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *p_event);
+    virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *p_event);
+    virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *p_event);
+    virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *p_event);
+    virtual void dropEvent(QGraphicsSceneDragDropEvent *p_event);
     virtual void paint(QPainter *p_painter, const QStyleOptionGraphicsItem *p_option, QWidget *p_widget);
 };
 
-class StephanusItem: public WordItem{
+class WordItem: public BasePassageItem{
+private:
+    M1Store::Item_lv2* m_occ;
 public:
-    StephanusItem(const QString& p_txt, QGraphicsItem *p_parent = nullptr): WordItem(p_txt, p_parent){}
-protected:
-    virtual void paint(QPainter *p_painter, const QStyleOptionGraphicsItem *p_option, QWidget *p_widget);
+    WordItem(const int p_id, M1Store::Item_lv2* p_occ, PassageEditor *p_parent = nullptr);
+};
+
+class StephanusItem: public BasePassageItem{
+private:
+    static QFont cm_font_stephanus;
+
+    QString m_stephanus_number;
+public:
+    StephanusItem(const int p_id, const QString& p_stephanus_number, PassageEditor *p_parent = nullptr);
 };
 
 class PassageEditor: public QGraphicsObject{
+    Q_OBJECT
     friend class PassagesPanel;
 private:
-    static QFont cm_font;
     QString m_id;
-    QList<WordItem*> m_item_list;
+    QList<BasePassageItem*> m_item_list;
     QSizeF m_editor_size;
+    int m_from_sel = -1;
+    int m_to_sel = -1;
     int m_margin_pe = 5;
     int m_spacing = 10;
     M1Store::Item_lv2* m_current_start = nullptr;
@@ -47,10 +87,14 @@ protected:
     virtual void paint(QPainter *p_painter, const QStyleOptionGraphicsItem *p_option, QWidget *p_widget) override;
     virtual QVariant itemChange(GraphicsItemChange p_change, const QVariant &p_value) override;
     virtual bool sceneEvent(QEvent *p_event) override;
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *p_event) override;
 public:
+    void unselect_all();
+    int spacing(){return m_spacing;}
     QString& id(){return m_id;}
     PassageEditor(M1Store::Item_lv2* p_occur_start, const QString& p_id, QGraphicsItem *p_parent=nullptr);
     QRectF get_outer_rect(const QPointF& p_top_left, int p_editor_width);
+    void select_from_to(const int p_from, const int p_to);
 };
 
 class PassagesPanel: public QGraphicsObject{
@@ -88,7 +132,7 @@ private:
     PassagesPanel* m_outer_panel = nullptr;
     int m_margin_view = 10;
 public:
-    View(QGraphicsScene *p_scene):QGraphicsView(p_scene){}
+    View(QGraphicsScene *p_scene);
     void set_panel(PassagesPanel* p_outer_panel){m_outer_panel = p_outer_panel;}
 protected:
     virtual bool event(QEvent *p_event);
