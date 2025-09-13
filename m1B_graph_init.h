@@ -84,6 +84,8 @@ extern M1Env::SpecialItemID GCHAT_TYPE_SIID;
 extern M1Env::SpecialItemID SMS_TYPE_SIID;
 // [TEXT_] Special Vertex ID of "Texts Root (type)"
 extern M1Env::SpecialItemID TEXT_SIID;
+// [GRATT] Special Vertex ID of "Grammar Attributes (type)"
+extern M1Env::SpecialItemID GRAMMAR_ATTR_SIID;
 // [LEMMA] Special Vertex ID of "Lemma (type)"
 extern M1Env::SpecialItemID LEMMA_SIID;
 // [NLENT] Special Vertex ID of "NLP Entity (type)"
@@ -114,39 +116,97 @@ extern M1Env::SpecialItemID TEXT_SLOKA_TRANSLATION_SIID;
 extern M1Env::SpecialItemID TEXT_SLOKA_BHASHYA_SIID;
 // [TRLUN] Special Vertex ID of "WfW Translation Unit (type)"
 extern M1Env::SpecialItemID TEXT_WFW_UNIT_SIID;
-// [NPADJ] Special Vertex ID of "ADJ-adjective"
+// [ABBR_] Special Vertex ID of "[Abbr]-abbreviation"
+extern M1Env::SpecialItemID ABBR__SIID;
+// [ANMCY] Special Vertex ID of "Animacy"
+extern M1Env::SpecialItemID ANMCY_SIID;
+// [ASPCT] Special Vertex ID of "Aspect"
+extern M1Env::SpecialItemID ASPCT_SIID;
+// [CASE_] Special Vertex ID of "Case"
+extern M1Env::SpecialItemID CASE__SIID;
+// [CTNJY] Special Vertex ID of "[ConjType]-conjunction type"
+extern M1Env::SpecialItemID CTNJY_SIID;
+// [CLSVT] Special Vertex ID of "Clusivity"
+extern M1Env::SpecialItemID CLSVT_SIID;
+// [DEFIN] Special Vertex ID of "[Definite]-definiteness or state"
+extern M1Env::SpecialItemID DEFIN_SIID;
+// [DEGRE] Special Vertex ID of "Degree"
+extern M1Env::SpecialItemID DEGRE_SIID;
+// [DEIXI] Special Vertex ID of "[Deixis]-relative location encoded in demonstratives"
+extern M1Env::SpecialItemID DEIXI_SIID;
+// [DRXSF] Special Vertex ID of "[DeixisRef]-person to which deixis is relative"
+extern M1Env::SpecialItemID DRXSF_SIID;
+// [EVDNT] Special Vertex ID of "[Evident]-evidentiality"
+extern M1Env::SpecialItemID EVDNT_SIID;
+// [EPXTS] Special Vertex ID of "[ExtPos]-external part of speech"
+extern M1Env::SpecialItemID EPXTS_SIID;
+// [FOREI] Special Vertex ID of "[Foreign]-is this a foreign word?"
+extern M1Env::SpecialItemID FOREI_SIID;
+// [GENDE] Special Vertex ID of "Gender"
+extern M1Env::SpecialItemID GENDE_SIID;
+// [MOOD_] Special Vertex ID of "Mood"
+extern M1Env::SpecialItemID MOOD__SIID;
+// [NCNLS] Special Vertex ID of "[NounClass]-noun class"
+extern M1Env::SpecialItemID NCNLS_SIID;
+// [NTMYP] Special Vertex ID of "[NumType]-numeral type"
+extern M1Env::SpecialItemID NTMYP_SIID;
+// [NUMBE] Special Vertex ID of "Number"
+extern M1Env::SpecialItemID NUMBE_SIID;
+// [PERSO] Special Vertex ID of "Person"
+extern M1Env::SpecialItemID PERSO_SIID;
+// [PLRTY] Special Vertex ID of "Polarity"
+extern M1Env::SpecialItemID PLRTY_SIID;
+// [POLIT] Special Vertex ID of "[Polite]-politeness"
+extern M1Env::SpecialItemID POLIT_SIID;
+// [POSS_] Special Vertex ID of "[Poss]-possessive"
+extern M1Env::SpecialItemID POSS__SIID;
+// [PTRNY] Special Vertex ID of "[PronType]-pronominal type"
+extern M1Env::SpecialItemID PTRNY_SIID;
+// [REFLE] Special Vertex ID of "[Reflex]-reflexive"
+extern M1Env::SpecialItemID REFLE_SIID;
+// [TENSE] Special Vertex ID of "Tense"
+extern M1Env::SpecialItemID TENSE_SIID;
+// [TYPO_] Special Vertex ID of "[Typo]-is this a misspelled word?"
+extern M1Env::SpecialItemID TYPO__SIID;
+// [VFRBR] Special Vertex ID of "[VerbForm]-form of verb or deverbative"
+extern M1Env::SpecialItemID VFRBR_SIID;
+// [VTRBY] Special Vertex ID of "[VerbType]-verb type"
+extern M1Env::SpecialItemID VTRBY_SIID;
+// [VOICE] Special Vertex ID of "Voice"
+extern M1Env::SpecialItemID VOICE_SIID;
+// [NPADJ] Special Vertex ID of "[ADJ]-adjective"
 extern M1Env::SpecialItemID NPADJ_SIID;
-// [NPADP] Special Vertex ID of "ADP-adposition"
+// [NPADP] Special Vertex ID of "[ADP]-adposition"
 extern M1Env::SpecialItemID NPADP_SIID;
-// [NPADV] Special Vertex ID of "ADV-adverb"
+// [NPADV] Special Vertex ID of "[ADV]-adverb"
 extern M1Env::SpecialItemID NPADV_SIID;
-// [NPAUX] Special Vertex ID of "AUX-auxiliary"
+// [NPAUX] Special Vertex ID of "[AUX]-auxiliary"
 extern M1Env::SpecialItemID NPAUX_SIID;
-// [NPCNJ] Special Vertex ID of "CCONJ-coordinating conjunction"
+// [NPCNJ] Special Vertex ID of "[CCONJ]-coordinating conjunction"
 extern M1Env::SpecialItemID NPCNJ_SIID;
-// [NPDET] Special Vertex ID of "DET-determiner"
+// [NPDET] Special Vertex ID of "[DET]-determiner"
 extern M1Env::SpecialItemID NPDET_SIID;
-// [NPINT] Special Vertex ID of "INTJ-interjection"
+// [NPINT] Special Vertex ID of "[INTJ]-interjection"
 extern M1Env::SpecialItemID NPINT_SIID;
-// [NPNON] Special Vertex ID of "NOUN-noun"
+// [NPNON] Special Vertex ID of "[NOUN]-noun"
 extern M1Env::SpecialItemID NPNON_SIID;
-// [NPNUM] Special Vertex ID of "NUM-numeral"
+// [NPNUM] Special Vertex ID of "[NUM]-numeral"
 extern M1Env::SpecialItemID NPNUM_SIID;
-// [NPPRT] Special Vertex ID of "PART-particle"
+// [NPPRT] Special Vertex ID of "[PART]-particle"
 extern M1Env::SpecialItemID NPPRT_SIID;
-// [NPPRN] Special Vertex ID of "PRON-pronoun"
+// [NPPRN] Special Vertex ID of "[PRON]-pronoun"
 extern M1Env::SpecialItemID NPPRN_SIID;
-// [NPPPN] Special Vertex ID of "PROPN-proper noun"
+// [NPPPN] Special Vertex ID of "[PROPN]-proper noun"
 extern M1Env::SpecialItemID NPPPN_SIID;
-// [NPPCT] Special Vertex ID of "PUNCT-punctuation"
+// [NPPCT] Special Vertex ID of "[PUNCT]-punctuation"
 extern M1Env::SpecialItemID NPPCT_SIID;
-// [NPSCJ] Special Vertex ID of "SCONJ-subordinating conjunction"
+// [NPSCJ] Special Vertex ID of "[SCONJ]-subordinating conjunction"
 extern M1Env::SpecialItemID NPSCJ_SIID;
-// [NPSYM] Special Vertex ID of "SYM-symbol"
+// [NPSYM] Special Vertex ID of "[SYM]-symbol"
 extern M1Env::SpecialItemID NPSYM_SIID;
-// [NPVRB] Special Vertex ID of "VERB-verb"
+// [NPVRB] Special Vertex ID of "[VERB]-verb"
 extern M1Env::SpecialItemID NPVRB_SIID;
-// [NPXXX] Special Vertex ID of "X-other"
+// [NPXXX] Special Vertex ID of "[X]-other"
 extern M1Env::SpecialItemID NPXXX_SIID;
 // [NTGSE] Special Vertex ID of "[.]-punctuation mark, sentence closer"
 extern M1Env::SpecialItemID NTGSE_SIID;
@@ -267,6 +327,7 @@ extern M1Env::SpecialItemID NT_SP_SIID;
             static void set_pseudo_constants();
             static void init_base();
             static void init_plato();
+            static QList<M1Env::SpecialItemID> cm_gram_attr_list; 
     };
     
 } // end namespace M1Env

@@ -41,7 +41,7 @@ if __name__ == '__main__':
         for c in l_cat_dict[l_cat]:
             l_char = chr(c)
             l_name = unicodedata.name(l_char)
-            # l_ini_word = l_name.split(' ')[0]
+            # l_ini_word = l_name_class.split(' ')[0]
             # l_ini_set.add(l_ini_word)
 
             # if not(l_ini_word in ['BALINESE', 'BATAK', 'BENGALI', 'BUGINESE', 'COPTIC', 'ETHIOPIC', 'GUJARATI',

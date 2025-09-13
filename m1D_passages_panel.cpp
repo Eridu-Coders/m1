@@ -10,6 +10,7 @@
 
 // TODO English passage lengths proportional to Greek length (calculate ratio of distance between 2 Stephanus markers)
 
+// BasePassageItem ---------------------------------------------------------------------------------------------------------------------------------------
 QFont M1UI::WordItem::BasePassageItem::cm_base_font = QFont("Noto Mono", 12);
 
 M1UI::BasePassageItem::BasePassageItem(const int p_id, PassageEditor *p_parent): QGraphicsSimpleTextItem(p_parent){
@@ -106,9 +107,21 @@ M1UI::WordItem::WordItem(const int p_id, M1Store::Item_lv2* p_occ, PassageEditor
     M1Store::Item_lv2* l_lemma_edge = m_occ->getTarget_lv2()->find_edge(M1Env::BLNGS_SIID, M1Env::LEMMA_SIID);
     QString l_lemma_txt = l_lemma_edge != nullptr ? QString("<p style=\"white-space:pre;margin:0;padding:0;\"><b>Lemma</b>: %1</p>").arg(l_lemma_edge->getTarget_lv2()->text()) : "";
 
+    // M1Env::GraphInit::cm_gram_attr_list
+    QString l_grammar_attr;
+    for (const M1Env::SpecialItemID& l_ssid_class : M1Env::GraphInit::cm_gram_attr_list) {
+        // qCDebug(g_cat_td_signals) << QString("grammar") << id() << l_ssid_class;
+        M1Store::Item_lv2* l_grammar_edge = m_occ->find_edge(M1Env::ISA_SIID, l_ssid_class, true);
+        if(l_grammar_edge != nullptr){
+            M1Store::Item_lv2* l_class_edge = l_grammar_edge->getTarget_lv2()->find_edge(M1Env::ISA_SIID, M1Env::GRAMMAR_ATTR_SIID, true);
+            QString l_grammar_class = l_class_edge != nullptr ? QString("%1").arg(l_class_edge->getTarget_lv2()->text()) : "";
+            l_grammar_attr += QString("<p style=\"white-space:pre;margin:0;padding:0;\"><b>%1</b>: %2</p>").arg(l_grammar_class).arg(l_grammar_edge->getTarget_lv2()->text());
+        }
+    }
+
     // qCDebug(g_cat_td_signals) << QString("POS/TAG") << id() << l_pos_txt + l_tag_txt << M1Env::NLPOS_SIID << M1Env::NLTAG_SIID;
 
-    this->setToolTip(QString("<p style=\"white-space:pre;margin:0;padding:0;\">Id: %1 %2</p>").arg(id()).arg(l_text) + l_pos_txt + l_tag_txt + l_lemma_txt);
+    this->setToolTip(QString("<p style=\"white-space:pre;margin:0;padding:0;\">Id: %1 %2</p>").arg(id()).arg(l_text) + l_pos_txt + l_tag_txt + l_lemma_txt + l_grammar_attr);
 }
 
 QFont M1UI::StephanusItem::StephanusItem::cm_font_stephanus = QFont("Noto Mono", 8);
@@ -120,6 +133,7 @@ M1UI::StephanusItem::StephanusItem(const int p_id, const QString& p_stephanus_nu
     this->setToolTip(QString("Id: %1").arg(id()));
 }
 
+// PassageEditor ---------------------------------------------------------------------------------------------------------------------------------------
 void M1UI::PassageEditor::move_forward(int p_steps){
     qCDebug(g_cat_td_signals) << QString("move_forward()") << m_id << p_steps;
     if(m_current_start->next_item_id() != M1Env::G_VOID_ITEM_ID){
@@ -299,6 +313,7 @@ void M1UI::PassageEditor::select_from_to(const int p_from, const int p_to){
     }
 }
 
+// PassagesPanel ---------------------------------------------------------------------------------------------------------------------------------------
 QRectF M1UI::PassagesPanel::boundingRect() const {
     QRectF l_br(QPoint(0, 0), m_size_panel);
     //qCDebug(g_cat_td_signals) << QString("PassagesPanel boundingRect()") << l_br.topLeft() << l_br.bottomRight();
@@ -361,6 +376,7 @@ void M1UI::PassagesPanel::move_backwards_ten(){
     calculate_positions();
 }
 
+// Scene & View ---------------------------------------------------------------------------------------------------------------------------------------
 bool M1UI::Scene::event(QEvent *p_event){
     if(p_event->type() != QEvent::GraphicsSceneDragMove)
         qCDebug(g_cat_td_signals) << QString("Scene event:") << p_event;

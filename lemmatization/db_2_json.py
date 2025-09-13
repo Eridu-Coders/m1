@@ -1624,7 +1624,7 @@ def process_cursor_list_gr(p_cursor_list):
                     for kv in w.feats.split('|'):
                         l_key, l_value = kv.split('=')
                         l_grammar_dict_0.setdefault(l_key, set()).add(l_value)
-                        # Z = combined values, M = Greek only
+                        # M = combined values, Z = Greek only
                         g_morph_attr.setdefault(f'Z-{l_key}', set()).add(l_value)
                         g_morph_attr.setdefault(f'M-{l_key}', set()).add(l_value)
 
@@ -1760,17 +1760,17 @@ def print_xpos():
 
 def print_morph_attr():
     print('================= Grammar Attributes =======================')
+    #    for l_key in sorted(list(g_morph_attr.keys())):
+    #       print(f'{l_key:10}: {sorted(list(g_morph_attr[l_key]))}')
+    l_key_explained = ''
     for l_key in sorted(list(g_morph_attr.keys())):
-        print(f'{l_key:10}: {sorted(list(g_morph_attr[l_key]))}')
+        if re.search('^M-', l_key):
+            l_key_short = l_key.replace('M-', '')
+            l_key_explained += f"('{l_key_short}', '{spacy.explain(l_key_short)}')\n"
+            print(f"'{l_key}': {[(l_val, spacy.explain(l_val)) for l_val in g_morph_attr[l_key]]},")
     print()
-    # l_key_explained = ''
-    #     for l_key in sorted(list(g_morph_attr.keys())):
-    #         if re.search('^M-', l_key):
-    #             l_key_short = l_key.replace('M-', '')
-    #             l_key_explained += f"('{l_key_short}', '{spacy.explain(l_key_short)}')\n"
-    #             print(f"'{l_key}': {[(l_val, spacy.explain(l_val)) for l_val in g_morph_attr[l_key]]},")
-    #     print()
-    #     print(l_key_explained)
+    print(l_key_explained)
+    print()
 
 
 def print_punctuation_groups():
@@ -2155,16 +2155,16 @@ if __name__ == '__main__':
     # print_xpos()
     # print_entities()
 
-    print_punctuation_groups()
-    print_punctuation_groups_re()
-    print_apostrophes()
-    print_pos_2_lemma()
-    print_missing()
-    print_remaining_dashes()
+    # print_punctuation_groups()
+    # print_punctuation_groups_re()
+    # print_apostrophes()
+    # print_pos_2_lemma()
+    # print_missing()
+    # print_remaining_dashes()
     print_morph_attr()
-    print_sp_stats(g_sent_pos)
-    print_sp_stats(g_sent_pos_2)
-    print_anno()
+    # print_sp_stats(g_sent_pos)
+    # print_sp_stats(g_sent_pos_2)
+    # print_anno()
 
     # g_tokens_no_punctuation
     # with open('occ_no_punc.json', 'w') as f:
