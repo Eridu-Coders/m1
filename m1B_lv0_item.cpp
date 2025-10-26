@@ -523,7 +523,8 @@ void M1Store::Item_lv0::setTarget(const M1Store::ItemID p_target){
     p.e.f.m_v_target = p_target;
     // increase target's incoming edges counter
     M1Store::Item_lv0* l_target_pointer = M1Store::Storage::getItemPointer_lv0(p_target);
-    l_target_pointer->setIncomingEdges(l_target_pointer->incomingEdges() + 1);
+    if((l_target_pointer->flags() & ITEM_NATURE_MASK) == M1Env::FULL_EDGE || (l_target_pointer->flags() & ITEM_NATURE_MASK) == M1Env::FULL_VERTEX)
+        l_target_pointer->setIncomingEdges(l_target_pointer->incomingEdges() + 1);
 
     M1_FUNC_EXIT
 }

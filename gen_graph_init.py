@@ -380,6 +380,7 @@ g_special_vertices = [
     ['MKPLF', 'SI_IS_TYPE'                     , None,                   'MKPLF_SIID', None, 'Special Vertex ID (Simple edge type) of Occurrence field markup left'],
     ['MKPRT', 'SI_IS_TYPE'                     , None,                   'MKPRT_SIID', None, 'Special Vertex ID (Simple edge type) of Occurrence field markup right'],
     ['STPOS', 'SI_IS_TYPE'                     , None,                   'STPOS_SIID', None, 'Special Vertex ID (Simple edge type) of Occurrence field sentence position'],
+    ['HLCLR', 'SI_IS_TYPE'                     , None,                   'HLCLR_SIID', None, 'Color of text highlight category'],
 ]
 
 g_vertices = [
@@ -400,16 +401,22 @@ g_vertices = [
 ['SMS Inbox',                    ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  '_MSG_')], 'SMS__', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'SMS_TYPE_SIID'],
 ['Texts Root (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TEXT_', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'TEXT_ICON_PATH',         'TEXT_SIID'],
 ['Grammar Attributes (type)',    ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'GRATT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'GRAMMAR_ATTR_SIID'],
-['Lemma (type)',                 ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'LEMMA', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE', 'SI_IS_ICON_TYPE'],  'LEMMA_ICON_PATH',        'LEMMA_SIID'],
+['Lemma (type)',                 ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'LEMMA', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
+                                                                                                               'SI_IS_ICON_TYPE'],                 'LEMMA_ICON_PATH',        'LEMMA_SIID'],
 ['NLP Entity (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'NLENT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'ENTITY_ICON_PATH',       'NLENT_SIID'],
 ['NLP Pos code (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'NLPOS', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'POS_ICON_PATH',          'NLPOS_SIID'],
 ['NLP Tag code (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'NLTAG', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'TAG_ICON_PATH',          'NLTAG_SIID'],
 ['Stephanus Section (type)',     ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'STPSC', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'STEPHANUS_SIID'],
 ['Text Version (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TXTVR', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'TXTVR_SIID'],
 ['Notes (type)',                 ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TXTNT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'TXTNT_SIID'],
-['Text Chunk (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TXTCK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'TEXT_CHUNK_ICON_PATH',   'TEXT_CHUNK_SIID'],
+['Text Chunk (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXTCK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'TEXT_CHUNK_ICON_PATH',   'TEXT_CHUNK_SIID'],
 ['Book (type)',                  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TXTBK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'BOOK_ICON_PATH',         'TEXT_BOOK_SIID'],
-['Sentence (type)',              ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TXSNT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'SENTENCE_ICON_PATH',     'TEXT_SENTENCE_SIID'],
+['Sentence (type)',              ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXSNT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'SENTENCE_ICON_PATH',     'TEXT_SENTENCE_SIID'],
+['Highlight (type)',             ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHLT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'TEXT_HIGHLIGHT_SIID'],
+['Highlight category (type)',    ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TXHLC', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'TEXT_HIGHLIGHT_CAT_SIID'],
+['Highlight Folder (type)',      ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHLF', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'TEXT_HIGHLIGHT_FLDR_SIID'],
+['Highlight Categories Folder',  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHCF', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'TEXT_HIGHLIGHT_CAT_FLDR_SIID'],
+['Highlight Chunk',              ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHCK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'TEXT_HIGHLIGHT_CHUNK_SIID'],
 ]
 
 g_special_vertices_gita = [
@@ -759,7 +766,7 @@ if __name__ == '__main__':
         l_form_id += 1
         l_plato_code += "\n"
 
-    # Sections and books
+    # books
     l_plato_code += (f'    // creation of Republic books node\n' +
                      f'    qCDebug(g_cat_silence) << QString("Creating Republic books node");\n' +
                      f'    M1Store::Item_lv2* l_republic_books = M1Store::Item_lv2::getNew(\n' +
@@ -781,6 +788,7 @@ if __name__ == '__main__':
         l_plato_code +=  f'    l_book[{l_book_num - 1}]->setType("TXTBK");\n'
         l_plato_code +=  f'    l_republic_books->linkTo(l_book[{l_book_num - 1}], "OWNS_");\n\n'
 
+    # Sections
     l_plato_code += (f'    // creation of Republic sections node\n' +
                      f'    qCDebug(g_cat_silence) << QString("Creating Republic sections node");\n' +
                      f'    M1Store::Item_lv2* l_republic_sections = M1Store::Item_lv2::getNew(\n' +
@@ -790,6 +798,53 @@ if __name__ == '__main__':
                      f'        "Stephanus Section");\n')
     l_plato_code +=   '    l_republic_sections->setType("FOLDR");\n'
     l_plato_code +=   '    l_republic->linkTo(l_republic_sections, "OWNS_");\n\n'
+
+    # Highlights folder
+    l_plato_code += (f'    // creation of Republic highlights node\n' +
+                     f'    qCDebug(g_cat_silence) << QString("Creating Republic highlights folder");\n' +
+                     f'    M1Store::Item_lv2* l_republic_highlights = M1Store::Item_lv2::getNew(\n' +
+                     f'        // vertex flags\n' +
+                     f'        M1Env::FULL_VERTEX,\n' +
+                     f'        // label\n' +
+                     f'        "Highlights");\n')
+    l_plato_code +=   '    l_republic_highlights->setType("FOLDR");\n'
+    l_plato_code +=   '    l_republic_highlights->setType("TXHLF");\n'
+    l_plato_code +=   '    l_republic->linkTo(l_republic_highlights, "OWNS_");\n\n'
+
+    # Highlights categories folder
+    l_plato_code += (f'    // creation of Republic highlight categories node\n' +
+                     f'    qCDebug(g_cat_silence) << QString("Creating Republic highlight categories folder");\n' +
+                     f'    M1Store::Item_lv2* l_republic_highlight_cat = M1Store::Item_lv2::getNew(\n' +
+                     f'        // vertex flags\n' +
+                     f'        M1Env::FULL_VERTEX,\n' +
+                     f'        // label\n' +
+                     f'        "Highlight categories");\n')
+    l_plato_code +=   '    l_republic_highlight_cat->setType("FOLDR");\n'
+    l_plato_code +=   '    l_republic_highlight_cat->setType("TXHCF");\n'
+    l_plato_code +=   '    l_republic->linkTo(l_republic_highlight_cat, "OWNS_");\n\n'
+
+    # example highlights categories HLCLR
+    l_plato_code += (f'    // creation of example highlights categories\n' +
+                     f'    qCDebug(g_cat_silence) << QString("Creating example Republic highlight categories");\n' +
+                     f'    M1Store::Item_lv2* l_republic_highlight_cat_1 = M1Store::Item_lv2::getNew(\n' +
+                     f'        // vertex flags\n' +
+                     f'        M1Env::FULL_VERTEX,\n' +
+                     f'        // label\n' +
+                     f'        "Category 1");\n')
+    l_plato_code +=   '    l_republic_highlight_cat_1->setType("FOLDR");\n'
+    l_plato_code +=   '    l_republic_highlight_cat_1->setType("TXHLC");\n'
+    l_plato_code +=  f'    l_republic_highlight_cat_1->setFieldVertex("#f78a38", M1Env::HLCLR_SIID);\n' # light orange
+    l_plato_code +=   '    l_republic_highlight_cat->linkTo(l_republic_highlight_cat_1, "OWNS_");\n\n'
+
+    l_plato_code += (f'    M1Store::Item_lv2* l_republic_highlight_cat_2 = M1Store::Item_lv2::getNew(\n' +
+                     f'        // vertex flags\n' +
+                     f'        M1Env::FULL_VERTEX,\n' +
+                     f'        // label\n' +
+                     f'        "Category 2");\n')
+    l_plato_code +=   '    l_republic_highlight_cat_2->setType("FOLDR");\n'
+    l_plato_code +=   '    l_republic_highlight_cat_2->setType("TXHLC");\n'
+    l_plato_code +=  f'    l_republic_highlight_cat_2->setFieldVertex("#3883f7", M1Env::HLCLR_SIID);\n'  # light blue
+    l_plato_code +=   '    l_republic_highlight_cat->linkTo(l_republic_highlight_cat_2, "OWNS_");\n\n'
 
     l_section_list = l_republic["Sections"]
     l_plato_code += f'    M1Store::Item_lv2* l_stephanus_array[{len(l_section_list)}];\n'
@@ -863,13 +918,13 @@ if __name__ == '__main__':
             # l_plato_code += f'    l_cur_occ->setTarget(l_form_array[{l_form_id}]->item_id());\n'
             l_occ_text = l_occ['Text']
             if re.search('[A-Z]', l_occ_text):
-                l_plato_code +=  f'    l_cur_occ->setField("true", false, M1Env::CAPTL_SIID);\n'
+                l_plato_code +=  f'    l_cur_occ->setFieldEdge("true", M1Env::CAPTL_SIID);\n'
             l_occ_pctl = l_occ['PunctLeft']
             if len(l_occ_pctl) > 0:
-                l_plato_code += f'    l_cur_occ->setField("{l_occ_pctl}", false, M1Env::PCTLF_SIID);\n'
+                l_plato_code += f'    l_cur_occ->setFieldEdge("{l_occ_pctl}", M1Env::PCTLF_SIID);\n'
             l_occ_pctr = l_occ['PunctRight']
             if len(l_occ_pctr) > 0:
-                l_plato_code += f'    l_cur_occ->setField("{l_occ_pctr}", false, M1Env::PCTRT_SIID);\n'
+                l_plato_code += f'    l_cur_occ->setFieldEdge("{l_occ_pctr}", M1Env::PCTRT_SIID);\n'
             l_occ_section = l_occ['NewSection']
             if len(l_occ_section) > 0:
                 l_plato_code += f'    l_stephanus_array[{l_stephanus_2_id[l_occ_section]}]->linkTo(l_cur_occ, "OWNS_");\n'
@@ -899,7 +954,7 @@ if __name__ == '__main__':
                 l_cur_bknum = l_occ_bknum
             l_occ_spos = l_occ['SentencePos']
             if len(l_occ_spos) > 0:
-                l_plato_code += f'    l_cur_occ->setField("{l_occ_spos}", false, M1Env::STPOS_SIID);\n'
+                l_plato_code += f'    l_cur_occ->setFieldEdge("{l_occ_spos}", M1Env::STPOS_SIID);\n'
             if l_occ_spos == 'SS':
                 l_sentence_name = f'{l_version} - Sentence {l_cur_sent + 1}'
                 l_cur_sent += 1

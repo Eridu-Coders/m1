@@ -133,6 +133,7 @@ Q_DECLARE_LOGGING_CATEGORY(g_cat_lv1_test)              ///< for tests of the lv
 Q_DECLARE_LOGGING_CATEGORY(g_cat_lv2_test)              ///< for tests of the lv2_Item class
 Q_DECLARE_LOGGING_CATEGORY(g_cat_tree_display)          ///< TreeDisplay widget class
 Q_DECLARE_LOGGING_CATEGORY(g_cat_td_signals)            ///< Signals between TreeDisplay and MainWindow
+Q_DECLARE_LOGGING_CATEGORY(g_cat_passages_panel)        ///< Passages panel UI class
 Q_DECLARE_LOGGING_CATEGORY(g_cat_interp_base)           ///< Base class of the Interp hierarchy
 Q_DECLARE_LOGGING_CATEGORY(g_cat_main_window)           ///< MainWindow widget class
 Q_DECLARE_LOGGING_CATEGORY(g_cat_main)                  ///< messages from main of complete (non-test) build (including XML loaders)

@@ -49,9 +49,24 @@ using namespace M1Env;
 
         /**
          * @brief Constructor 3 - set the ItemID type
-         * @param p
+         * @param p_item_id
          */
         ItemType(const ItemID p_item_id) { t.m_type_item = p_item_id; }
+
+        /**
+         * @brief Constructor 4 - set the 4 SpecialItemID values
+         * @param p_0
+         * @param p_1
+         * @param p_2
+         * @param p_3
+         */
+        ItemType(const SpecialItemID p_0, const SpecialItemID p_1, const SpecialItemID p_2, const SpecialItemID p_3);
+
+        /**
+         * @brief Constructor 5 - single SpecialItemID value - others set to G_VOID_SI_ID
+         * @param p_0
+         */
+        ItemType(const SpecialItemID p_0) : ItemType(p_0, G_VOID_SI_ID, G_VOID_SI_ID, G_VOID_SI_ID){}
 
         /**
          * @brief operator = overloading
@@ -70,9 +85,6 @@ using namespace M1Env;
          * @return
          */
         ItemID getItemIDType() const {return t.m_type_item; }
-
-        ItemType(const SpecialItemID p_0, const SpecialItemID p_1, const SpecialItemID p_2, const SpecialItemID p_3);
-        ItemType(const SpecialItemID p_0) : ItemType(p_0, G_VOID_SI_ID, G_VOID_SI_ID, G_VOID_SI_ID){}
 
         void setSpecialType(const unsigned int p_index, const SpecialItemID p_si_id);
         SpecialItemID getSpecialType(const unsigned int p_index) const;

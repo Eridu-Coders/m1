@@ -73,6 +73,7 @@ int main(int argc, char *argv[])
                                         "lv2.*=false\n"
                                         "interp.*=false\n"
                                         "tree_display=false\n"
+                                        "passages_panel=false\n"
                                         "qt.*.debug=false");
 
     M1MidPlane::Interp::init();
@@ -313,9 +314,9 @@ int loadGita(){
 
                     // lemma creation
                     M1Store::Item_lv2* l_lemma_node = M1Store::Item_lv2::getNew(
-                        M1Store::FULL_VERTEX,                       // category & attributes (flags)
-                        // M1Store::ItemType(M1Env::TEXT_LEMMA_SIID),  // type
-                        l_lemma.toUtf8().constData()                // label
+                        M1Store::FULL_VERTEX,                           // category & attributes (flags)
+                        // M1Store::ItemType(M1Env::TEXT_LEMMA_SIID),   // type
+                        l_lemma.toUtf8().constData()                    // label
                     );
                     l_lemma_node->setType(M1Env::LEMMA_SIID);
                     l_cur_lex_item->linkTo(l_lemma_node, "BLNGS", nullptr, true);
@@ -325,17 +326,15 @@ int loadGita(){
                 // store occurence edge for translation unit reference
                 l_id_2_occ[l_xml_id] = l_last_edge;
                 // store transliteration text
-                l_cur_lex_item->setField(
-                    l_transliteration_text,
-                    false,
-                    M1Store::Storage::getSpecialItemPointer(M1Env::TEXT_WORD_TRANSLIT_SIID));
+                l_cur_lex_item->setFieldEdge(l_transliteration_text, M1Env::TEXT_WORD_TRANSLIT_SIID);
                 // store dict-ref, if any
-                if(l_dict_ref_name.length() > 0 && l_dict_ref_name == "INRIA")
-                    l_cur_lex_item->setField(
+                if(l_dict_ref_name.length() > 0 && l_dict_ref_name == "INRIA"){
+                    M1Store::Item_lv2* l_field_edge = l_cur_lex_item->setFieldEdge(
                         QString("%1/%2").arg(l_dict_ref_name).arg(l_dict_ref_string),
-                        false,
-                        M1Store::Storage::getSpecialItemPointer(M1Env::TEXT_WORD_DICT_REF_SIID),
-                        M1Store::Storage::getSpecialItemPointer(M1Env::TEXT_WORD_DREF_INRIA_SIID));
+                        M1Env::TEXT_WORD_DICT_REF_SIID);
+                    l_field_edge->setType(M1Env::TEXT_WORD_DREF_INRIA_SIID);
+                }
+                // M1Store::Storage::getSpecialItemPointer(M1Env::TEXT_WORD_DREF_INRIA_SIID));
 
                 if(l_fresh_sloka){
                     // sloka just created --> link to first word
@@ -475,20 +474,20 @@ int loadGita(){
                 l_cursec_last_edge = l_current_section->linkTo(l_unit, "OWNS_", l_cursec_last_edge, false);
                 // add Prabhupada translation, if any
                 if(l_wfw_prabhupada.length() > 0){
-                    l_unit->setField(
+                    M1Store::Item_lv2* l_edge_field = l_unit->setFieldEdge(
                         l_wfw_prabhupada,
-                        false,
-                        M1Store::Storage::getSpecialItemPointer(M1Env::TEXT_WFW_TRANSL_SIID),
-                        M1Store::Storage::getSpecialItemPointer(M1Env::TEXT_WFW_PRABUPADA_SIID));
+                        M1Env::TEXT_WFW_TRANSL_SIID);
+                    l_edge_field->setType(M1Env::TEXT_WFW_PRABUPADA_SIID);
+                    // M1Store::Storage::getSpecialItemPointer(M1Env::TEXT_WFW_PRABUPADA_SIID));
                     qCDebug(g_cat_main) << QString("Setting Prabhupada WfW: %1").arg(l_wfw_prabhupada);
                 }
                 // add Sivanande translation, if any
                 if(l_wfw_sivananda.length() > 0){
-                    l_unit->setField(
+                    M1Store::Item_lv2* l_edge_field = l_unit->setFieldEdgeForce(
                         l_wfw_sivananda,
-                        true,
-                        M1Store::Storage::getSpecialItemPointer(M1Env::TEXT_WFW_TRANSL_SIID),
-                        M1Store::Storage::getSpecialItemPointer(M1Env::TEXT_WFW_SIVANANDA_SIID));
+                        M1Env::TEXT_WFW_TRANSL_SIID);
+                    l_edge_field->setType(M1Env::TEXT_WFW_SIVANANDA_SIID);
+                    // M1Store::Storage::getSpecialItemPointer(M1Env::TEXT_WFW_SIVANANDA_SIID));
                     qCDebug(g_cat_main) << QString("Setting Sivanande WfW: %1").arg(l_wfw_sivananda);
                 }
                 l_wfw_prabhupada = "";
@@ -513,10 +512,7 @@ int loadGita(){
 
                 l_current_section->linkTo(l_new_url, M1Env::OWNS_SIID, nullptr, false);
 
-                bool l_res = l_new_url->setField(
-                    l_url,
-                    false,
-                    M1Store::Storage::getSpecialItemPointer(M1Env::TEXT_URL_LINK_SIID));
+                bool l_res = l_new_url->setFieldEdge(l_url, M1Env::TEXT_URL_LINK_SIID);
                 qCDebug(g_cat_main) << QString("Url field created: %1").arg(l_res);
             }
         }

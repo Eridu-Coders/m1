@@ -23,6 +23,18 @@ private:
     bool m_start_line = false;
     bool m_end_line = false;
     PassageEditor* m_editor = nullptr;
+protected:
+    static QFont cm_base_font;
+    QString m_color;
+
+    virtual QRectF boundingRect() const;
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *p_event);
+    virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *p_event);
+    virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *p_event);
+    virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *p_event);
+    virtual void dropEvent(QGraphicsSceneDragDropEvent *p_event);
+    virtual void paint(QPainter *p_painter, const QStyleOptionGraphicsItem *p_option, QWidget *p_widget);
+
 public:
     BasePassageItem(const int p_id, PassageEditor *p_parent = nullptr);
     virtual QSizeF sizeHint(Qt::SizeHint p_which, const QSizeF &p_constraint = QSizeF()) const;
@@ -37,16 +49,7 @@ public:
         m_end_selection = false;
         m_in_selection = false;
     }
-protected:
-    static QFont cm_base_font;
-
-    virtual QRectF boundingRect() const;
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent *p_event);
-    virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *p_event);
-    virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *p_event);
-    virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *p_event);
-    virtual void dropEvent(QGraphicsSceneDragDropEvent *p_event);
-    virtual void paint(QPainter *p_painter, const QStyleOptionGraphicsItem *p_option, QWidget *p_widget);
+    virtual void highlight(M1Store::Item_lv2* p_chunk, M1Store::Item_lv2* p_category, M1Store::Item_lv2* p_color);
 };
 
 class WordItem: public BasePassageItem{
@@ -54,6 +57,7 @@ private:
     M1Store::Item_lv2* m_occ;
 public:
     WordItem(const int p_id, M1Store::Item_lv2* p_occ, PassageEditor *p_parent = nullptr);
+    virtual void highlight(M1Store::Item_lv2* p_chunk, M1Store::Item_lv2* p_category, M1Store::Item_lv2* p_color);
 };
 
 class StephanusItem: public BasePassageItem{
@@ -64,6 +68,8 @@ private:
 public:
     StephanusItem(const int p_id, const QString& p_stephanus_number, PassageEditor *p_parent = nullptr);
 };
+
+class PassagesPanel;
 
 class PassageEditor: public QGraphicsObject{
     Q_OBJECT
@@ -77,6 +83,7 @@ private:
     int m_margin_pe = 5;
     int m_spacing = 10;
     M1Store::Item_lv2* m_current_start = nullptr;
+    PassagesPanel* m_panel;
 
     void populate();
     QRectF do_layout(const QRectF& p_rect);
@@ -89,12 +96,14 @@ protected:
     virtual bool sceneEvent(QEvent *p_event) override;
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *p_event) override;
 public:
+    PassageEditor(M1Store::Item_lv2* p_occur_start, const QString& p_id, QGraphicsItem *p_parent=nullptr);
     void unselect_all();
     int spacing(){return m_spacing;}
     QString& id(){return m_id;}
-    PassageEditor(M1Store::Item_lv2* p_occur_start, const QString& p_id, QGraphicsItem *p_parent=nullptr);
     QRectF get_outer_rect(const QPointF& p_top_left, int p_editor_width);
     void select_from_to(const int p_from, const int p_to);
+    bool has_selection(){ return m_from_sel >= 0; }
+    QString bake_highlight(M1Store::Item_lv2* p_highlight_vertex, M1Store::Item_lv2* p_category, M1Store::Item_lv2* p_color);
 };
 
 class PassagesPanel: public QGraphicsObject{
@@ -103,21 +112,33 @@ class PassagesPanel: public QGraphicsObject{
 private:
     int m_view_width = -1;
     QSizeF m_size_panel;
-    int m_margin_pp = 30;
+    int m_margin_pp = 20;
     QList<PassageEditor*> m_pe_list;
+    QList<M1Store::Item_lv2*> m_cat_list;
+    int m_current_cat = 0;
+    M1Store::Item_lv2* m_highlight_folder;
+
     void calculate_positions();
 protected:
     virtual QRectF boundingRect() const override;
     virtual void paint(QPainter *p_painter, const QStyleOptionGraphicsItem *p_option, QWidget *p_widget) override;
 public:
-    PassagesPanel(QGraphicsItem *p_parent=nullptr): QGraphicsObject(p_parent){}
+    PassagesPanel(M1Store::Item_lv2* p_highlight_folder, const QList<M1Store::Item_lv2*>& p_cat_list, QGraphicsItem *p_parent=nullptr): QGraphicsObject(p_parent){
+        m_highlight_folder = p_highlight_folder;
+        m_cat_list = p_cat_list;
+    }
     void add_passage_editor(PassageEditor* p_pe){m_pe_list.append(p_pe);}
     QSizeF set_panel_width(const QPointF& p_top_left, int p_panel_width);
+    void selection_changed();
 public slots:
     void move_forward_one();
     void move_backwards_one();
     void move_forward_ten();
     void move_backwards_ten();
+    void highlight();
+    void cat_select(int p_index);
+signals:
+    void activate_highlight_button(bool p_enabled);
 };
 
 class Scene: public QGraphicsScene{
@@ -130,7 +151,7 @@ protected:
 class View: public QGraphicsView{
 private:
     PassagesPanel* m_outer_panel = nullptr;
-    int m_margin_view = 10;
+    int m_margin_view = 0;
 public:
     View(QGraphicsScene *p_scene);
     void set_panel(PassagesPanel* p_outer_panel){m_outer_panel = p_outer_panel;}

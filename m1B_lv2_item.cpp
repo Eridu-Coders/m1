@@ -266,44 +266,46 @@ void M1Store::Item_lv2::dbgRecurGraph(const ItemID p_item_id, std::set<ItemID>& 
         // print an item debug one-liner
         qCDebug(g_cat_silence) << p_left + l_current->dbgShort();
 
-        // go through special edges of current item (if any) ...
-        if(Item_lv2* l_edge = l_current->getFirstEdgeSpecial_lv2()){
-            // NB getFirstEdgeSpecial() will return nullptr if there are no special edges
-            ItemID l_stop_id = l_edge->item_id(); // this id is the first AND last edge bc edges are arranged in a doubly linked ring
-            // loop through all special edges
-            do{
-                Item_lv2* l_next_edge = l_edge->get_next_lv2();
-                // debug one liner of current edge ("S" = "special")
-                qCDebug(g_cat_silence) << p_left + "+--S" + (l_edge->isFullEdge() ? l_edge->dbgHalf() : l_edge->dbgShort(1));
-                // recursive call to recurGraph on the target of the current edge  (may not be a full edge bc of fields)
-                if(l_edge->isFullEdge())
-                    dbgRecurGraph(l_edge->target_item_id(), p_already_expanded,
-                               // the padding will be "|  " unless it is the last recusive call for this item ie if the current edge is the last
-                               // special one and there are no ordinary edges (rare case but you never know)
-                                  p_left + (((l_next_edge->item_id() == l_stop_id) && (l_current->firstEdge_item_id() == G_VOID_ITEM_ID)) ? "   " : "|  "));
-                l_edge = l_next_edge;
-            }while(l_edge->item_id() != l_stop_id);
-        }
-        // ... and edges (if any)
-        if(Item_lv2* l_edge = l_current->getFirstEdge_lv2()){
-            // NB getFirstEdgeSpecial() will return nullptr if there are no edges
-            ItemID l_stop_id = l_edge->item_id();  // this id is the first AND last edge bc edges are arranged in a doubly linked ring
-            // loop through all ordinary edges
-            do{
-                // debug one liner of current edge ("O" = "ordinary")
-                qCDebug(g_cat_silence) << p_left + "+--O" + (l_edge->isFullEdge() ? l_edge->dbgHalf() : l_edge->dbgShort(1));
-                Item_lv2* l_next_edge = l_edge->get_next_lv2();
-                // recursive call to recurGraph on the target of the current edge (may not be a full edge bc of fields)
-                if(l_edge->isFullEdge())
-                    dbgRecurGraph(l_edge->target_item_id(), p_already_expanded,
-                           // the padding will be "|  " unless it is the last recusive call for this item ie if
-                           // the current edge is the last ordinary one
-                           p_left + ((l_next_edge->item_id() == l_stop_id) ? QString("   ") : QString("|  ")));
+        if(l_current->isFullEdge() || l_current->isFullVertex()){
+            // go through special edges of current item (if any) ...
+            if(Item_lv2* l_edge = l_current->getFirstEdgeSpecial_lv2()){
+                // NB getFirstEdgeSpecial() will return nullptr if there are no special edges
+                ItemID l_stop_id = l_edge->item_id(); // this id is the first AND last edge bc edges are arranged in a doubly linked ring
+                // loop through all special edges
+                do{
+                    Item_lv2* l_next_edge = l_edge->get_next_lv2();
+                    // debug one liner of current edge ("S" = "special")
+                    qCDebug(g_cat_silence) << p_left + "+--S" + (l_edge->isFullEdge() ? l_edge->dbgHalf() : l_edge->dbgShort(1));
+                    // recursive call to recurGraph on the target of the current edge  (may not be a full edge bc of fields)
+                    if(l_edge->isFullEdge())
+                        dbgRecurGraph(l_edge->target_item_id(), p_already_expanded,
+                                   // the padding will be "|  " unless it is the last recusive call for this item ie if the current edge is the last
+                                   // special one and there are no ordinary edges (rare case but you never know)
+                                      p_left + (((l_next_edge->item_id() == l_stop_id) && (l_current->firstEdge_item_id() == G_VOID_ITEM_ID)) ? "   " : "|  "));
+                    l_edge = l_next_edge;
+                }while(l_edge->item_id() != l_stop_id);
+            }
+            // ... and edges (if any)
+            if(Item_lv2* l_edge = l_current->getFirstEdge_lv2()){
+                // NB getFirstEdgeSpecial() will return nullptr if there are no edges
+                ItemID l_stop_id = l_edge->item_id();  // this id is the first AND last edge bc edges are arranged in a doubly linked ring
+                // loop through all ordinary edges
+                do{
+                    // debug one liner of current edge ("O" = "ordinary")
+                    qCDebug(g_cat_silence) << p_left + "+--O" + (l_edge->isFullEdge() ? l_edge->dbgHalf() : l_edge->dbgShort(1));
+                    Item_lv2* l_next_edge = l_edge->get_next_lv2();
+                    // recursive call to recurGraph on the target of the current edge (may not be a full edge bc of fields)
+                    if(l_edge->isFullEdge())
+                        dbgRecurGraph(l_edge->target_item_id(), p_already_expanded,
+                               // the padding will be "|  " unless it is the last recusive call for this item ie if
+                               // the current edge is the last ordinary one
+                               p_left + ((l_next_edge->item_id() == l_stop_id) ? QString("   ") : QString("|  ")));
 
-                // release the current edge ItemWrapper and replace it with the ne current edge obtained previously (l_next_edge)
-                l_edge = l_next_edge;
-            }while(l_edge->item_id() != l_stop_id);
-            // finally, release the last edge ItemWrapper
+                    // release the current edge ItemWrapper and replace it with the ne current edge obtained previously (l_next_edge)
+                    l_edge = l_next_edge;
+                }while(l_edge->item_id() != l_stop_id);
+                // finally, release the last edge ItemWrapper
+            }
         }
     }
 }
@@ -321,32 +323,34 @@ QString M1Store::Item_lv2::dbgString(){
         .arg(QString("m_flags              : 0b%1").arg(flags(), 64, 2, QLatin1Char('0')))
         .arg(QString("m_type               : %1").arg(m_type.dbgStringHr(flags() & TYPE_IS_ITEM_ID)));
 
+    // string to contain the representation of edges coming off of this item
+    QString l_edges;
+    if((flags() & ITEM_NATURE_MASK) == M1Env::FULL_VERTEX || (flags() & ITEM_NATURE_MASK) == M1Env::FULL_EDGE){
+        // list of edges construction : same logic as recurGraph() above, minus the recursiveness
+        // special edges
+        if(Item_lv2* l_current_edge = getExisting(firstEdgeSpecial_item_id())){
+            l_edges += "\nSpecial edges:";
+            ItemID l_stop_id = l_current_edge->item_id();
+            do {
+                l_edges += "\n" + l_current_edge->dbgShort();
+                Item_lv2* l_next_edge = l_current_edge->get_next_lv2();
+                l_current_edge = l_next_edge;
+            } while (l_current_edge->item_id() != l_stop_id);
+        }
+        // ordinary edges
+        if(Item_lv2* l_current_edge = getExisting(firstEdge_item_id())){
+            l_edges += "\nOrdinary edges:";
+            ItemID l_stop_id = l_current_edge->item_id();
+            do {
+                l_edges += "\n" + l_current_edge->dbgShort();
+                Item_lv2* l_next_edge = l_current_edge->get_next_lv2();
+                l_current_edge = l_next_edge;
+            } while (l_current_edge->item_id() != l_stop_id);
+        }
+    }
+
     switch(flags() & ITEM_NATURE_MASK){
     case FULL_VERTEX:{
-            // string to contain the representation of edges coming off of this item
-            QString l_edges;
-            // list of edges construction : same logic as recurGraph() above, minus the recursiveness
-            // special edges
-            if(Item_lv2* l_current_edge = getExisting(firstEdgeSpecial_item_id())){
-                l_edges += "\nSpecial edges:";
-                ItemID l_stop_id = l_current_edge->item_id();
-                do {
-                    l_edges += "\n" + l_current_edge->dbgShort();
-                Item_lv2* l_next_edge = l_current_edge->get_next_lv2();
-                    l_current_edge = l_next_edge;
-                } while (l_current_edge->item_id() != l_stop_id);
-            }
-            // ordinary edges
-            if(Item_lv2* l_current_edge = getExisting(firstEdge_item_id())){
-                l_edges += "\nOrdinary edges:";
-                ItemID l_stop_id = l_current_edge->item_id();
-                do {
-                    l_edges += "\n" + l_current_edge->dbgShort();
-                    Item_lv2* l_next_edge = l_current_edge->get_next_lv2();
-                    l_current_edge = l_next_edge;
-                } while (l_current_edge->item_id() != l_stop_id);
-            }
-
             // add the rest to the returned string
             QString l_text(text());
 
@@ -389,7 +393,7 @@ QString M1Store::Item_lv2::dbgString(){
                            .arg(QString("m_e_previous         : 0x%1 %2").arg(previous_item_id(), 16, 16, QLatin1Char('0')).arg(previous_item_id()))
                            .arg(QString("m_e_next             : 0x%1 %2").arg(next_item_id(), 16, 16, QLatin1Char('0')).arg(next_item_id()))
                            .arg(QString("m_e_reciprocal       : 0x%1 %2").arg(reciprocal_item_id(), 16, 16, QLatin1Char('0')).arg(reciprocal_item_id()))
-                           .arg(QString("text                 : %1").arg(text()));
+                           .arg(QString("text                 : %1").arg(text())) + l_edges;
         }
         break;
     case SIMPLE_EDGE:{
@@ -923,6 +927,43 @@ M1Store::Item_lv2* M1Store::Item_lv2::linkTo(Item_lv2* p_target, const SpecialIt
 }
 
 /**
+ * @brief Create a new vertex linked to this item
+ *
+ * @param p_edge_type
+ * @param p_label
+ * @param p_vertex_type
+ * @param p_edge_above
+ * @param p_at_top
+ * @return the newly created vertex
+ */
+M1Store::Item_lv2* M1Store::Item_lv2::create_descendant(
+    const SpecialItemID p_edge_type,
+    const QString& p_label,
+    const SpecialItemID p_vertex_type,
+    Item_lv2* p_edge_above, const bool p_at_top){
+
+    M1_FUNC_ENTRY(g_cat_lv2_members,
+                  QString("{%1} new descendant: --{%2}--> [%4] %3")
+                    .arg(this->dbgShort()
+                    .arg(M1Store::Storage::getSpecialItemPointer(p_edge_type)->mnemonic())
+                    .arg(p_label)
+                    .arg(M1Store::Storage::getSpecialItemPointer(p_vertex_type)->mnemonic())
+    ))
+    // cannot give descendants to anything but full vertices or edge
+    Q_ASSERT_X(isFullVertex() || isFullEdge(), "Item_lv2::create_descendant()", "cannot give descendants to simple vertices or edges");
+
+    // the new vertex
+    M1Store::Item_lv2* l_new_vertex =
+        getNew(M1Store::FULL_VERTEX, M1Store::ItemType(p_vertex_type));
+    l_new_vertex->setText(p_label);
+
+    // link this to it
+    this->linkTo(l_new_vertex, p_edge_type);
+
+    M1_FUNC_EXIT
+    return l_new_vertex;
+}
+/**
  * @brief M1Store::Item_lv2::setField
  * @param p_content
  * @param p_force_new
@@ -932,8 +973,11 @@ M1Store::Item_lv2* M1Store::Item_lv2::linkTo(Item_lv2* p_target, const SpecialIt
  */
 // bool setField(const QString& p_content, const SpecialItem* p_field_type_si, const SpecialItem* p_field_extra_type_si = nullptr);
 
-bool M1Store::Item_lv2::setField(const QString& p_content, const bool p_force_new,
-                                 const SpecialItem* p_field_type_si, const SpecialItem* p_field_extra_type_si){
+/*
+bool M1Store::Item_lv2::setField(const QString& p_content,
+                                 const bool p_force_new,
+                                 const SpecialItem* p_field_type_si,
+                                 const SpecialItem* p_field_extra_type_si){
     M1_FUNC_ENTRY(g_cat_lv2_members, QString("Setting field of type [%1] to {%2}%3")
                                          .arg(p_field_type_si->mnemonic())
                                          .arg(p_content)
@@ -962,41 +1006,98 @@ bool M1Store::Item_lv2::setField(const QString& p_content, const bool p_force_ne
 bool M1Store::Item_lv2::setField(const QString& p_content, const bool p_force_new, const M1Env::SpecialItemID p_field_type_siid){
     return setField(p_content, p_force_new, M1Store::Storage::getSpecialItemPointer(p_field_type_siid));
 }
+*/
+
+M1Store::Item_lv2* M1Store::Item_lv2::setFieldInternal(const QString& p_content,
+                                                       const bool p_force_new,
+                                                       const bool p_edge,
+                                                       const M1Store::SpecialItem* p_field_type_si){
+    M1_FUNC_ENTRY(g_cat_lv2_members, QString("Setting field of type [%1] to {%2}%3%4")
+                                         .arg(p_field_type_si->mnemonic())
+                                         .arg(p_content)
+                                         .arg(p_force_new ? " Force New" : "")
+                                         .arg(p_edge ? " Edge Field" : " Special Vertex Field"))
+    M1Store::Item_lv2* l_ret;
+
+    M1Store::Item_lv2* l_field_edge = nullptr;
+    if(! p_force_new) l_field_edge = this->findFieldEdge(p_field_type_si);
+
+    if(p_force_new || l_field_edge == nullptr){
+        // new creation
+        if(p_edge){
+            // Simple Edge field
+            l_field_edge = getNew(M1Env::SIMPLE_EDGE, M1Store::ItemType(p_field_type_si->specialId()));
+            l_field_edge->setOrigin(this->item_id());
+            // below AUTO edge
+            this->installFullEdge(l_field_edge, G_VOID_SI_ID, nullptr, false);
+        }
+        else{
+            // Simple Vertex field
+            M1Store::Item_lv2* l_field_vertex = getNew(M1Env::SIMPLE_VERTEX, M1Store::ItemType(p_field_type_si->specialId()));
+            // also below AUTO edge
+            l_field_edge = this->linkTo(l_field_vertex, p_field_type_si->specialId());
+        }
+    }
+
+    // set content value
+    if(p_edge)
+        // will always work regardless of p_content's length bc simple edges accept arbitrary length strings
+        l_field_edge->setText(p_content);
+    else {
+        // content must fit in a Simple Vertex text area
+        Q_ASSERT_X(p_content.length() < M1Env::SIMPLE_VERTEX_TEXT_LEN, "Item_lv2::linkTo()", "content too big for a simple vertex");
+        l_field_edge->getTarget_lv2()->setText(p_content);
+    }
+
+    M1_FUNC_EXIT
+    return l_field_edge;
+}
+M1Store::Item_lv2* M1Store::Item_lv2::setFieldVertex(const QString& p_content, const M1Store::SpecialItemID p_field_type_siid){
+    return setFieldInternal(p_content, false, false, M1Store::Storage::getSpecialItemPointer(p_field_type_siid));
+}
+M1Store::Item_lv2* M1Store::Item_lv2::setFieldVertexForce(const QString& p_content, const M1Store::SpecialItemID p_field_type_siid){
+    return setFieldInternal(p_content, true, false, M1Store::Storage::getSpecialItemPointer(p_field_type_siid));
+}
+M1Store::Item_lv2* M1Store::Item_lv2::setFieldEdge(const QString& p_content, const M1Store::SpecialItemID p_field_type_siid){
+    return setFieldInternal(p_content, false, true, M1Store::Storage::getSpecialItemPointer(p_field_type_siid));
+}
+M1Store::Item_lv2* M1Store::Item_lv2::setFieldEdgeForce(const QString& p_content, const M1Store::SpecialItemID p_field_type_siid){
+    return setFieldInternal(p_content, true, true, M1Store::Storage::getSpecialItemPointer(p_field_type_siid));
+}
 
 /**
- * @brief M1Store::Item_lv2::getField
+ * @brief M1Store::Item_lv2::getFieldEdge
  * @param p_field_type_si
+ * @param p_field_type2_si
  * @return
  */
-QString M1Store::Item_lv2::getField(const SpecialItem* p_field_type_si, const SpecialItem* p_field_type2_si, const bool p_all) const {
-    M1_FUNC_ENTRY(g_cat_lv2_members, QString("Getting value of field of type [%1]")
-        .arg(M1Store::Storage::getSpecialItemPointer(p_field_type_si->specialId())->mnemonic()))
+M1Store::Item_lv2* M1Store::Item_lv2::getFieldEdge(
+    const SpecialItem* p_field_type_si,
+    const SpecialItem* p_field_type2_si) const{
 
-    QString l_ret;
+    M1_FUNC_ENTRY(g_cat_lv2_members, QString("Getting first field edge of type [%1]%2")
+                      .arg(M1Store::Storage::getSpecialItemPointer(p_field_type_si->specialId())->mnemonic())
+                      .arg(p_field_type2_si == nullptr ? "" : QString(" and [%1]").arg(
+                            M1Store::Storage::getSpecialItemPointer(p_field_type_si->specialId())->mnemonic())))
+
+    M1Store::Item_lv2* l_ret = nullptr;
     for(Item_lv2_iterator it = this->getIteratorTop(); !it.beyondEnd(); it.next())
-        if(it.at()->isOfType(p_field_type_si) &&(p_field_type2_si == nullptr || it.at()->isOfType(p_field_type2_si))){
-            if(p_all)
-                if(l_ret.length() == 0)
-                    l_ret = it.at()->text();
-                else
-                    l_ret += QString("/%1").arg(it.at()->text());
-            else{
-                l_ret = it.at()->text();
-                break;
-            }
+        if(it.at()->isOfType(p_field_type_si) && (p_field_type2_si == nullptr || it.at()->isOfType(p_field_type2_si))){
+            l_ret = it.at();
+            break;
         }
+
     M1_FUNC_EXIT
     return l_ret;
 }
-
 /**
  * @brief [Private]
  * @param p_field_type_si
  * @return
  */
 M1Store::Item_lv2* M1Store::Item_lv2::findFieldEdge(const SpecialItem* p_field_type_si) const{
-    M1_FUNC_ENTRY(g_cat_lv2_members, QString("Finding field of type [%1] if any")
-                                         .arg(M1Store::Storage::getSpecialItemPointer(p_field_type_si->specialId())->mnemonic()))
+    M1_FUNC_ENTRY(g_cat_lv2_members, QString("Finding field edge of type [%1] if any")
+                      .arg(M1Store::Storage::getSpecialItemPointer(p_field_type_si->specialId())->mnemonic()))
     M1Store::Item_lv2* l_ret = nullptr;
     for(Item_lv2_iterator it = this->getIteratorTop(); !it.beyondEnd(); it.next())
         if(it.at()->isOfType(p_field_type_si)){
@@ -1004,6 +1105,40 @@ M1Store::Item_lv2* M1Store::Item_lv2::findFieldEdge(const SpecialItem* p_field_t
             break;
         }
 
+    M1_FUNC_EXIT
+        return l_ret;
+}
+
+/**
+ * @brief M1Store::Item_lv2::getField
+ * @param p_field_type_si
+ * @return
+ */
+QString M1Store::Item_lv2::getField(const SpecialItem* p_field_type_si, const SpecialItem* p_field_type2_si, const bool p_all) const {
+    M1_FUNC_ENTRY(g_cat_lv2_members, QString("Getting %3 of type [%1]%2")
+        .arg(M1Store::Storage::getSpecialItemPointer(p_field_type_si->specialId())->mnemonic())
+        .arg(p_field_type2_si == nullptr ? "" : QString(" and [%1]").arg(
+                M1Store::Storage::getSpecialItemPointer(p_field_type_si->specialId())->mnemonic()))
+        .arg(p_all ? "concatenated values of fields" : "value of field"))
+
+    QString l_ret;
+    for(Item_lv2_iterator it = this->getIteratorTop(); !it.beyondEnd(); it.next())
+        if(it.at()->isOfType(p_field_type_si) && (p_field_type2_si == nullptr || it.at()->isOfType(p_field_type2_si))){
+            QString l_payload;
+
+            if(it.at()->isFullEdge()) l_payload = it.at()->getTarget_lv2()->text();
+            else l_payload = it.at()->text();
+
+            if(p_all)
+                if(l_ret.length() == 0)
+                    l_ret = l_payload;
+                else
+                    l_ret += QString("/%1").arg(l_payload);
+            else{
+                l_ret = l_payload;
+                break;
+            }
+        }
     M1_FUNC_EXIT
     return l_ret;
 }
@@ -1226,11 +1361,12 @@ M1Store::Item_lv2* M1Store::Item_lv2::find_edge(const SpecialItemID p_type_edge,
     M1Store::Item_lv2* l_ret = nullptr;
     for(Item_lv2_iterator it = p_special ? this->getIteratorSpecial() : this->getIteratorTop(); !it.beyondEnd(); it.next()){
         if(it.at()->isFullEdge()){
-            qCDebug(g_cat_interp_base) << "it.at():\n" << it.at()->dbgShort();
+            qCDebug(g_cat_lv2_members) << "it.at():" << it.at()->dbgShort();
             bool l_success_condition_edge = p_type_edge == M1Env::G_VOID_SI_ID || it.at()->isOfType(p_type_edge);
             bool l_success_condition_target = p_type_target == M1Env::G_VOID_SI_ID || it.at()->getTarget_lv2()->isOfType(p_type_target);
             if(l_success_condition_edge && l_success_condition_target){
                 l_ret = it.at();
+                qCDebug(g_cat_lv2_members) << "Found" << it.at()->getTarget_lv2()->text();
                 break;
             }
         }

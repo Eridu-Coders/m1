@@ -35,6 +35,8 @@ extern M1Env::SpecialItemID MKPLF_SIID;
 extern M1Env::SpecialItemID MKPRT_SIID;
 // [STPOS] Special Vertex ID (Simple edge type) of Occurrence field sentence position
 extern M1Env::SpecialItemID STPOS_SIID;
+// [HLCLR] Color of text highlight category
+extern M1Env::SpecialItemID HLCLR_SIID;
 // [PRABH] Special Vertex ID (Vertex type) of Gita translation source: Prabhupada
 extern M1Env::SpecialItemID TEXT_WFW_PRABUPADA_SIID;
 // [SIVAN] Special Vertex ID (Vertex type) of Gita translation source: Sivananda
@@ -106,6 +108,16 @@ extern M1Env::SpecialItemID TEXT_CHUNK_SIID;
 extern M1Env::SpecialItemID TEXT_BOOK_SIID;
 // [TXSNT] Special Vertex ID of "Sentence (type)"
 extern M1Env::SpecialItemID TEXT_SENTENCE_SIID;
+// [TXHLT] Special Vertex ID of "Highlight (type)"
+extern M1Env::SpecialItemID TEXT_HIGHLIGHT_SIID;
+// [TXHLC] Special Vertex ID of "Highlight category (type)"
+extern M1Env::SpecialItemID TEXT_HIGHLIGHT_CAT_SIID;
+// [TXHLF] Special Vertex ID of "Highlight Folder (type)"
+extern M1Env::SpecialItemID TEXT_HIGHLIGHT_FLDR_SIID;
+// [TXHCF] Special Vertex ID of "Highlight Categories Folder"
+extern M1Env::SpecialItemID TEXT_HIGHLIGHT_CAT_FLDR_SIID;
+// [TXHCK] Special Vertex ID of "Highlight Chunk"
+extern M1Env::SpecialItemID TEXT_HIGHLIGHT_CHUNK_SIID;
 // [SLKLN] Special Vertex ID of "Sloka Lines (type)"
 extern M1Env::SpecialItemID TEXT_SLOKA_LINE_SIID;
 // [INRIA] Special Vertex ID of "INRIA Dictionary Reference (type)"

@@ -463,6 +463,7 @@ QString M1MidPlane::SentenceInterp::getHtml(){
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QComboBox>
 
 #include "m1D_passages_panel.h"
 
@@ -512,20 +513,46 @@ QWidget *M1MidPlane::SentenceInterp::get_edit_widget(){
     QPushButton* l_btn1 = new QPushButton("< 1", l_button_bar);
     QPushButton* l_btn2 = new QPushButton("> 1", l_button_bar);
     QPushButton* l_btn3 = new QPushButton("> 10", l_button_bar);
+    QPushButton* l_btn4 = new QPushButton("Highlight", l_button_bar);
+    l_btn4->setEnabled(false);
 
-    qCDebug(g_cat_td_signals) << QString("l_btn1 sizePolicy") << l_btn1->sizePolicy();
-    qCDebug(g_cat_td_signals) << QString("l_btn1 sizeHint") << l_btn1->sizeHint();
+    QComboBox* l_cat_combo = new QComboBox(l_button_bar);
+    // fill categories combo box
+    M1Store::Item_lv2* l_republic = l_greek_start->getOrigin_lv2();
+    M1Store::Item_lv2* l_cat_folder = l_republic->find_edge(M1Env::OWNS_SIID, M1Env::TEXT_HIGHLIGHT_CAT_FLDR_SIID)->getTarget_lv2();
+    qCDebug(g_cat_td_signals) << QString("l_cat_folder") << l_cat_folder->dbgShort();
+
+    QList<M1Store::Item_lv2*> l_cat_list;
+    for(M1Store::Item_lv2_iterator it = l_cat_folder->getIteratorTop(); !it.beyondEnd(); it.next())
+        if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_HIGHLIGHT_CAT_SIID)){
+            M1Store::Item_lv2* l_cat = it.at()->getTarget_lv2();
+            l_cat_list.append(l_cat);
+            QString l_color = l_cat->getField(M1Env::HLCLR_SIID);
+            qCDebug(g_cat_td_signals) << QString("Cat: ") << it.at()->dbgShort();
+            qCDebug(g_cat_td_signals) << QString("l_color: ") << l_color;
+            QPixmap l_color_pixmap(16, 16);
+            l_color_pixmap.fill(QColor(l_color));
+            l_cat_combo->addItem(QIcon(l_color_pixmap), l_cat->text());
+        }
+
+    // qCDebug(g_cat_td_signals) << QString("l_btn1 sizePolicy") << l_btn1->sizePolicy();
+    // qCDebug(g_cat_td_signals) << QString("l_btn1 sizeHint") << l_btn1->sizeHint();
 
     l_bar_layout->addWidget(l_btn0);
     l_bar_layout->addWidget(l_btn1);
     l_bar_layout->addWidget(l_btn2);
     l_bar_layout->addWidget(l_btn3);
+    l_bar_layout->addWidget(l_btn4);
+    l_bar_layout->addWidget(l_cat_combo);
     l_bar_layout->addStretch(1);
 
     M1UI::Scene* l_scene = new M1UI::Scene();
     l_scene->setBackgroundBrush(Qt::white);
 
-    M1UI::PassagesPanel* l_passages_panel = new M1UI::PassagesPanel();
+    M1UI::PassagesPanel* l_passages_panel = new M1UI::PassagesPanel(
+        l_republic->find_edge(M1Env::OWNS_SIID, M1Env::TEXT_HIGHLIGHT_FLDR_SIID)->getTarget_lv2(),
+        l_cat_list
+    );
     l_scene->addItem(l_passages_panel);
 
     l_passages_panel->add_passage_editor(new M1UI::PassageEditor(l_jowett_start, "A", l_passages_panel));
@@ -540,6 +567,15 @@ QWidget *M1MidPlane::SentenceInterp::get_edit_widget(){
                      l_passages_panel, &M1UI::PassagesPanel::move_forward_one);
     QObject::connect(l_btn3, &QPushButton::clicked,
                      l_passages_panel, &M1UI::PassagesPanel::move_forward_ten);
+    QObject::connect(l_btn4, &QPushButton::clicked,
+                     l_passages_panel, &M1UI::PassagesPanel::highlight);
+
+    QObject::connect(l_cat_combo, &QComboBox::activated,
+                     l_passages_panel, &M1UI::PassagesPanel::cat_select);
+
+    // activate_highlight_button
+    QObject::connect(l_passages_panel, &M1UI::PassagesPanel::activate_highlight_button,
+                     l_btn4, &QPushButton::setEnabled);
 
     M1UI::View* l_view = new M1UI::View(l_scene);
     l_view->set_panel(l_passages_panel);

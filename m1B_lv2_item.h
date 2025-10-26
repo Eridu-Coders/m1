@@ -25,6 +25,10 @@ class Item_lv2 : public Item_lv1 {
         void loopNextPrevious();
         Item_lv2* findFieldEdge(const SpecialItem* p_field_type_si) const;
         std::shared_ptr<Item_lv2_iterator_base> getIteratorGeneric(Item_lv2* p_start_edge, const SpecialItemID p_type) const;
+        Item_lv2* setFieldInternal(const QString& p_content,
+                                   const bool p_force_new,
+                                   const bool p_edge,
+                                   const SpecialItem* p_field_type_si);
     public:
         // ------------------------------- Static --------------------------------------------------------
         static Item_lv2* getNew(const FlagField p_flags,
@@ -101,12 +105,25 @@ class Item_lv2 : public Item_lv1 {
         // bool isOfType(const ItemID p_type_item_id) const;
         SpecialItemID getIconTypeMember();
 
-        bool setField(const QString& p_content,
+        /*
+        Item_lv2* setField(const QString& p_content,
                       const bool p_force_new,
                       const SpecialItem* p_field_type_si,
                       const SpecialItem* p_field_extra_type_si = nullptr);
-        bool setField(const QString& p_content, const bool p_force_new, const SpecialItemID p_field_type_siid);
+        Item_lv2* setField(const QString& p_content, const bool p_force_new, const SpecialItemID p_field_type_siid);
+        */
 
+        Item_lv2* setFieldVertex(const QString& p_content, const SpecialItemID p_field_type_siid);
+        Item_lv2* setFieldVertexForce(const QString& p_content, const SpecialItemID p_field_type_siid);
+        Item_lv2* setFieldEdge(const QString& p_content, const SpecialItemID p_field_type_siid);
+        Item_lv2* setFieldEdgeForce(const QString& p_content, const SpecialItemID p_field_type_siid);
+
+        Item_lv2* getFieldEdge(const SpecialItem* p_field_type_si, const SpecialItem* p_field_type2_si=nullptr) const;
+        Item_lv2* getFieldEdge(const SpecialItemID p_field_type_si_id, const SpecialItemID p_field_type2_si_id = G_VOID_SI_ID) const{
+            return this->getFieldEdge(
+                M1Store::Storage::getSpecialItemPointer(p_field_type_si_id),
+                p_field_type2_si_id == G_VOID_SI_ID ? nullptr : M1Store::Storage::getSpecialItemPointer(p_field_type2_si_id));
+        }
         QString getField(const SpecialItem* p_field_type_si, const SpecialItem* p_field_type2_si=nullptr, const bool p_all=false) const;
         QString getField(const SpecialItemID p_field_type_si_id, const bool p_all=false) const{
             return this->getField(M1Store::Storage::getSpecialItemPointer(p_field_type_si_id), nullptr, p_all);
@@ -122,6 +139,12 @@ class Item_lv2 : public Item_lv1 {
 
         Item_lv2* linkTo(ItemID p_target_id, const SpecialItemID p_type, Item_lv2* p_edge_above = nullptr, const bool p_at_top = false);
         Item_lv2* linkTo(ItemID p_target_id, const char* p_mnemonic, Item_lv2* p_edge_above = nullptr, const bool p_at_top = false);
+
+        Item_lv2* create_descendant(
+            const SpecialItemID p_edge_type,
+            const QString& p_label,
+            const SpecialItemID p_vertex_type,
+            Item_lv2* p_edge_above = nullptr, const bool p_at_top = false);
 
         // prevents other types from being implicitly converted
         template <class T>
