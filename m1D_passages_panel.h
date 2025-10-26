@@ -49,7 +49,7 @@ public:
         m_end_selection = false;
         m_in_selection = false;
     }
-    virtual void highlight(M1Store::Item_lv2* p_chunk, M1Store::Item_lv2* p_category, M1Store::Item_lv2* p_color);
+    virtual QString highlight(M1Store::Item_lv2* p_chunk, M1Store::Item_lv2* p_category, M1Store::Item_lv2* p_color);
 };
 
 class WordItem: public BasePassageItem{
@@ -57,7 +57,7 @@ private:
     M1Store::Item_lv2* m_occ;
 public:
     WordItem(const int p_id, M1Store::Item_lv2* p_occ, PassageEditor *p_parent = nullptr);
-    virtual void highlight(M1Store::Item_lv2* p_chunk, M1Store::Item_lv2* p_category, M1Store::Item_lv2* p_color);
+    virtual QString highlight(M1Store::Item_lv2* p_chunk, M1Store::Item_lv2* p_category, M1Store::Item_lv2* p_color);
 };
 
 class StephanusItem: public BasePassageItem{

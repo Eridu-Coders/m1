@@ -804,11 +804,16 @@ void M1Store::Storage::appendDefaultIcon(){cm_type_icon.append(new QIcon("../Ico
 QIcon* M1Store::Storage::getQIcon(SpecialItemID p_si_id){
     M1_FUNC_ENTRY(g_cat_store, QString("Get Icon for [%1]").arg(getSpecialItemPointer(p_si_id)->mnemonic()))
 
-    // return "Unknown" Icon if no valid p_si_id was provided
-    if(p_si_id == M1Env::G_VOID_SI_ID) return new QIcon("../Icons/Unknown.svg");
+    static QIcon* l_unknown_icon = new QIcon("../Icons/Unknown.svg");
 
-    // otherwise, return appropriate QIcon pointer
-    QIcon* l_ret = cm_type_icon[p_si_id];
+    QIcon* l_ret = nullptr;
+    if(p_si_id == M1Env::G_VOID_SI_ID)
+        // return "Unknown" Icon if no valid p_si_id was provided
+        l_ret = l_unknown_icon;
+    else
+        // otherwise, return appropriate QIcon pointer
+        l_ret = cm_type_icon[p_si_id];
+
     M1_FUNC_EXIT
     return l_ret;
 }

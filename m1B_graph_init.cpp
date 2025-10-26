@@ -847,7 +847,7 @@ void M1Env::GraphInit::init_base(){
         // mnemonic
         "TXHLT",
         // icon path
-        nullptr);
+        M1Env::HIGHLIGHTER_ICON_PATH);
     l_txhlt->setType("TYPE_");
 
     // creation of "Highlight category (type)"
@@ -908,7 +908,7 @@ void M1Env::GraphInit::init_base(){
         // mnemonic
         "TXHCK",
         // icon path
-        nullptr);
+        M1Env::HL_CHUNK_ICON_PATH);
     l_txhck->setType("TYPE_");
 
     // creation of "His Divine Grace A. C. Bhaktivedanta Swami Prabhupada"
@@ -19414,7 +19414,7 @@ void M1Env::GraphInit::init_plato(){
         // vertex flags
         M1Env::FULL_VERTEX  | M1Env::IS_SPECIAL,
         // label
-        "Greek (version)",
+        "Greek v.",
         // Special Item flags
         SI_IS_TYPE  | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -26818,7 +26818,7 @@ void M1Env::GraphInit::init_plato(){
         // vertex flags
         M1Env::FULL_VERTEX  | M1Env::IS_SPECIAL,
         // label
-        "Jowett (version)",
+        "Jowett v.",
         // Special Item flags
         SI_IS_TYPE  | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -35897,7 +35897,7 @@ void M1Env::GraphInit::init_plato(){
         // vertex flags
         M1Env::FULL_VERTEX  | M1Env::IS_SPECIAL,
         // label
-        "Shorey (version)",
+        "Shorey v.",
         // Special Item flags
         SI_IS_TYPE  | M1Env::SI_REQUIRES_EDGE,
         // mnemonic

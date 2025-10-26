@@ -847,8 +847,8 @@ M1Env::SpecialItemID M1Store::Item_lv2::getIconTypeMember(){
         SpecialItemID l_si_id = this->getType_si_id(i);
         if(l_si_id != M1Env::G_VOID_SI_ID &&
             (l_ret == -1 || (M1Store::Storage::getSpecialItemPointer(l_si_id)->flags() & M1Env::SI_IS_ICON_TYPE))) l_ret = l_si_id;
-        // qCDebug(g_cat_lv2_members) << QString("l_ret %1 getType_si_id(i) %2").arg(l_ret).arg(this->getType_si_id(i));
     }
+    qCDebug(g_cat_td_signals) << QString("l_ret [%1] %2").arg(l_ret).arg(M1Store::Storage::getSpecialItemPointer(static_cast<M1Env::SpecialItemID>(l_ret))->mnemonic());
     M1_FUNC_EXIT
     return l_ret;
 }

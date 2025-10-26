@@ -412,11 +412,11 @@ g_vertices = [
 ['Text Chunk (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXTCK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'TEXT_CHUNK_ICON_PATH',   'TEXT_CHUNK_SIID'],
 ['Book (type)',                  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TXTBK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'BOOK_ICON_PATH',         'TEXT_BOOK_SIID'],
 ['Sentence (type)',              ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXSNT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'SENTENCE_ICON_PATH',     'TEXT_SENTENCE_SIID'],
-['Highlight (type)',             ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHLT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'TEXT_HIGHLIGHT_SIID'],
+['Highlight (type)',             ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHLT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'HIGHLIGHTER_ICON_PATH',  'TEXT_HIGHLIGHT_SIID'],
 ['Highlight category (type)',    ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TXHLC', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'TEXT_HIGHLIGHT_CAT_SIID'],
 ['Highlight Folder (type)',      ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHLF', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'TEXT_HIGHLIGHT_FLDR_SIID'],
 ['Highlight Categories Folder',  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHCF', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'TEXT_HIGHLIGHT_CAT_FLDR_SIID'],
-['Highlight Chunk',              ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHCK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'TEXT_HIGHLIGHT_CHUNK_SIID'],
+['Highlight Chunk',              ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHCK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  "HL_CHUNK_ICON_PATH",     'TEXT_HIGHLIGHT_CHUNK_SIID'],
 ]
 
 g_special_vertices_gita = [
@@ -886,7 +886,7 @@ if __name__ == '__main__':
                          f'        // vertex flags\n' +
                          f'        M1Env::FULL_VERTEX  | M1Env::IS_SPECIAL,\n' +
                          f'        // label\n' +
-                         f'        "{l_version} (version)",\n' +
+                         f'        "{l_version} v.",\n' +
                          f'        // Special Item flags\n' +
                          f'        SI_IS_TYPE  | M1Env::SI_REQUIRES_EDGE,\n' +
                          f'        // mnemonic\n' +

@@ -113,6 +113,8 @@ namespace M1Env{
     static const char* TEXT_WRITTEN_BY_ICON_PATH = "../Icons/WrittenBy.svg";            // *
     static const char* BOOK_ICON_PATH = "../Icons/Book.svg";                            // *
     static const char* SENTENCE_ICON_PATH = "../Icons/Sentence.svg";                    // *
+    static const char* HIGHLIGHTER_ICON_PATH = "../Icons/Highlighter.svg";              // *
+    static const char* HL_CHUNK_ICON_PATH = "../Icons/Highlighter2.svg";                // *
 
     static const bool SKIP_HEAVY_CHECKING = true; ///< true --> skip time-consuming Q_ASSERT in setType() and linkTo()
 } // end of M1Env namespace
