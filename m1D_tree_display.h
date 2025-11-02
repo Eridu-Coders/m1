@@ -19,9 +19,8 @@ namespace M1UI{
     private:
         // void addTestWidgets();
         void addInterp(M1Store::Item_lv2* p_root);
-        M1MidPlane::Interp* addInterpRecur(M1Store::Item_lv2* p_root, int p_depth, QVBoxLayout* p_vb, QVector<int>& p_alrady_seen);
+        M1MidPlane::Interp* addInterpRecur(M1Store::Item_lv2* p_root, int p_depth, QVBoxLayout* p_vb, QVector<M1Store::ItemID>& p_edges_alrady_traversed);
 
-        void mouseMoveEvent(QMouseEvent *event);
         void variousTests();
 
         M1Store::Item_lv2* m_root;
@@ -29,7 +28,8 @@ namespace M1UI{
     public:
         explicit TreeDisplay(QWidget *p_parent, MainWindow *p_main_window);
 
-        void paintEvent(QPaintEvent *);
+        virtual void paintEvent(QPaintEvent *);
+        // virtual void mouseMoveEvent(QMouseEvent *p_event);
     public slots:
         void gotoVertex(M1Store::Item_lv2* p_new_vertex);
         void htmlReceive(const QString& p_html);

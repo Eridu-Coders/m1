@@ -5,6 +5,7 @@
 
 #include <QWidget>
 #include <QGraphicsScene>
+#include <QDrag>
 
 namespace M1MidPlane{
 
@@ -14,6 +15,12 @@ public:
     InterpStaticConstructor();
 };
 */
+
+class Drag : public QDrag{
+public:
+    Drag(QObject *p_drag_source) : QDrag(p_drag_source){}
+    virtual ~Drag();
+};
 
 class Interp : public QWidget
 {
@@ -40,12 +47,16 @@ private:
     int m_icon_size;
     int m_oc_x;
 
+    bool m_drag_top = false;
+    bool m_drag_bottom = false;
+
     static QIcon cm_open;
     static QIcon cm_closed;
 
     void paintOC(QPainter& p);
     virtual QString getHtml();
     virtual QString displayText();
+    virtual bool diplayOpenClose(){ return true; }
     // static InterpStaticConstructor cm_the_init;
 public:
     static void init();
@@ -57,6 +68,13 @@ public:
     virtual void mousePressEvent(QMouseEvent *p_event);
     virtual void focusOutEvent(QFocusEvent *p_event);
     virtual void focusInEvent(QFocusEvent *p_event);
+
+    virtual void dragEnterEvent(QDragEnterEvent *p_event);
+    virtual void dragMoveEvent(QDragMoveEvent *p_event);
+    virtual void dragLeaveEvent(QDragLeaveEvent *p_event);
+    virtual void dropEvent(QDropEvent *p_event);
+
+    virtual void mouseMoveEvent(QMouseEvent *p_event);
 
     virtual QWidget *get_edit_widget();
     ~Interp();
@@ -85,6 +103,7 @@ public:
 
     AutoInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
     virtual void paintEvent(QPaintEvent* p_event);
+    virtual bool diplayOpenClose(){ return false; }
 };
 
 class TranslUnit : public Interp
@@ -158,7 +177,7 @@ public:
 
     SectionBeginEnd(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
     virtual QString displayText();
-    virtual void paintEvent(QPaintEvent* p_event);
+    // virtual void paintEvent(QPaintEvent* p_event);
 };
 
 class TextOccurrence : public Interp
@@ -169,7 +188,7 @@ public:
 
     TextOccurrence(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
     virtual QString displayText();
-    virtual void paintEvent(QPaintEvent* p_event);
+    // virtual void paintEvent(QPaintEvent* p_event);
 };
 
 class SentenceInterp : public SectionInterp

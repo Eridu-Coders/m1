@@ -26,6 +26,7 @@ private:
 public:
     MainWindow(QWidget *p_parent = nullptr);
     ~MainWindow();
+    // virtual void mouseMoveEvent(QMouseEvent *p_event);
 public slots:
     void htmlReceive(const QString& p_html);
     void editReceive(QWidget *p_edit_widget);

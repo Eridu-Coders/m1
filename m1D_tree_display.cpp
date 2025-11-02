@@ -8,7 +8,6 @@
 #include "m1B_lv2_item.h"
 
 Q_LOGGING_CATEGORY(g_cat_tree_display, "tree_display")
-Q_LOGGING_CATEGORY(g_cat_td_signals, "td_signals")
 
 M1UI::TreeDisplay::TreeDisplay(QWidget *p_parent, MainWindow *p_main_window) : QScrollArea{p_parent}{
     M1_FUNC_ENTRY(g_cat_tree_display, QString("TreeDisplay started yay"));
@@ -26,11 +25,20 @@ M1UI::TreeDisplay::TreeDisplay(QWidget *p_parent, MainWindow *p_main_window) : Q
     this->setBackgroundRole(QPalette::Window);
     this->setAutoFillBackground(true);
     addInterp(M1Store::Item_lv2::getExisting(M1Env::HOME_SIID));
+
+    // this->setAcceptDrops(true);
+    // this->setMouseTracking(true);
+
     M1_FUNC_EXIT
 }
 
+/*
+void M1UI::TreeDisplay::mouseMoveEvent(QMouseEvent *p_event){
+    qCDebug(g_cat_interp_drag) << QString("TD mouse move event") << p_event->position();
+}*/
+
 void M1UI::TreeDisplay::gotoVertex(M1Store::Item_lv2* p_new_vertex){
-    M1_FUNC_ENTRY(g_cat_td_signals, QString("gotoVertex %1").arg(p_new_vertex == nullptr ? m_root->dbgShort() : p_new_vertex->dbgShort()))
+    M1_FUNC_ENTRY(g_cat_tree_display, QString("gotoVertex %1").arg(p_new_vertex == nullptr ? m_root->dbgShort() : p_new_vertex->dbgShort()))
     delete this->widget();
     if(p_new_vertex == nullptr)
         addInterp(m_root);
@@ -43,15 +51,6 @@ void M1UI::TreeDisplay::gotoVertex(M1Store::Item_lv2* p_new_vertex){
 void M1UI::TreeDisplay::htmlReceive(const QString& p_html){
     M1_FUNC_ENTRY(g_cat_tree_display, QString("html %1").arg(p_html))
     emit emitHtml(p_html);
-    M1_FUNC_EXIT
-}
-
-
-void M1UI::TreeDisplay::mouseMoveEvent(QMouseEvent *p_event){
-    M1_FUNC_ENTRY(g_cat_tree_display, QString("TD_mouseMoveEvent %1 %2")
-                                          .arg(p_event->position().x())
-                                          .arg(p_event->position().y()))
-
     M1_FUNC_EXIT
 }
 
@@ -79,7 +78,7 @@ M1MidPlane::Interp* M1UI::TreeDisplay::addInterpRecur(
     M1Store::Item_lv2* p_root,
     int p_depth,
     QVBoxLayout* p_vb,
-    QVector<int>& p_alrady_seen)
+    QVector<M1Store::ItemID>& p_edges_alrady_traversed)
 {
     M1_FUNC_ENTRY(g_cat_tree_display, QString("current p_root: %1").arg(p_root->dbgShort()));
     M1MidPlane::Interp* l_auto_edge = nullptr;
@@ -94,6 +93,8 @@ M1MidPlane::Interp* M1UI::TreeDisplay::addInterpRecur(
             }
             else continue;
         }
+        else if(p_edges_alrady_traversed.contains(it.at()->item_id()))
+            continue;
         else {
             qCDebug(g_cat_tree_display) << "current edge (regular) : " << it.at()->dbgShort();
             l_ti = M1MidPlane::Interp::getInterp(it.at(), this, p_depth);
@@ -110,13 +111,15 @@ M1MidPlane::Interp* M1UI::TreeDisplay::addInterpRecur(
         p_vb->addWidget(l_ti);
 
         // recur if this edge is open
-        if(it.at()->flags() & M1Env::EDGE_IS_OPEN && !p_alrady_seen.contains(it.at()->item_id())){
+        if(it.at()->flags() & M1Env::EDGE_IS_OPEN && !p_edges_alrady_traversed.contains(it.at()->item_id())){
             qCDebug(g_cat_tree_display) << "current edge (open) : " << it.at()->dbgShort();
-            p_alrady_seen.append(it.at()->item_id());
+            p_edges_alrady_traversed.append(it.at()->item_id());
             if(it.at()->isOfType(M1Env::TW_SECTION_2_OCC_BEGIN_SIID) || it.at()->isOfType(M1Env::TW_SECTION_2_OCC_END_SIID))
-                addInterpRecur(it.at()->getTarget_lv2()->getTarget_lv2(), p_depth+1, p_vb, p_alrady_seen);
-            else
-                addInterpRecur(it.at()->getTarget_lv2(), p_depth+1, p_vb, p_alrady_seen);
+                addInterpRecur(it.at()->getTarget_lv2()->getTarget_lv2(), p_depth+1, p_vb, p_edges_alrady_traversed);
+            else{
+                p_edges_alrady_traversed.append(it.at()->getReciprocalEdge_lv2()->item_id());
+                addInterpRecur(it.at()->getTarget_lv2(), p_depth+1, p_vb, p_edges_alrady_traversed);
+            }
         }
     }
     M1_FUNC_EXIT
@@ -129,8 +132,8 @@ void M1UI::TreeDisplay::addInterp(M1Store::Item_lv2* p_root){
     QVBoxLayout* l_vb = new QVBoxLayout();
     l_vb->setSpacing(0);
     l_vb->setContentsMargins(0, 0, 0, 0);
-    QVector<int> l_alrady_seen;
-    M1MidPlane::Interp* l_auto_edge = addInterpRecur(p_root, 0, l_vb, l_alrady_seen);
+    QVector<M1Store::ItemID> l_alrady_traversed;
+    M1MidPlane::Interp* l_auto_edge = addInterpRecur(p_root, 0, l_vb, l_alrady_traversed);
     l_vb->addStretch();
 
     QWidget* l_scroll_area_widget = new QWidget();

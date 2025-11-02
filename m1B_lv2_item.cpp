@@ -329,7 +329,7 @@ QString M1Store::Item_lv2::dbgString(){
         // list of edges construction : same logic as recurGraph() above, minus the recursiveness
         // special edges
         if(Item_lv2* l_current_edge = getExisting(firstEdgeSpecial_item_id())){
-            l_edges += "\nSpecial edges:";
+            l_edges += "\n===== Special edges =====";
             ItemID l_stop_id = l_current_edge->item_id();
             do {
                 l_edges += "\n" + l_current_edge->dbgShort();
@@ -339,7 +339,7 @@ QString M1Store::Item_lv2::dbgString(){
         }
         // ordinary edges
         if(Item_lv2* l_current_edge = getExisting(firstEdge_item_id())){
-            l_edges += "\nOrdinary edges:";
+            l_edges += "\n===== Ordinary edges =====";
             ItemID l_stop_id = l_current_edge->item_id();
             do {
                 l_edges += "\n" + l_current_edge->dbgShort();
@@ -355,8 +355,9 @@ QString M1Store::Item_lv2::dbgString(){
             QString l_text(text());
 
             return l_ret +
+                        //       ------------------------------ LV2 ------------------------------------------------------
                         QString("--------------------------- FULL VERTEX -------------------------------------------------\n") +
-                        QString("%1\n%2\n%3\n%4\n%5\n%6\n%7\n%8\n%9\n%10")
+                        QString("%1\n%2\n%3\n%4\n%5\n%6\n%7\n%8\n%9")
                            .arg(QString("m_flags_extra        : 0b%1").arg(flagsExtra(), 64, 2, QLatin1Char('0')))
                            .arg(QString("m_creation_date      : %1").arg(creationDate().toString("dd/MM/yyyy hh:mm:ss")))
                            .arg(QString("m_lastmod_date       : %1").arg(lastmodDate().toString("dd/MM/yyyy hh:mm:ss")))
@@ -368,18 +369,20 @@ QString M1Store::Item_lv2::dbgString(){
                            .arg(QString("text                 : [%1] %2%3")
                                     .arg(l_text.length())
                                     .arg(l_text.left(100))
-                                    .arg(l_text.length() > 100 ? "..." : "")) + l_edges;
+                                    .arg(l_text.length() > 100 ? "..." : "")) + l_edges + "\n===== END =====";
         }
         break;
     case SIMPLE_VERTEX:{
             return l_ret +
-                        QString("--------------------------- SIMPLE VERTEX -----------------------------------------------\n") +
+                        //       ------------------------------ LV2 ------------------------------------------------------
+                        QString("------------------------- SIMPLE VERTEX -------------------------------------------------\n") +
                         QString("%1")
                            .arg(QString("text                 : %1").arg(text()));
         }
         break;
     case FULL_EDGE:{
             return l_ret +
+                        //       ------------------------------ LV2 ------------------------------------------------------
                         QString("--------------------------- FULL EDGE ---------------------------------------------------\n") +
                         QString("%1\n%2\n%3\n%4\n%5\n%6\n%7\n%8\n%9\n%10\n%11\n%12")
                            .arg(QString("m_flags_extra        : 0b%1").arg(flagsExtra(), 64, 2, QLatin1Char('0')))
@@ -398,7 +401,8 @@ QString M1Store::Item_lv2::dbgString(){
         break;
     case SIMPLE_EDGE:{
             return l_ret +
-                        QString("--------------------------- SIMPLE EDGE -------------------------------------------------\n") +
+                        //       ------------------------------ LV2 -----------------------------------------------------
+                        QString("-------------------------- SIMPLE EDGE -------------------------------------------------\n") +
                         QString("%1\n%2\n%3\n%4")
                             .arg(QString("m_v_origin           : 0x%1 %2").arg(origin_item_id(), 16, 16, QLatin1Char('0')).arg(origin_item_id()))
                             .arg(QString("m_e_previous         : 0x%1 %2").arg(previous_item_id(), 16, 16, QLatin1Char('0')).arg(previous_item_id()))
@@ -412,7 +416,7 @@ QString M1Store::Item_lv2::dbgString(){
 }
 
 QString M1Store::Item_lv2::dbgStringHtml(){
-    QString l_ret = QString("<p style=\"margin: 0;\">------------------------ LV2 ------------------------</p>\n") +
+    QString l_ret = QString("<p style=\"margin: 0;font-weight: bold;\">------------------------ LV2 ------------------------</p>\n") +
                     QString("<table>\n%1\n%2\n%3\n</table>\n")
                         .arg(QString("<tr><td>m_id</td><td>:</td><td>0x%1 %2</td></tr>\n").arg(item_id(), 16, 16, QLatin1Char('0')).arg(item_id()))
                         .arg(QString("<tr><td>m_flags</td><td>:</td><td>0b%1</td></tr>\n").arg(flags(), 64, 2, QLatin1Char('0')))
@@ -435,7 +439,7 @@ QString M1Store::Item_lv2::dbgStringHtml(){
             } while (l_current_edge->item_id() != l_stop_id);
         }
         if(!l_edge_list.empty())
-            l_edges = "<p style=\"margin: 0;\">Special edges:</p>\n" + l_edge_list.join("");
+            l_edges = "<p style=\"margin: 0;font-weight: bold;\">Special edges:</p>\n" + l_edge_list.join("");
         l_edge_list.clear();
         // ordinary edges
         if(Item_lv2* l_current_edge = getExisting(firstEdge_item_id())){
@@ -449,7 +453,7 @@ QString M1Store::Item_lv2::dbgStringHtml(){
             } while (l_current_edge->item_id() != l_stop_id);
         }
         if(!l_edge_list.empty())
-            l_edges += "<p style=\"margin: 0;\">Ordinary edges:</p>\n" + l_edge_list.join("");
+            l_edges += "<p style=\"margin: 0;font-weight: bold;\">Ordinary edges:</p>\n" + l_edge_list.join("");
     }
 
     switch(flags() & ITEM_NATURE_MASK){
@@ -458,7 +462,8 @@ QString M1Store::Item_lv2::dbgStringHtml(){
             QString l_text(text());
 
             return l_ret +
-                   QString("<p style=\"margin: 0;\">----------------------- FULL VERTEX -----------------------</p>\n") +
+                   //                                                 ------------------------ LV2 ------------------------
+                   QString("<p style=\"margin: 0;font-weight: bold;\">-------------------- FULL VERTEX --------------------</p>\n") +
                    QString("<table>%1\n%2\n%3\n%4\n%5\n%6\n%7\n%8\n%9<table>\n")
                        .arg(QString("<tr><td>m_flags_extra</td><td>:</td><td>0b%1</td></tr>\n").arg(flagsExtra(), 64, 2, QLatin1Char('0')))
                        .arg(QString("<tr><td>m_creation_date</td><td>:</td><td>%1</td></tr>\n").arg(creationDate().toString("dd/MM/yyyy hh:mm:ss")))
@@ -476,14 +481,16 @@ QString M1Store::Item_lv2::dbgStringHtml(){
     break;
     case SIMPLE_VERTEX:{
             return l_ret +
-                   QString("<p style=\"margin: 0;\">----------------------- SIMPLE VERTEX -----------------------</p>\n") +
+                   //                                                 ------------------------ LV2 ------------------------
+                   QString("<p style=\"margin: 0;font-weight: bold;\">------------------- SIMPLE VERTEX -------------------</p>\n") +
                    QString("<p style=\"margin: 0;\">%1</p>")
                        .arg(QString("text : %1").arg(text()));
     }
     break;
     case FULL_EDGE:{
             return l_ret +
-                   QString("<p style=\"margin: 0;\">----------------------- FULL EDGE -----------------------</p>\n") +
+                   //                                                 ------------------------ LV2 ------------------------
+                   QString("<p style=\"margin: 0;font-weight: bold;\">--------------------- FULL EDGE ---------------------</p>\n") +
                    QString("<table>%1\n%2\n%3\n%4\n%5\n%6\n%7\n%8\n%9\n%10\n%11<table>\n%12\n%13\n")
                        .arg(QString("<tr><td>m_flags_extra</td><td>:</td><td>0b%1</td></tr>\n").arg(flagsExtra(), 64, 2, QLatin1Char('0')))
                        .arg(QString("<tr><td>m_creation_date</td><td>:</td><td>%1</td></tr>\n").arg(creationDate().toString("dd/MM/yyyy hh:mm:ss")))
@@ -502,7 +509,8 @@ QString M1Store::Item_lv2::dbgStringHtml(){
     break;
     case SIMPLE_EDGE:{
             return l_ret +
-                   QString("<p style=\"margin: 0;\">----------------------- SIMPLE EDGE -----------------------</p>\n") +
+                   //                                                 ------------------------ LV2 ------------------------
+                   QString("<p style=\"margin: 0;font-weight: bold;\">-------------------- SIMPLE EDGE --------------------</p>\n") +
                    QString("<table>%1\n%2\n%3\n</table>%4")
                        .arg(QString("<tr><td>m_v_origin</td><td>:</td><td>0x%1 %2</td></tr>\n").arg(origin_item_id(), 16, 16, QLatin1Char('0')).arg(origin_item_id()))
                        .arg(QString("<tr><td>m_e_previous</td><td>:</td><td>0x%1 %2</td></tr>\n").arg(previous_item_id(), 16, 16, QLatin1Char('0')).arg(previous_item_id()))
@@ -848,7 +856,7 @@ M1Env::SpecialItemID M1Store::Item_lv2::getIconTypeMember(){
         if(l_si_id != M1Env::G_VOID_SI_ID &&
             (l_ret == -1 || (M1Store::Storage::getSpecialItemPointer(l_si_id)->flags() & M1Env::SI_IS_ICON_TYPE))) l_ret = l_si_id;
     }
-    qCDebug(g_cat_td_signals) << QString("l_ret [%1] %2").arg(l_ret).arg(M1Store::Storage::getSpecialItemPointer(static_cast<M1Env::SpecialItemID>(l_ret))->mnemonic());
+    qCDebug(g_cat_lv2_members) << QString("l_ret [%1] %2").arg(l_ret).arg(M1Store::Storage::getSpecialItemPointer(static_cast<M1Env::SpecialItemID>(l_ret))->mnemonic());
     M1_FUNC_EXIT
     return l_ret;
 }

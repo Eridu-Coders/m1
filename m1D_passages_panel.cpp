@@ -105,7 +105,7 @@ void M1UI::BasePassageItem::dropEvent(QGraphicsSceneDragDropEvent *p_event){
 }
 
 QString M1UI::BasePassageItem::highlight(M1Store::Item_lv2* p_chunk, M1Store::Item_lv2* p_category, M1Store::Item_lv2* p_color){
-    qCDebug(g_cat_td_signals) << QString("highlight") << m_id << this->text() << p_category->text() << p_color->text();
+    qCDebug(g_cat_passages_panel) << QString("highlight") << m_id << this->text() << p_category->text() << p_color->text();
 
     m_color = p_color->text();
     this->update(this->boundingRect());
@@ -334,10 +334,10 @@ void M1UI::PassageEditor::select_from_to(const int p_from, const int p_to){
     }
 }
 QString M1UI::PassageEditor::bake_highlight(M1Store::Item_lv2* p_highlight_vertex, M1Store::Item_lv2* p_category, M1Store::Item_lv2* p_color){
-    qCDebug(g_cat_td_signals).noquote() << QString("bake_highlight") << m_id << p_category->text() << p_color->text() << m_current_start->dbgShort();
+    qCDebug(g_cat_passages_panel).noquote() << QString("bake_highlight") << m_id << p_category->text() << p_color->text() << m_current_start->dbgShort();
     M1Store::Item_lv2* l_version = m_current_start->find_edge(M1Env::ISA_SIID, M1Env::TXTVR_SIID, true)->getTarget_lv2();
-    // qCDebug(g_cat_td_signals) << QString("version") << ((l_version == nullptr) ? "nullptr" : l_version->getTarget_lv2()->dbgShort());
-    qCDebug(g_cat_td_signals).noquote() << QString("version") << l_version->text();
+    // qCDebug(g_cat_main_window) << QString("version") << ((l_version == nullptr) ? "nullptr" : l_version->getTarget_lv2()->dbgShort());
+    qCDebug(g_cat_passages_panel).noquote() << QString("version") << l_version->text();
 
     M1Store::Item_lv2* l_highlight_chunk = p_highlight_vertex->create_descendant(
         M1Store::OWNS_SIID,
@@ -355,13 +355,13 @@ QString M1UI::PassageEditor::bake_highlight(M1Store::Item_lv2* p_highlight_verte
 
 // PassagesPanel ---------------------------------------------------------------------------------------------------------------------------------------
 void M1UI::PassagesPanel::selection_changed(){
-    qCDebug(g_cat_td_signals) << QString("selection_changed()");
+    qCDebug(g_cat_passages_panel) << QString("selection_changed()");
     bool l_all_selections = true;
     for(int i = 0; i < m_pe_list.count(); i++){
-        qCDebug(g_cat_td_signals) << QString("PassageEditor:") << m_pe_list.at(i)->id() << m_pe_list.at(i)->has_selection();
+        qCDebug(g_cat_passages_panel) << QString("PassageEditor:") << m_pe_list.at(i)->id() << m_pe_list.at(i)->has_selection();
         l_all_selections = l_all_selections && m_pe_list.at(i)->has_selection();
     }
-    qCDebug(g_cat_td_signals) << QString("All Selected?: ") << l_all_selections;
+    qCDebug(g_cat_passages_panel) << QString("All Selected?: ") << l_all_selections;
     emit activate_highlight_button(l_all_selections);
 }
 
@@ -427,12 +427,12 @@ void M1UI::PassagesPanel::move_backwards_ten(){
     calculate_positions();
 }
 void M1UI::PassagesPanel::cat_select(int p_index){
-    qCDebug(g_cat_td_signals) << QString("cat_select()") << p_index << m_cat_list[p_index]->text();
+    qCDebug(g_cat_passages_panel) << QString("cat_select()") << p_index << m_cat_list[p_index]->text();
     m_current_cat = p_index;
 }
 // highlight
 void M1UI::PassagesPanel::highlight(){
-    qCDebug(g_cat_td_signals) << QString("highlight()") << m_cat_list[m_current_cat]->text() << m_highlight_folder->dbgShort();
+    qCDebug(g_cat_passages_panel) << QString("highlight()") << m_cat_list[m_current_cat]->text() << m_highlight_folder->dbgShort();
 
     M1Store::Item_lv2* l_highlight_vertex = m_highlight_folder->create_descendant(M1Env::OWNS_SIID, "", M1Env::TEXT_HIGHLIGHT_SIID);
 

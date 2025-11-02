@@ -7,9 +7,14 @@
 #include <QPainter>
 #include <QResizeEvent>
 #include <QRegularExpression>
+#include <QGraphicsSceneDragDropEvent>
+#include <QMimeData>
+#include <QDrag>
 
 // g_cat_interp_base
 Q_LOGGING_CATEGORY(g_cat_interp_base, "interp.base")
+// g_cat_interp_drag
+Q_LOGGING_CATEGORY(g_cat_interp_drag, "interp.drag")
 
 QIcon M1MidPlane::Interp::cm_open;
 QIcon M1MidPlane::Interp::cm_closed;
@@ -83,6 +88,14 @@ M1MidPlane::Interp::Interp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p
     p.setColor(QPalette::Window, QColor(Qt::darkRed));
     this->setPalette(p);
     this->setBackgroundRole(QPalette::Window);
+
+    // qCDebug(g_cat_interp_drag) << "Accepting Drops" << m_myself->dbgShort();
+    this->setMouseTracking(true);
+    this->setAcceptDrops(true);
+
+    setAttribute(Qt::WA_AcceptDrops, false);
+    setAttribute(Qt::WA_AcceptDrops, true);
+
     M1_FUNC_EXIT
 }
 
@@ -98,22 +111,47 @@ QString M1MidPlane::Interp::displayText(){
 }
 
 void M1MidPlane::Interp::paintEvent(QPaintEvent* p_event){
-    qCDebug(g_cat_tree_display) << m_myself->dbgShort() << " painting: " << p_event->rect();
+    qCDebug(g_cat_interp_base) << m_myself->dbgShort() << " painting: " << p_event->rect();
     QPainter p(this);
-    // QString l_text = m_myself->isFullEdge() ? m_myself->dbgHalf() : m_myself->dbgShort(0);
+    // edge type icon
     M1Store::Storage::getQIcon(m_myself->getIconTypeMember())->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
-    paintOC(p);
+    // open/close icon
+    if(diplayOpenClose()) paintOC(p);
+    // target type icon
     M1Store::Storage::getQIcon(m_myself->getTarget_lv2()->getIconTypeMember())->paint(
         &p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
+
+    // text
     p.setPen(Qt::white);
     p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), this->displayText());
+
+    // drag markers
+    p.setPen(QPen(QBrush(Qt::red), 2.0));
+    if(m_drag_top){
+        p.drawLine(1, 1, this->width()-1, 1);
+        if(!m_drag_bottom)
+            for(int x = this->width()/4; x < this->width()-4; x += this->width()/4)
+                p.drawPolygon(QList<QPoint>() << QPoint(x, 2) << QPoint(x-4, 10) << QPoint(x+4, 10));
+        else{
+            p.setBrush(QBrush(QColor(255, 0, 0, 63)));
+            p.drawRect(this->rect());
+        }
+    }
+    if(m_drag_bottom){
+        p.drawLine(0, this->height()-2, this->width()-1, this->height()-2);
+        if(!m_drag_top)
+            for(int x = this->width()/4; x < this->width()-4; x += this->width()/4)
+                p.drawPolygon(QList<QPoint>() << QPoint(x, this->height()-2) << QPoint(x-4, this->height()-10) << QPoint(x+4, this->height()-10));
+    }
+
+    // qCDebug(g_cat_interp_drag) << "Accepting Drops" << this->acceptDrops() << m_myself->getTarget_lv2()->text();
 }
 void M1MidPlane::Interp::resizeEvent(QResizeEvent *p_event){
-    qCDebug(g_cat_tree_display) << m_myself->dbgShort() << " resized: " << p_event->size();
+    qCDebug(g_cat_interp_base) << m_myself->dbgShort() << " resized: " << p_event->size();
 }
 
 void M1MidPlane::Interp::mouseDoubleClickEvent(QMouseEvent *p_event){
-    qCDebug(g_cat_tree_display) << m_myself->dbgShort() << " double click: " << p_event->pos();
+    qCDebug(g_cat_interp_base) << m_myself->dbgShort() << " double click: " << p_event->pos();
     emit gotoVertex(m_myself->getTarget_lv2());
 }
 
@@ -149,8 +187,8 @@ QString M1MidPlane::Interp::getHtml(){
 #include <QGraphicsView>
 
 QWidget *M1MidPlane::Interp::get_edit_widget(){
-    qCDebug(g_cat_td_signals) << "Emitting <emitEdit> for" << m_myself->text();
-    qCDebug(g_cat_td_signals) << QString("text: %1").arg(m_myself->dbgShort());
+    qCDebug(g_cat_interp_base) << "Emitting <emitEdit> for" << m_myself->text();
+    qCDebug(g_cat_interp_base) << QString("text: %1").arg(m_myself->dbgShort());
 
     QGraphicsScene* l_scene = new QGraphicsScene();
 
@@ -165,8 +203,8 @@ QWidget *M1MidPlane::Interp::get_edit_widget(){
 
 void M1MidPlane::Interp::focusInEvent(QFocusEvent *p_event){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Interp::focusInEvent()"))
-    qCDebug(g_cat_tree_display) << m_myself->dbgShort() << " focus in: " << p_event->reason();
-    qCDebug(g_cat_tree_display) << m_myself->dbgShort() << " Background color: " << this->palette().color(QPalette::Window);
+    qCDebug(g_cat_interp_base) << m_myself->dbgShort() << " focus in: " << p_event->reason();
+    qCDebug(g_cat_interp_base) << m_myself->dbgShort() << " Background color: " << this->palette().color(QPalette::Window);
 
     emit emitHtml(getHtml());
     emit emitEdit(get_edit_widget());
@@ -176,20 +214,78 @@ void M1MidPlane::Interp::focusInEvent(QFocusEvent *p_event){
     M1_FUNC_EXIT
 }
 void M1MidPlane::Interp::focusOutEvent(QFocusEvent *p_event){
-    qCDebug(g_cat_tree_display) << m_myself->dbgShort() << " focus out: " << p_event->reason();
+    qCDebug(g_cat_interp_base) << m_myself->dbgShort() << " focus out: " << p_event->reason();
     this->setAutoFillBackground(false);
     this->repaint();
 }
+
+
+M1MidPlane::Drag::~Drag(){
+    qCDebug(g_cat_interp_drag) << "DRAG end: " << this->mimeData()->text();
+    static_cast<QWidget*>(this->source())->setAcceptDrops(true);
+}
+
 void M1MidPlane::Interp::mousePressEvent(QMouseEvent *p_event){
-    qCDebug(g_cat_tree_display) << m_myself->dbgShort() << " mouse press: " << p_event->pos();
+    qCDebug(g_cat_interp_drag) << m_myself->dbgShort() << " mouse press: " << p_event->pos();
     if(m_oc_x < p_event->pos().x() && p_event->pos().x() < m_oc_x + m_target_height){
-        qCDebug(g_cat_tree_display) << m_myself->dbgShort() << " OC clicked";
+        qCDebug(g_cat_interp_base) << m_myself->dbgShort() << " OC clicked";
         if(m_myself->flags() & M1Env::EDGE_IS_OPEN)
             m_myself->unSetFlag(M1Env::EDGE_IS_OPEN);
         else
             m_myself->setFlag(M1Env::EDGE_IS_OPEN);
         emit gotoVertex(nullptr);
     }
+    else {
+        // initiate Drag/Drop
+        Drag *l_drag = new Drag(this);
+
+        QString l_payload = QString("%1").arg(m_myself->getTarget_lv2()->text());
+        QMimeData *l_data = new QMimeData;
+        l_data->setText(l_payload);
+        qCDebug(g_cat_interp_drag) << QString("Drag CREATION ") << this->acceptDrops() << l_payload << l_data->formats();
+
+        l_drag->setMimeData(l_data);
+        this->setAcceptDrops(false);
+        l_drag->exec();
+    }
+}
+
+void M1MidPlane::Interp::mouseMoveEvent(QMouseEvent *p_event){
+    qCDebug(g_cat_interp_drag) << QString("INTERP mouse move event") << this->acceptDrops() << m_myself->getTarget_lv2()->text() << p_event->position();
+}
+
+void M1MidPlane::Interp::dragEnterEvent(QDragEnterEvent *p_event){
+    qCDebug(g_cat_interp_drag) << QString("Drag ENTER p_event") << p_event->mimeData()->text() << p_event->mimeData()->formats() << m_myself->getTarget_lv2()->text();
+    p_event->setAccepted(true);
+}
+void M1MidPlane::Interp::dragMoveEvent(QDragMoveEvent *p_event){
+    qCDebug(g_cat_interp_drag) << QString("Drag MOVE p_event") << p_event->mimeData()->text() << p_event->mimeData()->formats()
+                               << m_myself->getTarget_lv2()->text() << p_event->position().toPoint() << this->rect();
+
+    m_drag_top = false;
+    m_drag_bottom = false;
+    if(p_event->position().toPoint().y() < 7 ) m_drag_top = true;
+    else if(p_event->position().toPoint().y() > height() - 7 ) m_drag_bottom = true;
+    else {
+        m_drag_top = true;
+        m_drag_bottom = true;
+    }
+    this->repaint();
+    p_event->setAccepted(true);
+}
+void M1MidPlane::Interp::dragLeaveEvent(QDragLeaveEvent *p_event){
+    qCDebug(g_cat_interp_drag) << QString("Drag LEAVE p_event") << m_myself->getTarget_lv2()->text();
+    m_drag_top = false;
+    m_drag_bottom = false;
+
+    this->repaint();
+}
+void M1MidPlane::Interp::dropEvent(QDropEvent *p_event){
+    qCDebug(g_cat_interp_drag) << QString("DROP p_event") << p_event->mimeData()->text() << p_event->mimeData()->formats() << m_myself->text();
+    m_drag_top = false;
+    m_drag_bottom = false;
+
+    this->repaint();
 }
 
 M1MidPlane::Interp::~Interp(){
@@ -210,17 +306,11 @@ M1MidPlane::AutoInterp::AutoInterp(M1Store::Item_lv2* p_myself, QWidget* p_paren
     M1_FUNC_EXIT
 }
 void M1MidPlane::AutoInterp::paintEvent(QPaintEvent* p_event){
+    M1MidPlane::Interp::paintEvent(p_event);
     QPainter p(this);
-    // QString l_text = m_myself->getTarget_lv2()->text();
-    M1Store::Storage::getQIcon(m_myself->getIconTypeMember())->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
-    // M1MidPlane::Interp::cm_closed.paint(&p, m_target_padding + m_target_height, m_target_padding, m_icon_size, m_icon_size);
-    M1Store::Storage::getQIcon(m_myself->getTarget_lv2()->getIconTypeMember())->paint(
-        &p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
-    p.setPen(Qt::white);
-    p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), this->displayText());
     p.setPen(Qt::darkGray);
     p.drawLine(QPoint(0,0), QPoint(this->width(),0));
-    p.drawLine(QPoint(0,m_target_height-1), QPoint(this->width(),m_target_height-1));
+    p.drawLine(QPoint(0, m_target_height-1), QPoint(this->width(), m_target_height-1));
 }
 
 // ------------------------------------ FieldInterp -----------------------------------------------------
@@ -325,8 +415,10 @@ QString M1MidPlane::SectionBeginEnd::displayText(){
         .arg(m_myself->getTarget_lv2()->getTarget_lv2()->text())
         .arg(m_myself->getTarget_lv2()->getTarget_lv2()->getField(M1Store::TEXT_WORD_TRANSLIT_SIID));
 }
+/*
 void M1MidPlane::SectionBeginEnd::paintEvent(QPaintEvent* p_event){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("TranslUnit painting"))
+
     QPainter p(this);
     M1Store::Storage::getQIcon(m_myself->getIconTypeMember())->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
     paintOC(p);
@@ -334,8 +426,10 @@ void M1MidPlane::SectionBeginEnd::paintEvent(QPaintEvent* p_event){
         &p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
     p.setPen(Qt::white);
     p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), this->displayText());
+
     M1_FUNC_EXIT
 }
+*/
 //------------------------------------ UrlInterp -----------------------------------------------------
 bool M1MidPlane::UrlInterp::wantIt(M1Store::Item_lv2* p_myself){
     return p_myself->isFullEdge() && p_myself->getTarget_lv2()->isOfType(M1Env::TEXT_URL_LINK_SIID);
@@ -470,12 +564,12 @@ QString M1MidPlane::SentenceInterp::getHtml(){
 QWidget *M1MidPlane::SentenceInterp::get_edit_widget(){
     // find previous Stephanus Number
     M1Store::Item_lv2* l_current_edge = m_myself->getTarget_lv2()->find_edge(M1Env::OWNS_SIID, M1Env::OCCUR_SIID)->getTarget_lv2();
-    qCDebug(g_cat_td_signals) << QString("l_current_edge") << l_current_edge->dbgShort();
+    qCDebug(g_cat_interp_base) << QString("l_current_edge") << l_current_edge->dbgShort();
     M1Store::Item_lv2* l_section;
     while(true){
-        qCDebug(g_cat_td_signals) << QString("l_current_edge") << l_current_edge->dbgShort();
-        qCDebug(g_cat_td_signals) << QString("   previous") << l_current_edge->get_previous_lv2()->dbgShort();
-        qCDebug(g_cat_td_signals) << QString("   next    ") << l_current_edge->get_next_lv2()->dbgShort();
+        qCDebug(g_cat_interp_base) << QString("l_current_edge") << l_current_edge->dbgShort();
+        qCDebug(g_cat_interp_base) << QString("   previous") << l_current_edge->get_previous_lv2()->dbgShort();
+        qCDebug(g_cat_interp_base) << QString("   next    ") << l_current_edge->get_next_lv2()->dbgShort();
         l_section = l_current_edge->find_edge(M1Env::BLNGS_SIID, M1Env::STEPHANUS_SIID);
         if(l_section != nullptr){
             l_section = l_section->getTarget_lv2();
@@ -484,20 +578,20 @@ QWidget *M1MidPlane::SentenceInterp::get_edit_widget(){
         l_current_edge = l_current_edge->get_previous_lv2();
         // l_current_edge = l_current_edge->getNext_lv2();
     }
-    qCDebug(g_cat_td_signals) << QString("Previous section") << l_section->dbgShort();
+    qCDebug(g_cat_interp_base) << QString("Previous section") << l_section->dbgShort();
     M1Store::Item_lv2* l_greek_start = nullptr;
     M1Store::Item_lv2* l_jowett_start = nullptr;
     M1Store::Item_lv2* l_shorey_start = nullptr;
     for(M1Store::Item_lv2_iterator it = l_section->getIteratorTop(); !it.beyondEnd(); it.next())
         if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::OCCUR_SIID)){
-            qCDebug(g_cat_td_signals) << QString("section occur") << it.at()->getTarget_lv2()->dbgShort();
+            qCDebug(g_cat_interp_base) << QString("section occur") << it.at()->getTarget_lv2()->dbgShort();
             if(it.at()->getTarget_lv2()->isOfType("RVGRK")) l_greek_start = it.at()->getTarget_lv2();
             if(it.at()->getTarget_lv2()->isOfType("RVJWT")) l_jowett_start = it.at()->getTarget_lv2();
             if(it.at()->getTarget_lv2()->isOfType("RVSHR")) l_shorey_start = it.at()->getTarget_lv2();
         }
-    qCDebug(g_cat_td_signals) << QString("greek  start") << l_greek_start->dbgShort();
-    qCDebug(g_cat_td_signals) << QString("jowett start") << l_jowett_start->dbgShort();
-    qCDebug(g_cat_td_signals) << QString("shorey start") << l_shorey_start->dbgShort();
+    qCDebug(g_cat_interp_base) << QString("greek  start") << l_greek_start->dbgShort();
+    qCDebug(g_cat_interp_base) << QString("jowett start") << l_jowett_start->dbgShort();
+    qCDebug(g_cat_interp_base) << QString("shorey start") << l_shorey_start->dbgShort();
 
     // Set up UI
     QWidget* l_panel_widget = new QWidget();
@@ -520,7 +614,7 @@ QWidget *M1MidPlane::SentenceInterp::get_edit_widget(){
     // fill categories combo box
     M1Store::Item_lv2* l_republic = l_greek_start->getOrigin_lv2();
     M1Store::Item_lv2* l_cat_folder = l_republic->find_edge(M1Env::OWNS_SIID, M1Env::TEXT_HIGHLIGHT_CAT_FLDR_SIID)->getTarget_lv2();
-    qCDebug(g_cat_td_signals) << QString("l_cat_folder") << l_cat_folder->dbgShort();
+    qCDebug(g_cat_interp_base) << QString("l_cat_folder") << l_cat_folder->dbgShort();
 
     QList<M1Store::Item_lv2*> l_cat_list;
     for(M1Store::Item_lv2_iterator it = l_cat_folder->getIteratorTop(); !it.beyondEnd(); it.next())
@@ -528,8 +622,8 @@ QWidget *M1MidPlane::SentenceInterp::get_edit_widget(){
             M1Store::Item_lv2* l_cat = it.at()->getTarget_lv2();
             l_cat_list.append(l_cat);
             QString l_color = l_cat->getField(M1Env::HLCLR_SIID);
-            qCDebug(g_cat_td_signals) << QString("Cat: ") << it.at()->dbgShort();
-            qCDebug(g_cat_td_signals) << QString("l_color: ") << l_color;
+            qCDebug(g_cat_interp_base) << QString("Cat: ") << it.at()->dbgShort();
+            qCDebug(g_cat_interp_base) << QString("l_color: ") << l_color;
             QPixmap l_color_pixmap(16, 16);
             l_color_pixmap.fill(QColor(l_color));
             l_cat_combo->addItem(QIcon(l_color_pixmap), l_cat->text());
@@ -651,6 +745,7 @@ M1MidPlane::TextOccurrence::TextOccurrence(M1Store::Item_lv2* p_myself, QWidget*
 QString M1MidPlane::TextOccurrence::displayText(){
     return M1MidPlane::SentenceInterp::occur_to_text(m_myself->getTarget_lv2());
 }
+/*
 void M1MidPlane::TextOccurrence::paintEvent(QPaintEvent* p_event){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("TranslUnit painting"))
     QPainter p(this);
@@ -663,3 +758,4 @@ void M1MidPlane::TextOccurrence::paintEvent(QPaintEvent* p_event){
     p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), this->displayText());
     M1_FUNC_EXIT
 }
+*/

@@ -72,6 +72,7 @@ int main(int argc, char *argv[])
                                         "lv1.*=false\n"
                                         "lv2.*=false\n"
                                         "interp.*=false\n"
+                                        "interp.drag=true\n"
                                         "tree_display=false\n"
                                         "passages_panel=false\n"
                                         "qt.*.debug=false");
