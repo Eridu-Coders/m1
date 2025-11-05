@@ -21,8 +21,8 @@ M1Env::SpecialItemID M1Env::TEXT_WROTE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_WRITTEN_BY_SIID = G_NONEX_SI_ID;
 // [OCCUR] Special Vertex ID (Edge type) of occurrence edges
 M1Env::SpecialItemID M1Env::OCCUR_SIID = G_NONEX_SI_ID;
-// [FORM_] Special Vertex ID (Vertex type) of word form vertices
-M1Env::SpecialItemID M1Env::FORM_SIID = G_NONEX_SI_ID;
+// [WFORM] Special Vertex ID (Vertex type) of word form vertices
+M1Env::SpecialItemID M1Env::WFORM_SIID = G_NONEX_SI_ID;
 // [CAPTL] Special Vertex ID (Simple edge type) of Occurrence field capitalization flag
 M1Env::SpecialItemID M1Env::CAPTL_SIID = G_NONEX_SI_ID;
 // [PCTLF] Special Vertex ID (Simple edge type) of Occurrence field left punctuation
@@ -208,7 +208,7 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::TEXT_WROTE_SIID = M1Store::Storage::getSpecialID("WROTE");
     M1Env::TEXT_WRITTEN_BY_SIID = M1Store::Storage::getSpecialID("WRTBY");
     M1Env::OCCUR_SIID = M1Store::Storage::getSpecialID("OCCUR");
-    M1Env::FORM_SIID = M1Store::Storage::getSpecialID("FORM_");
+    M1Env::WFORM_SIID = M1Store::Storage::getSpecialID("WFORM");
     M1Env::CAPTL_SIID = M1Store::Storage::getSpecialID("CAPTL");
     M1Env::PCTLF_SIID = M1Store::Storage::getSpecialID("PCTLF");
     M1Env::PCTRT_SIID = M1Store::Storage::getSpecialID("PCTRT");
@@ -396,28 +396,28 @@ void M1Env::GraphInit::set_pseudo_constants(){
 
 void M1Env::GraphInit::init_base(){
     // Special Vertex ID (Vertex type) of folders (ordinary vertices with no special role)
-    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE, "FOLDR", M1Env::FOLDER_ICON_PATH);
+    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE | SI_IS_SELECTABLE, "FOLDR", M1Env::FOLDER_ICON_PATH);
     // Special Vertex ID (Edge type) of AUTO edges
-    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE, "AUTO_", M1Env::AUTO_ICON_PATH);
+    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE, "AUTO_", M1Env::AUTO_ICON_PATH);
     // Special Vertex ID (Edge type) of ownership edges
-    M1Store::Storage::getNewSpecialWithReciprocal(SI_IS_TYPE,
+    M1Store::Storage::getNewSpecialWithReciprocal(SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SELECTABLE,
         "OWNS_", M1Env::OWNS_ICON_PATH,
         "BLNGS", M1Env::BLNGS_ICON_PATH,
-        SI_IS_TYPE | SI_INSERT_AT_TOP);
+        SI_IS_TYPE | SI_EDGE_TYPE | SI_INSERT_AT_TOP | SI_IS_SELECTABLE);
     // Special Vertex ID (Edge type) of type edges
-    M1Store::Storage::getNewSpecialWithReciprocal(SI_IS_TYPE | SI_IS_SPECIAL_EDGE,
+    M1Store::Storage::getNewSpecialWithReciprocal(SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SPECIAL_EDGE | SI_IS_SELECTABLE,
         "_ISA_", M1Env::ISA_ICON_PATH,
         "_ITO_", M1Env::ITO_ICON_PATH,
-        SI_IS_TYPE);
+        SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SELECTABLE);
     // Special Vertex ID (Edge type) wrote / written by
-    M1Store::Storage::getNewSpecialWithReciprocal(SI_IS_TYPE,
+    M1Store::Storage::getNewSpecialWithReciprocal(SI_IS_TYPE | SI_EDGE_TYPE,
         "WROTE", M1Env::TEXT_WROTE_ICON_PATH,
         "WRTBY", M1Env::TEXT_WRITTEN_BY_ICON_PATH,
-        SI_IS_TYPE);
+        SI_IS_TYPE | SI_EDGE_TYPE);
     // Special Vertex ID (Edge type) of occurrence edges
-    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE | SI_IS_SPECIAL_EDGE, "OCCUR", M1Env::OCCURRENCE_ICON_PATH);
+    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SPECIAL_EDGE, "OCCUR", M1Env::OCCURRENCE_ICON_PATH);
     // Special Vertex ID (Vertex type) of word form vertices
-    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE | SI_IS_ICON_TYPE, "FORM_", M1Env::FORM_ICON_PATH);
+    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE | SI_IS_ICON_TYPE, "WFORM", M1Env::WFORM_ICON_PATH);
     // Special Vertex ID (Simple edge type) of Occurrence field capitalization flag
     M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE, "CAPTL", nullptr);
     // Special Vertex ID (Simple edge type) of Occurrence field left punctuation
@@ -512,7 +512,7 @@ void M1Env::GraphInit::init_base(){
         // label
         "Person (type)",
         // Special Item flag
-        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE | M1Env::SI_IS_SELECTABLE,
         // mnemonic
         "PERSN",
         // icon path
@@ -527,7 +527,7 @@ void M1Env::GraphInit::init_base(){
         // label
         "Organization (type)",
         // Special Item flag
-        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE | M1Env::SI_IS_SELECTABLE,
         // mnemonic
         "ORGN_",
         // icon path
@@ -11489,7 +11489,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "abilities");
-    l_form_array[0]->setType("FORM_");
+    l_form_array[0]->setType("WFORM");
     l_form_array[0]->setType("NTNNS");
     l_form_array[0]->linkTo(l_lemma_array[533], "BLNGS");
 
@@ -11500,7 +11500,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "able");
-    l_form_array[1]->setType("FORM_");
+    l_form_array[1]->setType("WFORM");
     l_form_array[1]->setType("NTGJJ");
     l_form_array[1]->linkTo(l_lemma_array[532], "BLNGS");
 
@@ -11511,7 +11511,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "about");
-    l_form_array[2]->setType("FORM_");
+    l_form_array[2]->setType("WFORM");
     l_form_array[2]->setType("NTGIN");
     l_form_array[2]->linkTo(l_lemma_array[531], "BLNGS");
 
@@ -11522,7 +11522,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "absolutely");
-    l_form_array[3]->setType("FORM_");
+    l_form_array[3]->setType("WFORM");
     l_form_array[3]->setType("NTGRB");
     l_form_array[3]->linkTo(l_lemma_array[530], "BLNGS");
 
@@ -11533,7 +11533,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "absolute");
-    l_form_array[4]->setType("FORM_");
+    l_form_array[4]->setType("WFORM");
     l_form_array[4]->setType("NTGJJ");
     l_form_array[4]->linkTo(l_lemma_array[529], "BLNGS");
 
@@ -11544,7 +11544,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "accomplishes");
-    l_form_array[5]->setType("FORM_");
+    l_form_array[5]->setType("WFORM");
     l_form_array[5]->setType("NTVBZ");
     l_form_array[5]->linkTo(l_lemma_array[528], "BLNGS");
 
@@ -11555,7 +11555,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "acknowledging");
-    l_form_array[6]->setType("FORM_");
+    l_form_array[6]->setType("WFORM");
     l_form_array[6]->setType("NTVBG");
     l_form_array[6]->linkTo(l_lemma_array[527], "BLNGS");
 
@@ -11566,7 +11566,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "administer");
-    l_form_array[7]->setType("FORM_");
+    l_form_array[7]->setType("WFORM");
     l_form_array[7]->setType("NTGVB");
     l_form_array[7]->linkTo(l_lemma_array[526], "BLNGS");
 
@@ -11577,7 +11577,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "admit");
-    l_form_array[8]->setType("FORM_");
+    l_form_array[8]->setType("WFORM");
     l_form_array[8]->setType("NTGVB");
     l_form_array[8]->linkTo(l_lemma_array[525], "BLNGS");
 
@@ -11588,7 +11588,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "advice");
-    l_form_array[9]->setType("FORM_");
+    l_form_array[9]->setType("WFORM");
     l_form_array[9]->setType("NTGNN");
     l_form_array[9]->linkTo(l_lemma_array[524], "BLNGS");
 
@@ -11599,7 +11599,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "affirm");
-    l_form_array[10]->setType("FORM_");
+    l_form_array[10]->setType("WFORM");
     l_form_array[10]->setType("NTGVB");
     l_form_array[10]->linkTo(l_lemma_array[523], "BLNGS");
 
@@ -11610,7 +11610,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "after");
-    l_form_array[11]->setType("FORM_");
+    l_form_array[11]->setType("WFORM");
     l_form_array[11]->setType("NTGIN");
     l_form_array[11]->linkTo(l_lemma_array[522], "BLNGS");
 
@@ -11621,7 +11621,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ago");
-    l_form_array[12]->setType("FORM_");
+    l_form_array[12]->setType("WFORM");
     l_form_array[12]->setType("NTGRB");
     l_form_array[12]->linkTo(l_lemma_array[521], "BLNGS");
 
@@ -11632,7 +11632,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "agreed");
-    l_form_array[13]->setType("FORM_");
+    l_form_array[13]->setType("WFORM");
     l_form_array[13]->setType("NTVBD");
     l_form_array[13]->linkTo(l_lemma_array[520], "BLNGS");
 
@@ -11643,7 +11643,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "agreed");
-    l_form_array[14]->setType("FORM_");
+    l_form_array[14]->setType("WFORM");
     l_form_array[14]->setType("NTVBN");
     l_form_array[14]->linkTo(l_lemma_array[520], "BLNGS");
 
@@ -11654,7 +11654,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "all");
-    l_form_array[15]->setType("FORM_");
+    l_form_array[15]->setType("WFORM");
     l_form_array[15]->setType("NTGDT");
     l_form_array[15]->linkTo(l_lemma_array[519], "BLNGS");
 
@@ -11665,7 +11665,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "also");
-    l_form_array[16]->setType("FORM_");
+    l_form_array[16]->setType("WFORM");
     l_form_array[16]->setType("NTGRB");
     l_form_array[16]->linkTo(l_lemma_array[518], "BLNGS");
 
@@ -11676,7 +11676,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "am");
-    l_form_array[17]->setType("FORM_");
+    l_form_array[17]->setType("WFORM");
     l_form_array[17]->setType("NTVBP");
     l_form_array[17]->linkTo(l_lemma_array[491], "BLNGS");
 
@@ -11687,7 +11687,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "and");
-    l_form_array[18]->setType("FORM_");
+    l_form_array[18]->setType("WFORM");
     l_form_array[18]->setType("NTGCC");
     l_form_array[18]->linkTo(l_lemma_array[517], "BLNGS");
 
@@ -11698,7 +11698,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "angry");
-    l_form_array[19]->setType("FORM_");
+    l_form_array[19]->setType("WFORM");
     l_form_array[19]->setType("NTGJJ");
     l_form_array[19]->linkTo(l_lemma_array[516], "BLNGS");
 
@@ -11709,7 +11709,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "another");
-    l_form_array[20]->setType("FORM_");
+    l_form_array[20]->setType("WFORM");
     l_form_array[20]->setType("NTGDT");
     l_form_array[20]->linkTo(l_lemma_array[515], "BLNGS");
 
@@ -11720,7 +11720,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "answer");
-    l_form_array[21]->setType("FORM_");
+    l_form_array[21]->setType("WFORM");
     l_form_array[21]->setType("NTGNN");
     l_form_array[21]->linkTo(l_lemma_array[514], "BLNGS");
 
@@ -11731,7 +11731,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "answer");
-    l_form_array[22]->setType("FORM_");
+    l_form_array[22]->setType("WFORM");
     l_form_array[22]->setType("NTGVB");
     l_form_array[22]->linkTo(l_lemma_array[513], "BLNGS");
 
@@ -11742,7 +11742,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "answer");
-    l_form_array[23]->setType("FORM_");
+    l_form_array[23]->setType("WFORM");
     l_form_array[23]->setType("NTVBP");
     l_form_array[23]->linkTo(l_lemma_array[513], "BLNGS");
 
@@ -11753,7 +11753,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "anything");
-    l_form_array[24]->setType("FORM_");
+    l_form_array[24]->setType("WFORM");
     l_form_array[24]->setType("NTGNN");
     l_form_array[24]->linkTo(l_lemma_array[512], "BLNGS");
 
@@ -11764,7 +11764,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "any");
-    l_form_array[25]->setType("FORM_");
+    l_form_array[25]->setType("WFORM");
     l_form_array[25]->setType("NTGDT");
     l_form_array[25]->linkTo(l_lemma_array[511], "BLNGS");
 
@@ -11775,7 +11775,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "an");
-    l_form_array[26]->setType("FORM_");
+    l_form_array[26]->setType("WFORM");
     l_form_array[26]->setType("NTGDT");
     l_form_array[26]->linkTo(l_lemma_array[510], "BLNGS");
 
@@ -11786,7 +11786,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "apply");
-    l_form_array[27]->setType("FORM_");
+    l_form_array[27]->setType("WFORM");
     l_form_array[27]->setType("NTGVB");
     l_form_array[27]->linkTo(l_lemma_array[509], "BLNGS");
 
@@ -11797,7 +11797,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "are");
-    l_form_array[28]->setType("FORM_");
+    l_form_array[28]->setType("WFORM");
     l_form_array[28]->setType("NTVBP");
     l_form_array[28]->linkTo(l_lemma_array[491], "BLNGS");
 
@@ -11808,7 +11808,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ask");
-    l_form_array[29]->setType("FORM_");
+    l_form_array[29]->setType("WFORM");
     l_form_array[29]->setType("NTGVB");
     l_form_array[29]->linkTo(l_lemma_array[508], "BLNGS");
 
@@ -11819,7 +11819,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ask");
-    l_form_array[30]->setType("FORM_");
+    l_form_array[30]->setType("WFORM");
     l_form_array[30]->setType("NTVBP");
     l_form_array[30]->linkTo(l_lemma_array[508], "BLNGS");
 
@@ -11830,7 +11830,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "asleep");
-    l_form_array[31]->setType("FORM_");
+    l_form_array[31]->setType("WFORM");
     l_form_array[31]->setType("NTGJJ");
     l_form_array[31]->linkTo(l_lemma_array[507], "BLNGS");
 
@@ -11841,7 +11841,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "assign");
-    l_form_array[32]->setType("FORM_");
+    l_form_array[32]->setType("WFORM");
     l_form_array[32]->setType("NTGVB");
     l_form_array[32]->linkTo(l_lemma_array[506], "BLNGS");
 
@@ -11852,7 +11852,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "assuredly");
-    l_form_array[33]->setType("FORM_");
+    l_form_array[33]->setType("WFORM");
     l_form_array[33]->setType("NTGRB");
     l_form_array[33]->linkTo(l_lemma_array[505], "BLNGS");
 
@@ -11863,7 +11863,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "assured");
-    l_form_array[34]->setType("FORM_");
+    l_form_array[34]->setType("WFORM");
     l_form_array[34]->setType("NTVBN");
     l_form_array[34]->linkTo(l_lemma_array[504], "BLNGS");
 
@@ -11874,7 +11874,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "assuring");
-    l_form_array[35]->setType("FORM_");
+    l_form_array[35]->setType("WFORM");
     l_form_array[35]->setType("NTVBG");
     l_form_array[35]->linkTo(l_lemma_array[504], "BLNGS");
 
@@ -11885,7 +11885,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "as");
-    l_form_array[36]->setType("FORM_");
+    l_form_array[36]->setType("WFORM");
     l_form_array[36]->setType("NTGIN");
     l_form_array[36]->linkTo(l_lemma_array[503], "BLNGS");
 
@@ -11896,7 +11896,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "at");
-    l_form_array[37]->setType("FORM_");
+    l_form_array[37]->setType("WFORM");
     l_form_array[37]->setType("NTGIN");
     l_form_array[37]->linkTo(l_lemma_array[502], "BLNGS");
 
@@ -11907,7 +11907,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "awake");
-    l_form_array[38]->setType("FORM_");
+    l_form_array[38]->setType("WFORM");
     l_form_array[38]->setType("NTGJJ");
     l_form_array[38]->linkTo(l_lemma_array[501], "BLNGS");
 
@@ -11918,7 +11918,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "a");
-    l_form_array[39]->setType("FORM_");
+    l_form_array[39]->setType("WFORM");
     l_form_array[39]->setType("NTGDT");
     l_form_array[39]->linkTo(l_lemma_array[500], "BLNGS");
 
@@ -11929,7 +11929,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "beautiful");
-    l_form_array[40]->setType("FORM_");
+    l_form_array[40]->setType("WFORM");
     l_form_array[40]->setType("NTGJJ");
     l_form_array[40]->linkTo(l_lemma_array[499], "BLNGS");
 
@@ -11940,7 +11940,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "beauty");
-    l_form_array[41]->setType("FORM_");
+    l_form_array[41]->setType("WFORM");
     l_form_array[41]->setType("NTGNN");
     l_form_array[41]->linkTo(l_lemma_array[498], "BLNGS");
 
@@ -11951,7 +11951,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "before");
-    l_form_array[42]->setType("FORM_");
+    l_form_array[42]->setType("WFORM");
     l_form_array[42]->setType("NTGIN");
     l_form_array[42]->linkTo(l_lemma_array[497], "BLNGS");
 
@@ -11962,7 +11962,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "begin");
-    l_form_array[43]->setType("FORM_");
+    l_form_array[43]->setType("WFORM");
     l_form_array[43]->setType("NTGVB");
     l_form_array[43]->linkTo(l_lemma_array[496], "BLNGS");
 
@@ -11973,7 +11973,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "behalf");
-    l_form_array[44]->setType("FORM_");
+    l_form_array[44]->setType("WFORM");
     l_form_array[44]->setType("NTGNN");
     l_form_array[44]->linkTo(l_lemma_array[495], "BLNGS");
 
@@ -11984,7 +11984,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "being");
-    l_form_array[45]->setType("FORM_");
+    l_form_array[45]->setType("WFORM");
     l_form_array[45]->setType("NTGNN");
     l_form_array[45]->linkTo(l_lemma_array[494], "BLNGS");
 
@@ -11995,7 +11995,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "being");
-    l_form_array[46]->setType("FORM_");
+    l_form_array[46]->setType("WFORM");
     l_form_array[46]->setType("NTVBG");
     l_form_array[46]->linkTo(l_lemma_array[491], "BLNGS");
 
@@ -12006,7 +12006,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "believes");
-    l_form_array[47]->setType("FORM_");
+    l_form_array[47]->setType("WFORM");
     l_form_array[47]->setType("NTVBZ");
     l_form_array[47]->linkTo(l_lemma_array[493], "BLNGS");
 
@@ -12017,7 +12017,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "between");
-    l_form_array[48]->setType("FORM_");
+    l_form_array[48]->setType("WFORM");
     l_form_array[48]->setType("NTGIN");
     l_form_array[48]->linkTo(l_lemma_array[492], "BLNGS");
 
@@ -12028,7 +12028,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "be");
-    l_form_array[49]->setType("FORM_");
+    l_form_array[49]->setType("WFORM");
     l_form_array[49]->setType("NTGVB");
     l_form_array[49]->linkTo(l_lemma_array[491], "BLNGS");
 
@@ -12039,7 +12039,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "both");
-    l_form_array[50]->setType("FORM_");
+    l_form_array[50]->setType("WFORM");
     l_form_array[50]->setType("NTGDT");
     l_form_array[50]->linkTo(l_lemma_array[490], "BLNGS");
 
@@ -12050,7 +12050,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "but");
-    l_form_array[51]->setType("FORM_");
+    l_form_array[51]->setType("WFORM");
     l_form_array[51]->setType("NTGCC");
     l_form_array[51]->linkTo(l_lemma_array[489], "BLNGS");
 
@@ -12061,7 +12061,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "by");
-    l_form_array[52]->setType("FORM_");
+    l_form_array[52]->setType("WFORM");
     l_form_array[52]->setType("NTGIN");
     l_form_array[52]->linkTo(l_lemma_array[488], "BLNGS");
 
@@ -12072,7 +12072,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "call");
-    l_form_array[53]->setType("FORM_");
+    l_form_array[53]->setType("WFORM");
     l_form_array[53]->setType("NTGVB");
     l_form_array[53]->linkTo(l_lemma_array[487], "BLNGS");
 
@@ -12083,7 +12083,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "call");
-    l_form_array[54]->setType("FORM_");
+    l_form_array[54]->setType("WFORM");
     l_form_array[54]->setType("NTVBP");
     l_form_array[54]->linkTo(l_lemma_array[487], "BLNGS");
 
@@ -12094,7 +12094,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "can");
-    l_form_array[55]->setType("FORM_");
+    l_form_array[55]->setType("WFORM");
     l_form_array[55]->setType("NTGMD");
     l_form_array[55]->linkTo(l_lemma_array[486], "BLNGS");
 
@@ -12105,7 +12105,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "cases");
-    l_form_array[56]->setType("FORM_");
+    l_form_array[56]->setType("WFORM");
     l_form_array[56]->setType("NTNNS");
     l_form_array[56]->linkTo(l_lemma_array[485], "BLNGS");
 
@@ -12116,7 +12116,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "case");
-    l_form_array[57]->setType("FORM_");
+    l_form_array[57]->setType("WFORM");
     l_form_array[57]->setType("NTGNN");
     l_form_array[57]->linkTo(l_lemma_array[485], "BLNGS");
 
@@ -12127,7 +12127,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "certainly");
-    l_form_array[58]->setType("FORM_");
+    l_form_array[58]->setType("WFORM");
     l_form_array[58]->setType("NTGRB");
     l_form_array[58]->linkTo(l_lemma_array[484], "BLNGS");
 
@@ -12138,7 +12138,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "certain");
-    l_form_array[59]->setType("FORM_");
+    l_form_array[59]->setType("WFORM");
     l_form_array[59]->setType("NTGJJ");
     l_form_array[59]->linkTo(l_lemma_array[483], "BLNGS");
 
@@ -12149,7 +12149,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "challenge");
-    l_form_array[60]->setType("FORM_");
+    l_form_array[60]->setType("WFORM");
     l_form_array[60]->setType("NTGVB");
     l_form_array[60]->linkTo(l_lemma_array[482], "BLNGS");
 
@@ -12160,7 +12160,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "class");
-    l_form_array[61]->setType("FORM_");
+    l_form_array[61]->setType("WFORM");
     l_form_array[61]->setType("NTGNN");
     l_form_array[61]->linkTo(l_lemma_array[481], "BLNGS");
 
@@ -12171,7 +12171,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "clearly");
-    l_form_array[62]->setType("FORM_");
+    l_form_array[62]->setType("WFORM");
     l_form_array[62]->setType("NTGRB");
     l_form_array[62]->linkTo(l_lemma_array[480], "BLNGS");
 
@@ -12182,7 +12182,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "color");
-    l_form_array[63]->setType("FORM_");
+    l_form_array[63]->setType("WFORM");
     l_form_array[63]->setType("NTGNN");
     l_form_array[63]->linkTo(l_lemma_array[479], "BLNGS");
 
@@ -12193,7 +12193,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "colour");
-    l_form_array[64]->setType("FORM_");
+    l_form_array[64]->setType("WFORM");
     l_form_array[64]->setType("NTGNN");
     l_form_array[64]->linkTo(l_lemma_array[478], "BLNGS");
 
@@ -12204,7 +12204,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "come");
-    l_form_array[65]->setType("FORM_");
+    l_form_array[65]->setType("WFORM");
     l_form_array[65]->setType("NTGVB");
     l_form_array[65]->linkTo(l_lemma_array[477], "BLNGS");
 
@@ -12215,7 +12215,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "come");
-    l_form_array[66]->setType("FORM_");
+    l_form_array[66]->setType("WFORM");
     l_form_array[66]->setType("NTVBP");
     l_form_array[66]->linkTo(l_lemma_array[477], "BLNGS");
 
@@ -12226,7 +12226,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "conditioned");
-    l_form_array[67]->setType("FORM_");
+    l_form_array[67]->setType("WFORM");
     l_form_array[67]->setType("NTGJJ");
     l_form_array[67]->linkTo(l_lemma_array[476], "BLNGS");
 
@@ -12237,7 +12237,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "conscious");
-    l_form_array[68]->setType("FORM_");
+    l_form_array[68]->setType("WFORM");
     l_form_array[68]->setType("NTGJJ");
     l_form_array[68]->linkTo(l_lemma_array[475], "BLNGS");
 
@@ -12248,7 +12248,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "consider");
-    l_form_array[69]->setType("FORM_");
+    l_form_array[69]->setType("WFORM");
     l_form_array[69]->setType("NTGVB");
     l_form_array[69]->linkTo(l_lemma_array[474], "BLNGS");
 
@@ -12259,7 +12259,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "copy");
-    l_form_array[70]->setType("FORM_");
+    l_form_array[70]->setType("WFORM");
     l_form_array[70]->setType("NTGNN");
     l_form_array[70]->linkTo(l_lemma_array[473], "BLNGS");
 
@@ -12270,7 +12270,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "cordial");
-    l_form_array[71]->setType("FORM_");
+    l_form_array[71]->setType("WFORM");
     l_form_array[71]->setType("NTGNN");
     l_form_array[71]->linkTo(l_lemma_array[472], "BLNGS");
 
@@ -12281,7 +12281,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "corresponded");
-    l_form_array[72]->setType("FORM_");
+    l_form_array[72]->setType("WFORM");
     l_form_array[72]->setType("NTVBD");
     l_form_array[72]->linkTo(l_lemma_array[471], "BLNGS");
 
@@ -12292,7 +12292,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "corresponding");
-    l_form_array[73]->setType("FORM_");
+    l_form_array[73]->setType("WFORM");
     l_form_array[73]->setType("NTVBG");
     l_form_array[73]->linkTo(l_lemma_array[471], "BLNGS");
 
@@ -12303,7 +12303,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "could");
-    l_form_array[74]->setType("FORM_");
+    l_form_array[74]->setType("WFORM");
     l_form_array[74]->setType("NTGMD");
     l_form_array[74]->linkTo(l_lemma_array[470], "BLNGS");
 
@@ -12314,7 +12314,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "describe");
-    l_form_array[75]->setType("FORM_");
+    l_form_array[75]->setType("WFORM");
     l_form_array[75]->setType("NTGVB");
     l_form_array[75]->linkTo(l_lemma_array[469], "BLNGS");
 
@@ -12325,7 +12325,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "differences");
-    l_form_array[76]->setType("FORM_");
+    l_form_array[76]->setType("WFORM");
     l_form_array[76]->setType("NTNNS");
     l_form_array[76]->linkTo(l_lemma_array[468], "BLNGS");
 
@@ -12336,7 +12336,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "difference");
-    l_form_array[77]->setType("FORM_");
+    l_form_array[77]->setType("WFORM");
     l_form_array[77]->setType("NTGNN");
     l_form_array[77]->linkTo(l_lemma_array[468], "BLNGS");
 
@@ -12347,7 +12347,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "different");
-    l_form_array[78]->setType("FORM_");
+    l_form_array[78]->setType("WFORM");
     l_form_array[78]->setType("NTGJJ");
     l_form_array[78]->linkTo(l_lemma_array[467], "BLNGS");
 
@@ -12358,7 +12358,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "discern");
-    l_form_array[79]->setType("FORM_");
+    l_form_array[79]->setType("WFORM");
     l_form_array[79]->setType("NTGVB");
     l_form_array[79]->linkTo(l_lemma_array[466], "BLNGS");
 
@@ -12369,7 +12369,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "discovered");
-    l_form_array[80]->setType("FORM_");
+    l_form_array[80]->setType("WFORM");
     l_form_array[80]->setType("NTVBN");
     l_form_array[80]->linkTo(l_lemma_array[465], "BLNGS");
 
@@ -12380,7 +12380,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "discriminating");
-    l_form_array[81]->setType("FORM_");
+    l_form_array[81]->setType("WFORM");
     l_form_array[81]->setType("NTVBG");
     l_form_array[81]->linkTo(l_lemma_array[464], "BLNGS");
 
@@ -12391,7 +12391,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "disorder");
-    l_form_array[82]->setType("FORM_");
+    l_form_array[82]->setType("WFORM");
     l_form_array[82]->setType("NTGNN");
     l_form_array[82]->linkTo(l_lemma_array[463], "BLNGS");
 
@@ -12402,7 +12402,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "dispute");
-    l_form_array[83]->setType("FORM_");
+    l_form_array[83]->setType("WFORM");
     l_form_array[83]->setType("NTGVB");
     l_form_array[83]->linkTo(l_lemma_array[462], "BLNGS");
 
@@ -12413,7 +12413,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "dissimilar");
-    l_form_array[84]->setType("FORM_");
+    l_form_array[84]->setType("WFORM");
     l_form_array[84]->setType("NTGJJ");
     l_form_array[84]->linkTo(l_lemma_array[461], "BLNGS");
 
@@ -12424,7 +12424,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "distinctions");
-    l_form_array[85]->setType("FORM_");
+    l_form_array[85]->setType("WFORM");
     l_form_array[85]->setType("NTNNS");
     l_form_array[85]->linkTo(l_lemma_array[460], "BLNGS");
 
@@ -12435,7 +12435,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "distinction");
-    l_form_array[86]->setType("FORM_");
+    l_form_array[86]->setType("WFORM");
     l_form_array[86]->setType("NTGNN");
     l_form_array[86]->linkTo(l_lemma_array[460], "BLNGS");
 
@@ -12446,7 +12446,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "distinctive");
-    l_form_array[87]->setType("FORM_");
+    l_form_array[87]->setType("WFORM");
     l_form_array[87]->setType("NTGJJ");
     l_form_array[87]->linkTo(l_lemma_array[459], "BLNGS");
 
@@ -12457,7 +12457,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "distinguish");
-    l_form_array[88]->setType("FORM_");
+    l_form_array[88]->setType("WFORM");
     l_form_array[88]->setType("NTGVB");
     l_form_array[88]->linkTo(l_lemma_array[458], "BLNGS");
 
@@ -12468,7 +12468,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "division");
-    l_form_array[89]->setType("FORM_");
+    l_form_array[89]->setType("WFORM");
     l_form_array[89]->setType("NTGNN");
     l_form_array[89]->linkTo(l_lemma_array[457], "BLNGS");
 
@@ -12479,7 +12479,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "does");
-    l_form_array[90]->setType("FORM_");
+    l_form_array[90]->setType("WFORM");
     l_form_array[90]->setType("NTVBZ");
     l_form_array[90]->linkTo(l_lemma_array[456], "BLNGS");
 
@@ -12490,7 +12490,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "do");
-    l_form_array[91]->setType("FORM_");
+    l_form_array[91]->setType("WFORM");
     l_form_array[91]->setType("NTGVB");
     l_form_array[91]->linkTo(l_lemma_array[456], "BLNGS");
 
@@ -12501,7 +12501,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "do");
-    l_form_array[92]->setType("FORM_");
+    l_form_array[92]->setType("WFORM");
     l_form_array[92]->setType("NTVBP");
     l_form_array[92]->linkTo(l_lemma_array[456], "BLNGS");
 
@@ -12512,7 +12512,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "draw");
-    l_form_array[93]->setType("FORM_");
+    l_form_array[93]->setType("WFORM");
     l_form_array[93]->setType("NTGVB");
     l_form_array[93]->linkTo(l_lemma_array[455], "BLNGS");
 
@@ -12523,7 +12523,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "dreamer");
-    l_form_array[94]->setType("FORM_");
+    l_form_array[94]->setType("WFORM");
     l_form_array[94]->setType("NTGNN");
     l_form_array[94]->linkTo(l_lemma_array[454], "BLNGS");
 
@@ -12534,7 +12534,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "dreaming");
-    l_form_array[95]->setType("FORM_");
+    l_form_array[95]->setType("WFORM");
     l_form_array[95]->setType("NTGNN");
     l_form_array[95]->linkTo(l_lemma_array[453], "BLNGS");
 
@@ -12545,7 +12545,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "dreaming");
-    l_form_array[96]->setType("FORM_");
+    l_form_array[96]->setType("WFORM");
     l_form_array[96]->setType("NTVBG");
     l_form_array[96]->linkTo(l_lemma_array[451], "BLNGS");
 
@@ -12556,7 +12556,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "dream");
-    l_form_array[97]->setType("FORM_");
+    l_form_array[97]->setType("WFORM");
     l_form_array[97]->setType("NTGNN");
     l_form_array[97]->linkTo(l_lemma_array[452], "BLNGS");
 
@@ -12567,7 +12567,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "each");
-    l_form_array[98]->setType("FORM_");
+    l_form_array[98]->setType("WFORM");
     l_form_array[98]->setType("NTGDT");
     l_form_array[98]->linkTo(l_lemma_array[450], "BLNGS");
 
@@ -12578,7 +12578,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "effects");
-    l_form_array[99]->setType("FORM_");
+    l_form_array[99]->setType("WFORM");
     l_form_array[99]->setType("NTVBZ");
     l_form_array[99]->linkTo(l_lemma_array[449], "BLNGS");
 
@@ -12589,7 +12589,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "else");
-    l_form_array[100]->setType("FORM_");
+    l_form_array[100]->setType("WFORM");
     l_form_array[100]->setType("NTGRB");
     l_form_array[100]->linkTo(l_lemma_array[448], "BLNGS");
 
@@ -12600,7 +12600,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "enable");
-    l_form_array[101]->setType("FORM_");
+    l_form_array[101]->setType("WFORM");
     l_form_array[101]->setType("NTVBP");
     l_form_array[101]->linkTo(l_lemma_array[447], "BLNGS");
 
@@ -12611,7 +12611,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "entirely");
-    l_form_array[102]->setType("FORM_");
+    l_form_array[102]->setType("WFORM");
     l_form_array[102]->setType("NTGRB");
     l_form_array[102]->linkTo(l_lemma_array[446], "BLNGS");
 
@@ -12622,7 +12622,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "entities");
-    l_form_array[103]->setType("FORM_");
+    l_form_array[103]->setType("WFORM");
     l_form_array[103]->setType("NTNNS");
     l_form_array[103]->linkTo(l_lemma_array[445], "BLNGS");
 
@@ -12633,7 +12633,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "errs");
-    l_form_array[104]->setType("FORM_");
+    l_form_array[104]->setType("WFORM");
     l_form_array[104]->setType("NTVBZ");
     l_form_array[104]->linkTo(l_lemma_array[444], "BLNGS");
 
@@ -12644,7 +12644,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "even");
-    l_form_array[105]->setType("FORM_");
+    l_form_array[105]->setType("WFORM");
     l_form_array[105]->setType("NTGRB");
     l_form_array[105]->linkTo(l_lemma_array[443], "BLNGS");
 
@@ -12655,7 +12655,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "every");
-    l_form_array[106]->setType("FORM_");
+    l_form_array[106]->setType("WFORM");
     l_form_array[106]->setType("NTGDT");
     l_form_array[106]->linkTo(l_lemma_array[442], "BLNGS");
 
@@ -12666,7 +12666,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ever");
-    l_form_array[107]->setType("FORM_");
+    l_form_array[107]->setType("WFORM");
     l_form_array[107]->setType("NTGRB");
     l_form_array[107]->linkTo(l_lemma_array[441], "BLNGS");
 
@@ -12677,7 +12677,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "examine");
-    l_form_array[108]->setType("FORM_");
+    l_form_array[108]->setType("WFORM");
     l_form_array[108]->setType("NTGVB");
     l_form_array[108]->linkTo(l_lemma_array[440], "BLNGS");
 
@@ -12688,7 +12688,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "example");
-    l_form_array[109]->setType("FORM_");
+    l_form_array[109]->setType("WFORM");
     l_form_array[109]->setType("NTGNN");
     l_form_array[109]->linkTo(l_lemma_array[439], "BLNGS");
 
@@ -12699,7 +12699,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "excellent");
-    l_form_array[110]->setType("FORM_");
+    l_form_array[110]->setType("WFORM");
     l_form_array[110]->setType("NTGJJ");
     l_form_array[110]->linkTo(l_lemma_array[438], "BLNGS");
 
@@ -12710,7 +12710,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "existence");
-    l_form_array[111]->setType("FORM_");
+    l_form_array[111]->setType("WFORM");
     l_form_array[111]->setType("NTGNN");
     l_form_array[111]->linkTo(l_lemma_array[437], "BLNGS");
 
@@ -12721,7 +12721,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "explained");
-    l_form_array[112]->setType("FORM_");
+    l_form_array[112]->setType("WFORM");
     l_form_array[112]->setType("NTVBN");
     l_form_array[112]->linkTo(l_lemma_array[435], "BLNGS");
 
@@ -12732,7 +12732,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "eyes");
-    l_form_array[113]->setType("FORM_");
+    l_form_array[113]->setType("WFORM");
     l_form_array[113]->setType("NTNNS");
     l_form_array[113]->linkTo(l_lemma_array[434], "BLNGS");
 
@@ -12743,7 +12743,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "faculties");
-    l_form_array[114]->setType("FORM_");
+    l_form_array[114]->setType("WFORM");
     l_form_array[114]->setType("NTNNS");
     l_form_array[114]->linkTo(l_lemma_array[433], "BLNGS");
 
@@ -12754,7 +12754,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "faculty");
-    l_form_array[115]->setType("FORM_");
+    l_form_array[115]->setType("WFORM");
     l_form_array[115]->setType("NTGNN");
     l_form_array[115]->linkTo(l_lemma_array[433], "BLNGS");
 
@@ -12765,7 +12765,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "fallible");
-    l_form_array[116]->setType("FORM_");
+    l_form_array[116]->setType("WFORM");
     l_form_array[116]->setType("NTGJJ");
     l_form_array[116]->linkTo(l_lemma_array[432], "BLNGS");
 
@@ -12776,7 +12776,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "fashion");
-    l_form_array[117]->setType("FORM_");
+    l_form_array[117]->setType("WFORM");
     l_form_array[117]->setType("NTGNN");
     l_form_array[117]->linkTo(l_lemma_array[430], "BLNGS");
 
@@ -12787,7 +12787,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "figure");
-    l_form_array[118]->setType("FORM_");
+    l_form_array[118]->setType("WFORM");
     l_form_array[118]->setType("NTGNN");
     l_form_array[118]->linkTo(l_lemma_array[429], "BLNGS");
 
@@ -12798,7 +12798,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "find");
-    l_form_array[119]->setType("FORM_");
+    l_form_array[119]->setType("WFORM");
     l_form_array[119]->setType("NTGVB");
     l_form_array[119]->linkTo(l_lemma_array[428], "BLNGS");
 
@@ -12809,7 +12809,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "fix");
-    l_form_array[120]->setType("FORM_");
+    l_form_array[120]->setType("WFORM");
     l_form_array[120]->setType("NTVBP");
     l_form_array[120]->linkTo(l_lemma_array[427], "BLNGS");
 
@@ -12820,7 +12820,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "following");
-    l_form_array[121]->setType("FORM_");
+    l_form_array[121]->setType("WFORM");
     l_form_array[121]->setType("NTVBG");
     l_form_array[121]->linkTo(l_lemma_array[426], "BLNGS");
 
@@ -12831,7 +12831,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "follow");
-    l_form_array[122]->setType("FORM_");
+    l_form_array[122]->setType("WFORM");
     l_form_array[122]->setType("NTGVB");
     l_form_array[122]->linkTo(l_lemma_array[426], "BLNGS");
 
@@ -12842,7 +12842,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "form");
-    l_form_array[123]->setType("FORM_");
+    l_form_array[123]->setType("WFORM");
     l_form_array[123]->setType("NTGVB");
     l_form_array[123]->linkTo(l_lemma_array[425], "BLNGS");
 
@@ -12853,7 +12853,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "for");
-    l_form_array[124]->setType("FORM_");
+    l_form_array[124]->setType("WFORM");
     l_form_array[124]->setType("NTGCC");
     l_form_array[124]->linkTo(l_lemma_array[424], "BLNGS");
 
@@ -12864,7 +12864,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "for");
-    l_form_array[125]->setType("FORM_");
+    l_form_array[125]->setType("WFORM");
     l_form_array[125]->setType("NTGIN");
     l_form_array[125]->linkTo(l_lemma_array[423], "BLNGS");
 
@@ -12875,7 +12875,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "friend");
-    l_form_array[126]->setType("FORM_");
+    l_form_array[126]->setType("WFORM");
     l_form_array[126]->setType("NTGNN");
     l_form_array[126]->linkTo(l_lemma_array[422], "BLNGS");
 
@@ -12886,7 +12886,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "from");
-    l_form_array[127]->setType("FORM_");
+    l_form_array[127]->setType("WFORM");
     l_form_array[127]->setType("NTGIN");
     l_form_array[127]->linkTo(l_lemma_array[421], "BLNGS");
 
@@ -12897,7 +12897,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "further");
-    l_form_array[128]->setType("FORM_");
+    l_form_array[128]->setType("WFORM");
     l_form_array[128]->setType("NTRBR");
     l_form_array[128]->linkTo(l_lemma_array[431], "BLNGS");
 
@@ -12908,7 +12908,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "gently");
-    l_form_array[129]->setType("FORM_");
+    l_form_array[129]->setType("WFORM");
     l_form_array[129]->setType("NTGRB");
     l_form_array[129]->linkTo(l_lemma_array[420], "BLNGS");
 
@@ -12919,7 +12919,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "glad");
-    l_form_array[130]->setType("FORM_");
+    l_form_array[130]->setType("WFORM");
     l_form_array[130]->setType("NTGJJ");
     l_form_array[130]->linkTo(l_lemma_array[419], "BLNGS");
 
@@ -12930,7 +12930,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "good");
-    l_form_array[131]->setType("FORM_");
+    l_form_array[131]->setType("WFORM");
     l_form_array[131]->setType("NTGJJ");
     l_form_array[131]->linkTo(l_lemma_array[418], "BLNGS");
 
@@ -12941,7 +12941,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "grudges");
-    l_form_array[132]->setType("FORM_");
+    l_form_array[132]->setType("WFORM");
     l_form_array[132]->setType("NTVBZ");
     l_form_array[132]->linkTo(l_lemma_array[417], "BLNGS");
 
@@ -12952,7 +12952,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "guide");
-    l_form_array[133]->setType("FORM_");
+    l_form_array[133]->setType("WFORM");
     l_form_array[133]->setType("NTGVB");
     l_form_array[133]->linkTo(l_lemma_array[416], "BLNGS");
 
@@ -12963,7 +12963,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "has");
-    l_form_array[134]->setType("FORM_");
+    l_form_array[134]->setType("WFORM");
     l_form_array[134]->setType("NTVBZ");
     l_form_array[134]->linkTo(l_lemma_array[415], "BLNGS");
 
@@ -12974,7 +12974,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "have");
-    l_form_array[135]->setType("FORM_");
+    l_form_array[135]->setType("WFORM");
     l_form_array[135]->setType("NTGVB");
     l_form_array[135]->linkTo(l_lemma_array[415], "BLNGS");
 
@@ -12985,7 +12985,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "have");
-    l_form_array[136]->setType("FORM_");
+    l_form_array[136]->setType("WFORM");
     l_form_array[136]->setType("NTVBP");
     l_form_array[136]->linkTo(l_lemma_array[415], "BLNGS");
 
@@ -12996,7 +12996,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "having");
-    l_form_array[137]->setType("FORM_");
+    l_form_array[137]->setType("WFORM");
     l_form_array[137]->setType("NTVBG");
     l_form_array[137]->linkTo(l_lemma_array[415], "BLNGS");
 
@@ -13007,7 +13007,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "hearing");
-    l_form_array[138]->setType("FORM_");
+    l_form_array[138]->setType("WFORM");
     l_form_array[138]->setType("NTGNN");
     l_form_array[138]->linkTo(l_lemma_array[414], "BLNGS");
 
@@ -13018,7 +13018,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "hear");
-    l_form_array[139]->setType("FORM_");
+    l_form_array[139]->setType("WFORM");
     l_form_array[139]->setType("NTGVB");
     l_form_array[139]->linkTo(l_lemma_array[413], "BLNGS");
 
@@ -13029,7 +13029,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "he");
-    l_form_array[140]->setType("FORM_");
+    l_form_array[140]->setType("WFORM");
     l_form_array[140]->setType("NTPRP");
     l_form_array[140]->linkTo(l_lemma_array[412], "BLNGS");
 
@@ -13040,7 +13040,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "him");
-    l_form_array[141]->setType("FORM_");
+    l_form_array[141]->setType("WFORM");
     l_form_array[141]->setType("NTPRP");
     l_form_array[141]->linkTo(l_lemma_array[412], "BLNGS");
 
@@ -13051,7 +13051,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "his");
-    l_form_array[142]->setType("FORM_");
+    l_form_array[142]->setType("WFORM");
     l_form_array[142]->setType("NTPR$");
     l_form_array[142]->linkTo(l_lemma_array[411], "BLNGS");
 
@@ -13062,7 +13062,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "how");
-    l_form_array[143]->setType("FORM_");
+    l_form_array[143]->setType("WFORM");
     l_form_array[143]->setType("NTWRB");
     l_form_array[143]->linkTo(l_lemma_array[410], "BLNGS");
 
@@ -13073,7 +13073,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "idea");
-    l_form_array[144]->setType("FORM_");
+    l_form_array[144]->setType("WFORM");
     l_form_array[144]->setType("NTGNN");
     l_form_array[144]->linkTo(l_lemma_array[409], "BLNGS");
 
@@ -13084,7 +13084,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "identical");
-    l_form_array[145]->setType("FORM_");
+    l_form_array[145]->setType("WFORM");
     l_form_array[145]->setType("NTGJJ");
     l_form_array[145]->linkTo(l_lemma_array[408], "BLNGS");
 
@@ -13095,7 +13095,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "identify");
-    l_form_array[146]->setType("FORM_");
+    l_form_array[146]->setType("WFORM");
     l_form_array[146]->setType("NTGVB");
     l_form_array[146]->linkTo(l_lemma_array[407], "BLNGS");
 
@@ -13106,7 +13106,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "identity");
-    l_form_array[147]->setType("FORM_");
+    l_form_array[147]->setType("WFORM");
     l_form_array[147]->setType("NTGNN");
     l_form_array[147]->linkTo(l_lemma_array[406], "BLNGS");
 
@@ -13117,7 +13117,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "if");
-    l_form_array[148]->setType("FORM_");
+    l_form_array[148]->setType("WFORM");
     l_form_array[148]->setType("NTGIN");
     l_form_array[148]->linkTo(l_lemma_array[405], "BLNGS");
 
@@ -13128,7 +13128,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ignorance");
-    l_form_array[149]->setType("FORM_");
+    l_form_array[149]->setType("WFORM");
     l_form_array[149]->setType("NTGNN");
     l_form_array[149]->linkTo(l_lemma_array[404], "BLNGS");
 
@@ -13139,7 +13139,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "indeed");
-    l_form_array[150]->setType("FORM_");
+    l_form_array[150]->setType("WFORM");
     l_form_array[150]->setType("NTGRB");
     l_form_array[150]->linkTo(l_lemma_array[403], "BLNGS");
 
@@ -13150,7 +13150,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "infallible");
-    l_form_array[151]->setType("FORM_");
+    l_form_array[151]->setType("WFORM");
     l_form_array[151]->setType("NTGJJ");
     l_form_array[151]->linkTo(l_lemma_array[402], "BLNGS");
 
@@ -13161,7 +13161,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "intermediate");
-    l_form_array[152]->setType("FORM_");
+    l_form_array[152]->setType("WFORM");
     l_form_array[152]->setType("NTGJJ");
     l_form_array[152]->linkTo(l_lemma_array[401], "BLNGS");
 
@@ -13172,7 +13172,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "into");
-    l_form_array[153]->setType("FORM_");
+    l_form_array[153]->setType("WFORM");
     l_form_array[153]->setType("NTGIN");
     l_form_array[153]->linkTo(l_lemma_array[400], "BLNGS");
 
@@ -13183,7 +13183,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "in");
-    l_form_array[154]->setType("FORM_");
+    l_form_array[154]->setType("WFORM");
     l_form_array[154]->setType("NTGIN");
     l_form_array[154]->linkTo(l_lemma_array[399], "BLNGS");
 
@@ -13194,7 +13194,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "is");
-    l_form_array[155]->setType("FORM_");
+    l_form_array[155]->setType("WFORM");
     l_form_array[155]->setType("NTVBZ");
     l_form_array[155]->linkTo(l_lemma_array[491], "BLNGS");
 
@@ -13205,7 +13205,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "itself");
-    l_form_array[156]->setType("FORM_");
+    l_form_array[156]->setType("WFORM");
     l_form_array[156]->setType("NTPRP");
     l_form_array[156]->linkTo(l_lemma_array[398], "BLNGS");
 
@@ -13216,7 +13216,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "its");
-    l_form_array[157]->setType("FORM_");
+    l_form_array[157]->setType("WFORM");
     l_form_array[157]->setType("NTPR$");
     l_form_array[157]->linkTo(l_lemma_array[397], "BLNGS");
 
@@ -13227,7 +13227,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "it");
-    l_form_array[158]->setType("FORM_");
+    l_form_array[158]->setType("WFORM");
     l_form_array[158]->setType("NTPRP");
     l_form_array[158]->linkTo(l_lemma_array[396], "BLNGS");
 
@@ -13238,7 +13238,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "i");
-    l_form_array[159]->setType("FORM_");
+    l_form_array[159]->setType("WFORM");
     l_form_array[159]->setType("NTPRP");
     l_form_array[159]->linkTo(l_lemma_array[395], "BLNGS");
 
@@ -13249,7 +13249,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "just");
-    l_form_array[160]->setType("FORM_");
+    l_form_array[160]->setType("WFORM");
     l_form_array[160]->setType("NTGRB");
     l_form_array[160]->linkTo(l_lemma_array[394], "BLNGS");
 
@@ -13260,7 +13260,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "kinds");
-    l_form_array[161]->setType("FORM_");
+    l_form_array[161]->setType("WFORM");
     l_form_array[161]->setType("NTNNS");
     l_form_array[161]->linkTo(l_lemma_array[393], "BLNGS");
 
@@ -13271,7 +13271,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "knowable");
-    l_form_array[162]->setType("FORM_");
+    l_form_array[162]->setType("WFORM");
     l_form_array[162]->setType("NTGJJ");
     l_form_array[162]->linkTo(l_lemma_array[392], "BLNGS");
 
@@ -13282,7 +13282,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "knowing");
-    l_form_array[163]->setType("FORM_");
+    l_form_array[163]->setType("WFORM");
     l_form_array[163]->setType("NTGNN");
     l_form_array[163]->linkTo(l_lemma_array[391], "BLNGS");
 
@@ -13293,7 +13293,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "knowing");
-    l_form_array[164]->setType("FORM_");
+    l_form_array[164]->setType("WFORM");
     l_form_array[164]->setType("NTVBG");
     l_form_array[164]->linkTo(l_lemma_array[389], "BLNGS");
 
@@ -13304,7 +13304,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "knowledge");
-    l_form_array[165]->setType("FORM_");
+    l_form_array[165]->setType("WFORM");
     l_form_array[165]->setType("NTGNN");
     l_form_array[165]->linkTo(l_lemma_array[390], "BLNGS");
 
@@ -13315,7 +13315,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "known");
-    l_form_array[166]->setType("FORM_");
+    l_form_array[166]->setType("WFORM");
     l_form_array[166]->setType("NTVBN");
     l_form_array[166]->linkTo(l_lemma_array[389], "BLNGS");
 
@@ -13326,7 +13326,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "knows");
-    l_form_array[167]->setType("FORM_");
+    l_form_array[167]->setType("WFORM");
     l_form_array[167]->setType("NTVBZ");
     l_form_array[167]->linkTo(l_lemma_array[389], "BLNGS");
 
@@ -13337,7 +13337,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "know");
-    l_form_array[168]->setType("FORM_");
+    l_form_array[168]->setType("WFORM");
     l_form_array[168]->setType("NTGVB");
     l_form_array[168]->linkTo(l_lemma_array[389], "BLNGS");
 
@@ -13348,7 +13348,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "latter");
-    l_form_array[169]->setType("FORM_");
+    l_form_array[169]->setType("WFORM");
     l_form_array[169]->setType("NTGJJ");
     l_form_array[169]->linkTo(l_lemma_array[388], "BLNGS");
 
@@ -13359,7 +13359,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "lead");
-    l_form_array[170]->setType("FORM_");
+    l_form_array[170]->setType("WFORM");
     l_form_array[170]->setType("NTVBP");
     l_form_array[170]->linkTo(l_lemma_array[387], "BLNGS");
 
@@ -13370,7 +13370,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "let");
-    l_form_array[171]->setType("FORM_");
+    l_form_array[171]->setType("WFORM");
     l_form_array[171]->setType("NTGVB");
     l_form_array[171]->linkTo(l_lemma_array[386], "BLNGS");
 
@@ -13381,7 +13381,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "lies");
-    l_form_array[172]->setType("FORM_");
+    l_form_array[172]->setType("WFORM");
     l_form_array[172]->setType("NTVBZ");
     l_form_array[172]->linkTo(l_lemma_array[385], "BLNGS");
 
@@ -13392,7 +13392,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "lie");
-    l_form_array[173]->setType("FORM_");
+    l_form_array[173]->setType("WFORM");
     l_form_array[173]->setType("NTGVB");
     l_form_array[173]->linkTo(l_lemma_array[385], "BLNGS");
 
@@ -13403,7 +13403,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "life");
-    l_form_array[174]->setType("FORM_");
+    l_form_array[174]->setType("WFORM");
     l_form_array[174]->setType("NTGNN");
     l_form_array[174]->linkTo(l_lemma_array[384], "BLNGS");
 
@@ -13414,7 +13414,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "likens");
-    l_form_array[175]->setType("FORM_");
+    l_form_array[175]->setType("WFORM");
     l_form_array[175]->setType("NTVBZ");
     l_form_array[175]->linkTo(l_lemma_array[383], "BLNGS");
 
@@ -13425,7 +13425,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "like");
-    l_form_array[176]->setType("FORM_");
+    l_form_array[176]->setType("WFORM");
     l_form_array[176]->setType("NTGJJ");
     l_form_array[176]->linkTo(l_lemma_array[382], "BLNGS");
 
@@ -13436,7 +13436,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "like");
-    l_form_array[177]->setType("FORM_");
+    l_form_array[177]->setType("WFORM");
     l_form_array[177]->setType("NTGVB");
     l_form_array[177]->linkTo(l_lemma_array[381], "BLNGS");
 
@@ -13447,7 +13447,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "little");
-    l_form_array[178]->setType("FORM_");
+    l_form_array[178]->setType("WFORM");
     l_form_array[178]->setType("NTGJJ");
     l_form_array[178]->linkTo(l_lemma_array[380], "BLNGS");
 
@@ -13458,7 +13458,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "long");
-    l_form_array[179]->setType("FORM_");
+    l_form_array[179]->setType("WFORM");
     l_form_array[179]->setType("NTGRB");
     l_form_array[179]->linkTo(l_lemma_array[379], "BLNGS");
 
@@ -13469,7 +13469,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "looking");
-    l_form_array[180]->setType("FORM_");
+    l_form_array[180]->setType("WFORM");
     l_form_array[180]->setType("NTVBG");
     l_form_array[180]->linkTo(l_lemma_array[378], "BLNGS");
 
@@ -13480,7 +13480,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "look");
-    l_form_array[181]->setType("FORM_");
+    l_form_array[181]->setType("WFORM");
     l_form_array[181]->setType("NTVBP");
     l_form_array[181]->linkTo(l_lemma_array[378], "BLNGS");
 
@@ -13491,7 +13491,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "make");
-    l_form_array[182]->setType("FORM_");
+    l_form_array[182]->setType("WFORM");
     l_form_array[182]->setType("NTGVB");
     l_form_array[182]->linkTo(l_lemma_array[377], "BLNGS");
 
@@ -13502,7 +13502,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "many");
-    l_form_array[183]->setType("FORM_");
+    l_form_array[183]->setType("WFORM");
     l_form_array[183]->setType("NTGJJ");
     l_form_array[183]->linkTo(l_lemma_array[376], "BLNGS");
 
@@ -13513,7 +13513,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "man");
-    l_form_array[184]->setType("FORM_");
+    l_form_array[184]->setType("WFORM");
     l_form_array[184]->setType("NTGNN");
     l_form_array[184]->linkTo(l_lemma_array[375], "BLNGS");
 
@@ -13524,7 +13524,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "mark");
-    l_form_array[185]->setType("FORM_");
+    l_form_array[185]->setType("WFORM");
     l_form_array[185]->setType("NTGNN");
     l_form_array[185]->linkTo(l_lemma_array[374], "BLNGS");
 
@@ -13535,7 +13535,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "matter");
-    l_form_array[186]->setType("FORM_");
+    l_form_array[186]->setType("WFORM");
     l_form_array[186]->setType("NTGNN");
     l_form_array[186]->linkTo(l_lemma_array[373], "BLNGS");
 
@@ -13546,7 +13546,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "may");
-    l_form_array[187]->setType("FORM_");
+    l_form_array[187]->setType("WFORM");
     l_form_array[187]->setType("NTGMD");
     l_form_array[187]->linkTo(l_lemma_array[372], "BLNGS");
 
@@ -13557,7 +13557,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "means");
-    l_form_array[188]->setType("FORM_");
+    l_form_array[188]->setType("WFORM");
     l_form_array[188]->setType("NTNNS");
     l_form_array[188]->linkTo(l_lemma_array[371], "BLNGS");
 
@@ -13568,7 +13568,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "mean");
-    l_form_array[189]->setType("FORM_");
+    l_form_array[189]->setType("WFORM");
     l_form_array[189]->setType("NTVBP");
     l_form_array[189]->linkTo(l_lemma_array[370], "BLNGS");
 
@@ -13579,7 +13579,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "mental");
-    l_form_array[190]->setType("FORM_");
+    l_form_array[190]->setType("WFORM");
     l_form_array[190]->setType("NTGJJ");
     l_form_array[190]->linkTo(l_lemma_array[369], "BLNGS");
 
@@ -13590,7 +13590,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "me");
-    l_form_array[191]->setType("FORM_");
+    l_form_array[191]->setType("WFORM");
     l_form_array[191]->setType("NTPRP");
     l_form_array[191]->linkTo(l_lemma_array[395], "BLNGS");
 
@@ -13601,7 +13601,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "mightiest");
-    l_form_array[192]->setType("FORM_");
+    l_form_array[192]->setType("WFORM");
     l_form_array[192]->setType("NTJJS");
     l_form_array[192]->linkTo(l_lemma_array[368], "BLNGS");
 
@@ -13612,7 +13612,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "mind");
-    l_form_array[193]->setType("FORM_");
+    l_form_array[193]->setType("WFORM");
     l_form_array[193]->setType("NTGNN");
     l_form_array[193]->linkTo(l_lemma_array[367], "BLNGS");
 
@@ -13623,7 +13623,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "mistaking");
-    l_form_array[194]->setType("FORM_");
+    l_form_array[194]->setType("WFORM");
     l_form_array[194]->setType("NTGNN");
     l_form_array[194]->linkTo(l_lemma_array[366], "BLNGS");
 
@@ -13634,7 +13634,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "more");
-    l_form_array[195]->setType("FORM_");
+    l_form_array[195]->setType("WFORM");
     l_form_array[195]->setType("NTJJR");
     l_form_array[195]->linkTo(l_lemma_array[365], "BLNGS");
 
@@ -13645,7 +13645,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "more");
-    l_form_array[196]->setType("FORM_");
+    l_form_array[196]->setType("WFORM");
     l_form_array[196]->setType("NTRBR");
     l_form_array[196]->linkTo(l_lemma_array[364], "BLNGS");
 
@@ -13656,7 +13656,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "most");
-    l_form_array[197]->setType("FORM_");
+    l_form_array[197]->setType("WFORM");
     l_form_array[197]->setType("NTRBS");
     l_form_array[197]->linkTo(l_lemma_array[363], "BLNGS");
 
@@ -13667,7 +13667,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "much");
-    l_form_array[198]->setType("FORM_");
+    l_form_array[198]->setType("WFORM");
     l_form_array[198]->setType("NTGRB");
     l_form_array[198]->linkTo(l_lemma_array[362], "BLNGS");
 
@@ -13678,7 +13678,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "must");
-    l_form_array[199]->setType("FORM_");
+    l_form_array[199]->setType("WFORM");
     l_form_array[199]->setType("NTGMD");
     l_form_array[199]->linkTo(l_lemma_array[361], "BLNGS");
 
@@ -13689,7 +13689,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "my");
-    l_form_array[200]->setType("FORM_");
+    l_form_array[200]->setType("WFORM");
     l_form_array[200]->setType("NTPR$");
     l_form_array[200]->linkTo(l_lemma_array[360], "BLNGS");
 
@@ -13700,7 +13700,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "naturally");
-    l_form_array[201]->setType("FORM_");
+    l_form_array[201]->setType("WFORM");
     l_form_array[201]->setType("NTGRB");
     l_form_array[201]->linkTo(l_lemma_array[359], "BLNGS");
 
@@ -13711,7 +13711,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "nature");
-    l_form_array[202]->setType("FORM_");
+    l_form_array[202]->setType("WFORM");
     l_form_array[202]->setType("NTGNN");
     l_form_array[202]->linkTo(l_lemma_array[358], "BLNGS");
 
@@ -13722,7 +13722,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "necessity");
-    l_form_array[203]->setType("FORM_");
+    l_form_array[203]->setType("WFORM");
     l_form_array[203]->setType("NTGNN");
     l_form_array[203]->linkTo(l_lemma_array[357], "BLNGS");
 
@@ -13733,7 +13733,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "negation");
-    l_form_array[204]->setType("FORM_");
+    l_form_array[204]->setType("WFORM");
     l_form_array[204]->setType("NTGNN");
     l_form_array[204]->linkTo(l_lemma_array[356], "BLNGS");
 
@@ -13744,7 +13744,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "neither");
-    l_form_array[205]->setType("FORM_");
+    l_form_array[205]->setType("WFORM");
     l_form_array[205]->setType("NTGCC");
     l_form_array[205]->linkTo(l_lemma_array[355], "BLNGS");
 
@@ -13755,7 +13755,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "nescience");
-    l_form_array[206]->setType("FORM_");
+    l_form_array[206]->setType("WFORM");
     l_form_array[206]->setType("NTGNN");
     l_form_array[206]->linkTo(l_lemma_array[354], "BLNGS");
 
@@ -13766,7 +13766,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "nobody");
-    l_form_array[207]->setType("FORM_");
+    l_form_array[207]->setType("WFORM");
     l_form_array[207]->setType("NTGNN");
     l_form_array[207]->linkTo(l_lemma_array[353], "BLNGS");
 
@@ -13777,7 +13777,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "non-existent");
-    l_form_array[208]->setType("FORM_");
+    l_form_array[208]->setType("WFORM");
     l_form_array[208]->setType("NTGJJ");
     l_form_array[208]->linkTo(l_lemma_array[351], "BLNGS");
     l_form_array[208]->linkTo(l_lemma_array[352], "BLNGS");
@@ -13790,7 +13790,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "nor");
-    l_form_array[209]->setType("FORM_");
+    l_form_array[209]->setType("WFORM");
     l_form_array[209]->setType("NTGCC");
     l_form_array[209]->linkTo(l_lemma_array[350], "BLNGS");
 
@@ -13801,7 +13801,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "not-being");
-    l_form_array[210]->setType("FORM_");
+    l_form_array[210]->setType("WFORM");
     l_form_array[210]->setType("NTGRB");
     l_form_array[210]->linkTo(l_lemma_array[346], "BLNGS");
     l_form_array[210]->linkTo(l_lemma_array[349], "BLNGS");
@@ -13814,7 +13814,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "nothing");
-    l_form_array[211]->setType("FORM_");
+    l_form_array[211]->setType("WFORM");
     l_form_array[211]->setType("NTGNN");
     l_form_array[211]->linkTo(l_lemma_array[348], "BLNGS");
 
@@ -13825,7 +13825,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "notion");
-    l_form_array[212]->setType("FORM_");
+    l_form_array[212]->setType("WFORM");
     l_form_array[212]->setType("NTGNN");
     l_form_array[212]->linkTo(l_lemma_array[347], "BLNGS");
 
@@ -13836,7 +13836,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "not");
-    l_form_array[213]->setType("FORM_");
+    l_form_array[213]->setType("WFORM");
     l_form_array[213]->setType("NTGRB");
     l_form_array[213]->linkTo(l_lemma_array[346], "BLNGS");
 
@@ -13847,7 +13847,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "now");
-    l_form_array[214]->setType("FORM_");
+    l_form_array[214]->setType("WFORM");
     l_form_array[214]->setType("NTGRB");
     l_form_array[214]->linkTo(l_lemma_array[345], "BLNGS");
 
@@ -13858,7 +13858,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "no");
-    l_form_array[215]->setType("FORM_");
+    l_form_array[215]->setType("WFORM");
     l_form_array[215]->setType("NTGDT");
     l_form_array[215]->linkTo(l_lemma_array[344], "BLNGS");
 
@@ -13869,7 +13869,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "objects");
-    l_form_array[216]->setType("FORM_");
+    l_form_array[216]->setType("WFORM");
     l_form_array[216]->setType("NTNNS");
     l_form_array[216]->linkTo(l_lemma_array[343], "BLNGS");
 
@@ -13880,7 +13880,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "object");
-    l_form_array[217]->setType("FORM_");
+    l_form_array[217]->setType("WFORM");
     l_form_array[217]->setType("NTGNN");
     l_form_array[217]->linkTo(l_lemma_array[343], "BLNGS");
 
@@ -13891,7 +13891,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "offer");
-    l_form_array[218]->setType("FORM_");
+    l_form_array[218]->setType("WFORM");
     l_form_array[218]->setType("NTGVB");
     l_form_array[218]->linkTo(l_lemma_array[342], "BLNGS");
 
@@ -13902,7 +13902,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "of");
-    l_form_array[219]->setType("FORM_");
+    l_form_array[219]->setType("WFORM");
     l_form_array[219]->setType("NTGIN");
     l_form_array[219]->linkTo(l_lemma_array[341], "BLNGS");
 
@@ -13913,7 +13913,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ones");
-    l_form_array[220]->setType("FORM_");
+    l_form_array[220]->setType("WFORM");
     l_form_array[220]->setType("NTNNS");
     l_form_array[220]->linkTo(l_lemma_array[340], "BLNGS");
 
@@ -13924,7 +13924,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "one");
-    l_form_array[221]->setType("FORM_");
+    l_form_array[221]->setType("WFORM");
     l_form_array[221]->setType("NTGCD");
     l_form_array[221]->linkTo(l_lemma_array[339], "BLNGS");
 
@@ -13935,7 +13935,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "one");
-    l_form_array[222]->setType("FORM_");
+    l_form_array[222]->setType("WFORM");
     l_form_array[222]->setType("NTGNN");
     l_form_array[222]->linkTo(l_lemma_array[340], "BLNGS");
 
@@ -13946,7 +13946,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "only");
-    l_form_array[223]->setType("FORM_");
+    l_form_array[223]->setType("WFORM");
     l_form_array[223]->setType("NTGRB");
     l_form_array[223]->linkTo(l_lemma_array[338], "BLNGS");
 
@@ -13957,7 +13957,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "on");
-    l_form_array[224]->setType("FORM_");
+    l_form_array[224]->setType("WFORM");
     l_form_array[224]->setType("NTGIN");
     l_form_array[224]->linkTo(l_lemma_array[337], "BLNGS");
 
@@ -13968,7 +13968,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "opines");
-    l_form_array[225]->setType("FORM_");
+    l_form_array[225]->setType("WFORM");
     l_form_array[225]->setType("NTVBZ");
     l_form_array[225]->linkTo(l_lemma_array[336], "BLNGS");
 
@@ -13979,7 +13979,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "opine");
-    l_form_array[226]->setType("FORM_");
+    l_form_array[226]->setType("WFORM");
     l_form_array[226]->setType("NTGVB");
     l_form_array[226]->linkTo(l_lemma_array[336], "BLNGS");
 
@@ -13990,7 +13990,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "opining");
-    l_form_array[227]->setType("FORM_");
+    l_form_array[227]->setType("WFORM");
     l_form_array[227]->setType("NTGNN");
     l_form_array[227]->linkTo(l_lemma_array[335], "BLNGS");
 
@@ -14001,7 +14001,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "opinion");
-    l_form_array[228]->setType("FORM_");
+    l_form_array[228]->setType("WFORM");
     l_form_array[228]->setType("NTGNN");
     l_form_array[228]->linkTo(l_lemma_array[334], "BLNGS");
 
@@ -14012,7 +14012,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "opposite");
-    l_form_array[229]->setType("FORM_");
+    l_form_array[229]->setType("WFORM");
     l_form_array[229]->setType("NTGJJ");
     l_form_array[229]->linkTo(l_lemma_array[333], "BLNGS");
 
@@ -14023,7 +14023,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "or");
-    l_form_array[230]->setType("FORM_");
+    l_form_array[230]->setType("WFORM");
     l_form_array[230]->setType("NTGCC");
     l_form_array[230]->linkTo(l_lemma_array[332], "BLNGS");
 
@@ -14034,7 +14034,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "other");
-    l_form_array[231]->setType("FORM_");
+    l_form_array[231]->setType("WFORM");
     l_form_array[231]->setType("NTGJJ");
     l_form_array[231]->linkTo(l_lemma_array[331], "BLNGS");
 
@@ -14045,7 +14045,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "our");
-    l_form_array[232]->setType("FORM_");
+    l_form_array[232]->setType("WFORM");
     l_form_array[232]->setType("NTPR$");
     l_form_array[232]->linkTo(l_lemma_array[330], "BLNGS");
 
@@ -14056,7 +14056,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "over");
-    l_form_array[233]->setType("FORM_");
+    l_form_array[233]->setType("WFORM");
     l_form_array[233]->setType("NTGIN");
     l_form_array[233]->linkTo(l_lemma_array[329], "BLNGS");
 
@@ -14067,7 +14067,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "over");
-    l_form_array[234]->setType("FORM_");
+    l_form_array[234]->setType("WFORM");
     l_form_array[234]->setType("NTGRP");
     l_form_array[234]->linkTo(l_lemma_array[329], "BLNGS");
 
@@ -14078,7 +14078,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "own");
-    l_form_array[235]->setType("FORM_");
+    l_form_array[235]->setType("WFORM");
     l_form_array[235]->setType("NTGJJ");
     l_form_array[235]->linkTo(l_lemma_array[328], "BLNGS");
 
@@ -14089,7 +14089,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "participants");
-    l_form_array[236]->setType("FORM_");
+    l_form_array[236]->setType("WFORM");
     l_form_array[236]->setType("NTNNS");
     l_form_array[236]->linkTo(l_lemma_array[327], "BLNGS");
 
@@ -14100,7 +14100,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "participate");
-    l_form_array[237]->setType("FORM_");
+    l_form_array[237]->setType("WFORM");
     l_form_array[237]->setType("NTGVB");
     l_form_array[237]->linkTo(l_lemma_array[326], "BLNGS");
 
@@ -14111,7 +14111,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "participate");
-    l_form_array[238]->setType("FORM_");
+    l_form_array[238]->setType("WFORM");
     l_form_array[238]->setType("NTVBP");
     l_form_array[238]->linkTo(l_lemma_array[326], "BLNGS");
 
@@ -14122,7 +14122,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "pertains");
-    l_form_array[239]->setType("FORM_");
+    l_form_array[239]->setType("WFORM");
     l_form_array[239]->setType("NTVBZ");
     l_form_array[239]->linkTo(l_lemma_array[325], "BLNGS");
 
@@ -14133,7 +14133,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "place");
-    l_form_array[240]->setType("FORM_");
+    l_form_array[240]->setType("WFORM");
     l_form_array[240]->setType("NTGNN");
     l_form_array[240]->linkTo(l_lemma_array[324], "BLNGS");
 
@@ -14144,7 +14144,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "place");
-    l_form_array[241]->setType("FORM_");
+    l_form_array[241]->setType("WFORM");
     l_form_array[241]->setType("NTGVB");
     l_form_array[241]->linkTo(l_lemma_array[323], "BLNGS");
 
@@ -14155,7 +14155,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "placing");
-    l_form_array[242]->setType("FORM_");
+    l_form_array[242]->setType("WFORM");
     l_form_array[242]->setType("NTVBG");
     l_form_array[242]->linkTo(l_lemma_array[323], "BLNGS");
 
@@ -14166,7 +14166,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "plainly");
-    l_form_array[243]->setType("FORM_");
+    l_form_array[243]->setType("WFORM");
     l_form_array[243]->setType("NTGRB");
     l_form_array[243]->linkTo(l_lemma_array[322], "BLNGS");
 
@@ -14177,7 +14177,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "points");
-    l_form_array[244]->setType("FORM_");
+    l_form_array[244]->setType("WFORM");
     l_form_array[244]->setType("NTNNS");
     l_form_array[244]->linkTo(l_lemma_array[321], "BLNGS");
 
@@ -14188,7 +14188,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "point");
-    l_form_array[245]->setType("FORM_");
+    l_form_array[245]->setType("WFORM");
     l_form_array[245]->setType("NTGNN");
     l_form_array[245]->linkTo(l_lemma_array[321], "BLNGS");
 
@@ -14199,7 +14199,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "potent");
-    l_form_array[246]->setType("FORM_");
+    l_form_array[246]->setType("WFORM");
     l_form_array[246]->setType("NTGJJ");
     l_form_array[246]->linkTo(l_lemma_array[320], "BLNGS");
 
@@ -14210,7 +14210,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "powers");
-    l_form_array[247]->setType("FORM_");
+    l_form_array[247]->setType("WFORM");
     l_form_array[247]->setType("NTNNS");
     l_form_array[247]->linkTo(l_lemma_array[319], "BLNGS");
 
@@ -14221,7 +14221,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "power");
-    l_form_array[248]->setType("FORM_");
+    l_form_array[248]->setType("WFORM");
     l_form_array[248]->setType("NTGNN");
     l_form_array[248]->linkTo(l_lemma_array[319], "BLNGS");
 
@@ -14232,7 +14232,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "practice");
-    l_form_array[249]->setType("FORM_");
+    l_form_array[249]->setType("WFORM");
     l_form_array[249]->setType("NTGNN");
     l_form_array[249]->linkTo(l_lemma_array[318], "BLNGS");
 
@@ -14243,7 +14243,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "premising");
-    l_form_array[250]->setType("FORM_");
+    l_form_array[250]->setType("WFORM");
     l_form_array[250]->setType("NTVBG");
     l_form_array[250]->linkTo(l_lemma_array[317], "BLNGS");
 
@@ -14254,7 +14254,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "proceed");
-    l_form_array[251]->setType("FORM_");
+    l_form_array[251]->setType("WFORM");
     l_form_array[251]->setType("NTVBP");
     l_form_array[251]->linkTo(l_lemma_array[316], "BLNGS");
 
@@ -14265,7 +14265,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "proving");
-    l_form_array[252]->setType("FORM_");
+    l_form_array[252]->setType("WFORM");
     l_form_array[252]->setType("NTVBG");
     l_form_array[252]->linkTo(l_lemma_array[315], "BLNGS");
 
@@ -14276,7 +14276,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "pure");
-    l_form_array[253]->setType("FORM_");
+    l_form_array[253]->setType("WFORM");
     l_form_array[253]->setType("NTGJJ");
     l_form_array[253]->linkTo(l_lemma_array[314], "BLNGS");
 
@@ -14287,7 +14287,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "puts");
-    l_form_array[254]->setType("FORM_");
+    l_form_array[254]->setType("WFORM");
     l_form_array[254]->setType("NTVBZ");
     l_form_array[254]->linkTo(l_lemma_array[313], "BLNGS");
 
@@ -14298,7 +14298,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "putting");
-    l_form_array[255]->setType("FORM_");
+    l_form_array[255]->setType("WFORM");
     l_form_array[255]->setType("NTVBG");
     l_form_array[255]->linkTo(l_lemma_array[313], "BLNGS");
 
@@ -14309,7 +14309,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "put");
-    l_form_array[256]->setType("FORM_");
+    l_form_array[256]->setType("WFORM");
     l_form_array[256]->setType("NTGVB");
     l_form_array[256]->linkTo(l_lemma_array[313], "BLNGS");
 
@@ -14320,7 +14320,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "quarrel");
-    l_form_array[257]->setType("FORM_");
+    l_form_array[257]->setType("WFORM");
     l_form_array[257]->setType("NTGVB");
     l_form_array[257]->linkTo(l_lemma_array[312], "BLNGS");
 
@@ -14331,7 +14331,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "question");
-    l_form_array[258]->setType("FORM_");
+    l_form_array[258]->setType("WFORM");
     l_form_array[258]->setType("NTGNN");
     l_form_array[258]->linkTo(l_lemma_array[311], "BLNGS");
 
@@ -14342,7 +14342,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "question");
-    l_form_array[259]->setType("FORM_");
+    l_form_array[259]->setType("WFORM");
     l_form_array[259]->setType("NTGVB");
     l_form_array[259]->linkTo(l_lemma_array[310], "BLNGS");
 
@@ -14353,7 +14353,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "quite");
-    l_form_array[260]->setType("FORM_");
+    l_form_array[260]->setType("WFORM");
     l_form_array[260]->setType("NTGRB");
     l_form_array[260]->linkTo(l_lemma_array[309], "BLNGS");
 
@@ -14364,7 +14364,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "rather");
-    l_form_array[261]->setType("FORM_");
+    l_form_array[261]->setType("WFORM");
     l_form_array[261]->setType("NTGRB");
     l_form_array[261]->linkTo(l_lemma_array[308], "BLNGS");
 
@@ -14375,7 +14375,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "rational");
-    l_form_array[262]->setType("FORM_");
+    l_form_array[262]->setType("WFORM");
     l_form_array[262]->setType("NTGJJ");
     l_form_array[262]->linkTo(l_lemma_array[307], "BLNGS");
 
@@ -14386,7 +14386,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "real");
-    l_form_array[263]->setType("FORM_");
+    l_form_array[263]->setType("WFORM");
     l_form_array[263]->setType("NTGJJ");
     l_form_array[263]->linkTo(l_lemma_array[306], "BLNGS");
 
@@ -14397,7 +14397,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "reasonable");
-    l_form_array[264]->setType("FORM_");
+    l_form_array[264]->setType("WFORM");
     l_form_array[264]->setType("NTGJJ");
     l_form_array[264]->linkTo(l_lemma_array[305], "BLNGS");
 
@@ -14408,7 +14408,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "recognises");
-    l_form_array[265]->setType("FORM_");
+    l_form_array[265]->setType("WFORM");
     l_form_array[265]->setType("NTVBZ");
     l_form_array[265]->linkTo(l_lemma_array[304], "BLNGS");
 
@@ -14419,7 +14419,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "recognizes");
-    l_form_array[266]->setType("FORM_");
+    l_form_array[266]->setType("WFORM");
     l_form_array[266]->setType("NTVBZ");
     l_form_array[266]->linkTo(l_lemma_array[303], "BLNGS");
 
@@ -14430,7 +14430,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "reflect");
-    l_form_array[267]->setType("FORM_");
+    l_form_array[267]->setType("WFORM");
     l_form_array[267]->setType("NTGVB");
     l_form_array[267]->linkTo(l_lemma_array[302], "BLNGS");
 
@@ -14441,7 +14441,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "rejoiced");
-    l_form_array[268]->setType("FORM_");
+    l_form_array[268]->setType("WFORM");
     l_form_array[268]->setType("NTVBN");
     l_form_array[268]->linkTo(l_lemma_array[301], "BLNGS");
 
@@ -14452,7 +14452,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "related");
-    l_form_array[269]->setType("FORM_");
+    l_form_array[269]->setType("WFORM");
     l_form_array[269]->setType("NTVBN");
     l_form_array[269]->linkTo(l_lemma_array[300], "BLNGS");
 
@@ -14463,7 +14463,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "relative");
-    l_form_array[270]->setType("FORM_");
+    l_form_array[270]->setType("WFORM");
     l_form_array[270]->setType("NTGJJ");
     l_form_array[270]->linkTo(l_lemma_array[299], "BLNGS");
 
@@ -14474,7 +14474,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "replied");
-    l_form_array[271]->setType("FORM_");
+    l_form_array[271]->setType("WFORM");
     l_form_array[271]->setType("NTVBD");
     l_form_array[271]->linkTo(l_lemma_array[298], "BLNGS");
 
@@ -14485,7 +14485,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "reply");
-    l_form_array[272]->setType("FORM_");
+    l_form_array[272]->setType("WFORM");
     l_form_array[272]->setType("NTGVB");
     l_form_array[272]->linkTo(l_lemma_array[298], "BLNGS");
 
@@ -14496,7 +14496,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "resemblance");
-    l_form_array[273]->setType("FORM_");
+    l_form_array[273]->setType("WFORM");
     l_form_array[273]->setType("NTGNN");
     l_form_array[273]->linkTo(l_lemma_array[297], "BLNGS");
 
@@ -14507,7 +14507,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "result");
-    l_form_array[274]->setType("FORM_");
+    l_form_array[274]->setType("WFORM");
     l_form_array[274]->setType("NTGNN");
     l_form_array[274]->linkTo(l_lemma_array[296], "BLNGS");
 
@@ -14518,7 +14518,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "return");
-    l_form_array[275]->setType("FORM_");
+    l_form_array[275]->setType("WFORM");
     l_form_array[275]->setType("NTGVB");
     l_form_array[275]->linkTo(l_lemma_array[295], "BLNGS");
 
@@ -14529,7 +14529,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "revealing");
-    l_form_array[276]->setType("FORM_");
+    l_form_array[276]->setType("WFORM");
     l_form_array[276]->setType("NTVBG");
     l_form_array[276]->linkTo(l_lemma_array[294], "BLNGS");
 
@@ -14540,7 +14540,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "rightly");
-    l_form_array[277]->setType("FORM_");
+    l_form_array[277]->setType("WFORM");
     l_form_array[277]->setType("NTGRB");
     l_form_array[277]->linkTo(l_lemma_array[293], "BLNGS");
 
@@ -14551,7 +14551,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "right");
-    l_form_array[278]->setType("FORM_");
+    l_form_array[278]->setType("WFORM");
     l_form_array[278]->setType("NTGJJ");
     l_form_array[278]->linkTo(l_lemma_array[292], "BLNGS");
 
@@ -14562,7 +14562,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "sad");
-    l_form_array[279]->setType("FORM_");
+    l_form_array[279]->setType("WFORM");
     l_form_array[279]->setType("NTGJJ");
     l_form_array[279]->linkTo(l_lemma_array[291], "BLNGS");
 
@@ -14573,7 +14573,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "said");
-    l_form_array[280]->setType("FORM_");
+    l_form_array[280]->setType("WFORM");
     l_form_array[280]->setType("NTVBD");
     l_form_array[280]->linkTo(l_lemma_array[289], "BLNGS");
 
@@ -14584,7 +14584,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "same");
-    l_form_array[281]->setType("FORM_");
+    l_form_array[281]->setType("WFORM");
     l_form_array[281]->setType("NTGJJ");
     l_form_array[281]->linkTo(l_lemma_array[290], "BLNGS");
 
@@ -14595,7 +14595,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "say");
-    l_form_array[282]->setType("FORM_");
+    l_form_array[282]->setType("WFORM");
     l_form_array[282]->setType("NTGVB");
     l_form_array[282]->linkTo(l_lemma_array[289], "BLNGS");
 
@@ -14606,7 +14606,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "say");
-    l_form_array[283]->setType("FORM_");
+    l_form_array[283]->setType("WFORM");
     l_form_array[283]->setType("NTVBP");
     l_form_array[283]->linkTo(l_lemma_array[289], "BLNGS");
 
@@ -14617,7 +14617,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "science");
-    l_form_array[284]->setType("FORM_");
+    l_form_array[284]->setType("WFORM");
     l_form_array[284]->setType("NTGNN");
     l_form_array[284]->linkTo(l_lemma_array[288], "BLNGS");
 
@@ -14628,7 +14628,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "scientific");
-    l_form_array[285]->setType("FORM_");
+    l_form_array[285]->setType("WFORM");
     l_form_array[285]->setType("NTGJJ");
     l_form_array[285]->linkTo(l_lemma_array[287], "BLNGS");
 
@@ -14639,7 +14639,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "seek");
-    l_form_array[286]->setType("FORM_");
+    l_form_array[286]->setType("WFORM");
     l_form_array[286]->setType("NTGVB");
     l_form_array[286]->linkTo(l_lemma_array[286], "BLNGS");
 
@@ -14650,7 +14650,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "see");
-    l_form_array[287]->setType("FORM_");
+    l_form_array[287]->setType("WFORM");
     l_form_array[287]->setType("NTGVB");
     l_form_array[287]->linkTo(l_lemma_array[285], "BLNGS");
 
@@ -14661,7 +14661,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "self-beautiful");
-    l_form_array[288]->setType("FORM_");
+    l_form_array[288]->setType("WFORM");
     l_form_array[288]->setType("NTGNN");
     l_form_array[288]->linkTo(l_lemma_array[283], "BLNGS");
     l_form_array[288]->linkTo(l_lemma_array[284], "BLNGS");
@@ -14674,7 +14674,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "sense");
-    l_form_array[289]->setType("FORM_");
+    l_form_array[289]->setType("WFORM");
     l_form_array[289]->setType("NTGNN");
     l_form_array[289]->linkTo(l_lemma_array[282], "BLNGS");
 
@@ -14685,7 +14685,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "set");
-    l_form_array[290]->setType("FORM_");
+    l_form_array[290]->setType("WFORM");
     l_form_array[290]->setType("NTVBN");
     l_form_array[290]->linkTo(l_lemma_array[281], "BLNGS");
 
@@ -14696,7 +14696,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "shall");
-    l_form_array[291]->setType("FORM_");
+    l_form_array[291]->setType("WFORM");
     l_form_array[291]->setType("NTGMD");
     l_form_array[291]->linkTo(l_lemma_array[280], "BLNGS");
 
@@ -14707,7 +14707,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "shape");
-    l_form_array[292]->setType("FORM_");
+    l_form_array[292]->setType("WFORM");
     l_form_array[292]->setType("NTGNN");
     l_form_array[292]->linkTo(l_lemma_array[279], "BLNGS");
 
@@ -14718,7 +14718,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "should");
-    l_form_array[293]->setType("FORM_");
+    l_form_array[293]->setType("WFORM");
     l_form_array[293]->setType("NTGMD");
     l_form_array[293]->linkTo(l_lemma_array[278], "BLNGS");
 
@@ -14729,7 +14729,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "sight");
-    l_form_array[294]->setType("FORM_");
+    l_form_array[294]->setType("WFORM");
     l_form_array[294]->setType("NTGNN");
     l_form_array[294]->linkTo(l_lemma_array[277], "BLNGS");
 
@@ -14740,7 +14740,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "similar");
-    l_form_array[295]->setType("FORM_");
+    l_form_array[295]->setType("WFORM");
     l_form_array[295]->setType("NTGJJ");
     l_form_array[295]->linkTo(l_lemma_array[276], "BLNGS");
 
@@ -14751,7 +14751,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "sleeping");
-    l_form_array[296]->setType("FORM_");
+    l_form_array[296]->setType("WFORM");
     l_form_array[296]->setType("NTVBG");
     l_form_array[296]->linkTo(l_lemma_array[275], "BLNGS");
 
@@ -14762,7 +14762,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "someone");
-    l_form_array[297]->setType("FORM_");
+    l_form_array[297]->setType("WFORM");
     l_form_array[297]->setType("NTGNN");
     l_form_array[297]->linkTo(l_lemma_array[274], "BLNGS");
 
@@ -14773,7 +14773,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "something");
-    l_form_array[298]->setType("FORM_");
+    l_form_array[298]->setType("WFORM");
     l_form_array[298]->setType("NTGNN");
     l_form_array[298]->linkTo(l_lemma_array[273], "BLNGS");
 
@@ -14784,7 +14784,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "some");
-    l_form_array[299]->setType("FORM_");
+    l_form_array[299]->setType("WFORM");
     l_form_array[299]->setType("NTGDT");
     l_form_array[299]->linkTo(l_lemma_array[272], "BLNGS");
 
@@ -14795,7 +14795,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "soothing");
-    l_form_array[300]->setType("FORM_");
+    l_form_array[300]->setType("WFORM");
     l_form_array[300]->setType("NTGJJ");
     l_form_array[300]->linkTo(l_lemma_array[270], "BLNGS");
 
@@ -14806,7 +14806,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "soothing");
-    l_form_array[301]->setType("FORM_");
+    l_form_array[301]->setType("WFORM");
     l_form_array[301]->setType("NTVBG");
     l_form_array[301]->linkTo(l_lemma_array[271], "BLNGS");
 
@@ -14817,7 +14817,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "so");
-    l_form_array[302]->setType("FORM_");
+    l_form_array[302]->setType("WFORM");
     l_form_array[302]->setType("NTGRB");
     l_form_array[302]->linkTo(l_lemma_array[269], "BLNGS");
 
@@ -14828,7 +14828,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "speaking");
-    l_form_array[303]->setType("FORM_");
+    l_form_array[303]->setType("WFORM");
     l_form_array[303]->setType("NTVBG");
     l_form_array[303]->linkTo(l_lemma_array[268], "BLNGS");
 
@@ -14839,7 +14839,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "sphere");
-    l_form_array[304]->setType("FORM_");
+    l_form_array[304]->setType("WFORM");
     l_form_array[304]->setType("NTGNN");
     l_form_array[304]->linkTo(l_lemma_array[267], "BLNGS");
 
@@ -14850,7 +14850,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "statement");
-    l_form_array[305]->setType("FORM_");
+    l_form_array[305]->setType("WFORM");
     l_form_array[305]->setType("NTGNN");
     l_form_array[305]->linkTo(l_lemma_array[266], "BLNGS");
 
@@ -14861,7 +14861,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "state");
-    l_form_array[306]->setType("FORM_");
+    l_form_array[306]->setType("WFORM");
     l_form_array[306]->setType("NTGNN");
     l_form_array[306]->linkTo(l_lemma_array[265], "BLNGS");
 
@@ -14872,7 +14872,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "such");
-    l_form_array[307]->setType("FORM_");
+    l_form_array[307]->setType("WFORM");
     l_form_array[307]->setType("NTGJJ");
     l_form_array[307]->linkTo(l_lemma_array[264], "BLNGS");
 
@@ -14883,7 +14883,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "such");
-    l_form_array[308]->setType("FORM_");
+    l_form_array[308]->setType("WFORM");
     l_form_array[308]->setType("NTPDT");
     l_form_array[308]->linkTo(l_lemma_array[263], "BLNGS");
 
@@ -14894,7 +14894,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "sufficiently");
-    l_form_array[309]->setType("FORM_");
+    l_form_array[309]->setType("WFORM");
     l_form_array[309]->setType("NTGRB");
     l_form_array[309]->linkTo(l_lemma_array[262], "BLNGS");
 
@@ -14905,7 +14905,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "supposes");
-    l_form_array[310]->setType("FORM_");
+    l_form_array[310]->setType("WFORM");
     l_form_array[310]->setType("NTVBZ");
     l_form_array[310]->linkTo(l_lemma_array[261], "BLNGS");
 
@@ -14916,7 +14916,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "suppose");
-    l_form_array[311]->setType("FORM_");
+    l_form_array[311]->setType("WFORM");
     l_form_array[311]->setType("NTGVB");
     l_form_array[311]->linkTo(l_lemma_array[261], "BLNGS");
 
@@ -14927,7 +14927,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "surely");
-    l_form_array[312]->setType("FORM_");
+    l_form_array[312]->setType("WFORM");
     l_form_array[312]->setType("NTGRB");
     l_form_array[312]->linkTo(l_lemma_array[260], "BLNGS");
 
@@ -14938,7 +14938,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "take");
-    l_form_array[313]->setType("FORM_");
+    l_form_array[313]->setType("WFORM");
     l_form_array[313]->setType("NTGVB");
     l_form_array[313]->linkTo(l_lemma_array[259], "BLNGS");
 
@@ -14949,7 +14949,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "telling");
-    l_form_array[314]->setType("FORM_");
+    l_form_array[314]->setType("WFORM");
     l_form_array[314]->setType("NTVBG");
     l_form_array[314]->linkTo(l_lemma_array[258], "BLNGS");
 
@@ -14960,7 +14960,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "tell");
-    l_form_array[315]->setType("FORM_");
+    l_form_array[315]->setType("WFORM");
     l_form_array[315]->setType("NTGVB");
     l_form_array[315]->linkTo(l_lemma_array[258], "BLNGS");
 
@@ -14971,7 +14971,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "than");
-    l_form_array[316]->setType("FORM_");
+    l_form_array[316]->setType("WFORM");
     l_form_array[316]->setType("NTGIN");
     l_form_array[316]->linkTo(l_lemma_array[257], "BLNGS");
 
@@ -14982,7 +14982,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "that");
-    l_form_array[317]->setType("FORM_");
+    l_form_array[317]->setType("WFORM");
     l_form_array[317]->setType("NTGDT");
     l_form_array[317]->linkTo(l_lemma_array[256], "BLNGS");
 
@@ -14993,7 +14993,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "that");
-    l_form_array[318]->setType("FORM_");
+    l_form_array[318]->setType("WFORM");
     l_form_array[318]->setType("NTGIN");
     l_form_array[318]->linkTo(l_lemma_array[255], "BLNGS");
 
@@ -15004,7 +15004,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "that");
-    l_form_array[319]->setType("FORM_");
+    l_form_array[319]->setType("WFORM");
     l_form_array[319]->setType("NTWDT");
     l_form_array[319]->linkTo(l_lemma_array[256], "BLNGS");
 
@@ -15015,7 +15015,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "themselves");
-    l_form_array[320]->setType("FORM_");
+    l_form_array[320]->setType("WFORM");
     l_form_array[320]->setType("NTPRP");
     l_form_array[320]->linkTo(l_lemma_array[254], "BLNGS");
 
@@ -15026,7 +15026,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "them");
-    l_form_array[321]->setType("FORM_");
+    l_form_array[321]->setType("WFORM");
     l_form_array[321]->setType("NTPRP");
     l_form_array[321]->linkTo(l_lemma_array[250], "BLNGS");
 
@@ -15037,7 +15037,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "then");
-    l_form_array[322]->setType("FORM_");
+    l_form_array[322]->setType("WFORM");
     l_form_array[322]->setType("NTGRB");
     l_form_array[322]->linkTo(l_lemma_array[253], "BLNGS");
 
@@ -15048,7 +15048,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "therefore");
-    l_form_array[323]->setType("FORM_");
+    l_form_array[323]->setType("WFORM");
     l_form_array[323]->setType("NTGRB");
     l_form_array[323]->linkTo(l_lemma_array[252], "BLNGS");
 
@@ -15059,7 +15059,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "there");
-    l_form_array[324]->setType("FORM_");
+    l_form_array[324]->setType("WFORM");
     l_form_array[324]->setType("NTGEX");
     l_form_array[324]->linkTo(l_lemma_array[251], "BLNGS");
 
@@ -15070,7 +15070,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "they");
-    l_form_array[325]->setType("FORM_");
+    l_form_array[325]->setType("WFORM");
     l_form_array[325]->setType("NTPRP");
     l_form_array[325]->linkTo(l_lemma_array[250], "BLNGS");
 
@@ -15081,7 +15081,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "the");
-    l_form_array[326]->setType("FORM_");
+    l_form_array[326]->setType("WFORM");
     l_form_array[326]->setType("NTGDT");
     l_form_array[326]->linkTo(l_lemma_array[249], "BLNGS");
 
@@ -15092,7 +15092,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "things");
-    l_form_array[327]->setType("FORM_");
+    l_form_array[327]->setType("WFORM");
     l_form_array[327]->setType("NTNNS");
     l_form_array[327]->linkTo(l_lemma_array[248], "BLNGS");
 
@@ -15103,7 +15103,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "thing");
-    l_form_array[328]->setType("FORM_");
+    l_form_array[328]->setType("WFORM");
     l_form_array[328]->setType("NTGNN");
     l_form_array[328]->linkTo(l_lemma_array[248], "BLNGS");
 
@@ -15114,7 +15114,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "think");
-    l_form_array[329]->setType("FORM_");
+    l_form_array[329]->setType("WFORM");
     l_form_array[329]->setType("NTGVB");
     l_form_array[329]->linkTo(l_lemma_array[247], "BLNGS");
 
@@ -15125,7 +15125,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "think");
-    l_form_array[330]->setType("FORM_");
+    l_form_array[330]->setType("WFORM");
     l_form_array[330]->setType("NTVBP");
     l_form_array[330]->linkTo(l_lemma_array[247], "BLNGS");
 
@@ -15136,7 +15136,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "this");
-    l_form_array[331]->setType("FORM_");
+    l_form_array[331]->setType("WFORM");
     l_form_array[331]->setType("NTGDT");
     l_form_array[331]->linkTo(l_lemma_array[246], "BLNGS");
 
@@ -15147,7 +15147,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "those");
-    l_form_array[332]->setType("FORM_");
+    l_form_array[332]->setType("WFORM");
     l_form_array[332]->setType("NTGDT");
     l_form_array[332]->linkTo(l_lemma_array[245], "BLNGS");
 
@@ -15158,7 +15158,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "thought");
-    l_form_array[333]->setType("FORM_");
+    l_form_array[333]->setType("WFORM");
     l_form_array[333]->setType("NTGNN");
     l_form_array[333]->linkTo(l_lemma_array[244], "BLNGS");
 
@@ -15169,7 +15169,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "too");
-    l_form_array[334]->setType("FORM_");
+    l_form_array[334]->setType("WFORM");
     l_form_array[334]->setType("NTGRB");
     l_form_array[334]->linkTo(l_lemma_array[243], "BLNGS");
 
@@ -15180,7 +15180,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "to");
-    l_form_array[335]->setType("FORM_");
+    l_form_array[335]->setType("WFORM");
     l_form_array[335]->setType("NTGIN");
     l_form_array[335]->linkTo(l_lemma_array[241], "BLNGS");
 
@@ -15191,7 +15191,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "to");
-    l_form_array[336]->setType("FORM_");
+    l_form_array[336]->setType("WFORM");
     l_form_array[336]->setType("NTGTO");
     l_form_array[336]->linkTo(l_lemma_array[242], "BLNGS");
 
@@ -15202,7 +15202,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "tries");
-    l_form_array[337]->setType("FORM_");
+    l_form_array[337]->setType("WFORM");
     l_form_array[337]->setType("NTVBZ");
     l_form_array[337]->linkTo(l_lemma_array[239], "BLNGS");
 
@@ -15213,7 +15213,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "true");
-    l_form_array[338]->setType("FORM_");
+    l_form_array[338]->setType("WFORM");
     l_form_array[338]->setType("NTGJJ");
     l_form_array[338]->linkTo(l_lemma_array[240], "BLNGS");
 
@@ -15224,7 +15224,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "trying");
-    l_form_array[339]->setType("FORM_");
+    l_form_array[339]->setType("WFORM");
     l_form_array[339]->setType("NTVBG");
     l_form_array[339]->linkTo(l_lemma_array[239], "BLNGS");
 
@@ -15235,7 +15235,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "try");
-    l_form_array[340]->setType("FORM_");
+    l_form_array[340]->setType("WFORM");
     l_form_array[340]->setType("NTGVB");
     l_form_array[340]->linkTo(l_lemma_array[239], "BLNGS");
 
@@ -15246,7 +15246,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "type");
-    l_form_array[341]->setType("FORM_");
+    l_form_array[341]->setType("WFORM");
     l_form_array[341]->setType("NTGNN");
     l_form_array[341]->linkTo(l_lemma_array[238], "BLNGS");
 
@@ -15257,7 +15257,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "unable");
-    l_form_array[342]->setType("FORM_");
+    l_form_array[342]->setType("WFORM");
     l_form_array[342]->setType("NTGJJ");
     l_form_array[342]->linkTo(l_lemma_array[237], "BLNGS");
 
@@ -15268,7 +15268,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "understand");
-    l_form_array[343]->setType("FORM_");
+    l_form_array[343]->setType("WFORM");
     l_form_array[343]->setType("NTVBP");
     l_form_array[343]->linkTo(l_lemma_array[236], "BLNGS");
 
@@ -15279,7 +15279,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "undoubtedly");
-    l_form_array[344]->setType("FORM_");
+    l_form_array[344]->setType("WFORM");
     l_form_array[344]->setType("NTGRB");
     l_form_array[344]->linkTo(l_lemma_array[235], "BLNGS");
 
@@ -15290,7 +15290,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "unknowable");
-    l_form_array[345]->setType("FORM_");
+    l_form_array[345]->setType("WFORM");
     l_form_array[345]->setType("NTGJJ");
     l_form_array[345]->linkTo(l_lemma_array[234], "BLNGS");
 
@@ -15301,7 +15301,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "unknown");
-    l_form_array[346]->setType("FORM_");
+    l_form_array[346]->setType("WFORM");
     l_form_array[346]->setType("NTGJJ");
     l_form_array[346]->linkTo(l_lemma_array[233], "BLNGS");
 
@@ -15312,7 +15312,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "unqualifiedly");
-    l_form_array[347]->setType("FORM_");
+    l_form_array[347]->setType("WFORM");
     l_form_array[347]->setType("NTGRB");
     l_form_array[347]->linkTo(l_lemma_array[232], "BLNGS");
 
@@ -15323,7 +15323,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "us");
-    l_form_array[348]->setType("FORM_");
+    l_form_array[348]->setType("WFORM");
     l_form_array[348]->setType("NTPRP");
     l_form_array[348]->linkTo(l_lemma_array[222], "BLNGS");
 
@@ -15334,7 +15334,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "utterly");
-    l_form_array[349]->setType("FORM_");
+    l_form_array[349]->setType("WFORM");
     l_form_array[349]->setType("NTGRB");
     l_form_array[349]->linkTo(l_lemma_array[231], "BLNGS");
 
@@ -15345,7 +15345,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "very");
-    l_form_array[350]->setType("FORM_");
+    l_form_array[350]->setType("WFORM");
     l_form_array[350]->setType("NTGRB");
     l_form_array[350]->linkTo(l_lemma_array[230], "BLNGS");
 
@@ -15356,7 +15356,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "view");
-    l_form_array[351]->setType("FORM_");
+    l_form_array[351]->setType("WFORM");
     l_form_array[351]->setType("NTGNN");
     l_form_array[351]->linkTo(l_lemma_array[229], "BLNGS");
 
@@ -15367,7 +15367,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "virtue");
-    l_form_array[352]->setType("FORM_");
+    l_form_array[352]->setType("WFORM");
     l_form_array[352]->setType("NTGNN");
     l_form_array[352]->linkTo(l_lemma_array[228], "BLNGS");
 
@@ -15378,7 +15378,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "waking");
-    l_form_array[353]->setType("FORM_");
+    l_form_array[353]->setType("WFORM");
     l_form_array[353]->setType("NTGNN");
     l_form_array[353]->linkTo(l_lemma_array[226], "BLNGS");
 
@@ -15389,7 +15389,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "waking");
-    l_form_array[354]->setType("FORM_");
+    l_form_array[354]->setType("WFORM");
     l_form_array[354]->setType("NTVBG");
     l_form_array[354]->linkTo(l_lemma_array[227], "BLNGS");
 
@@ -15400,7 +15400,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "was");
-    l_form_array[355]->setType("FORM_");
+    l_form_array[355]->setType("WFORM");
     l_form_array[355]->setType("NTVBD");
     l_form_array[355]->linkTo(l_lemma_array[491], "BLNGS");
 
@@ -15411,7 +15411,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "way");
-    l_form_array[356]->setType("FORM_");
+    l_form_array[356]->setType("WFORM");
     l_form_array[356]->setType("NTGNN");
     l_form_array[356]->linkTo(l_lemma_array[225], "BLNGS");
 
@@ -15422,7 +15422,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "welcome");
-    l_form_array[357]->setType("FORM_");
+    l_form_array[357]->setType("WFORM");
     l_form_array[357]->setType("NTGJJ");
     l_form_array[357]->linkTo(l_lemma_array[224], "BLNGS");
 
@@ -15433,7 +15433,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "well");
-    l_form_array[358]->setType("FORM_");
+    l_form_array[358]->setType("WFORM");
     l_form_array[358]->setType("NTGRB");
     l_form_array[358]->linkTo(l_lemma_array[223], "BLNGS");
 
@@ -15444,7 +15444,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "were");
-    l_form_array[359]->setType("FORM_");
+    l_form_array[359]->setType("WFORM");
     l_form_array[359]->setType("NTVBD");
     l_form_array[359]->linkTo(l_lemma_array[491], "BLNGS");
 
@@ -15455,7 +15455,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "we");
-    l_form_array[360]->setType("FORM_");
+    l_form_array[360]->setType("WFORM");
     l_form_array[360]->setType("NTPRP");
     l_form_array[360]->linkTo(l_lemma_array[222], "BLNGS");
 
@@ -15466,7 +15466,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "what");
-    l_form_array[361]->setType("FORM_");
+    l_form_array[361]->setType("WFORM");
     l_form_array[361]->setType("NTWDT");
     l_form_array[361]->linkTo(l_lemma_array[221], "BLNGS");
 
@@ -15477,7 +15477,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "what");
-    l_form_array[362]->setType("FORM_");
+    l_form_array[362]->setType("WFORM");
     l_form_array[362]->setType("NTGWP");
     l_form_array[362]->linkTo(l_lemma_array[221], "BLNGS");
 
@@ -15488,7 +15488,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "when");
-    l_form_array[363]->setType("FORM_");
+    l_form_array[363]->setType("WFORM");
     l_form_array[363]->setType("NTWRB");
     l_form_array[363]->linkTo(l_lemma_array[220], "BLNGS");
 
@@ -15499,7 +15499,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "whether");
-    l_form_array[364]->setType("FORM_");
+    l_form_array[364]->setType("WFORM");
     l_form_array[364]->setType("NTGIN");
     l_form_array[364]->linkTo(l_lemma_array[219], "BLNGS");
 
@@ -15510,7 +15510,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "which");
-    l_form_array[365]->setType("FORM_");
+    l_form_array[365]->setType("WFORM");
     l_form_array[365]->setType("NTWDT");
     l_form_array[365]->linkTo(l_lemma_array[218], "BLNGS");
 
@@ -15521,7 +15521,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "while");
-    l_form_array[366]->setType("FORM_");
+    l_form_array[366]->setType("WFORM");
     l_form_array[366]->setType("NTGNN");
     l_form_array[366]->linkTo(l_lemma_array[217], "BLNGS");
 
@@ -15532,7 +15532,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "whose");
-    l_form_array[367]->setType("FORM_");
+    l_form_array[367]->setType("WFORM");
     l_form_array[367]->setType("NTWP$");
     l_form_array[367]->linkTo(l_lemma_array[216], "BLNGS");
 
@@ -15543,7 +15543,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "who");
-    l_form_array[368]->setType("FORM_");
+    l_form_array[368]->setType("WFORM");
     l_form_array[368]->setType("NTGWP");
     l_form_array[368]->linkTo(l_lemma_array[215], "BLNGS");
 
@@ -15554,7 +15554,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "why");
-    l_form_array[369]->setType("FORM_");
+    l_form_array[369]->setType("WFORM");
     l_form_array[369]->setType("NTWRB");
     l_form_array[369]->linkTo(l_lemma_array[214], "BLNGS");
 
@@ -15565,7 +15565,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "wide");
-    l_form_array[370]->setType("FORM_");
+    l_form_array[370]->setType("WFORM");
     l_form_array[370]->setType("NTGRB");
     l_form_array[370]->linkTo(l_lemma_array[213], "BLNGS");
 
@@ -15576,7 +15576,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "will");
-    l_form_array[371]->setType("FORM_");
+    l_form_array[371]->setType("WFORM");
     l_form_array[371]->setType("NTGMD");
     l_form_array[371]->linkTo(l_lemma_array[212], "BLNGS");
 
@@ -15587,7 +15587,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "winning");
-    l_form_array[372]->setType("FORM_");
+    l_form_array[372]->setType("WFORM");
     l_form_array[372]->setType("NTVBG");
     l_form_array[372]->linkTo(l_lemma_array[211], "BLNGS");
 
@@ -15598,7 +15598,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "without");
-    l_form_array[373]->setType("FORM_");
+    l_form_array[373]->setType("WFORM");
     l_form_array[373]->setType("NTGIN");
     l_form_array[373]->linkTo(l_lemma_array[210], "BLNGS");
 
@@ -15609,7 +15609,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "with");
-    l_form_array[374]->setType("FORM_");
+    l_form_array[374]->setType("WFORM");
     l_form_array[374]->setType("NTGIN");
     l_form_array[374]->linkTo(l_lemma_array[209], "BLNGS");
 
@@ -15620,7 +15620,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "wits");
-    l_form_array[375]->setType("FORM_");
+    l_form_array[375]->setType("WFORM");
     l_form_array[375]->setType("NTNNS");
     l_form_array[375]->linkTo(l_lemma_array[208], "BLNGS");
 
@@ -15631,7 +15631,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "would");
-    l_form_array[376]->setType("FORM_");
+    l_form_array[376]->setType("WFORM");
     l_form_array[376]->setType("NTGMD");
     l_form_array[376]->linkTo(l_lemma_array[207], "BLNGS");
 
@@ -15642,7 +15642,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "yes");
-    l_form_array[377]->setType("FORM_");
+    l_form_array[377]->setType("WFORM");
     l_form_array[377]->setType("NTGUH");
     l_form_array[377]->linkTo(l_lemma_array[206], "BLNGS");
 
@@ -15653,7 +15653,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "yet");
-    l_form_array[378]->setType("FORM_");
+    l_form_array[378]->setType("WFORM");
     l_form_array[378]->setType("NTGRB");
     l_form_array[378]->linkTo(l_lemma_array[205], "BLNGS");
 
@@ -15664,7 +15664,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "your");
-    l_form_array[379]->setType("FORM_");
+    l_form_array[379]->setType("WFORM");
     l_form_array[379]->setType("NTPR$");
     l_form_array[379]->linkTo(l_lemma_array[204], "BLNGS");
 
@@ -15675,7 +15675,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "you");
-    l_form_array[380]->setType("FORM_");
+    l_form_array[380]->setType("WFORM");
     l_form_array[380]->setType("NTPRP");
     l_form_array[380]->linkTo(l_lemma_array[203], "BLNGS");
 
@@ -15686,7 +15686,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "αἷς");
-    l_form_array[381]->setType("FORM_");
+    l_form_array[381]->setType("WFORM");
     l_form_array[381]->setType("NPPRN");
     l_form_array[381]->linkTo(l_lemma_array[9], "BLNGS");
 
@@ -15697,7 +15697,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "αὐτήν");
-    l_form_array[382]->setType("FORM_");
+    l_form_array[382]->setType("WFORM");
     l_form_array[382]->setType("NPADJ");
     l_form_array[382]->linkTo(l_lemma_array[201], "BLNGS");
 
@@ -15708,7 +15708,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "αὐτοῦ");
-    l_form_array[383]->setType("FORM_");
+    l_form_array[383]->setType("WFORM");
     l_form_array[383]->setType("NPADV");
     l_form_array[383]->linkTo(l_lemma_array[202], "BLNGS");
 
@@ -15719,7 +15719,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "αὐτοῦ");
-    l_form_array[384]->setType("FORM_");
+    l_form_array[384]->setType("WFORM");
     l_form_array[384]->setType("NPPRN");
     l_form_array[384]->linkTo(l_lemma_array[200], "BLNGS");
 
@@ -15730,7 +15730,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "αὐτόν");
-    l_form_array[385]->setType("FORM_");
+    l_form_array[385]->setType("WFORM");
     l_form_array[385]->setType("NPADJ");
     l_form_array[385]->linkTo(l_lemma_array[201], "BLNGS");
 
@@ -15741,7 +15741,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "αὐτὴν");
-    l_form_array[386]->setType("FORM_");
+    l_form_array[386]->setType("WFORM");
     l_form_array[386]->setType("NPPRN");
     l_form_array[386]->linkTo(l_lemma_array[200], "BLNGS");
 
@@ -15752,7 +15752,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "αὐτὸν");
-    l_form_array[387]->setType("FORM_");
+    l_form_array[387]->setType("WFORM");
     l_form_array[387]->setType("NPADJ");
     l_form_array[387]->linkTo(l_lemma_array[201], "BLNGS");
 
@@ -15763,7 +15763,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "αὐτὸ");
-    l_form_array[388]->setType("FORM_");
+    l_form_array[388]->setType("WFORM");
     l_form_array[388]->setType("NPPRN");
     l_form_array[388]->linkTo(l_lemma_array[200], "BLNGS");
 
@@ -15774,7 +15774,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "αὐτῶν");
-    l_form_array[389]->setType("FORM_");
+    l_form_array[389]->setType("WFORM");
     l_form_array[389]->setType("NPPRN");
     l_form_array[389]->linkTo(l_lemma_array[200], "BLNGS");
 
@@ -15785,7 +15785,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "αὐτῷ");
-    l_form_array[390]->setType("FORM_");
+    l_form_array[390]->setType("WFORM");
     l_form_array[390]->setType("NPADJ");
     l_form_array[390]->linkTo(l_lemma_array[201], "BLNGS");
 
@@ -15796,7 +15796,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "αὐτῷ");
-    l_form_array[391]->setType("FORM_");
+    l_form_array[391]->setType("WFORM");
     l_form_array[391]->setType("NPPRN");
     l_form_array[391]->linkTo(l_lemma_array[200], "BLNGS");
 
@@ -15807,7 +15807,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "αὑτῆς");
-    l_form_array[392]->setType("FORM_");
+    l_form_array[392]->setType("WFORM");
     l_form_array[392]->setType("NPPRN");
     l_form_array[392]->linkTo(l_lemma_array[35], "BLNGS");
 
@@ -15818,7 +15818,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "αὖ");
-    l_form_array[393]->setType("FORM_");
+    l_form_array[393]->setType("WFORM");
     l_form_array[393]->setType("NPADV");
     l_form_array[393]->linkTo(l_lemma_array[199], "BLNGS");
 
@@ -15829,7 +15829,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "βλέπω");
-    l_form_array[394]->setType("FORM_");
+    l_form_array[394]->setType("WFORM");
     l_form_array[394]->setType("NPVRB");
     l_form_array[394]->linkTo(l_lemma_array[198], "BLNGS");
 
@@ -15840,7 +15840,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "βούλει");
-    l_form_array[395]->setType("FORM_");
+    l_form_array[395]->setType("WFORM");
     l_form_array[395]->setType("NPVRB");
     l_form_array[395]->linkTo(l_lemma_array[197], "BLNGS");
 
@@ -15851,7 +15851,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "βούλομαι");
-    l_form_array[396]->setType("FORM_");
+    l_form_array[396]->setType("WFORM");
     l_form_array[396]->setType("NPVRB");
     l_form_array[396]->linkTo(l_lemma_array[197], "BLNGS");
 
@@ -15862,7 +15862,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "γένος");
-    l_form_array[397]->setType("FORM_");
+    l_form_array[397]->setType("WFORM");
     l_form_array[397]->setType("NPNON");
     l_form_array[397]->linkTo(l_lemma_array[194], "BLNGS");
 
@@ -15873,7 +15873,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "γέ");
-    l_form_array[398]->setType("FORM_");
+    l_form_array[398]->setType("WFORM");
     l_form_array[398]->setType("NPADV");
     l_form_array[398]->linkTo(l_lemma_array[193], "BLNGS");
 
@@ -15884,7 +15884,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "γέ");
-    l_form_array[399]->setType("FORM_");
+    l_form_array[399]->setType("WFORM");
     l_form_array[399]->setType("NPPRT");
     l_form_array[399]->linkTo(l_lemma_array[192], "BLNGS");
 
@@ -15895,7 +15895,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "γε");
-    l_form_array[400]->setType("FORM_");
+    l_form_array[400]->setType("WFORM");
     l_form_array[400]->setType("NPADV");
     l_form_array[400]->linkTo(l_lemma_array[193], "BLNGS");
 
@@ -15906,7 +15906,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "γε");
-    l_form_array[401]->setType("FORM_");
+    l_form_array[401]->setType("WFORM");
     l_form_array[401]->setType("NPPRT");
     l_form_array[401]->linkTo(l_lemma_array[192], "BLNGS");
 
@@ -15917,7 +15917,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "γιγνώσκειν");
-    l_form_array[402]->setType("FORM_");
+    l_form_array[402]->setType("WFORM");
     l_form_array[402]->setType("NPVRB");
     l_form_array[402]->linkTo(l_lemma_array[191], "BLNGS");
 
@@ -15928,7 +15928,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "γιγνώσκει");
-    l_form_array[403]->setType("FORM_");
+    l_form_array[403]->setType("WFORM");
     l_form_array[403]->setType("NPVRB");
     l_form_array[403]->linkTo(l_lemma_array[191], "BLNGS");
 
@@ -15939,7 +15939,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "γιγνώσκοντος");
-    l_form_array[404]->setType("FORM_");
+    l_form_array[404]->setType("WFORM");
     l_form_array[404]->setType("NPVRB");
     l_form_array[404]->linkTo(l_lemma_array[191], "BLNGS");
 
@@ -15950,7 +15950,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "γιγνώσκων");
-    l_form_array[405]->setType("FORM_");
+    l_form_array[405]->setType("WFORM");
     l_form_array[405]->setType("NPVRB");
     l_form_array[405]->linkTo(l_lemma_array[191], "BLNGS");
 
@@ -15961,7 +15961,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "γνωσθείη");
-    l_form_array[406]->setType("FORM_");
+    l_form_array[406]->setType("WFORM");
     l_form_array[406]->setType("NPVRB");
     l_form_array[406]->linkTo(l_lemma_array[191], "BLNGS");
 
@@ -15972,7 +15972,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "γνωστόν");
-    l_form_array[407]->setType("FORM_");
+    l_form_array[407]->setType("WFORM");
     l_form_array[407]->setType("NPADJ");
     l_form_array[407]->linkTo(l_lemma_array[190], "BLNGS");
 
@@ -15983,7 +15983,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "γνώμην");
-    l_form_array[408]->setType("FORM_");
+    l_form_array[408]->setType("WFORM");
     l_form_array[408]->setType("NPNON");
     l_form_array[408]->linkTo(l_lemma_array[189], "BLNGS");
 
@@ -15994,7 +15994,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "γνῶναι");
-    l_form_array[409]->setType("FORM_");
+    l_form_array[409]->setType("WFORM");
     l_form_array[409]->setType("NPVRB");
     l_form_array[409]->linkTo(l_lemma_array[191], "BLNGS");
 
@@ -16005,7 +16005,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "γνῶσιν");
-    l_form_array[410]->setType("FORM_");
+    l_form_array[410]->setType("WFORM");
     l_form_array[410]->setType("NPNON");
     l_form_array[410]->linkTo(l_lemma_array[188], "BLNGS");
 
@@ -16016,7 +16016,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "γνῶσις");
-    l_form_array[411]->setType("FORM_");
+    l_form_array[411]->setType("WFORM");
     l_form_array[411]->setType("NPNON");
     l_form_array[411]->linkTo(l_lemma_array[188], "BLNGS");
 
@@ -16027,7 +16027,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "γοῦν");
-    l_form_array[412]->setType("FORM_");
+    l_form_array[412]->setType("WFORM");
     l_form_array[412]->setType("NPPRT");
     l_form_array[412]->linkTo(l_lemma_array[187], "BLNGS");
 
@@ -16038,7 +16038,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "γὰρ");
-    l_form_array[413]->setType("FORM_");
+    l_form_array[413]->setType("WFORM");
     l_form_array[413]->setType("NPADV");
     l_form_array[413]->linkTo(l_lemma_array[196], "BLNGS");
 
@@ -16049,7 +16049,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "γὰρ");
-    l_form_array[414]->setType("FORM_");
+    l_form_array[414]->setType("WFORM");
     l_form_array[414]->setType("NPPRT");
     l_form_array[414]->linkTo(l_lemma_array[195], "BLNGS");
 
@@ -16060,7 +16060,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δέ");
-    l_form_array[415]->setType("FORM_");
+    l_form_array[415]->setType("WFORM");
     l_form_array[415]->setType("NPPRT");
     l_form_array[415]->linkTo(l_lemma_array[184], "BLNGS");
 
@@ -16071,7 +16071,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δή");
-    l_form_array[416]->setType("FORM_");
+    l_form_array[416]->setType("WFORM");
     l_form_array[416]->setType("NPADV");
     l_form_array[416]->linkTo(l_lemma_array[183], "BLNGS");
 
@@ -16082,7 +16082,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δή");
-    l_form_array[417]->setType("FORM_");
+    l_form_array[417]->setType("WFORM");
     l_form_array[417]->setType("NPPRT");
     l_form_array[417]->linkTo(l_lemma_array[182], "BLNGS");
 
@@ -16093,7 +16093,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δεῖ");
-    l_form_array[418]->setType("FORM_");
+    l_form_array[418]->setType("WFORM");
     l_form_array[418]->setType("NPVRB");
     l_form_array[418]->linkTo(l_lemma_array[181], "BLNGS");
 
@@ -16104,7 +16104,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δεῦρο");
-    l_form_array[419]->setType("FORM_");
+    l_form_array[419]->setType("WFORM");
     l_form_array[419]->setType("NPADV");
     l_form_array[419]->linkTo(l_lemma_array[180], "BLNGS");
 
@@ -16115,7 +16115,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "διάνοιαν");
-    l_form_array[420]->setType("FORM_");
+    l_form_array[420]->setType("WFORM");
     l_form_array[420]->setType("NPNON");
     l_form_array[420]->linkTo(l_lemma_array[179], "BLNGS");
 
@@ -16126,7 +16126,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "διελέσθαι");
-    l_form_array[421]->setType("FORM_");
+    l_form_array[421]->setType("WFORM");
     l_form_array[421]->setType("NPVRB");
     l_form_array[421]->linkTo(l_lemma_array[178], "BLNGS");
 
@@ -16137,7 +16137,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "διορίζομαι");
-    l_form_array[422]->setType("FORM_");
+    l_form_array[422]->setType("WFORM");
     l_form_array[422]->setType("NPVRB");
     l_form_array[422]->linkTo(l_lemma_array[177], "BLNGS");
 
@@ -16148,7 +16148,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δοκεῖ");
-    l_form_array[423]->setType("FORM_");
+    l_form_array[423]->setType("WFORM");
     l_form_array[423]->setType("NPVRB");
     l_form_array[423]->linkTo(l_lemma_array[176], "BLNGS");
 
@@ -16159,7 +16159,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δοξάζειν");
-    l_form_array[424]->setType("FORM_");
+    l_form_array[424]->setType("WFORM");
     l_form_array[424]->setType("NPVRB");
     l_form_array[424]->linkTo(l_lemma_array[175], "BLNGS");
 
@@ -16170,7 +16170,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δοξάζοντος");
-    l_form_array[425]->setType("FORM_");
+    l_form_array[425]->setType("WFORM");
     l_form_array[425]->setType("NPVRB");
     l_form_array[425]->linkTo(l_lemma_array[175], "BLNGS");
 
@@ -16181,7 +16181,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δυνάμεθα");
-    l_form_array[426]->setType("FORM_");
+    l_form_array[426]->setType("WFORM");
     l_form_array[426]->setType("NPVRB");
     l_form_array[426]->linkTo(l_lemma_array[173], "BLNGS");
 
@@ -16192,7 +16192,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δυνάμεις");
-    l_form_array[427]->setType("FORM_");
+    l_form_array[427]->setType("WFORM");
     l_form_array[427]->setType("NPNON");
     l_form_array[427]->linkTo(l_lemma_array[172], "BLNGS");
 
@@ -16203,7 +16203,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δυνάμενος");
-    l_form_array[428]->setType("FORM_");
+    l_form_array[428]->setType("WFORM");
     l_form_array[428]->setType("NPVRB");
     l_form_array[428]->linkTo(l_lemma_array[173], "BLNGS");
 
@@ -16214,7 +16214,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δυνάμεων");
-    l_form_array[429]->setType("FORM_");
+    l_form_array[429]->setType("WFORM");
     l_form_array[429]->setType("NPNON");
     l_form_array[429]->linkTo(l_lemma_array[172], "BLNGS");
 
@@ -16225,7 +16225,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δυνάμεως");
-    l_form_array[430]->setType("FORM_");
+    l_form_array[430]->setType("WFORM");
     l_form_array[430]->setType("NPNON");
     l_form_array[430]->linkTo(l_lemma_array[172], "BLNGS");
 
@@ -16236,7 +16236,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δόξαν");
-    l_form_array[431]->setType("FORM_");
+    l_form_array[431]->setType("WFORM");
     l_form_array[431]->setType("NPNON");
     l_form_array[431]->linkTo(l_lemma_array[174], "BLNGS");
 
@@ -16247,7 +16247,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δόξα");
-    l_form_array[432]->setType("FORM_");
+    l_form_array[432]->setType("WFORM");
     l_form_array[432]->setType("NPNON");
     l_form_array[432]->linkTo(l_lemma_array[174], "BLNGS");
 
@@ -16258,7 +16258,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δύναμίν");
-    l_form_array[433]->setType("FORM_");
+    l_form_array[433]->setType("WFORM");
     l_form_array[433]->setType("NPNON");
     l_form_array[433]->linkTo(l_lemma_array[172], "BLNGS");
 
@@ -16269,7 +16269,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δύναμιν");
-    l_form_array[434]->setType("FORM_");
+    l_form_array[434]->setType("WFORM");
     l_form_array[434]->setType("NPNON");
     l_form_array[434]->linkTo(l_lemma_array[172], "BLNGS");
 
@@ -16280,7 +16280,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δύνηται");
-    l_form_array[435]->setType("FORM_");
+    l_form_array[435]->setType("WFORM");
     l_form_array[435]->setType("NPVRB");
     l_form_array[435]->linkTo(l_lemma_array[173], "BLNGS");
 
@@ -16291,7 +16291,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δὲ");
-    l_form_array[436]->setType("FORM_");
+    l_form_array[436]->setType("WFORM");
     l_form_array[436]->setType("NPADV");
     l_form_array[436]->linkTo(l_lemma_array[186], "BLNGS");
 
@@ -16302,7 +16302,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δὲ");
-    l_form_array[437]->setType("FORM_");
+    l_form_array[437]->setType("WFORM");
     l_form_array[437]->setType("NPCNJ");
     l_form_array[437]->linkTo(l_lemma_array[185], "BLNGS");
 
@@ -16313,7 +16313,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δὲ");
-    l_form_array[438]->setType("FORM_");
+    l_form_array[438]->setType("WFORM");
     l_form_array[438]->setType("NPPRT");
     l_form_array[438]->linkTo(l_lemma_array[184], "BLNGS");
 
@@ -16324,7 +16324,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δὴ");
-    l_form_array[439]->setType("FORM_");
+    l_form_array[439]->setType("WFORM");
     l_form_array[439]->setType("NPADV");
     l_form_array[439]->linkTo(l_lemma_array[183], "BLNGS");
 
@@ -16335,7 +16335,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δὴ");
-    l_form_array[440]->setType("FORM_");
+    l_form_array[440]->setType("WFORM");
     l_form_array[440]->setType("NPPRT");
     l_form_array[440]->linkTo(l_lemma_array[182], "BLNGS");
 
@@ -16346,7 +16346,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δ᾽");
-    l_form_array[441]->setType("FORM_");
+    l_form_array[441]->setType("WFORM");
     l_form_array[441]->setType("NPADV");
     l_form_array[441]->linkTo(l_lemma_array[186], "BLNGS");
 
@@ -16357,7 +16357,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δ᾽");
-    l_form_array[442]->setType("FORM_");
+    l_form_array[442]->setType("WFORM");
     l_form_array[442]->setType("NPCNJ");
     l_form_array[442]->linkTo(l_lemma_array[185], "BLNGS");
 
@@ -16368,7 +16368,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δ᾽");
-    l_form_array[443]->setType("FORM_");
+    l_form_array[443]->setType("WFORM");
     l_form_array[443]->setType("NPPRT");
     l_form_array[443]->linkTo(l_lemma_array[184], "BLNGS");
 
@@ -16379,7 +16379,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "δῆλον");
-    l_form_array[444]->setType("FORM_");
+    l_form_array[444]->setType("WFORM");
     l_form_array[444]->setType("NPNON");
     l_form_array[444]->linkTo(l_lemma_array[171], "BLNGS");
 
@@ -16390,7 +16390,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "εἰδότα");
-    l_form_array[445]->setType("FORM_");
+    l_form_array[445]->setType("WFORM");
     l_form_array[445]->setType("NPVRB");
     l_form_array[445]->linkTo(l_lemma_array[132], "BLNGS");
 
@@ -16401,7 +16401,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "εἰλικρινῶς");
-    l_form_array[446]->setType("FORM_");
+    l_form_array[446]->setType("WFORM");
     l_form_array[446]->setType("NPADV");
     l_form_array[446]->linkTo(l_lemma_array[170], "BLNGS");
 
@@ -16412,7 +16412,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "εἰπὲ");
-    l_form_array[447]->setType("FORM_");
+    l_form_array[447]->setType("WFORM");
     l_form_array[447]->setType("NPVRB");
     l_form_array[447]->linkTo(l_lemma_array[163], "BLNGS");
 
@@ -16423,7 +16423,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "εἰς");
-    l_form_array[448]->setType("FORM_");
+    l_form_array[448]->setType("WFORM");
     l_form_array[448]->setType("NPSCJ");
     l_form_array[448]->linkTo(l_lemma_array[168], "BLNGS");
 
@@ -16434,7 +16434,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "εἰ");
-    l_form_array[449]->setType("FORM_");
+    l_form_array[449]->setType("WFORM");
     l_form_array[449]->setType("NPSCJ");
     l_form_array[449]->linkTo(l_lemma_array[167], "BLNGS");
 
@@ -16445,7 +16445,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "εἴ");
-    l_form_array[450]->setType("FORM_");
+    l_form_array[450]->setType("WFORM");
     l_form_array[450]->setType("NPSCJ");
     l_form_array[450]->linkTo(l_lemma_array[167], "BLNGS");
 
@@ -16456,7 +16456,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "εἶδος");
-    l_form_array[451]->setType("FORM_");
+    l_form_array[451]->setType("WFORM");
     l_form_array[451]->setType("NPNON");
     l_form_array[451]->linkTo(l_lemma_array[165], "BLNGS");
 
@@ -16467,7 +16467,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "εἶεν");
-    l_form_array[452]->setType("FORM_");
+    l_form_array[452]->setType("WFORM");
     l_form_array[452]->setType("NPVRB");
     l_form_array[452]->linkTo(l_lemma_array[169], "BLNGS");
 
@@ -16478,7 +16478,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "εἶναί");
-    l_form_array[453]->setType("FORM_");
+    l_form_array[453]->setType("WFORM");
     l_form_array[453]->setType("NPVRB");
     l_form_array[453]->linkTo(l_lemma_array[169], "BLNGS");
 
@@ -16489,7 +16489,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "εἶναι");
-    l_form_array[454]->setType("FORM_");
+    l_form_array[454]->setType("WFORM");
     l_form_array[454]->setType("NPVRB");
     l_form_array[454]->linkTo(l_lemma_array[169], "BLNGS");
 
@@ -16500,7 +16500,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ζητητέον");
-    l_form_array[455]->setType("FORM_");
+    l_form_array[455]->setType("WFORM");
     l_form_array[455]->setType("NPADJ");
     l_form_array[455]->linkTo(l_lemma_array[161], "BLNGS");
 
@@ -16511,7 +16511,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ζῆν");
-    l_form_array[456]->setType("FORM_");
+    l_form_array[456]->setType("WFORM");
     l_form_array[456]->setType("NPVRB");
     l_form_array[456]->linkTo(l_lemma_array[162], "BLNGS");
 
@@ -16522,7 +16522,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "κάλλος");
-    l_form_array[457]->setType("FORM_");
+    l_form_array[457]->setType("WFORM");
     l_form_array[457]->setType("NPNON");
     l_form_array[457]->linkTo(l_lemma_array[160], "BLNGS");
 
@@ -16533,7 +16533,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "κέοιτο");
-    l_form_array[458]->setType("FORM_");
+    l_form_array[458]->setType("WFORM");
     l_form_array[458]->setType("NPVRB");
     l_form_array[458]->linkTo(l_lemma_array[152], "BLNGS");
 
@@ -16544,7 +16544,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "καθορᾶν");
-    l_form_array[459]->setType("FORM_");
+    l_form_array[459]->setType("WFORM");
     l_form_array[459]->setType("NPVRB");
     l_form_array[459]->linkTo(l_lemma_array[157], "BLNGS");
 
@@ -16555,7 +16555,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "καλὰ");
-    l_form_array[460]->setType("FORM_");
+    l_form_array[460]->setType("WFORM");
     l_form_array[460]->setType("NPADJ");
     l_form_array[460]->linkTo(l_lemma_array[155], "BLNGS");
 
@@ -16566,7 +16566,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "καλὸν");
-    l_form_array[461]->setType("FORM_");
+    l_form_array[461]->setType("WFORM");
     l_form_array[461]->setType("NPADJ");
     l_form_array[461]->linkTo(l_lemma_array[155], "BLNGS");
 
@@ -16577,7 +16577,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "καλῶς");
-    l_form_array[462]->setType("FORM_");
+    l_form_array[462]->setType("WFORM");
     l_form_array[462]->setType("NPADV");
     l_form_array[462]->linkTo(l_lemma_array[154], "BLNGS");
 
@@ -16588,7 +16588,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "καλῶ");
-    l_form_array[463]->setType("FORM_");
+    l_form_array[463]->setType("WFORM");
     l_form_array[463]->setType("NPVRB");
     l_form_array[463]->linkTo(l_lemma_array[156], "BLNGS");
 
@@ -16599,7 +16599,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "κατὰ");
-    l_form_array[464]->setType("FORM_");
+    l_form_array[464]->setType("WFORM");
     l_form_array[464]->setType("NPSCJ");
     l_form_array[464]->linkTo(l_lemma_array[153], "BLNGS");
 
@@ -16610,7 +16610,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "καὶ");
-    l_form_array[465]->setType("FORM_");
+    l_form_array[465]->setType("WFORM");
     l_form_array[465]->setType("NPADV");
     l_form_array[465]->linkTo(l_lemma_array[159], "BLNGS");
 
@@ -16621,7 +16621,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "καὶ");
-    l_form_array[466]->setType("FORM_");
+    l_form_array[466]->setType("WFORM");
     l_form_array[466]->setType("NPCNJ");
     l_form_array[466]->linkTo(l_lemma_array[158], "BLNGS");
 
@@ -16632,7 +16632,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "κἂν");
-    l_form_array[467]->setType("FORM_");
+    l_form_array[467]->setType("WFORM");
     l_form_array[467]->setType("NPCNJ");
     l_form_array[467]->linkTo(l_lemma_array[151], "BLNGS");
 
@@ -16643,7 +16643,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "λέγειν");
-    l_form_array[468]->setType("FORM_");
+    l_form_array[468]->setType("WFORM");
     l_form_array[468]->setType("NPVRB");
     l_form_array[468]->linkTo(l_lemma_array[150], "BLNGS");
 
@@ -16654,7 +16654,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "λέγομέν");
-    l_form_array[469]->setType("FORM_");
+    l_form_array[469]->setType("WFORM");
     l_form_array[469]->setType("NPVRB");
     l_form_array[469]->linkTo(l_lemma_array[150], "BLNGS");
 
@@ -16665,7 +16665,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "λέγομεν");
-    l_form_array[470]->setType("FORM_");
+    l_form_array[470]->setType("WFORM");
     l_form_array[470]->setType("NPVRB");
     l_form_array[470]->linkTo(l_lemma_array[150], "BLNGS");
 
@@ -16676,7 +16676,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "λέγοντες");
-    l_form_array[471]->setType("FORM_");
+    l_form_array[471]->setType("WFORM");
     l_form_array[471]->setType("NPVRB");
     l_form_array[471]->linkTo(l_lemma_array[150], "BLNGS");
 
@@ -16687,7 +16687,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "λέγω");
-    l_form_array[472]->setType("FORM_");
+    l_form_array[472]->setType("WFORM");
     l_form_array[472]->setType("NPVRB");
     l_form_array[472]->linkTo(l_lemma_array[150], "BLNGS");
 
@@ -16698,7 +16698,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "μάλα");
-    l_form_array[473]->setType("FORM_");
+    l_form_array[473]->setType("WFORM");
     l_form_array[473]->setType("NPADV");
     l_form_array[473]->linkTo(l_lemma_array[149], "BLNGS");
 
@@ -16709,7 +16709,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "μήτε");
-    l_form_array[474]->setType("FORM_");
+    l_form_array[474]->setType("WFORM");
     l_form_array[474]->setType("NPADV");
     l_form_array[474]->linkTo(l_lemma_array[146], "BLNGS");
 
@@ -16720,7 +16720,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "μανθάνεις");
-    l_form_array[475]->setType("FORM_");
+    l_form_array[475]->setType("WFORM");
     l_form_array[475]->setType("NPVRB");
     l_form_array[475]->linkTo(l_lemma_array[142], "BLNGS");
 
@@ -16731,7 +16731,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "μανθάνω");
-    l_form_array[476]->setType("FORM_");
+    l_form_array[476]->setType("WFORM");
     l_form_array[476]->setType("NPVRB");
     l_form_array[476]->linkTo(l_lemma_array[142], "BLNGS");
 
@@ -16742,7 +16742,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "μετέχοντα");
-    l_form_array[477]->setType("FORM_");
+    l_form_array[477]->setType("WFORM");
     l_form_array[477]->setType("NPVRB");
     l_form_array[477]->linkTo(l_lemma_array[141], "BLNGS");
 
@@ -16753,7 +16753,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "μεταξύ");
-    l_form_array[478]->setType("FORM_");
+    l_form_array[478]->setType("WFORM");
     l_form_array[478]->setType("NPNON");
     l_form_array[478]->linkTo(l_lemma_array[140], "BLNGS");
 
@@ -16764,7 +16764,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "μεταξὺ");
-    l_form_array[479]->setType("FORM_");
+    l_form_array[479]->setType("WFORM");
     l_form_array[479]->setType("NPSCJ");
     l_form_array[479]->linkTo(l_lemma_array[139], "BLNGS");
 
@@ -16775,7 +16775,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "μηδαμῇ");
-    l_form_array[480]->setType("FORM_");
+    l_form_array[480]->setType("WFORM");
     l_form_array[480]->setType("NPADJ");
     l_form_array[480]->linkTo(l_lemma_array[137], "BLNGS");
 
@@ -16786,7 +16786,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "μηδαμῇ");
-    l_form_array[481]->setType("FORM_");
+    l_form_array[481]->setType("WFORM");
     l_form_array[481]->setType("NPVRB");
     l_form_array[481]->linkTo(l_lemma_array[138], "BLNGS");
 
@@ -16797,7 +16797,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "μοι");
-    l_form_array[482]->setType("FORM_");
+    l_form_array[482]->setType("WFORM");
     l_form_array[482]->setType("NPPRN");
     l_form_array[482]->linkTo(l_lemma_array[50], "BLNGS");
 
@@ -16808,7 +16808,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "μόνον");
-    l_form_array[483]->setType("FORM_");
+    l_form_array[483]->setType("WFORM");
     l_form_array[483]->setType("NPADJ");
     l_form_array[483]->linkTo(l_lemma_array[136], "BLNGS");
 
@@ -16819,7 +16819,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "μὲν");
-    l_form_array[484]->setType("FORM_");
+    l_form_array[484]->setType("WFORM");
     l_form_array[484]->setType("NPADV");
     l_form_array[484]->linkTo(l_lemma_array[148], "BLNGS");
 
@@ -16830,7 +16830,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "μὲν");
-    l_form_array[485]->setType("FORM_");
+    l_form_array[485]->setType("WFORM");
     l_form_array[485]->setType("NPPRT");
     l_form_array[485]->linkTo(l_lemma_array[147], "BLNGS");
 
@@ -16841,7 +16841,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "μὴ");
-    l_form_array[486]->setType("FORM_");
+    l_form_array[486]->setType("WFORM");
     l_form_array[486]->setType("NPADV");
     l_form_array[486]->linkTo(l_lemma_array[145], "BLNGS");
 
@@ -16852,7 +16852,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "μὴ");
-    l_form_array[487]->setType("FORM_");
+    l_form_array[487]->setType("WFORM");
     l_form_array[487]->setType("NPCNJ");
     l_form_array[487]->linkTo(l_lemma_array[144], "BLNGS");
 
@@ -16863,7 +16863,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "μὴ");
-    l_form_array[488]->setType("FORM_");
+    l_form_array[488]->setType("WFORM");
     l_form_array[488]->setType("NPPRT");
     l_form_array[488]->linkTo(l_lemma_array[143], "BLNGS");
 
@@ -16874,7 +16874,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "μᾶλλον");
-    l_form_array[489]->setType("FORM_");
+    l_form_array[489]->setType("WFORM");
     l_form_array[489]->setType("NPADV");
     l_form_array[489]->linkTo(l_lemma_array[135], "BLNGS");
 
@@ -16885,7 +16885,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "νομίζων");
-    l_form_array[490]->setType("FORM_");
+    l_form_array[490]->setType("WFORM");
     l_form_array[490]->setType("NPVRB");
     l_form_array[490]->linkTo(l_lemma_array[134], "BLNGS");
 
@@ -16896,7 +16896,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "νοῦν");
-    l_form_array[491]->setType("FORM_");
+    l_form_array[491]->setType("WFORM");
     l_form_array[491]->setType("NPNON");
     l_form_array[491]->linkTo(l_lemma_array[133], "BLNGS");
 
@@ -16907,7 +16907,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "οἴσομεν");
-    l_form_array[492]->setType("FORM_");
+    l_form_array[492]->setType("WFORM");
     l_form_array[492]->setType("NPVRB");
     l_form_array[492]->linkTo(l_lemma_array[87], "BLNGS");
 
@@ -16918,7 +16918,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "οἶδεν");
-    l_form_array[493]->setType("FORM_");
+    l_form_array[493]->setType("WFORM");
     l_form_array[493]->setType("NPVRB");
     l_form_array[493]->linkTo(l_lemma_array[132], "BLNGS");
 
@@ -16929,7 +16929,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "οἷον");
-    l_form_array[494]->setType("FORM_");
+    l_form_array[494]->setType("WFORM");
     l_form_array[494]->setType("NPADJ");
     l_form_array[494]->linkTo(l_lemma_array[131], "BLNGS");
 
@@ -16940,7 +16940,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "οὐδέν");
-    l_form_array[495]->setType("FORM_");
+    l_form_array[495]->setType("WFORM");
     l_form_array[495]->setType("NPADJ");
     l_form_array[495]->linkTo(l_lemma_array[129], "BLNGS");
 
@@ -16951,7 +16951,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "οὐδαμῶς");
-    l_form_array[496]->setType("FORM_");
+    l_form_array[496]->setType("WFORM");
     l_form_array[496]->setType("NPADV");
     l_form_array[496]->linkTo(l_lemma_array[130], "BLNGS");
 
@@ -16962,7 +16962,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "οὐδεὶς");
-    l_form_array[497]->setType("FORM_");
+    l_form_array[497]->setType("WFORM");
     l_form_array[497]->setType("NPADJ");
     l_form_array[497]->linkTo(l_lemma_array[129], "BLNGS");
 
@@ -16973,7 +16973,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "οὐκοῦν");
-    l_form_array[498]->setType("FORM_");
+    l_form_array[498]->setType("WFORM");
     l_form_array[498]->setType("NPADV");
     l_form_array[498]->linkTo(l_lemma_array[128], "BLNGS");
 
@@ -16984,7 +16984,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "οὐκ");
-    l_form_array[499]->setType("FORM_");
+    l_form_array[499]->setType("WFORM");
     l_form_array[499]->setType("NPADV");
     l_form_array[499]->linkTo(l_lemma_array[126], "BLNGS");
 
@@ -16995,7 +16995,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "οὐχ");
-    l_form_array[500]->setType("FORM_");
+    l_form_array[500]->setType("WFORM");
     l_form_array[500]->setType("NPADV");
     l_form_array[500]->linkTo(l_lemma_array[126], "BLNGS");
 
@@ -17006,7 +17006,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "οὐ");
-    l_form_array[501]->setType("FORM_");
+    l_form_array[501]->setType("WFORM");
     l_form_array[501]->setType("NPADV");
     l_form_array[501]->linkTo(l_lemma_array[126], "BLNGS");
 
@@ -17017,7 +17017,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "οὔτε");
-    l_form_array[502]->setType("FORM_");
+    l_form_array[502]->setType("WFORM");
     l_form_array[502]->setType("NPADV");
     l_form_array[502]->linkTo(l_lemma_array[125], "BLNGS");
 
@@ -17028,7 +17028,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "οὔτε");
-    l_form_array[503]->setType("FORM_");
+    l_form_array[503]->setType("WFORM");
     l_form_array[503]->setType("NPCNJ");
     l_form_array[503]->linkTo(l_lemma_array[124], "BLNGS");
 
@@ -17039,7 +17039,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "οὔ");
-    l_form_array[504]->setType("FORM_");
+    l_form_array[504]->setType("WFORM");
     l_form_array[504]->setType("NPADV");
     l_form_array[504]->linkTo(l_lemma_array[126], "BLNGS");
 
@@ -17050,7 +17050,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "οὕτως");
-    l_form_array[505]->setType("FORM_");
+    l_form_array[505]->setType("WFORM");
     l_form_array[505]->setType("NPADV");
     l_form_array[505]->linkTo(l_lemma_array[123], "BLNGS");
 
@@ -17061,7 +17061,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "οὕτω");
-    l_form_array[506]->setType("FORM_");
+    l_form_array[506]->setType("WFORM");
     l_form_array[506]->setType("NPADV");
     l_form_array[506]->linkTo(l_lemma_array[123], "BLNGS");
 
@@ -17072,7 +17072,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "οὖν");
-    l_form_array[507]->setType("FORM_");
+    l_form_array[507]->setType("WFORM");
     l_form_array[507]->setType("NPADV");
     l_form_array[507]->linkTo(l_lemma_array[122], "BLNGS");
 
@@ -17083,7 +17083,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "οὖν");
-    l_form_array[508]->setType("FORM_");
+    l_form_array[508]->setType("WFORM");
     l_form_array[508]->setType("NPPRT");
     l_form_array[508]->linkTo(l_lemma_array[121], "BLNGS");
 
@@ -17094,7 +17094,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "οὗτος");
-    l_form_array[509]->setType("FORM_");
+    l_form_array[509]->setType("WFORM");
     l_form_array[509]->setType("NPADJ");
     l_form_array[509]->linkTo(l_lemma_array[120], "BLNGS");
 
@@ -17105,7 +17105,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "πάλιν");
-    l_form_array[510]->setType("FORM_");
+    l_form_array[510]->setType("WFORM");
     l_form_array[510]->setType("NPADV");
     l_form_array[510]->linkTo(l_lemma_array[118], "BLNGS");
 
@@ -17116,7 +17116,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "πάντῃ");
-    l_form_array[511]->setType("FORM_");
+    l_form_array[511]->setType("WFORM");
     l_form_array[511]->setType("NPADV");
     l_form_array[511]->linkTo(l_lemma_array[117], "BLNGS");
 
@@ -17127,7 +17127,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "πάνυ");
-    l_form_array[512]->setType("FORM_");
+    l_form_array[512]->setType("WFORM");
     l_form_array[512]->setType("NPADV");
     l_form_array[512]->linkTo(l_lemma_array[116], "BLNGS");
 
@@ -17138,7 +17138,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "πέφυκε");
-    l_form_array[513]->setType("FORM_");
+    l_form_array[513]->setType("WFORM");
     l_form_array[513]->setType("NPVRB");
     l_form_array[513]->linkTo(l_lemma_array[83], "BLNGS");
 
@@ -17149,7 +17149,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "παντελῶς");
-    l_form_array[514]->setType("FORM_");
+    l_form_array[514]->setType("WFORM");
     l_form_array[514]->setType("NPADV");
     l_form_array[514]->linkTo(l_lemma_array[114], "BLNGS");
 
@@ -17160,7 +17160,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "παραμυθεῖσθαι");
-    l_form_array[515]->setType("FORM_");
+    l_form_array[515]->setType("WFORM");
     l_form_array[515]->setType("NPVRB");
     l_form_array[515]->linkTo(l_lemma_array[112], "BLNGS");
 
@@ -17171,7 +17171,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "παρ᾽");
-    l_form_array[516]->setType("FORM_");
+    l_form_array[516]->setType("WFORM");
     l_form_array[516]->setType("NPSCJ");
     l_form_array[516]->linkTo(l_lemma_array[113], "BLNGS");
 
@@ -17182,7 +17182,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "πασῶν");
-    l_form_array[517]->setType("FORM_");
+    l_form_array[517]->setType("WFORM");
     l_form_array[517]->setType("NPADJ");
     l_form_array[517]->linkTo(l_lemma_array[101], "BLNGS");
 
@@ -17193,7 +17193,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "πείθειν");
-    l_form_array[518]->setType("FORM_");
+    l_form_array[518]->setType("WFORM");
     l_form_array[518]->setType("NPVRB");
     l_form_array[518]->linkTo(l_lemma_array[111], "BLNGS");
 
@@ -17204,7 +17204,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "περὶ");
-    l_form_array[519]->setType("FORM_");
+    l_form_array[519]->setType("WFORM");
     l_form_array[519]->setType("NPSCJ");
     l_form_array[519]->linkTo(l_lemma_array[110], "BLNGS");
 
@@ -17215,7 +17215,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "περ");
-    l_form_array[520]->setType("FORM_");
+    l_form_array[520]->setType("WFORM");
     l_form_array[520]->setType("NPADV");
     l_form_array[520]->linkTo(l_lemma_array[115], "BLNGS");
 
@@ -17226,7 +17226,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "πλεοναχῇ");
-    l_form_array[521]->setType("FORM_");
+    l_form_array[521]->setType("WFORM");
     l_form_array[521]->setType("NPADJ");
     l_form_array[521]->linkTo(l_lemma_array[109], "BLNGS");
 
@@ -17237,7 +17237,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ποιεῖς");
-    l_form_array[522]->setType("FORM_");
+    l_form_array[522]->setType("WFORM");
     l_form_array[522]->setType("NPVRB");
     l_form_array[522]->linkTo(l_lemma_array[108], "BLNGS");
 
@@ -17248,7 +17248,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "πολλῶν");
-    l_form_array[523]->setType("FORM_");
+    l_form_array[523]->setType("WFORM");
     l_form_array[523]->setType("NPADJ");
     l_form_array[523]->linkTo(l_lemma_array[107], "BLNGS");
 
@@ -17259,7 +17259,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "πράγματα");
-    l_form_array[524]->setType("FORM_");
+    l_form_array[524]->setType("WFORM");
     l_form_array[524]->setType("NPNON");
     l_form_array[524]->linkTo(l_lemma_array[104], "BLNGS");
 
@@ -17270,7 +17270,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "πρότερον");
-    l_form_array[525]->setType("FORM_");
+    l_form_array[525]->setType("WFORM");
     l_form_array[525]->setType("NPADJ");
     l_form_array[525]->linkTo(l_lemma_array[105], "BLNGS");
 
@@ -17281,7 +17281,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "πρὸς");
-    l_form_array[526]->setType("FORM_");
+    l_form_array[526]->setType("WFORM");
     l_form_array[526]->setType("NPSCJ");
     l_form_array[526]->linkTo(l_lemma_array[106], "BLNGS");
 
@@ -17292,7 +17292,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "πυνθανώμεθα");
-    l_form_array[527]->setType("FORM_");
+    l_form_array[527]->setType("WFORM");
     l_form_array[527]->setType("NPVRB");
     l_form_array[527]->linkTo(l_lemma_array[103], "BLNGS");
 
@@ -17303,7 +17303,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "πότερον");
-    l_form_array[528]->setType("FORM_");
+    l_form_array[528]->setType("WFORM");
     l_form_array[528]->setType("NPADJ");
     l_form_array[528]->linkTo(l_lemma_array[102], "BLNGS");
 
@@ -17314,7 +17314,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "πᾶν");
-    l_form_array[529]->setType("FORM_");
+    l_form_array[529]->setType("WFORM");
     l_form_array[529]->setType("NPADJ");
     l_form_array[529]->linkTo(l_lemma_array[101], "BLNGS");
 
@@ -17325,7 +17325,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "πῶς");
-    l_form_array[530]->setType("FORM_");
+    l_form_array[530]->setType("WFORM");
     l_form_array[530]->setType("NPADV");
     l_form_array[530]->linkTo(l_lemma_array[100], "BLNGS");
 
@@ -17336,7 +17336,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "σκοποῖμεν");
-    l_form_array[531]->setType("FORM_");
+    l_form_array[531]->setType("WFORM");
     l_form_array[531]->setType("NPVRB");
     l_form_array[531]->linkTo(l_lemma_array[99], "BLNGS");
 
@@ -17347,7 +17347,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "σκόπει");
-    l_form_array[532]->setType("FORM_");
+    l_form_array[532]->setType("WFORM");
     l_form_array[532]->setType("NPVRB");
     l_form_array[532]->linkTo(l_lemma_array[99], "BLNGS");
 
@@ -17358,7 +17358,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "σοι");
-    l_form_array[533]->setType("FORM_");
+    l_form_array[533]->setType("WFORM");
     l_form_array[533]->setType("NPPRN");
     l_form_array[533]->linkTo(l_lemma_array[97], "BLNGS");
 
@@ -17369,7 +17369,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "σχῆμα");
-    l_form_array[534]->setType("FORM_");
+    l_form_array[534]->setType("WFORM");
     l_form_array[534]->setType("NPNON");
     l_form_array[534]->linkTo(l_lemma_array[98], "BLNGS");
 
@@ -17380,7 +17380,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "σύ");
-    l_form_array[535]->setType("FORM_");
+    l_form_array[535]->setType("WFORM");
     l_form_array[535]->setType("NPPRN");
     l_form_array[535]->linkTo(l_lemma_array[97], "BLNGS");
 
@@ -17391,7 +17391,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "σὺ");
-    l_form_array[536]->setType("FORM_");
+    l_form_array[536]->setType("WFORM");
     l_form_array[536]->setType("NPPRN");
     l_form_array[536]->linkTo(l_lemma_array[97], "BLNGS");
 
@@ -17402,7 +17402,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τέτακται");
-    l_form_array[537]->setType("FORM_");
+    l_form_array[537]->setType("WFORM");
     l_form_array[537]->setType("NPVRB");
     l_form_array[537]->linkTo(l_lemma_array[96], "BLNGS");
 
@@ -17413,7 +17413,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τέ");
-    l_form_array[538]->setType("FORM_");
+    l_form_array[538]->setType("WFORM");
     l_form_array[538]->setType("NPADV");
     l_form_array[538]->linkTo(l_lemma_array[92], "BLNGS");
 
@@ -17424,7 +17424,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τί");
-    l_form_array[539]->setType("FORM_");
+    l_form_array[539]->setType("WFORM");
     l_form_array[539]->setType("NPPRN");
     l_form_array[539]->linkTo(l_lemma_array[93], "BLNGS");
 
@@ -17435,7 +17435,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ταύτῃ");
-    l_form_array[540]->setType("FORM_");
+    l_form_array[540]->setType("WFORM");
     l_form_array[540]->setType("NPPRN");
     l_form_array[540]->linkTo(l_lemma_array[119], "BLNGS");
 
@@ -17446,7 +17446,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ταὐτόν");
-    l_form_array[541]->setType("FORM_");
+    l_form_array[541]->setType("WFORM");
     l_form_array[541]->setType("NPADJ");
     l_form_array[541]->linkTo(l_lemma_array[127], "BLNGS");
 
@@ -17457,7 +17457,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τεταγμένην");
-    l_form_array[542]->setType("FORM_");
+    l_form_array[542]->setType("WFORM");
     l_form_array[542]->setType("NPVRB");
     l_form_array[542]->linkTo(l_lemma_array[96], "BLNGS");
 
@@ -17468,7 +17468,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τε");
-    l_form_array[543]->setType("FORM_");
+    l_form_array[543]->setType("WFORM");
     l_form_array[543]->setType("NPADV");
     l_form_array[543]->linkTo(l_lemma_array[92], "BLNGS");
 
@@ -17479,7 +17479,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τιθείη");
-    l_form_array[544]->setType("FORM_");
+    l_form_array[544]->setType("WFORM");
     l_form_array[544]->setType("NPVRB");
     l_form_array[544]->linkTo(l_lemma_array[95], "BLNGS");
 
@@ -17490,7 +17490,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τιθεῖς");
-    l_form_array[545]->setType("FORM_");
+    l_form_array[545]->setType("WFORM");
     l_form_array[545]->setType("NPVRB");
     l_form_array[545]->linkTo(l_lemma_array[95], "BLNGS");
 
@@ -17501,7 +17501,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τινα");
-    l_form_array[546]->setType("FORM_");
+    l_form_array[546]->setType("WFORM");
     l_form_array[546]->setType("NPPRN");
     l_form_array[546]->linkTo(l_lemma_array[90], "BLNGS");
 
@@ -17512,7 +17512,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τινὰ");
-    l_form_array[547]->setType("FORM_");
+    l_form_array[547]->setType("WFORM");
     l_form_array[547]->setType("NPADJ");
     l_form_array[547]->linkTo(l_lemma_array[91], "BLNGS");
 
@@ -17523,7 +17523,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τις");
-    l_form_array[548]->setType("FORM_");
+    l_form_array[548]->setType("WFORM");
     l_form_array[548]->setType("NPPRN");
     l_form_array[548]->linkTo(l_lemma_array[90], "BLNGS");
 
@@ -17534,7 +17534,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τι");
-    l_form_array[549]->setType("FORM_");
+    l_form_array[549]->setType("WFORM");
     l_form_array[549]->setType("NPADJ");
     l_form_array[549]->linkTo(l_lemma_array[91], "BLNGS");
 
@@ -17545,7 +17545,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τι");
-    l_form_array[550]->setType("FORM_");
+    l_form_array[550]->setType("WFORM");
     l_form_array[550]->setType("NPPRN");
     l_form_array[550]->linkTo(l_lemma_array[90], "BLNGS");
 
@@ -17556,7 +17556,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τοιούτων");
-    l_form_array[551]->setType("FORM_");
+    l_form_array[551]->setType("WFORM");
     l_form_array[551]->setType("NPADJ");
     l_form_array[551]->linkTo(l_lemma_array[89], "BLNGS");
 
@@ -17567,7 +17567,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τοιοῦτον");
-    l_form_array[552]->setType("FORM_");
+    l_form_array[552]->setType("WFORM");
     l_form_array[552]->setType("NPADJ");
     l_form_array[552]->linkTo(l_lemma_array[89], "BLNGS");
 
@@ -17578,7 +17578,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τοι");
-    l_form_array[553]->setType("FORM_");
+    l_form_array[553]->setType("WFORM");
     l_form_array[553]->setType("NPPRN");
     l_form_array[553]->linkTo(l_lemma_array[97], "BLNGS");
 
@@ -17589,7 +17589,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τούτου");
-    l_form_array[554]->setType("FORM_");
+    l_form_array[554]->setType("WFORM");
     l_form_array[554]->setType("NPPRN");
     l_form_array[554]->linkTo(l_lemma_array[119], "BLNGS");
 
@@ -17600,7 +17600,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τούτων");
-    l_form_array[555]->setType("FORM_");
+    l_form_array[555]->setType("WFORM");
     l_form_array[555]->setType("NPPRN");
     l_form_array[555]->linkTo(l_lemma_array[119], "BLNGS");
 
@@ -17611,7 +17611,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τούτῳ");
-    l_form_array[556]->setType("FORM_");
+    l_form_array[556]->setType("WFORM");
     l_form_array[556]->setType("NPADJ");
     l_form_array[556]->linkTo(l_lemma_array[120], "BLNGS");
 
@@ -17622,7 +17622,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τοῦτο");
-    l_form_array[557]->setType("FORM_");
+    l_form_array[557]->setType("WFORM");
     l_form_array[557]->setType("NPADJ");
     l_form_array[557]->linkTo(l_lemma_array[120], "BLNGS");
 
@@ -17633,7 +17633,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τοῦτο");
-    l_form_array[558]->setType("FORM_");
+    l_form_array[558]->setType("WFORM");
     l_form_array[558]->setType("NPPRN");
     l_form_array[558]->linkTo(l_lemma_array[119], "BLNGS");
 
@@ -17644,7 +17644,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τοῦ");
-    l_form_array[559]->setType("FORM_");
+    l_form_array[559]->setType("WFORM");
     l_form_array[559]->setType("NPPRN");
     l_form_array[559]->linkTo(l_lemma_array[14], "BLNGS");
 
@@ -17655,7 +17655,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τυγχάνει");
-    l_form_array[560]->setType("FORM_");
+    l_form_array[560]->setType("WFORM");
     l_form_array[560]->setType("NPVRB");
     l_form_array[560]->linkTo(l_lemma_array[88], "BLNGS");
 
@@ -17666,7 +17666,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τόδε");
-    l_form_array[561]->setType("FORM_");
+    l_form_array[561]->setType("WFORM");
     l_form_array[561]->setType("NPPRN");
     l_form_array[561]->linkTo(l_lemma_array[11], "BLNGS");
 
@@ -17677,7 +17677,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τό");
-    l_form_array[562]->setType("FORM_");
+    l_form_array[562]->setType("WFORM");
     l_form_array[562]->setType("NPPRN");
     l_form_array[562]->linkTo(l_lemma_array[14], "BLNGS");
 
@@ -17688,7 +17688,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τἀναντία");
-    l_form_array[563]->setType("FORM_");
+    l_form_array[563]->setType("WFORM");
     l_form_array[563]->setType("NPADJ");
     l_form_array[563]->linkTo(l_lemma_array[45], "BLNGS");
 
@@ -17699,7 +17699,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τὰ");
-    l_form_array[564]->setType("FORM_");
+    l_form_array[564]->setType("WFORM");
     l_form_array[564]->setType("NPPRN");
     l_form_array[564]->linkTo(l_lemma_array[14], "BLNGS");
 
@@ -17710,7 +17710,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τὴν");
-    l_form_array[565]->setType("FORM_");
+    l_form_array[565]->setType("WFORM");
     l_form_array[565]->setType("NPPRN");
     l_form_array[565]->linkTo(l_lemma_array[14], "BLNGS");
 
@@ -17721,7 +17721,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τὶ");
-    l_form_array[566]->setType("FORM_");
+    l_form_array[566]->setType("WFORM");
     l_form_array[566]->setType("NPADJ");
     l_form_array[566]->linkTo(l_lemma_array[94], "BLNGS");
 
@@ -17732,7 +17732,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τὸν");
-    l_form_array[567]->setType("FORM_");
+    l_form_array[567]->setType("WFORM");
     l_form_array[567]->setType("NPPRN");
     l_form_array[567]->linkTo(l_lemma_array[14], "BLNGS");
 
@@ -17743,7 +17743,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τὸ");
-    l_form_array[568]->setType("FORM_");
+    l_form_array[568]->setType("WFORM");
     l_form_array[568]->setType("NPPRN");
     l_form_array[568]->linkTo(l_lemma_array[14], "BLNGS");
 
@@ -17754,7 +17754,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τῳ");
-    l_form_array[569]->setType("FORM_");
+    l_form_array[569]->setType("WFORM");
     l_form_array[569]->setType("NPPRN");
     l_form_array[569]->linkTo(l_lemma_array[90], "BLNGS");
 
@@ -17765,7 +17765,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τῶν");
-    l_form_array[570]->setType("FORM_");
+    l_form_array[570]->setType("WFORM");
     l_form_array[570]->setType("NPPRN");
     l_form_array[570]->linkTo(l_lemma_array[14], "BLNGS");
 
@@ -17776,7 +17776,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "τῷ");
-    l_form_array[571]->setType("FORM_");
+    l_form_array[571]->setType("WFORM");
     l_form_array[571]->setType("NPPRN");
     l_form_array[571]->linkTo(l_lemma_array[14], "BLNGS");
 
@@ -17787,7 +17787,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "φήσομεν");
-    l_form_array[572]->setType("FORM_");
+    l_form_array[572]->setType("WFORM");
     l_form_array[572]->setType("NPVRB");
     l_form_array[572]->linkTo(l_lemma_array[85], "BLNGS");
 
@@ -17798,7 +17798,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "φαίην");
-    l_form_array[573]->setType("FORM_");
+    l_form_array[573]->setType("WFORM");
     l_form_array[573]->setType("NPVRB");
     l_form_array[573]->linkTo(l_lemma_array[85], "BLNGS");
 
@@ -17809,7 +17809,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "φαίνεται");
-    l_form_array[574]->setType("FORM_");
+    l_form_array[574]->setType("WFORM");
     l_form_array[574]->setType("NPVRB");
     l_form_array[574]->linkTo(l_lemma_array[86], "BLNGS");
 
@@ -17820,7 +17820,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "φαμεν");
-    l_form_array[575]->setType("FORM_");
+    l_form_array[575]->setType("WFORM");
     l_form_array[575]->setType("NPVRB");
     l_form_array[575]->linkTo(l_lemma_array[85], "BLNGS");
 
@@ -17831,7 +17831,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "φαῖμεν");
-    l_form_array[576]->setType("FORM_");
+    l_form_array[576]->setType("WFORM");
     l_form_array[576]->setType("NPVRB");
     l_form_array[576]->linkTo(l_lemma_array[86], "BLNGS");
 
@@ -17842,7 +17842,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "φθόνος");
-    l_form_array[577]->setType("FORM_");
+    l_form_array[577]->setType("WFORM");
     l_form_array[577]->setType("NPNON");
     l_form_array[577]->linkTo(l_lemma_array[84], "BLNGS");
 
@@ -17853,7 +17853,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "φῂς");
-    l_form_array[578]->setType("FORM_");
+    l_form_array[578]->setType("WFORM");
     l_form_array[578]->setType("NPVRB");
     l_form_array[578]->linkTo(l_lemma_array[85], "BLNGS");
 
@@ -17864,7 +17864,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "χαλεπαίνῃ");
-    l_form_array[579]->setType("FORM_");
+    l_form_array[579]->setType("WFORM");
     l_form_array[579]->setType("NPVRB");
     l_form_array[579]->linkTo(l_lemma_array[82], "BLNGS");
 
@@ -17875,7 +17875,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "χρόαν");
-    l_form_array[580]->setType("FORM_");
+    l_form_array[580]->setType("WFORM");
     l_form_array[580]->setType("NPNON");
     l_form_array[580]->linkTo(l_lemma_array[81], "BLNGS");
 
@@ -17886,7 +17886,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἀγνοίας");
-    l_form_array[581]->setType("FORM_");
+    l_form_array[581]->setType("WFORM");
     l_form_array[581]->setType("NPNON");
     l_form_array[581]->linkTo(l_lemma_array[65], "BLNGS");
 
@@ -17897,7 +17897,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἀγνωσία");
-    l_form_array[582]->setType("FORM_");
+    l_form_array[582]->setType("WFORM");
     l_form_array[582]->setType("NPNON");
     l_form_array[582]->linkTo(l_lemma_array[80], "BLNGS");
 
@@ -17908,7 +17908,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἀκοὴν");
-    l_form_array[583]->setType("FORM_");
+    l_form_array[583]->setType("WFORM");
     l_form_array[583]->setType("NPNON");
     l_form_array[583]->linkTo(l_lemma_array[79], "BLNGS");
 
@@ -17919,7 +17919,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἀληθῆ");
-    l_form_array[584]->setType("FORM_");
+    l_form_array[584]->setType("WFORM");
     l_form_array[584]->setType("NPADJ");
     l_form_array[584]->linkTo(l_lemma_array[77], "BLNGS");
 
@@ -17930,7 +17930,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἀλλὰ");
-    l_form_array[585]->setType("FORM_");
+    l_form_array[585]->setType("WFORM");
     l_form_array[585]->setType("NPADV");
     l_form_array[585]->linkTo(l_lemma_array[76], "BLNGS");
 
@@ -17941,7 +17941,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἀλλὰ");
-    l_form_array[586]->setType("FORM_");
+    l_form_array[586]->setType("WFORM");
     l_form_array[586]->setType("NPCNJ");
     l_form_array[586]->linkTo(l_lemma_array[75], "BLNGS");
 
@@ -17952,7 +17952,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἀλλ᾽");
-    l_form_array[587]->setType("FORM_");
+    l_form_array[587]->setType("WFORM");
     l_form_array[587]->setType("NPPRT");
     l_form_array[587]->linkTo(l_lemma_array[74], "BLNGS");
 
@@ -17963,7 +17963,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἀμφισβητῇ");
-    l_form_array[588]->setType("FORM_");
+    l_form_array[588]->setType("WFORM");
     l_form_array[588]->setType("NPNON");
     l_form_array[588]->linkTo(l_lemma_array[73], "BLNGS");
 
@@ -17974,7 +17974,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἀνάγκης");
-    l_form_array[589]->setType("FORM_");
+    l_form_array[589]->setType("WFORM");
     l_form_array[589]->setType("NPNON");
     l_form_array[589]->linkTo(l_lemma_array[72], "BLNGS");
 
@@ -17985,7 +17985,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἀναγκαῖον");
-    l_form_array[590]->setType("FORM_");
+    l_form_array[590]->setType("WFORM");
     l_form_array[590]->setType("NPADJ");
     l_form_array[590]->linkTo(l_lemma_array[70], "BLNGS");
 
@@ -17996,7 +17996,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἀναμάρτητον");
-    l_form_array[591]->setType("FORM_");
+    l_form_array[591]->setType("WFORM");
     l_form_array[591]->setType("NPADJ");
     l_form_array[591]->linkTo(l_lemma_array[71], "BLNGS");
 
@@ -18007,7 +18007,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἀναμαρτήτῳ");
-    l_form_array[592]->setType("FORM_");
+    l_form_array[592]->setType("WFORM");
     l_form_array[592]->setType("NPADJ");
     l_form_array[592]->linkTo(l_lemma_array[69], "BLNGS");
 
@@ -18018,7 +18018,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἀπεργάζεται");
-    l_form_array[593]->setType("FORM_");
+    l_form_array[593]->setType("WFORM");
     l_form_array[593]->setType("NPVRB");
     l_form_array[593]->linkTo(l_lemma_array[66], "BLNGS");
 
@@ -18029,7 +18029,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἀπεργαζομένην");
-    l_form_array[594]->setType("FORM_");
+    l_form_array[594]->setType("WFORM");
     l_form_array[594]->setType("NPVRB");
     l_form_array[594]->linkTo(l_lemma_array[66], "BLNGS");
 
@@ -18040,7 +18040,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἀποβλέπων");
-    l_form_array[595]->setType("FORM_");
+    l_form_array[595]->setType("WFORM");
     l_form_array[595]->setType("NPVRB");
     l_form_array[595]->linkTo(l_lemma_array[68], "BLNGS");
 
@@ -18051,7 +18051,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἀποκρίνου");
-    l_form_array[596]->setType("FORM_");
+    l_form_array[596]->setType("WFORM");
     l_form_array[596]->setType("NPVRB");
     l_form_array[596]->linkTo(l_lemma_array[67], "BLNGS");
 
@@ -18062,7 +18062,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἀποκρινοῦμαι");
-    l_form_array[597]->setType("FORM_");
+    l_form_array[597]->setType("WFORM");
     l_form_array[597]->setType("NPVRB");
     l_form_array[597]->linkTo(l_lemma_array[67], "BLNGS");
 
@@ -18073,7 +18073,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἂν");
-    l_form_array[598]->setType("FORM_");
+    l_form_array[598]->setType("WFORM");
     l_form_array[598]->setType("NPADV");
     l_form_array[598]->linkTo(l_lemma_array[61], "BLNGS");
 
@@ -18084,7 +18084,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἂν");
-    l_form_array[599]->setType("FORM_");
+    l_form_array[599]->setType("WFORM");
     l_form_array[599]->setType("NPPRT");
     l_form_array[599]->linkTo(l_lemma_array[60], "BLNGS");
 
@@ -18095,7 +18095,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἃ");
-    l_form_array[600]->setType("FORM_");
+    l_form_array[600]->setType("WFORM");
     l_form_array[600]->setType("NPPRN");
     l_form_array[600]->linkTo(l_lemma_array[9], "BLNGS");
 
@@ -18106,7 +18106,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἄγνωστον");
-    l_form_array[601]->setType("FORM_");
+    l_form_array[601]->setType("WFORM");
     l_form_array[601]->setType("NPADJ");
     l_form_array[601]->linkTo(l_lemma_array[64], "BLNGS");
 
@@ -18117,7 +18117,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἄκουσον");
-    l_form_array[602]->setType("FORM_");
+    l_form_array[602]->setType("WFORM");
     l_form_array[602]->setType("NPVRB");
     l_form_array[602]->linkTo(l_lemma_array[78], "BLNGS");
 
@@ -18128,7 +18128,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἄλλα");
-    l_form_array[603]->setType("FORM_");
+    l_form_array[603]->setType("WFORM");
     l_form_array[603]->setType("NPPRN");
     l_form_array[603]->linkTo(l_lemma_array[62], "BLNGS");
 
@@ -18139,7 +18139,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἄλλην");
-    l_form_array[604]->setType("FORM_");
+    l_form_array[604]->setType("WFORM");
     l_form_array[604]->setType("NPADJ");
     l_form_array[604]->linkTo(l_lemma_array[63], "BLNGS");
 
@@ -18150,7 +18150,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἄλλο");
-    l_form_array[605]->setType("FORM_");
+    l_form_array[605]->setType("WFORM");
     l_form_array[605]->setType("NPADJ");
     l_form_array[605]->linkTo(l_lemma_array[63], "BLNGS");
 
@@ -18161,7 +18161,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἄλλων");
-    l_form_array[606]->setType("FORM_");
+    l_form_array[606]->setType("WFORM");
     l_form_array[606]->setType("NPPRN");
     l_form_array[606]->linkTo(l_lemma_array[62], "BLNGS");
 
@@ -18172,7 +18172,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἄλλῳ");
-    l_form_array[607]->setType("FORM_");
+    l_form_array[607]->setType("WFORM");
     l_form_array[607]->setType("NPPRN");
     l_form_array[607]->linkTo(l_lemma_array[62], "BLNGS");
 
@@ -18183,7 +18183,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἄν");
-    l_form_array[608]->setType("FORM_");
+    l_form_array[608]->setType("WFORM");
     l_form_array[608]->setType("NPADV");
     l_form_array[608]->linkTo(l_lemma_array[61], "BLNGS");
 
@@ -18194,7 +18194,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἄν");
-    l_form_array[609]->setType("FORM_");
+    l_form_array[609]->setType("WFORM");
     l_form_array[609]->setType("NPPRT");
     l_form_array[609]->linkTo(l_lemma_array[60], "BLNGS");
 
@@ -18205,7 +18205,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἄρα");
-    l_form_array[610]->setType("FORM_");
+    l_form_array[610]->setType("WFORM");
     l_form_array[610]->setType("NPADV");
     l_form_array[610]->linkTo(l_lemma_array[59], "BLNGS");
 
@@ -18216,7 +18216,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἄρα");
-    l_form_array[611]->setType("FORM_");
+    l_form_array[611]->setType("WFORM");
     l_form_array[611]->setType("NPPRT");
     l_form_array[611]->linkTo(l_lemma_array[58], "BLNGS");
 
@@ -18227,7 +18227,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἄριστε");
-    l_form_array[612]->setType("FORM_");
+    l_form_array[612]->setType("WFORM");
     l_form_array[612]->setType("NPADJ");
     l_form_array[612]->linkTo(l_lemma_array[57], "BLNGS");
 
@@ -18238,7 +18238,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἅσμενοι");
-    l_form_array[613]->setType("FORM_");
+    l_form_array[613]->setType("WFORM");
     l_form_array[613]->setType("NPVRB");
     l_form_array[613]->linkTo(l_lemma_array[29], "BLNGS");
 
@@ -18249,7 +18249,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἆρα");
-    l_form_array[614]->setType("FORM_");
+    l_form_array[614]->setType("WFORM");
     l_form_array[614]->setType("NPPRT");
     l_form_array[614]->linkTo(l_lemma_array[55], "BLNGS");
 
@@ -18260,7 +18260,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἆρ᾽");
-    l_form_array[615]->setType("FORM_");
+    l_form_array[615]->setType("WFORM");
     l_form_array[615]->setType("NPADV");
     l_form_array[615]->linkTo(l_lemma_array[56], "BLNGS");
 
@@ -18271,7 +18271,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐάντε");
-    l_form_array[616]->setType("FORM_");
+    l_form_array[616]->setType("WFORM");
     l_form_array[616]->setType("NPSCJ");
     l_form_array[616]->linkTo(l_lemma_array[54], "BLNGS");
 
@@ -18282,7 +18282,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐάντ᾽");
-    l_form_array[617]->setType("FORM_");
+    l_form_array[617]->setType("WFORM");
     l_form_array[617]->setType("NPVRB");
     l_form_array[617]->linkTo(l_lemma_array[52], "BLNGS");
 
@@ -18293,7 +18293,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐγρηγορὼς");
-    l_form_array[618]->setType("FORM_");
+    l_form_array[618]->setType("WFORM");
     l_form_array[618]->setType("NPVRB");
     l_form_array[618]->linkTo(l_lemma_array[51], "BLNGS");
 
@@ -18304,7 +18304,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐγώ");
-    l_form_array[619]->setType("FORM_");
+    l_form_array[619]->setType("WFORM");
     l_form_array[619]->setType("NPPRN");
     l_form_array[619]->linkTo(l_lemma_array[50], "BLNGS");
 
@@ -18315,7 +18315,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐγὼ");
-    l_form_array[620]->setType("FORM_");
+    l_form_array[620]->setType("WFORM");
     l_form_array[620]->setType("NPPRN");
     l_form_array[620]->linkTo(l_lemma_array[50], "BLNGS");
 
@@ -18326,7 +18326,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐκάλεσα");
-    l_form_array[621]->setType("FORM_");
+    l_form_array[621]->setType("WFORM");
     l_form_array[621]->setType("NPVRB");
     l_form_array[621]->linkTo(l_lemma_array[156], "BLNGS");
 
@@ -18337,7 +18337,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐκείνου");
-    l_form_array[622]->setType("FORM_");
+    l_form_array[622]->setType("WFORM");
     l_form_array[622]->setType("NPADJ");
     l_form_array[622]->linkTo(l_lemma_array[49], "BLNGS");
 
@@ -18348,7 +18348,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐκείνου");
-    l_form_array[623]->setType("FORM_");
+    l_form_array[623]->setType("WFORM");
     l_form_array[623]->setType("NPPRN");
     l_form_array[623]->linkTo(l_lemma_array[48], "BLNGS");
 
@@ -18359,7 +18359,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐκεῖνο");
-    l_form_array[624]->setType("FORM_");
+    l_form_array[624]->setType("WFORM");
     l_form_array[624]->setType("NPPRN");
     l_form_array[624]->linkTo(l_lemma_array[48], "BLNGS");
 
@@ -18370,7 +18370,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐμαυτῷ");
-    l_form_array[625]->setType("FORM_");
+    l_form_array[625]->setType("WFORM");
     l_form_array[625]->setType("NPPRN");
     l_form_array[625]->linkTo(l_lemma_array[46], "BLNGS");
 
@@ -18381,7 +18381,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐν");
-    l_form_array[626]->setType("FORM_");
+    l_form_array[626]->setType("WFORM");
     l_form_array[626]->setType("NPSCJ");
     l_form_array[626]->linkTo(l_lemma_array[44], "BLNGS");
 
@@ -18392,7 +18392,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐξ");
-    l_form_array[627]->setType("FORM_");
+    l_form_array[627]->setType("WFORM");
     l_form_array[627]->setType("NPSCJ");
     l_form_array[627]->linkTo(l_lemma_array[47], "BLNGS");
 
@@ -18403,7 +18403,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐπικρυπτόμενοι");
-    l_form_array[628]->setType("FORM_");
+    l_form_array[628]->setType("WFORM");
     l_form_array[628]->setType("NPVRB");
     l_form_array[628]->linkTo(l_lemma_array[42], "BLNGS");
 
@@ -18414,7 +18414,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐπιστήμην");
-    l_form_array[629]->setType("FORM_");
+    l_form_array[629]->setType("WFORM");
     l_form_array[629]->setType("NPNON");
     l_form_array[629]->linkTo(l_lemma_array[41], "BLNGS");
 
@@ -18425,7 +18425,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐπιστήμης");
-    l_form_array[630]->setType("FORM_");
+    l_form_array[630]->setType("WFORM");
     l_form_array[630]->setType("NPNON");
     l_form_array[630]->linkTo(l_lemma_array[41], "BLNGS");
 
@@ -18436,7 +18436,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐπιστήμη");
-    l_form_array[631]->setType("FORM_");
+    l_form_array[631]->setType("WFORM");
     l_form_array[631]->setType("NPNON");
     l_form_array[631]->linkTo(l_lemma_array[41], "BLNGS");
 
@@ -18447,7 +18447,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐπὶ");
-    l_form_array[632]->setType("FORM_");
+    l_form_array[632]->setType("WFORM");
     l_form_array[632]->setType("NPSCJ");
     l_form_array[632]->linkTo(l_lemma_array[43], "BLNGS");
 
@@ -18458,7 +18458,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐπ᾽");
-    l_form_array[633]->setType("FORM_");
+    l_form_array[633]->setType("WFORM");
     l_form_array[633]->setType("NPADV");
     l_form_array[633]->linkTo(l_lemma_array[40], "BLNGS");
 
@@ -18469,7 +18469,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐπ᾽");
-    l_form_array[634]->setType("FORM_");
+    l_form_array[634]->setType("WFORM");
     l_form_array[634]->setType("NPSCJ");
     l_form_array[634]->linkTo(l_lemma_array[43], "BLNGS");
 
@@ -18480,7 +18480,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐροῦμεν");
-    l_form_array[635]->setType("FORM_");
+    l_form_array[635]->setType("WFORM");
     l_form_array[635]->setType("NPVRB");
     l_form_array[635]->linkTo(l_lemma_array[38], "BLNGS");
 
@@ -18491,7 +18491,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐρρωμενεστάτην");
-    l_form_array[636]->setType("FORM_");
+    l_form_array[636]->setType("WFORM");
     l_form_array[636]->setType("NPADJ");
     l_form_array[636]->linkTo(l_lemma_array[39], "BLNGS");
 
@@ -18502,7 +18502,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐστίν");
-    l_form_array[637]->setType("FORM_");
+    l_form_array[637]->setType("WFORM");
     l_form_array[637]->setType("NPVRB");
     l_form_array[637]->linkTo(l_lemma_array[169], "BLNGS");
 
@@ -18513,7 +18513,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐφ᾽");
-    l_form_array[638]->setType("FORM_");
+    l_form_array[638]->setType("WFORM");
     l_form_array[638]->setType("NPSCJ");
     l_form_array[638]->linkTo(l_lemma_array[37], "BLNGS");
 
@@ -18524,7 +18524,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἐὰν");
-    l_form_array[639]->setType("FORM_");
+    l_form_array[639]->setType("WFORM");
     l_form_array[639]->setType("NPSCJ");
     l_form_array[639]->linkTo(l_lemma_array[53], "BLNGS");
 
@@ -18535,7 +18535,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἑκάστην");
-    l_form_array[640]->setType("FORM_");
+    l_form_array[640]->setType("WFORM");
     l_form_array[640]->setType("NPADJ");
     l_form_array[640]->linkTo(l_lemma_array[31], "BLNGS");
 
@@ -18546,7 +18546,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἑκατέρα");
-    l_form_array[641]->setType("FORM_");
+    l_form_array[641]->setType("WFORM");
     l_form_array[641]->setType("NPADJ");
     l_form_array[641]->linkTo(l_lemma_array[30], "BLNGS");
 
@@ -18557,7 +18557,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἑτέρῳ");
-    l_form_array[642]->setType("FORM_");
+    l_form_array[642]->setType("WFORM");
     l_form_array[642]->setType("NPADJ");
     l_form_array[642]->linkTo(l_lemma_array[27], "BLNGS");
 
@@ -18568,7 +18568,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἔνια");
-    l_form_array[643]->setType("FORM_");
+    l_form_array[643]->setType("WFORM");
     l_form_array[643]->setType("NPADJ");
     l_form_array[643]->linkTo(l_lemma_array[34], "BLNGS");
 
@@ -18579,7 +18579,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἔοικεν");
-    l_form_array[644]->setType("FORM_");
+    l_form_array[644]->setType("WFORM");
     l_form_array[644]->setType("NPVRB");
     l_form_array[644]->linkTo(l_lemma_array[33], "BLNGS");
 
@@ -18590,7 +18590,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἔστι");
-    l_form_array[645]->setType("FORM_");
+    l_form_array[645]->setType("WFORM");
     l_form_array[645]->setType("NPVRB");
     l_form_array[645]->linkTo(l_lemma_array[169], "BLNGS");
 
@@ -18601,7 +18601,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἔφη");
-    l_form_array[646]->setType("FORM_");
+    l_form_array[646]->setType("WFORM");
     l_form_array[646]->setType("NPVRB");
     l_form_array[646]->linkTo(l_lemma_array[85], "BLNGS");
 
@@ -18612,7 +18612,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἔχει");
-    l_form_array[647]->setType("FORM_");
+    l_form_array[647]->setType("WFORM");
     l_form_array[647]->setType("NPVRB");
     l_form_array[647]->linkTo(l_lemma_array[32], "BLNGS");
 
@@ -18623,7 +18623,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἔχομεν");
-    l_form_array[648]->setType("FORM_");
+    l_form_array[648]->setType("WFORM");
     l_form_array[648]->setType("NPVRB");
     l_form_array[648]->linkTo(l_lemma_array[32], "BLNGS");
 
@@ -18634,7 +18634,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἔχων");
-    l_form_array[649]->setType("FORM_");
+    l_form_array[649]->setType("WFORM");
     l_form_array[649]->setType("NPVRB");
     l_form_array[649]->linkTo(l_lemma_array[32], "BLNGS");
 
@@ -18645,7 +18645,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἕξομέν");
-    l_form_array[650]->setType("FORM_");
+    l_form_array[650]->setType("WFORM");
     l_form_array[650]->setType("NPVRB");
     l_form_array[650]->linkTo(l_lemma_array[32], "BLNGS");
 
@@ -18656,7 +18656,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἕπεσθαι");
-    l_form_array[651]->setType("FORM_");
+    l_form_array[651]->setType("WFORM");
     l_form_array[651]->setType("NPVRB");
     l_form_array[651]->linkTo(l_lemma_array[28], "BLNGS");
 
@@ -18667,7 +18667,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἕτερον");
-    l_form_array[652]->setType("FORM_");
+    l_form_array[652]->setType("WFORM");
     l_form_array[652]->setType("NPADJ");
     l_form_array[652]->linkTo(l_lemma_array[27], "BLNGS");
 
@@ -18678,7 +18678,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἠρέμα");
-    l_form_array[653]->setType("FORM_");
+    l_form_array[653]->setType("WFORM");
     l_form_array[653]->setType("NPNON");
     l_form_array[653]->linkTo(l_lemma_array[26], "BLNGS");
 
@@ -18689,7 +18689,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἡγούμενος");
-    l_form_array[654]->setType("FORM_");
+    l_form_array[654]->setType("WFORM");
     l_form_array[654]->setType("NPVRB");
     l_form_array[654]->linkTo(l_lemma_array[25], "BLNGS");
 
@@ -18700,7 +18700,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἡγούμενός");
-    l_form_array[655]->setType("FORM_");
+    l_form_array[655]->setType("WFORM");
     l_form_array[655]->setType("NPVRB");
     l_form_array[655]->linkTo(l_lemma_array[25], "BLNGS");
 
@@ -18711,7 +18711,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἡγῆται");
-    l_form_array[656]->setType("FORM_");
+    l_form_array[656]->setType("WFORM");
     l_form_array[656]->setType("NPVRB");
     l_form_array[656]->linkTo(l_lemma_array[25], "BLNGS");
 
@@ -18722,7 +18722,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἡμεῖς");
-    l_form_array[657]->setType("FORM_");
+    l_form_array[657]->setType("WFORM");
     l_form_array[657]->setType("NPPRN");
     l_form_array[657]->linkTo(l_lemma_array[50], "BLNGS");
 
@@ -18733,7 +18733,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἡμῖν");
-    l_form_array[658]->setType("FORM_");
+    l_form_array[658]->setType("WFORM");
     l_form_array[658]->setType("NPPRN");
     l_form_array[658]->linkTo(l_lemma_array[50], "BLNGS");
 
@@ -18744,7 +18744,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἢ");
-    l_form_array[659]->setType("FORM_");
+    l_form_array[659]->setType("WFORM");
     l_form_array[659]->setType("NPCNJ");
     l_form_array[659]->linkTo(l_lemma_array[24], "BLNGS");
 
@@ -18755,7 +18755,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἦν");
-    l_form_array[660]->setType("FORM_");
+    l_form_array[660]->setType("WFORM");
     l_form_array[660]->setType("NPVRB");
     l_form_array[660]->linkTo(l_lemma_array[169], "BLNGS");
 
@@ -18766,7 +18766,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἦ");
-    l_form_array[661]->setType("FORM_");
+    l_form_array[661]->setType("WFORM");
     l_form_array[661]->setType("NPADV");
     l_form_array[661]->linkTo(l_lemma_array[23], "BLNGS");
 
@@ -18777,7 +18777,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἱκανώτατα");
-    l_form_array[662]->setType("FORM_");
+    l_form_array[662]->setType("WFORM");
     l_form_array[662]->setType("NPADJ");
     l_form_array[662]->linkTo(l_lemma_array[22], "BLNGS");
 
@@ -18788,7 +18788,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἱκανῶς");
-    l_form_array[663]->setType("FORM_");
+    l_form_array[663]->setType("WFORM");
     l_form_array[663]->setType("NPADV");
     l_form_array[663]->linkTo(l_lemma_array[21], "BLNGS");
 
@@ -18799,7 +18799,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἴδοιμεν");
-    l_form_array[664]->setType("FORM_");
+    l_form_array[664]->setType("WFORM");
     l_form_array[664]->setType("NPVRB");
     l_form_array[664]->linkTo(l_lemma_array[166], "BLNGS");
 
@@ -18810,7 +18810,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ἴθι");
-    l_form_array[665]->setType("FORM_");
+    l_form_array[665]->setType("WFORM");
     l_form_array[665]->setType("NPVRB");
     l_form_array[665]->linkTo(l_lemma_array[164], "BLNGS");
 
@@ -18821,7 +18821,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὀλίγον");
-    l_form_array[666]->setType("FORM_");
+    l_form_array[666]->setType("WFORM");
     l_form_array[666]->setType("NPADJ");
     l_form_array[666]->linkTo(l_lemma_array[20], "BLNGS");
 
@@ -18832,7 +18832,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὀνειρώττειν");
-    l_form_array[667]->setType("FORM_");
+    l_form_array[667]->setType("WFORM");
     l_form_array[667]->setType("NPVRB");
     l_form_array[667]->linkTo(l_lemma_array[19], "BLNGS");
 
@@ -18843,7 +18843,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὀρθῶς");
-    l_form_array[668]->setType("FORM_");
+    l_form_array[668]->setType("WFORM");
     l_form_array[668]->setType("NPADV");
     l_form_array[668]->linkTo(l_lemma_array[18], "BLNGS");
 
@@ -18854,7 +18854,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὁμολογεῖται");
-    l_form_array[669]->setType("FORM_");
+    l_form_array[669]->setType("WFORM");
     l_form_array[669]->setType("NPVRB");
     l_form_array[669]->linkTo(l_lemma_array[17], "BLNGS");
 
@@ -18865,7 +18865,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὁρῶ");
-    l_form_array[670]->setType("FORM_");
+    l_form_array[670]->setType("WFORM");
     l_form_array[670]->setType("NPVRB");
     l_form_array[670]->linkTo(l_lemma_array[15], "BLNGS");
 
@@ -18876,7 +18876,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὁ");
-    l_form_array[671]->setType("FORM_");
+    l_form_array[671]->setType("WFORM");
     l_form_array[671]->setType("NPPRN");
     l_form_array[671]->linkTo(l_lemma_array[14], "BLNGS");
 
@@ -18887,7 +18887,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὂν");
-    l_form_array[672]->setType("FORM_");
+    l_form_array[672]->setType("WFORM");
     l_form_array[672]->setType("NPADJ");
     l_form_array[672]->linkTo(l_lemma_array[36], "BLNGS");
 
@@ -18898,7 +18898,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὃ");
-    l_form_array[673]->setType("FORM_");
+    l_form_array[673]->setType("WFORM");
     l_form_array[673]->setType("NPPRN");
     l_form_array[673]->linkTo(l_lemma_array[14], "BLNGS");
 
@@ -18909,7 +18909,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὄναρ");
-    l_form_array[674]->setType("FORM_");
+    l_form_array[674]->setType("WFORM");
     l_form_array[674]->setType("NPNON");
     l_form_array[674]->linkTo(l_lemma_array[13], "BLNGS");
 
@@ -18920,7 +18920,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὄντι");
-    l_form_array[675]->setType("FORM_");
+    l_form_array[675]->setType("WFORM");
     l_form_array[675]->setType("NPVRB");
     l_form_array[675]->linkTo(l_lemma_array[169], "BLNGS");
 
@@ -18931,7 +18931,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὄντος");
-    l_form_array[676]->setType("FORM_");
+    l_form_array[676]->setType("WFORM");
     l_form_array[676]->setType("NPVRB");
     l_form_array[676]->linkTo(l_lemma_array[169], "BLNGS");
 
@@ -18942,7 +18942,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὄντων");
-    l_form_array[677]->setType("FORM_");
+    l_form_array[677]->setType("WFORM");
     l_form_array[677]->setType("NPVRB");
     l_form_array[677]->linkTo(l_lemma_array[169], "BLNGS");
 
@@ -18953,7 +18953,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὄν");
-    l_form_array[678]->setType("FORM_");
+    l_form_array[678]->setType("WFORM");
     l_form_array[678]->setType("NPADJ");
     l_form_array[678]->linkTo(l_lemma_array[10], "BLNGS");
 
@@ -18964,7 +18964,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὄψιν");
-    l_form_array[679]->setType("FORM_");
+    l_form_array[679]->setType("WFORM");
     l_form_array[679]->setType("NPNON");
     l_form_array[679]->linkTo(l_lemma_array[12], "BLNGS");
 
@@ -18975,7 +18975,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὅμοιον");
-    l_form_array[680]->setType("FORM_");
+    l_form_array[680]->setType("WFORM");
     l_form_array[680]->setType("NPADJ");
     l_form_array[680]->linkTo(l_lemma_array[16], "BLNGS");
 
@@ -18986,7 +18986,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὅμοιόν");
-    l_form_array[681]->setType("FORM_");
+    l_form_array[681]->setType("WFORM");
     l_form_array[681]->setType("NPADJ");
     l_form_array[681]->linkTo(l_lemma_array[16], "BLNGS");
 
@@ -18997,7 +18997,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὅν");
-    l_form_array[682]->setType("FORM_");
+    l_form_array[682]->setType("WFORM");
     l_form_array[682]->setType("NPPRN");
     l_form_array[682]->linkTo(l_lemma_array[9], "BLNGS");
 
@@ -19008,7 +19008,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὅς");
-    l_form_array[683]->setType("FORM_");
+    l_form_array[683]->setType("WFORM");
     l_form_array[683]->setType("NPPRN");
     l_form_array[683]->linkTo(l_lemma_array[9], "BLNGS");
 
@@ -19019,7 +19019,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὅτι");
-    l_form_array[684]->setType("FORM_");
+    l_form_array[684]->setType("WFORM");
     l_form_array[684]->setType("NPSCJ");
     l_form_array[684]->linkTo(l_lemma_array[8], "BLNGS");
 
@@ -19030,7 +19030,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὅ");
-    l_form_array[685]->setType("FORM_");
+    l_form_array[685]->setType("WFORM");
     l_form_array[685]->setType("NPPRN");
     l_form_array[685]->linkTo(l_lemma_array[14], "BLNGS");
 
@@ -19041,7 +19041,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὑγιαίνει");
-    l_form_array[686]->setType("FORM_");
+    l_form_array[686]->setType("WFORM");
     l_form_array[686]->setType("NPVRB");
     l_form_array[686]->linkTo(l_lemma_array[7], "BLNGS");
 
@@ -19052,7 +19052,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὑπὲρ");
-    l_form_array[687]->setType("FORM_");
+    l_form_array[687]->setType("WFORM");
     l_form_array[687]->setType("NPSCJ");
     l_form_array[687]->linkTo(l_lemma_array[5], "BLNGS");
 
@@ -19063,7 +19063,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὕπαρ");
-    l_form_array[688]->setType("FORM_");
+    l_form_array[688]->setType("WFORM");
     l_form_array[688]->setType("NPNON");
     l_form_array[688]->linkTo(l_lemma_array[4], "BLNGS");
 
@@ -19074,7 +19074,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὕπαρ");
-    l_form_array[689]->setType("FORM_");
+    l_form_array[689]->setType("WFORM");
     l_form_array[689]->setType("NPVRB");
     l_form_array[689]->linkTo(l_lemma_array[6], "BLNGS");
 
@@ -19085,7 +19085,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὕπνῳ");
-    l_form_array[690]->setType("FORM_");
+    l_form_array[690]->setType("WFORM");
     l_form_array[690]->setType("NPNON");
     l_form_array[690]->linkTo(l_lemma_array[3], "BLNGS");
 
@@ -19096,7 +19096,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὡμολόγεις");
-    l_form_array[691]->setType("FORM_");
+    l_form_array[691]->setType("WFORM");
     l_form_array[691]->setType("NPVRB");
     l_form_array[691]->linkTo(l_lemma_array[17], "BLNGS");
 
@@ -19107,7 +19107,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὡς");
-    l_form_array[692]->setType("FORM_");
+    l_form_array[692]->setType("WFORM");
     l_form_array[692]->setType("NPSCJ");
     l_form_array[692]->linkTo(l_lemma_array[2], "BLNGS");
 
@@ -19118,7 +19118,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὦ");
-    l_form_array[693]->setType("FORM_");
+    l_form_array[693]->setType("WFORM");
     l_form_array[693]->setType("NPINT");
     l_form_array[693]->linkTo(l_lemma_array[1], "BLNGS");
 
@@ -19129,7 +19129,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὧδέ");
-    l_form_array[694]->setType("FORM_");
+    l_form_array[694]->setType("WFORM");
     l_form_array[694]->setType("NPADV");
     l_form_array[694]->linkTo(l_lemma_array[0], "BLNGS");
 
@@ -19140,7 +19140,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ὧδε");
-    l_form_array[695]->setType("FORM_");
+    l_form_array[695]->setType("WFORM");
     l_form_array[695]->setType("NPADV");
     l_form_array[695]->linkTo(l_lemma_array[0], "BLNGS");
 
@@ -19151,7 +19151,7 @@ void M1Env::GraphInit::init_plato(){
         M1Env::FULL_VERTEX,
         // label
         "ᾧ");
-    l_form_array[696]->setType("FORM_");
+    l_form_array[696]->setType("WFORM");
     l_form_array[696]->setType("NPPRN");
     l_form_array[696]->linkTo(l_lemma_array[9], "BLNGS");
 

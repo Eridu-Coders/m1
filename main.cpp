@@ -309,7 +309,7 @@ int loadGita(){
                         // M1Store::ItemType(M1Env::TEXT_WORD_SIID), // type
                         l_bare_word.toUtf8().constData()                // label
                     );
-                    l_cur_lex_item->setType(M1Env::FORM_SIID);
+                    l_cur_lex_item->setType(M1Env::WFORM_SIID);
                     l_word_2_lex[l_bare_word] = l_cur_lex_item;
                     // l_cur_lex_item->linkTo(l_words_root, "BLNGS", nullptr, true);
 
@@ -536,7 +536,7 @@ void loadEnoch(){
 
     //--------------------------------- words -----------------------------------------------------------
     // lexicon building
-    M1Store::Item_lv2* l_words_root = M1Store::Item_lv2::getExisting(M1Env::FORM_SIID);
+    M1Store::Item_lv2* l_words_root = M1Store::Item_lv2::getExisting(M1Env::WFORM_SIID);
     QFile l_fin_words("../Enoch-words.txt");
     l_fin_words.open(QFile::ReadOnly | QFile::Text);
     QTextStream l_in_words(&l_fin_words);
@@ -550,7 +550,7 @@ void loadEnoch(){
             // M1Store::ItemType(M1Env::TEXT_WORD_SIID), // type
             l_lex.toUtf8().constData()                      // label
             );
-        l_lex_item->setType(M1Env::FORM_SIID);
+        l_lex_item->setType(M1Env::WFORM_SIID);
         l_lex_item->linkTo(l_words_root, "BLNGS", nullptr, true);
         l_lex_2_word[l_lex] = l_lex_item;
     }

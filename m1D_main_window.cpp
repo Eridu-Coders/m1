@@ -10,6 +10,7 @@
 #include <QUrl>
 #include <QGraphicsView>
 #include <QMouseEvent>
+#include <QComboBox>
 
 // g_cat_main_window
 Q_LOGGING_CATEGORY(g_cat_main_window, "main_window")
@@ -17,23 +18,59 @@ Q_LOGGING_CATEGORY(g_cat_main_window, "main_window")
 void loadWords(){}
 
 const int EDIT_TAB_INDEX = 2;
+const int INIT_SIZE_X = 1200;
+const int INIT_SIZE_Y = 1000;
 
 M1UI::MainWindow::MainWindow(QWidget *p_parent) : QMainWindow(p_parent){
-    this->resize(1200, 800);
-    //centralwidget = new QWidget(MainWindow);
+    this->resize(INIT_SIZE_X, INIT_SIZE_Y);
+
     m_central_widget = new QSplitter(this);
     m_central_widget->setObjectName("centralwidget");
     this->setCentralWidget(m_central_widget);
 
-    M1UI::TreeDisplay* l_tree_display_left = new M1UI::TreeDisplay(m_central_widget, this);
-    m_central_widget->addWidget(l_tree_display_left);
+    QWidget* l_left_panel = new QWidget(m_central_widget);
+    QVBoxLayout* l_panel_layout = new QVBoxLayout();
+    l_left_panel->setLayout(l_panel_layout);
+    m_central_widget->addWidget(l_left_panel);
+
+    QWidget* l_buttons_bar = new QWidget(l_left_panel);
+    l_panel_layout->addWidget(l_buttons_bar);
+    QHBoxLayout* l_bar_layout = new QHBoxLayout();
+    l_buttons_bar->setLayout(l_bar_layout);
+
+    QComboBox* l_et_combo = new QComboBox(l_left_panel);
+    l_bar_layout->addWidget(l_et_combo);
+
+    QComboBox* l_vt_combo = new QComboBox(l_left_panel);
+    l_bar_layout->addWidget(l_vt_combo);
+    l_bar_layout->addStretch(1);
+
+    for(const M1Store::SpecialItem* l_special : M1Store::Storage::getSelectableEdgeTypes()) {
+        qDebug() << l_special->mnemonic();
+        l_et_combo->addItem(*M1Store::Storage::getQIcon(l_special->specialId()), l_special->mnemonic());
+    }
+    for(const M1Store::SpecialItem* l_special : M1Store::Storage::getSelectableVertexTypes()) {
+        qDebug() << l_special->mnemonic();
+        l_vt_combo->addItem(*M1Store::Storage::getQIcon(l_special->specialId()), l_special->mnemonic());
+    }
+
+    l_panel_layout->addWidget(l_buttons_bar);
+
+    M1UI::TreeDisplay* l_tree_display_left = new M1UI::TreeDisplay(l_left_panel, this);
+    l_panel_layout->addWidget(l_tree_display_left);
 
     m_tab_widget = new QTabWidget(m_central_widget);
     m_central_widget->addWidget(m_tab_widget);
 
+    m_central_widget->setStretchFactor(0, 1);
+    m_central_widget->setStretchFactor(1, 2);
+
+    this->resize(INIT_SIZE_X, INIT_SIZE_Y);
+    m_central_widget->setSizes(QList<int>() << INIT_SIZE_X/3 << 2*(INIT_SIZE_X/3) + INIT_SIZE_X%3);
+
     m_web_view = new QWebEngineView(m_central_widget);
-    m_web_view->load(QUrl("https://www.lefigaro.fr"));
-    m_web_view->resize(600, 800);
+    m_web_view->load(QUrl("https://www.deccanherald.com"));
+    // m_web_view->resize(600, 800);
     m_web_view->show();
     m_tab_widget->addTab(m_web_view, "HTML");
 
@@ -42,7 +79,7 @@ M1UI::MainWindow::MainWindow(QWidget *p_parent) : QMainWindow(p_parent){
 
     m_menubar = new QMenuBar(this);
     m_menubar->setObjectName("menubar");
-    m_menubar->setGeometry(QRect(0, 0, 800, 20));
+    // m_menubar->setGeometry(QRect(0, 0, 800, 20));
     this->setMenuBar(m_menubar);
 
     m_statusbar = new QStatusBar(this);
@@ -54,6 +91,10 @@ M1UI::MainWindow::MainWindow(QWidget *p_parent) : QMainWindow(p_parent){
 
     QObject::connect(l_tree_display_left, &M1UI::TreeDisplay::emitHtml,
                      this, &MainWindow::htmlReceive);
+    QObject::connect(l_et_combo, &QComboBox::activated,
+                     l_tree_display_left, &M1UI::TreeDisplay::edgeTypeSelected);
+    QObject::connect(l_vt_combo, &QComboBox::activated,
+                     l_tree_display_left, &M1UI::TreeDisplay::vertexTypeSelected);
 
     // this->setMouseTracking(true);
 

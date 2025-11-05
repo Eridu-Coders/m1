@@ -21,8 +21,8 @@ extern M1Env::SpecialItemID TEXT_WROTE_SIID;
 extern M1Env::SpecialItemID TEXT_WRITTEN_BY_SIID;
 // [OCCUR] Special Vertex ID (Edge type) of occurrence edges
 extern M1Env::SpecialItemID OCCUR_SIID;
-// [FORM_] Special Vertex ID (Vertex type) of word form vertices
-extern M1Env::SpecialItemID FORM_SIID;
+// [WFORM] Special Vertex ID (Vertex type) of word form vertices
+extern M1Env::SpecialItemID WFORM_SIID;
 // [CAPTL] Special Vertex ID (Simple edge type) of Occurrence field capitalization flag
 extern M1Env::SpecialItemID CAPTL_SIID;
 // [PCTLF] Special Vertex ID (Simple edge type) of Occurrence field left punctuation

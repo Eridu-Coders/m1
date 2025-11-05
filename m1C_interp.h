@@ -6,9 +6,41 @@
 #include <QWidget>
 #include <QGraphicsScene>
 #include <QDrag>
+#include <QVBoxLayout>
 
 namespace M1MidPlane{
+    class Interp;
+}
 
+namespace M1UI{
+
+class TreeDisplay;
+
+class InterpProxyWidget : public QWidget{
+        Q_OBJECT
+private:
+    M1MidPlane::Interp* m_main_instance;
+public:
+    InterpProxyWidget(M1MidPlane::Interp* p_main_instance, QWidget* p_parent) : QWidget(p_parent){m_main_instance = p_main_instance;}
+    ~InterpProxyWidget();
+
+    virtual void paintEvent(QPaintEvent* p_event);
+    virtual void resizeEvent(QResizeEvent *p_event);
+    virtual void mouseDoubleClickEvent(QMouseEvent *p_event);
+    virtual void mousePressEvent(QMouseEvent *p_event);
+    virtual void focusOutEvent(QFocusEvent *p_event);
+    virtual void focusInEvent(QFocusEvent *p_event);
+    virtual void contextMenuEvent(QContextMenuEvent *p_event);
+
+    virtual void dragEnterEvent(QDragEnterEvent *p_event);
+    virtual void dragMoveEvent(QDragMoveEvent *p_event);
+    virtual void dragLeaveEvent(QDragLeaveEvent *p_event);
+    virtual void dropEvent(QDropEvent *p_event);
+};
+
+}
+
+namespace M1MidPlane{
 /*
 class InterpStaticConstructor{
 public:
@@ -22,7 +54,8 @@ public:
     virtual ~Drag();
 };
 
-class Interp : public QWidget
+
+class Interp : public QObject
 {
     Q_OBJECT
     friend class TranslUnit;
@@ -47,6 +80,9 @@ private:
     int m_icon_size;
     int m_oc_x;
 
+    M1UI::TreeDisplay* m_td_parent;
+    M1UI::InterpProxyWidget* m_proxy;
+
     bool m_drag_top = false;
     bool m_drag_bottom = false;
 
@@ -60,26 +96,36 @@ private:
     // static InterpStaticConstructor cm_the_init;
 public:
     static void init();
-    static Interp* getInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
-    Interp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
+    static Interp* getInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
+
+    Interp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_tree, int p_depth);
+    ~Interp();
+
     virtual void paintEvent(QPaintEvent* p_event);
     virtual void resizeEvent(QResizeEvent *p_event);
     virtual void mouseDoubleClickEvent(QMouseEvent *p_event);
     virtual void mousePressEvent(QMouseEvent *p_event);
     virtual void focusOutEvent(QFocusEvent *p_event);
     virtual void focusInEvent(QFocusEvent *p_event);
+    virtual void contextMenuEvent(QContextMenuEvent *p_event);
 
     virtual void dragEnterEvent(QDragEnterEvent *p_event);
     virtual void dragMoveEvent(QDragMoveEvent *p_event);
     virtual void dragLeaveEvent(QDragLeaveEvent *p_event);
     virtual void dropEvent(QDropEvent *p_event);
 
-    virtual void mouseMoveEvent(QMouseEvent *p_event);
+    virtual void setFocus(Qt::FocusReason p_reason){m_proxy->setFocus(p_reason);}
+
+    // virtual void mouseMoveEvent(QMouseEvent *p_event);
+    void deleteProxyLater();
 
     virtual QWidget *get_edit_widget();
-    ~Interp();
+
+    QString dbgString(){return "Interp for" + m_myself->dbgShort();}
+public slots:
+    void create_descendant();
 signals:
-    void gotoVertex(M1Store::Item_lv2* p_new_vertex);
+    void gotoVertex(M1Store::Item_lv2* p_new_vertex, M1MidPlane::Interp* p_sender);
     void emitHtml(const QString& p_html);
     void emitEdit(QWidget *p_edit_widget);
 };
@@ -90,7 +136,7 @@ class FieldInterp : public Interp
 public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
 
-    FieldInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
+    FieldInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
     virtual QString displayText();
     virtual void paintEvent(QPaintEvent* p_event);
 };
@@ -101,7 +147,7 @@ class AutoInterp : public Interp
 public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
 
-    AutoInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
+    AutoInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
     virtual void paintEvent(QPaintEvent* p_event);
     virtual bool diplayOpenClose(){ return false; }
 };
@@ -114,7 +160,7 @@ public:
 public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
 
-    TranslUnit(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
+    TranslUnit(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
     virtual QString displayText();
     // virtual void paintEvent(QPaintEvent* p_event);
 };
@@ -125,7 +171,7 @@ class SectionInterp : public Interp
 public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
 
-    SectionInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
+    SectionInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
     virtual QString getHtml();
     // virtual QString displayText();
     // virtual void paintEvent(QPaintEvent* p_event);
@@ -140,7 +186,7 @@ private:
 public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
 
-    UrlInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
+    UrlInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
     virtual QString getHtml();
     // virtual void paintEvent(QPaintEvent* p_event);
 };
@@ -151,7 +197,7 @@ class BhashyaTranslation : public Interp
 public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
 
-    BhashyaTranslation(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
+    BhashyaTranslation(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
     virtual QString getHtml();
     virtual QString displayText();
     // virtual void paintEvent(QPaintEvent* p_event);
@@ -164,7 +210,7 @@ class TextInterp : public Interp
 public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
 
-    TextInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
+    TextInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
     virtual QString getHtml();
     // virtual void paintEvent(QPaintEvent* p_event);
 };
@@ -175,7 +221,7 @@ class SectionBeginEnd : public Interp
 public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
 
-    SectionBeginEnd(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
+    SectionBeginEnd(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
     virtual QString displayText();
     // virtual void paintEvent(QPaintEvent* p_event);
 };
@@ -186,7 +232,7 @@ class TextOccurrence : public Interp
 public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
 
-    TextOccurrence(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
+    TextOccurrence(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
     virtual QString displayText();
     // virtual void paintEvent(QPaintEvent* p_event);
 };
@@ -198,7 +244,7 @@ public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
     static QString occur_to_text(const M1Store::Item_lv2* p_occur_edge);
 
-    SentenceInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
+    SentenceInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
     virtual QString getHtml();
     virtual QWidget *get_edit_widget();
 };
@@ -209,7 +255,7 @@ class BookInterp : public SectionInterp
 public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
 
-    BookInterp(M1Store::Item_lv2* p_myself, QWidget* p_parent, int p_depth);
+    BookInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
     virtual QString getHtml();
 };
 

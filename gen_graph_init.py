@@ -361,26 +361,31 @@ g_nlp_tag_list = [
 ]
 
 g_special_vertices = [
-    ['FOLDR', 'SI_IS_TYPE',                      'FOLDER_ICON_PATH',     'FOLDER_SIID', None, 'Special Vertex ID (Vertex type) of folders (ordinary vertices with no special role)'],
-    ['AUTO_', 'SI_IS_TYPE',                      'AUTO_ICON_PATH',       'AUTO_SIID', None, 'Special Vertex ID (Edge type) of AUTO edges'],
+    ['FOLDR', ['SI_IS_TYPE', 'SI_IS_SELECTABLE'],          'FOLDER_ICON_PATH',           'FOLDER_SIID', None,     'Special Vertex ID (Vertex type) of folders (ordinary vertices with no special role)'],
+    ['AUTO_', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'AUTO_ICON_PATH',             'AUTO_SIID', None,       'Special Vertex ID (Edge type) of AUTO edges'],
     # --------------------------- OWNS / BLNGS ---------------------------
-    ['OWNS_', 'SI_IS_TYPE',                      'OWNS_ICON_PATH',       'OWNS_SIID',
-    ('BLNGS', 'SI_IS_TYPE | SI_INSERT_AT_TOP',   'BLNGS_ICON_PATH',      'BLNGS_SIID'), 'Special Vertex ID (Edge type) of ownership edges'],
+    ['OWNS_', ['SI_IS_TYPE', 'SI_EDGE_TYPE',
+               'SI_IS_SELECTABLE'],                        'OWNS_ICON_PATH',             'OWNS_SIID',
+    ('BLNGS', ['SI_IS_TYPE', 'SI_EDGE_TYPE',
+               'SI_INSERT_AT_TOP', 'SI_IS_SELECTABLE'],    'BLNGS_ICON_PATH',            'BLNGS_SIID'),           'Special Vertex ID (Edge type) of ownership edges'],
     # --------------------------- ISA / ITO ---------------------------
-    ['_ISA_', 'SI_IS_TYPE | SI_IS_SPECIAL_EDGE', 'ISA_ICON_PATH',        'ISA_SIID',
-    ('_ITO_', 'SI_IS_TYPE'                     , 'ITO_ICON_PATH',        'ITO_SIID'), 'Special Vertex ID (Edge type) of type edges'],
+    ['_ISA_', ['SI_IS_TYPE', 'SI_EDGE_TYPE',
+               'SI_IS_SPECIAL_EDGE', 'SI_IS_SELECTABLE'],  'ISA_ICON_PATH',              'ISA_SIID',
+    ('_ITO_', ['SI_IS_TYPE', 'SI_EDGE_TYPE',
+               'SI_IS_SELECTABLE'],                        'ITO_ICON_PATH',              'ITO_SIID'),            'Special Vertex ID (Edge type) of type edges'],
     # --------------------------- WROTE / WRTBY ---------------------------
-    ['WROTE', 'SI_IS_TYPE', 'TEXT_WROTE_ICON_PATH',             'TEXT_WROTE_SIID',
-    ('WRTBY', 'SI_IS_TYPE', 'TEXT_WRITTEN_BY_ICON_PATH',        'TEXT_WRITTEN_BY_SIID'), 'Special Vertex ID (Edge type) wrote / written by'],
-    ['OCCUR', 'SI_IS_TYPE | SI_IS_SPECIAL_EDGE', 'OCCURRENCE_ICON_PATH', 'OCCUR_SIID', None, 'Special Vertex ID (Edge type) of occurrence edges'],
-    ['FORM_', 'SI_IS_TYPE | SI_IS_ICON_TYPE',    'FORM_ICON_PATH',       'FORM_SIID' , None, 'Special Vertex ID (Vertex type) of word form vertices'],
-    ['CAPTL', 'SI_IS_TYPE'                     , None,                   'CAPTL_SIID', None, 'Special Vertex ID (Simple edge type) of Occurrence field capitalization flag'],
-    ['PCTLF', 'SI_IS_TYPE'                     , None,                   'PCTLF_SIID', None, 'Special Vertex ID (Simple edge type) of Occurrence field left punctuation'],
-    ['PCTRT', 'SI_IS_TYPE'                     , None,                   'PCTRT_SIID', None, 'Special Vertex ID (Simple edge type) of Occurrence field right punctuation'],
-    ['MKPLF', 'SI_IS_TYPE'                     , None,                   'MKPLF_SIID', None, 'Special Vertex ID (Simple edge type) of Occurrence field markup left'],
-    ['MKPRT', 'SI_IS_TYPE'                     , None,                   'MKPRT_SIID', None, 'Special Vertex ID (Simple edge type) of Occurrence field markup right'],
-    ['STPOS', 'SI_IS_TYPE'                     , None,                   'STPOS_SIID', None, 'Special Vertex ID (Simple edge type) of Occurrence field sentence position'],
-    ['HLCLR', 'SI_IS_TYPE'                     , None,                   'HLCLR_SIID', None, 'Color of text highlight category'],
+    ['WROTE', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'TEXT_WROTE_ICON_PATH',      'TEXT_WROTE_SIID',
+    ('WRTBY', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'TEXT_WRITTEN_BY_ICON_PATH', 'TEXT_WRITTEN_BY_SIID'), 'Special Vertex ID (Edge type) wrote / written by'],
+    ['OCCUR', ['SI_IS_TYPE', 'SI_EDGE_TYPE',
+               'SI_IS_SPECIAL_EDGE'],                      'OCCURRENCE_ICON_PATH',      'OCCUR_SIID', None,      'Special Vertex ID (Edge type) of occurrence edges'],
+    ['WFORM', 'SI_IS_TYPE | SI_IS_ICON_TYPE',              'WFORM_ICON_PATH',           'WFORM_SIID', None,      'Special Vertex ID (Vertex type) of word form vertices'],
+    ['CAPTL', 'SI_IS_TYPE',                                None,                        'CAPTL_SIID', None,      'Special Vertex ID (Simple edge type) of Occurrence field capitalization flag'],
+    ['PCTLF', 'SI_IS_TYPE',                                None,                        'PCTLF_SIID', None,      'Special Vertex ID (Simple edge type) of Occurrence field left punctuation'],
+    ['PCTRT', 'SI_IS_TYPE',                                None,                        'PCTRT_SIID', None,      'Special Vertex ID (Simple edge type) of Occurrence field right punctuation'],
+    ['MKPLF', 'SI_IS_TYPE',                                None,                        'MKPLF_SIID', None,      'Special Vertex ID (Simple edge type) of Occurrence field markup left'],
+    ['MKPRT', 'SI_IS_TYPE',                                None,                        'MKPRT_SIID', None,      'Special Vertex ID (Simple edge type) of Occurrence field markup right'],
+    ['STPOS', 'SI_IS_TYPE',                                None,                        'STPOS_SIID', None,      'Special Vertex ID (Simple edge type) of Occurrence field sentence position'],
+    ['HLCLR', 'SI_IS_TYPE',                                None,                        'HLCLR_SIID', None,      'Color of text highlight category'],
 ]
 
 g_vertices = [
@@ -390,8 +395,10 @@ g_vertices = [
 ['Global graph root',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['FOLDR'],  None,                  'ROOT_', '0',                                 None,                     'ROOT_SIID'],
 ['Home',                         ['FULL_VERTEX',  'IS_SPECIAL'],  ['FOLDR'],  [('BLNGS',  'ROOT_')], 'HOME_', '0',                                 None,                     'HOME_SIID'],
 ['Root of all types',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'ROOT_')], 'TYPE_', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'TYPE_NODE_ICON_PATH',    'TYPE_NODE_SIID'],
-['Person (type)',                ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'PERSN', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'PERSON_ICON_PATH',       'PERS_TYPE_SIID'],
-['Organization (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'ORGN_', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'ORGANIZATION_ICON_PATH', 'ORG_TYPE_SIID'],
+['Person (type)',                ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'PERSN', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
+                                                                                                               'SI_IS_SELECTABLE'],                'PERSON_ICON_PATH',       'PERS_TYPE_SIID'],
+['Organization (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'ORGN_', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
+                                                                                                               'SI_IS_SELECTABLE'],                'ORGANIZATION_ICON_PATH', 'ORG_TYPE_SIID'],
 ['Me',                           ['FULL_VERTEX',  'IS_SPECIAL'],  ['PERSN'],  [('BLNGS',  'HOME_')], 'ME___', '0',                                 None,                     'ME_SIID'],
 ['Inboxes / Message Root Type',  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  '_MSG_', ['SI_IS_TYPE'],                      None,                     'MSG_TYPE_SIID'],
 ['Email Inbox',                  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  '_MSG_')], 'EMAIL', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'EMAIL_TYPE_SIID'],
@@ -616,9 +623,13 @@ if __name__ == '__main__':
     # main code
     l_base_code = ''
     for l_mnemo, l_flags, l_icon_path, _, l_reciprocal, l_comment in g_special_vertices:
+        if isinstance(l_flags, list):
+            l_flags = ' | '.join(l_flags)
         l_icon_path = f'M1Env::{l_icon_path}' if l_icon_path else 'nullptr'
         if l_reciprocal:
             l_mnemo_r, l_flags_r, l_icon_path_r, l_pseudo_constant_r = l_reciprocal
+            if isinstance(l_flags_r, list):
+                l_flags_r = ' | '.join(l_flags_r)
             l_icon_path_r = f'M1Env::{l_icon_path_r}' if l_icon_path_r else 'nullptr'
             l_base_code += (f'    // {l_comment}\n' +
                             f'    M1Store::Storage::getNewSpecialWithReciprocal({l_flags},\n' +
@@ -756,7 +767,7 @@ if __name__ == '__main__':
                          f'        M1Env::FULL_VERTEX,\n' +
                          f'        // label\n' +
                          f'        "{l_form_txt}");\n')
-        l_plato_code +=  f'    l_form_array[{l_form_id}]->setType("FORM_");\n'
+        l_plato_code +=  f'    l_form_array[{l_form_id}]->setType("WFORM");\n'
         l_tag_mn = l_tag_2_mn[l_form_tag] if l_form_tag in l_tag_2_mn.keys() else l_pos_2_mn[l_form_tag]
         l_plato_code +=  f'    l_form_array[{l_form_id}]->setType("{l_tag_mn}");\n'
         for l_lemma_key in l_republic["Forms"][l_form_key]['LemmaKey']:

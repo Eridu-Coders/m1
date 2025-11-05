@@ -7,10 +7,14 @@
 #include "m1B_graph_init.h"
 #include "m1B_lv2_item.h"
 
+#include <typeinfo>
+#include <iostream>
+#include <string>
+
 Q_LOGGING_CATEGORY(g_cat_tree_display, "tree_display")
 
 M1UI::TreeDisplay::TreeDisplay(QWidget *p_parent, MainWindow *p_main_window) : QScrollArea{p_parent}{
-    M1_FUNC_ENTRY(g_cat_tree_display, QString("TreeDisplay started yay"));
+    M1_FUNC_ENTRY(g_cat_interp_drag, QString("TreeDisplay started yay"));
 
     m_main_window = p_main_window;
     // setMouseTracking(true);
@@ -20,11 +24,23 @@ M1UI::TreeDisplay::TreeDisplay(QWidget *p_parent, MainWindow *p_main_window) : Q
     this->setMinimumWidth(450);
 
     QPalette p = this->palette();
-    p.setColor(QPalette::Window, QColor(QColor(30,30,30)));
+    p.setColor(QPalette::Window, QColor(QColor(30, 30, 30)));
     this->setPalette(p);
     this->setBackgroundRole(QPalette::Window);
     this->setAutoFillBackground(true);
+
+    m_scroll_area_widget = new QWidget(this);
+    m_vb_layout = new QVBoxLayout();
+    m_scroll_area_widget->setLayout(m_vb_layout);
+    this->setWidget(m_scroll_area_widget);
+    m_vb_layout->setSpacing(0);
+    m_vb_layout->setContentsMargins(0, 0, 0, 0);
+
     addInterp(M1Store::Item_lv2::getExisting(M1Env::HOME_SIID));
+
+    m_new_edge_type = M1Store::Storage::getSelectableEdgeTypes()[0];
+    m_new_vertex_type = M1Store::Storage::getSelectableVertexTypes()[0];
+    qCDebug(g_cat_interp_drag) << "Default Edge type : " << m_new_edge_type->mnemonic();
 
     // this->setAcceptDrops(true);
     // this->setMouseTracking(true);
@@ -36,17 +52,6 @@ M1UI::TreeDisplay::TreeDisplay(QWidget *p_parent, MainWindow *p_main_window) : Q
 void M1UI::TreeDisplay::mouseMoveEvent(QMouseEvent *p_event){
     qCDebug(g_cat_interp_drag) << QString("TD mouse move event") << p_event->position();
 }*/
-
-void M1UI::TreeDisplay::gotoVertex(M1Store::Item_lv2* p_new_vertex){
-    M1_FUNC_ENTRY(g_cat_tree_display, QString("gotoVertex %1").arg(p_new_vertex == nullptr ? m_root->dbgShort() : p_new_vertex->dbgShort()))
-    delete this->widget();
-    if(p_new_vertex == nullptr)
-        addInterp(m_root);
-    else
-        addInterp(p_new_vertex);
-
-    M1_FUNC_EXIT
-}
 
 void M1UI::TreeDisplay::htmlReceive(const QString& p_html){
     M1_FUNC_ENTRY(g_cat_tree_display, QString("html %1").arg(p_html))
@@ -88,7 +93,7 @@ M1MidPlane::Interp* M1UI::TreeDisplay::addInterpRecur(
         if(it.at()->isOfType(M1Env::AUTO_SIID)){
             qCDebug(g_cat_tree_display) << "current edge (auto) : " << it.at()->dbgShort() << " Auto? " << it.at()->isOfType(M1Env::AUTO_SIID);
             if(p_depth == 0){
-                l_ti = M1MidPlane::Interp::getInterp(it.at(), this, p_depth);
+                l_ti = M1MidPlane::Interp::getInterp(it.at(), p_vb, this, p_depth);
                 l_auto_edge = l_ti;
             }
             else continue;
@@ -97,18 +102,17 @@ M1MidPlane::Interp* M1UI::TreeDisplay::addInterpRecur(
             continue;
         else {
             qCDebug(g_cat_tree_display) << "current edge (regular) : " << it.at()->dbgShort();
-            l_ti = M1MidPlane::Interp::getInterp(it.at(), this, p_depth);
+            l_ti = M1MidPlane::Interp::getInterp(it.at(), p_vb, this, p_depth);
         }
+        m_interp_list.append(l_ti);
 
         QObject::connect(l_ti, &M1MidPlane::Interp::gotoVertex,
                          this, &M1UI::TreeDisplay::gotoVertex);
         QObject::connect(l_ti, &M1MidPlane::Interp::emitHtml,
                          this, &M1UI::TreeDisplay::htmlReceive);
-        // QObject::connect(l_ti, &M1MidPlane::Interp::emitEdit,
-        //                  this, &M1UI::TreeDisplay::editReceive);
         QObject::connect(l_ti, &M1MidPlane::Interp::emitEdit,
                          m_main_window, &M1UI::MainWindow::editReceive);
-        p_vb->addWidget(l_ti);
+        // p_vb->addWidget(l_ti);
 
         // recur if this edge is open
         if(it.at()->flags() & M1Env::EDGE_IS_OPEN && !p_edges_alrady_traversed.contains(it.at()->item_id())){
@@ -129,29 +133,82 @@ M1MidPlane::Interp* M1UI::TreeDisplay::addInterpRecur(
 void M1UI::TreeDisplay::addInterp(M1Store::Item_lv2* p_root){
     M1_FUNC_ENTRY(g_cat_tree_display, QString("p_root: %1").arg(p_root->dbgShort()));
     m_root = p_root;
-    QVBoxLayout* l_vb = new QVBoxLayout();
-    l_vb->setSpacing(0);
-    l_vb->setContentsMargins(0, 0, 0, 0);
+
     QVector<M1Store::ItemID> l_alrady_traversed;
-    M1MidPlane::Interp* l_auto_edge = addInterpRecur(p_root, 0, l_vb, l_alrady_traversed);
-    l_vb->addStretch();
+    qCDebug(g_cat_interp_drag) << "before recur" << m_vb_layout->count() << this->widget()->children().count() << m_interp_list.count();
+    M1MidPlane::Interp* l_auto_edge = addInterpRecur(p_root, 0, m_vb_layout, l_alrady_traversed);
+    qCDebug(g_cat_interp_drag) << "after recur" << m_vb_layout->count() << this->widget()->children().count() << m_interp_list.count();
 
-    QWidget* l_scroll_area_widget = new QWidget();
-    l_scroll_area_widget->setLayout(l_vb);
+    m_vb_layout->addStretch();
+    qCDebug(g_cat_interp_drag) << "after stretch" << m_vb_layout->count() << this->widget()->children().count() << m_interp_list.count();
+    // std::cout << "Class name: " << typeid(m_vb_layout->).name() << std::endl;
+    // l_vb->addStretch();
 
-    this->setWidget(l_scroll_area_widget);
     this->setWidgetResizable(true);
     this->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
     this->show();
 
-    if(l_auto_edge != nullptr) l_auto_edge->setFocus();
+    if(l_auto_edge != nullptr) l_auto_edge->setFocus(Qt::OtherFocusReason);
 
     qCDebug(g_cat_tree_display) << "Font family : " << this->fontInfo().family();
     qCDebug(g_cat_tree_display) << "Font style  : " << this->fontInfo().style();
     qCDebug(g_cat_tree_display) << "Font height : " << this->fontMetrics().height();
     M1_FUNC_EXIT
 }
+void M1UI::TreeDisplay::gotoVertex(M1Store::Item_lv2* p_new_vertex, M1MidPlane::Interp* p_sender){
+    M1_FUNC_ENTRY(g_cat_interp_drag, QString("gotoVertex %1").arg(p_new_vertex == nullptr ? m_root->dbgShort() : p_new_vertex->dbgShort()))
 
+    this->setUpdatesEnabled(false);
+    qCDebug(g_cat_interp_drag) << "before m_interp_list delete" << m_vb_layout->count() << m_scroll_area_widget->children().count();
+    if(m_old_interp != nullptr){
+        delete m_old_interp;
+        m_old_interp = nullptr;
+    }
+    for(M1MidPlane::Interp *l_interp : std::as_const(m_interp_list)){
+        l_interp->deleteProxyLater();
+        if(l_interp == p_sender)
+            m_old_interp = l_interp;
+        else
+            delete l_interp;
+    }
+    qCDebug(g_cat_interp_drag) << "before clear" << m_vb_layout->count() << m_scroll_area_widget->children().count();
+    m_interp_list.clear();
+    // remove stretch item at end
+    m_vb_layout->removeItem(m_vb_layout->itemAt(0));
+    qCDebug(g_cat_interp_drag) << "after clear" << m_vb_layout->count() << m_scroll_area_widget->children().count();
+    for(int i=0; i<m_vb_layout->count(); i++)
+        qCDebug(g_cat_interp_drag) << "Layout" << i << m_vb_layout->itemAt(i)->spacerItem() << m_vb_layout->itemAt(i)->widget();
+    for(int i=0; i<this->widget()->children().count(); i++)
+        qCDebug(g_cat_interp_drag) << "m_scroll_area_widget" << i << m_scroll_area_widget->children().at(i);
+
+    if(p_new_vertex == nullptr)
+        addInterp(m_root);
+    else
+        addInterp(p_new_vertex);
+    this->setUpdatesEnabled(true);
+
+    qCDebug(g_cat_interp_drag) << "after new filling" << m_vb_layout->children().count() << m_scroll_area_widget->children().count();
+    M1_FUNC_EXIT
+}
+
+void M1UI::TreeDisplay::edgeTypeSelected(int p_index){
+    qCDebug(g_cat_interp_drag) << "Edge type : " << M1Store::Storage::getSelectableEdgeTypes()[p_index]->mnemonic();
+    m_new_edge_type = M1Store::Storage::getSelectableEdgeTypes()[p_index];
+}
+void M1UI::TreeDisplay::vertexTypeSelected(int p_index){
+    qCDebug(g_cat_interp_drag) << "Vertex type : " << M1Store::Storage::getSelectableVertexTypes()[p_index]->mnemonic();
+    m_new_vertex_type = M1Store::Storage::getSelectableVertexTypes()[p_index];
+}
+
+M1Store::SpecialItem* M1UI::TreeDisplay::newEdgeType(){
+    qCDebug(g_cat_interp_drag) << "Current Edge type : " << m_new_edge_type->mnemonic();
+    return m_new_edge_type;
+}
+
+M1Store::SpecialItem* M1UI::TreeDisplay::newVertexType(){
+    qCDebug(g_cat_interp_drag) << "Current Vertex type : " << m_new_vertex_type->mnemonic();
+    return m_new_vertex_type;
+}
 // ------------------------------------------ Tests --------------------------------------------------------------
 /*
 void M1UI::TreeDisplay::variousTests(){

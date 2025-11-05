@@ -248,7 +248,7 @@ void M1Store::Storage::storeSetUp(bool p_reset){
     qCDebug(g_cat_silence) << QString("BLNGS_SIID                 = %1").arg(M1Store::BLNGS_SIID);
 
     qCDebug(g_cat_silence) << QString("TEXT_SIID                  = %1").arg(M1Store::TEXT_SIID);
-    qCDebug(g_cat_silence) << QString("FORM_SIID                  = %1").arg(M1Store::FORM_SIID);
+    qCDebug(g_cat_silence) << QString("WFORM_SIID                 = %1").arg(M1Store::WFORM_SIID);
     qCDebug(g_cat_silence) << QString("TEXT_CHUNK_SIID            = %1").arg(M1Store::TEXT_CHUNK_SIID);
 
     qCDebug(g_cat_silence) << QString("TW_WORD_OCC                = %1").arg(M1Store::OCCUR_SIID);
@@ -818,6 +818,34 @@ QIcon* M1Store::Storage::getQIcon(SpecialItemID p_si_id){
     return l_ret;
 }
 
+QList<M1Store::SpecialItem*>& M1Store::Storage::getSelectableEdgeTypes(){
+    M1_FUNC_ENTRY(g_cat_store, QString("Get list of selectable edge types"))
+    static QList<M1Store::SpecialItem*> l_ret_edges;
+
+    l_ret_edges.clear();
+    for(M1Env::SpecialItemID l_special_id = 0; l_special_id < cm_next_special; l_special_id++){
+        M1Store::SpecialItem* l_special_item = getSpecialItemPointer(l_special_id);
+        if((l_special_item->flags() & M1Env::SI_IS_SELECTABLE) && (l_special_item->flags() & M1Env::SI_EDGE_TYPE)) l_ret_edges.append(l_special_item);
+    }
+
+    M1_FUNC_EXIT
+    return l_ret_edges;
+}
+QList<M1Store::SpecialItem*>& M1Store::Storage::getSelectableVertexTypes(){
+    M1_FUNC_ENTRY(g_cat_store, QString("Get list of selectable vertex types"))
+    static QList<M1Store::SpecialItem*> l_ret_vertices;
+
+    l_ret_vertices.clear();
+    for(M1Env::SpecialItemID l_special_id = 0; l_special_id < cm_next_special; l_special_id++){
+        M1Store::SpecialItem* l_special_item = getSpecialItemPointer(l_special_id);
+        if((l_special_item->flags() & M1Env::SI_IS_SELECTABLE) && !(l_special_item->flags() & M1Env::SI_EDGE_TYPE)) l_ret_vertices.append(l_special_item);
+    }
+
+    M1_FUNC_EXIT
+    return l_ret_vertices;
+}
+
+
 /*
 0x0000 AUTO_ 0xffffffffffffffff 0b0000000000000000000000000000000000000000000000000000000000001001
 0x0001 OWNS_ 0xffffffffffffffff 0b0000000000000000000000000000000000000000000000000000000000011001 --RECIPROCAL--> BLNGS
@@ -1057,7 +1085,7 @@ void M1Store::Storage::dbgDump(){
     qCDebug(g_cat_silence) << QString("OWNS_SIID  = 0x%1").arg(M1Store::OWNS_SIID, 4, 16, QChar('0'));
     qCDebug(g_cat_silence) << QString("BLNGS_SIID = 0x%1").arg(M1Store::BLNGS_SIID, 4, 16, QChar('0'));
     qCDebug(g_cat_silence) << QString("TEXT_SIID  = 0x%1").arg(M1Store::TEXT_SIID, 4, 16, QChar('0'));
-    qCDebug(g_cat_silence) << QString("FORM_SIID  = 0x%1").arg(M1Store::FORM_SIID, 4, 16, QChar('0'));
+    qCDebug(g_cat_silence) << QString("FORM_SIID  = 0x%1").arg(M1Store::WFORM_SIID, 4, 16, QChar('0'));
 
     // dump special items table
     qCDebug(g_cat_silence) << QString("========= Special Items dump ========");

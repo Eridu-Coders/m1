@@ -117,6 +117,10 @@ namespace M1Store{
         /// get the current version number
         static unsigned int currentVersion(){return cm_current_version;}
 
+        /// get the list of special vertices that have the flag SI_IS_SELECTABLE set (for the edge type selection on the left pannel)
+        static QList<SpecialItem*>& getSelectableEdgeTypes();
+        static QList<SpecialItem*>& getSelectableVertexTypes();
+
         /// for testing purposes only
         static StringID dbg_get_string_id(Item_lv0& p_item) {return p_item.p.v.f.m_string_id;}
 

@@ -950,13 +950,13 @@ M1Store::Item_lv2* M1Store::Item_lv2::create_descendant(
     const SpecialItemID p_vertex_type,
     Item_lv2* p_edge_above, const bool p_at_top){
 
-    M1_FUNC_ENTRY(g_cat_lv2_members,
-                  QString("{%1} new descendant: --{%2}--> [%4] %3")
-                    .arg(this->dbgShort()
+    M1_FUNC_ENTRY(g_cat_interp_drag,
+                  QString("new descendant: %1 --{%2}--> [%3] %4")
+                    .arg(this->dbgShort())
                     .arg(M1Store::Storage::getSpecialItemPointer(p_edge_type)->mnemonic())
-                    .arg(p_label)
                     .arg(M1Store::Storage::getSpecialItemPointer(p_vertex_type)->mnemonic())
-    ))
+                    .arg(p_label)
+    )
     // cannot give descendants to anything but full vertices or edge
     Q_ASSERT_X(isFullVertex() || isFullEdge(), "Item_lv2::create_descendant()", "cannot give descendants to simple vertices or edges");
 
@@ -1166,7 +1166,8 @@ QString M1Store::Item_lv2::getField(const SpecialItem* p_field_type_si, const Sp
 void M1Store::Item_lv2::installFullEdge(Item_lv2* p_new_edge, const SpecialItemID p_edge_type, Item_lv2* p_edge_above, bool p_at_top){
     M1_FUNC_ENTRY(g_cat_lv2_members, QString("{%3} adding full edge [%1] at top? %2")
                                          .arg(p_new_edge->dbgShort())
-                                         .arg(p_at_top).arg(this->dbgShort()))
+                                         .arg(p_at_top)
+                                         .arg(this->dbgShort()))
 
     // cannot link simple items to anything
     Q_ASSERT_X(this->isFullVertex() || this->isFullEdge(),

@@ -20,9 +20,9 @@ namespace M1Env{
 
     // Null values for ItemID (64 bits) and SpecialItemID (16 bits) respectively
     const ItemID G_VOID_ITEM_ID = 0xffffffffffffffff;   ///< -1 = NULL value for ItemID
-    const ItemID G_NONEX_ITEM_ID = 0xfffffffffffffffe;   ///<
+    const ItemID G_NONEX_ITEM_ID = 0xfffffffffffffffe;  ///<
     const SpecialItemID G_VOID_SI_ID = 0xffff;          ///< -1 = NULL value for SpecialItemID
-    const SpecialItemID G_NONEX_SI_ID = 0xfffe;          ///<
+    const SpecialItemID G_NONEX_SI_ID = 0xfffe;         ///<
 
     // flag bits for items
     const unsigned long long ITEM_IS_VERTEX         = 0x0000000000000001; ///< 0 --> item is an edge, 1 --> item is a vertex
@@ -40,14 +40,14 @@ namespace M1Env{
     const unsigned long long SIMPLE_EDGE = ITEM_IS_SIMPLE;                      ///< (0x2) flag & ITEM_NATURE_MASK == SIMPLE_EDGE --> it is a simple vertex
     // bit masks for testing the above
     const unsigned long long ITEM_NATURE_MASK = 0x0000000000000003;             ///< all bits to determine Item nature
-    const unsigned long long ITEM_BASE0_MASK = 0x0000000000000007;              ///< same as ITEM_NATURE_MASK + ITEM_HAS_LOCAL_STRING
-    const unsigned long long ITEM_BASE1_MASK = 0x000000000000000f;              ///< same as ITEM_BASE0_MASK + TYPE_IS_ITEM_ID
+    const unsigned long long ITEM_BASE0_MASK  = 0x0000000000000007;             ///< same as ITEM_NATURE_MASK + ITEM_HAS_LOCAL_STRING
+    const unsigned long long ITEM_BASE1_MASK  = 0x000000000000000f;             ///< same as ITEM_BASE0_MASK + TYPE_IS_ITEM_ID
 
     // length of text area in each of the 4 types of items
-    const unsigned int FULL_EDGE_TEXT_LEN = 16;      ///< text length for full edges
-    const unsigned int SIMPLE_EDGE_TEXT_LEN = 64;    ///< text length for simple edges
+    const unsigned int FULL_VERTEX_TEXT_LEN   = 32;  ///< text length for full vertices
     const unsigned int SIMPLE_VERTEX_TEXT_LEN = 96;  ///< text length for simple vertices
-    const unsigned int FULL_VERTEX_TEXT_LEN = 32;    ///< text length for full vertices
+    const unsigned int FULL_EDGE_TEXT_LEN     = 16;  ///< text length for full edges
+    const unsigned int SIMPLE_EDGE_TEXT_LEN   = 64;  ///< text length for simple edges
 
     // keys for value storage in the utilities table
     // values up to 0x00010000 are reserved for icon paths
@@ -72,6 +72,8 @@ namespace M1Env{
     const unsigned long long SI_IS_SPECIAL_EDGE = 0x0000000000000020; ///< When this type is given to an edge it must be added to the special edge list
     const unsigned long long SI_INSERT_AT_TOP   = 0x0000000000000040; ///< insert at top of the ordinary edges ring (for edges that are not special)
     const unsigned long long SI_IS_ICON_TYPE    = 0x0000000000000080; ///< type for icon choice
+    const unsigned long long SI_IS_SELECTABLE   = 0x0000000000000100; ///< type appears in the vertex/edge selection combos on left panel
+    const unsigned long long SI_EDGE_TYPE       = 0x0000000000000200; ///< type appears in the vertex/edge selection combos on left panel
 
     // M1Store constants
     // class-level constants holding the names of various things
@@ -92,7 +94,7 @@ namespace M1Env{
     static const char* BLNGS_ICON_PATH = "../Icons/BLNGS.svg";                          // *
     static const char* TEXT_ICON_PATH = "../Icons/Text.svg";                            // *
     static const char* OCCURRENCE_ICON_PATH = "../Icons/Occurrence.svg";                // *
-    static const char* FORM_ICON_PATH = "../Icons/Word.svg";                            // *
+    static const char* WFORM_ICON_PATH = "../Icons/Word.svg";                           // *
     static const char* LEMMA_ICON_PATH = "../Icons/Lemma.svg";                          // *
     static const char* ENTITY_ICON_PATH = "../Icons/Entity.svg";                        // *
     static const char* POS_ICON_PATH = "../Icons/Nlp-Pos.svg";                          // *
@@ -134,10 +136,10 @@ Q_DECLARE_LOGGING_CATEGORY(g_cat_lv0_test)              ///< for tests of the lv
 Q_DECLARE_LOGGING_CATEGORY(g_cat_lv1_test)              ///< for tests of the lv1_Item class
 Q_DECLARE_LOGGING_CATEGORY(g_cat_lv2_test)              ///< for tests of the lv2_Item class
 Q_DECLARE_LOGGING_CATEGORY(g_cat_tree_display)          ///< TreeDisplay widget class
-Q_DECLARE_LOGGING_CATEGORY(g_cat_td_signals)            ///< Signals between TreeDisplay and MainWindow
 Q_DECLARE_LOGGING_CATEGORY(g_cat_passages_panel)        ///< Passages panel UI class
 Q_DECLARE_LOGGING_CATEGORY(g_cat_interp_base)           ///< Base class of the Interp hierarchy
+Q_DECLARE_LOGGING_CATEGORY(g_cat_interp_drag)           ///< Drag/Drop in the Interp hierarchy
 Q_DECLARE_LOGGING_CATEGORY(g_cat_main_window)           ///< MainWindow widget class
 Q_DECLARE_LOGGING_CATEGORY(g_cat_main)                  ///< messages from main of complete (non-test) build (including XML loaders)
 
-#endif // M1_CONSTANTS_H g_cat_td_signals
+#endif // M1_CONSTANTS_H

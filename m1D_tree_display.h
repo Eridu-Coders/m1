@@ -19,20 +19,33 @@ namespace M1UI{
     private:
         // void addTestWidgets();
         void addInterp(M1Store::Item_lv2* p_root);
-        M1MidPlane::Interp* addInterpRecur(M1Store::Item_lv2* p_root, int p_depth, QVBoxLayout* p_vb, QVector<M1Store::ItemID>& p_edges_alrady_traversed);
+        M1MidPlane::Interp* addInterpRecur(M1Store::Item_lv2* p_root,
+                                           int p_depth,
+                                           QVBoxLayout* p_vb,
+                                           QVector<M1Store::ItemID>& p_edges_alrady_traversed);
 
         void variousTests();
 
         M1Store::Item_lv2* m_root;
         MainWindow *m_main_window;
+        M1Store::SpecialItem* m_new_edge_type;
+        M1Store::SpecialItem* m_new_vertex_type;
+        QList<M1MidPlane::Interp*> m_interp_list;
+        M1MidPlane::Interp* m_old_interp = nullptr;
+        QWidget* m_scroll_area_widget = nullptr;
+        QVBoxLayout* m_vb_layout = nullptr;
     public:
         explicit TreeDisplay(QWidget *p_parent, MainWindow *p_main_window);
 
         virtual void paintEvent(QPaintEvent *);
+        M1Store::SpecialItem* newEdgeType();
+        M1Store::SpecialItem* newVertexType();
         // virtual void mouseMoveEvent(QMouseEvent *p_event);
     public slots:
-        void gotoVertex(M1Store::Item_lv2* p_new_vertex);
+        void gotoVertex(M1Store::Item_lv2* p_new_vertex, M1MidPlane::Interp* p_sender);
         void htmlReceive(const QString& p_html);
+        void edgeTypeSelected(int p_index);
+        void vertexTypeSelected(int p_index);
     signals:
         void emitHtml(const QString& p_html);
     };
