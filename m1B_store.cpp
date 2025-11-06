@@ -1101,6 +1101,7 @@ void M1Store::Storage::dbgDump(){
         qCDebug(g_cat_silence) << QString("0x%1 ").arg(i, 16, 16, QChar('0')) + l_item->dbgShort();
     }
 
+    /*
     // dump vertices --------------------------------------------------------------
     qCDebug(g_cat_silence) << QString("========= Vertices dump =============");
 
@@ -1112,7 +1113,8 @@ void M1Store::Storage::dbgDump(){
 
     // tree dump --------------------------------------------------------------
     qCDebug(g_cat_silence) << QString("========= Tree Dump =================");
-    // Item_lv2::dbgRecurGraphStart(getSpecialItemPointer("ROOT_")->itemId());
+    Item_lv2::dbgRecurGraphStart(getSpecialItemPointer("ROOT_")->itemId());
+    */
 
     // restore categories --> all allowed
     M1Env::M1EnvStatic::setSilentMode(false);

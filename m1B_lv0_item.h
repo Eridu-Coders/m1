@@ -180,6 +180,7 @@ using namespace M1Env;
         void setFlagsExtra(const FlagField p_flags);
         void setFlagExtra(const FlagField p_flag);
         void unSetFlagExtra(const FlagField p_flag);
+        void storeSpecialItemID(const SpecialItemID p_si_id);
 
         void setOrigin(const ItemID p_origin);
         void setTarget(const ItemID p_target);
@@ -198,6 +199,7 @@ using namespace M1Env;
         void setText(const QString& p_text);
 
         // ------------------------ Getters ---------------------------------------------------------
+        SpecialItemID specialItemId();
         ItemID item_id() const;
         FlagField flags() const;
         SpecialItemID getType_si_id(const unsigned int p_index) const;

@@ -24,7 +24,7 @@ namespace M1Env{
     const SpecialItemID G_VOID_SI_ID = 0xffff;          ///< -1 = NULL value for SpecialItemID
     const SpecialItemID G_NONEX_SI_ID = 0xfffe;         ///<
 
-    // flag bits for items
+    // flag bits for items                              OOOO____OOOO____
     const unsigned long long ITEM_IS_VERTEX         = 0x0000000000000001; ///< 0 --> item is an edge, 1 --> item is a vertex
     const unsigned long long ITEM_IS_SIMPLE         = 0x0000000000000002; ///< 1 --> item is either a simple edge or simple vertex
     const unsigned long long ITEM_HAS_LOCAL_STRING  = 0x0000000000000004; ///< 1 --> the local m_text (if any) is used to store the string
@@ -33,15 +33,17 @@ namespace M1Env{
     const unsigned long long IS_AUTO                = 0x0000000000000020; ///< 1 --> this is an AUTO_ edge
     const unsigned long long EDGE_IS_OPEN           = 0x0000000000000080; ///< 1 --> this edge is open (recursive descent)
 
+    const unsigned long long SPECIAL_ITEM_ID_MASK   = 0xFFFF000000000080; ///<
+
+    // bit masks for testing the values below           OOOO____OOOO____
+    const unsigned long long ITEM_NATURE_MASK       = 0x0000000000000003; ///< all bits to determine Item nature
+    const unsigned long long ITEM_BASE0_MASK        = 0x0000000000000007; ///< same as ITEM_NATURE_MASK | ITEM_HAS_LOCAL_STRING
+    const unsigned long long ITEM_BASE1_MASK        = 0x000000000000000f; ///< same as ITEM_BASE0_MASK | TYPE_IS_ITEM_ID
     // composite flag values for item nature testing
     const unsigned long long FULL_VERTEX = ITEM_IS_VERTEX;                      ///< (0x1) flag & ITEM_NATURE_MASK == FULL_VERTEX --> it is a full vertex
     const unsigned long long SIMPLE_VERTEX = ITEM_IS_VERTEX | ITEM_IS_SIMPLE;   ///< (0x3) flag & ITEM_NATURE_MASK == SIMPLE_VERTEX --> it is a simple vertex
     const unsigned long long FULL_EDGE = 0x0;                                   ///< (0x0) flag & ITEM_NATURE_MASK == FULL_EDGE --> it is a full edge
     const unsigned long long SIMPLE_EDGE = ITEM_IS_SIMPLE;                      ///< (0x2) flag & ITEM_NATURE_MASK == SIMPLE_EDGE --> it is a simple vertex
-    // bit masks for testing the above
-    const unsigned long long ITEM_NATURE_MASK = 0x0000000000000003;             ///< all bits to determine Item nature
-    const unsigned long long ITEM_BASE0_MASK  = 0x0000000000000007;             ///< same as ITEM_NATURE_MASK + ITEM_HAS_LOCAL_STRING
-    const unsigned long long ITEM_BASE1_MASK  = 0x000000000000000f;             ///< same as ITEM_BASE0_MASK + TYPE_IS_ITEM_ID
 
     // length of text area in each of the 4 types of items
     const unsigned int FULL_VERTEX_TEXT_LEN   = 32;  ///< text length for full vertices

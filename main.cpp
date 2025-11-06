@@ -75,6 +75,7 @@ int main(int argc, char *argv[])
                                         "interp.drag=true\n"
                                         "tree_display=false\n"
                                         "passages_panel=false\n"
+                                        "main_window=false\n"
                                         "qt.*.debug=false");
 
     M1MidPlane::Interp::init();

@@ -54,7 +54,8 @@ void M1UI::TreeDisplay::mouseMoveEvent(QMouseEvent *p_event){
 }*/
 
 void M1UI::TreeDisplay::htmlReceive(const QString& p_html){
-    M1_FUNC_ENTRY(g_cat_tree_display, QString("html %1").arg(p_html))
+    // M1_FUNC_ENTRY(g_cat_interp_drag, QString("html %1").arg(p_html))
+    M1_FUNC_ENTRY(g_cat_interp_drag, QString("html received"))
     emit emitHtml(p_html);
     M1_FUNC_EXIT
 }
@@ -161,6 +162,7 @@ void M1UI::TreeDisplay::gotoVertex(M1Store::Item_lv2* p_new_vertex, M1MidPlane::
     this->setUpdatesEnabled(false);
     qCDebug(g_cat_interp_drag) << "before m_interp_list delete" << m_vb_layout->count() << m_scroll_area_widget->children().count();
     if(m_old_interp != nullptr){
+        qCDebug(g_cat_interp_drag) << "delete m_old_interp" << m_old_interp->dbgString();
         delete m_old_interp;
         m_old_interp = nullptr;
     }

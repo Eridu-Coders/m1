@@ -97,10 +97,12 @@ class Item_lv2 : public Item_lv1 {
 
         bool setType(const SpecialItem* p_type_si);
         bool setType(const SpecialItemID p_type_si_id);
+        bool setType(const Item_lv2* p_type_lv2);
         bool setType(const char* p_mnemonic);
 
         bool isOfType(const SpecialItem* p_type_si) const;
         bool isOfType(const SpecialItemID p_type_si_id) const;
+        bool isOfType(const Item_lv2* p_type_lv2) const;
         bool isOfType(const char* p_mnemonic) const;
         // bool isOfType(const ItemID p_type_item_id) const;
         SpecialItemID getIconTypeMember();

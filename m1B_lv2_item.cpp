@@ -184,7 +184,8 @@ M1Store::Item_lv2* M1Store::Item_lv2::getNew(
     
     M1Store::Item_lv2* l_item_lv2 = getNew(p_flags, p_label);
     qCDebug(g_cat_lv2_constructors) << QString("Creating new special: %1").arg(p_mnemonic);
-    M1Store::Storage::getNewSpecialWithItem(l_item_lv2->item_id(), p_flags_special, p_mnemonic, p_icon_path);
+    M1Store::SpecialItem* l_special = M1Store::Storage::getNewSpecialWithItem(l_item_lv2->item_id(), p_flags_special, p_mnemonic, p_icon_path);
+    l_item_lv2->storeSpecialItemID(l_special->specialId());
 
     qCDebug(g_cat_lv2_constructors) << QString("New: %1").arg(l_item_lv2->dbgShort());
     M1_FUNC_EXIT
@@ -768,7 +769,25 @@ bool M1Store::Item_lv2::setType(const char* p_mnemonic){
     M1_FUNC_EXIT
     return l_ret;
 }
+/**
+ * @brief M1Store::Item_lv2::setType
+ * @param p_type_lv2
+ * @return
+ */
+bool M1Store::Item_lv2::setType(const Item_lv2* p_type_lv2){
+    M1_FUNC_ENTRY(g_cat_lv2_members, QString("Set type to: %1").arg(p_type_lv2->text()))
 
+    bool l_ret;
+    M1_FUNC_EXIT
+    return l_ret;
+}
+bool M1Store::Item_lv2::isOfType(const Item_lv2* p_type_lv2) const{
+    M1_FUNC_ENTRY(g_cat_lv2_members, QString("Is of type: %1?").arg(p_type_lv2->text()))
+
+    bool l_ret;
+    M1_FUNC_EXIT
+    return l_ret;
+}
 /***********************************************************************************************************/
 /** \defgroup IOT2 Tests type values stored in Item_lv0::m_type AND ALSO the types embodied by ISA/ITO edges
  *  @{

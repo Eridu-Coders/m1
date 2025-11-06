@@ -343,6 +343,7 @@ QString M1UI::PassageEditor::bake_highlight(M1Store::Item_lv2* p_highlight_verte
         M1Store::OWNS_SIID,
         QString(l_version->text()) + " Chunk",
         M1Store::TEXT_HIGHLIGHT_CHUNK_SIID);
+    l_highlight_chunk->setType(l_version->specialItemId());
 
     QStringList l_ret_list;
     if(m_from_sel >= 0)

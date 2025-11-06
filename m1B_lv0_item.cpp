@@ -286,6 +286,23 @@ M1Store::FlagField M1Store::Item_lv0::flags() const {
     return m_flags;
 }
 
+/**
+ * @brief M1Store::Item_lv0::storeSpecialItemID
+ * @param p_si_id
+ */
+void M1Store::Item_lv0::storeSpecialItemID(const SpecialItemID p_si_id){
+    FlagField l_id_as_flags = p_si_id;
+    l_id_as_flags = l_id_as_flags << 48;
+    this->setFlags( (flags() & 0x0000FFFFFFFFFFFF) | l_id_as_flags);
+}
+/**
+ * @brief M1Store::Item_lv0::specialItemId
+ * @return
+ */
+M1Env::SpecialItemID M1Store::Item_lv0::specialItemId(){
+    return (flags() & 0xFFFF000000000000) >> 48;
+}
+
 // ---------------------------------------------------------------------------------------------------------
 // type setting and testing
 /**

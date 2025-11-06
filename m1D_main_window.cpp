@@ -17,6 +17,7 @@ Q_LOGGING_CATEGORY(g_cat_main_window, "main_window")
 
 void loadWords(){}
 
+const int HTML_TAB_INDEX = 0;
 const int EDIT_TAB_INDEX = 2;
 const int INIT_SIZE_X = 1200;
 const int INIT_SIZE_Y = 1000;
@@ -111,17 +112,19 @@ void M1UI::MainWindow::mouseMoveEvent(QMouseEvent *p_event){
 
 void M1UI::MainWindow::htmlReceive(const QString& p_html){
     // printf("%s\n", p_html.toUtf8().constData());
-    M1_FUNC_ENTRY(g_cat_main_window, QString("Html"));
+    M1_FUNC_ENTRY(g_cat_main_window, QString("Html: %1").arg(p_html));
+
     if(p_html.left(4) == "http")
         m_web_view->setUrl(QUrl(p_html));
     else
         m_web_view->setHtml(p_html);
-    m_tab_widget->setCurrentIndex(0);
+
+    m_tab_widget->setCurrentIndex(HTML_TAB_INDEX);
     M1_FUNC_EXIT
 }
 
 void M1UI::MainWindow::editReceive(QWidget *p_edit_widget){
-    M1_FUNC_ENTRY(g_cat_main_window, QString("Item"));
+    M1_FUNC_ENTRY(g_cat_interp_drag, QString("Item"));
 
     if(m_tab_widget->count() > 0)
         m_tab_widget->removeTab(EDIT_TAB_INDEX);
