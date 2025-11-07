@@ -126,6 +126,7 @@ namespace M1Store{
 
         static QIcon* getQIcon(SpecialItemID p_si_id);
 
+        static QString maxLength(const QString& s, int p_maxlength){return s.length() > p_maxlength ? s.left(p_maxlength) + " ..." : s;}
         static void dbgDump();
     };
 

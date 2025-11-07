@@ -406,7 +406,8 @@ g_vertices = [
 ['Discord Inbox',                ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  '_MSG_')], 'DSCRD', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'DSCRD_TYPE_SIID'],
 ['GChat Inbox',                  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  '_MSG_')], 'GCHAT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'GCHAT_TYPE_SIID'],
 ['SMS Inbox',                    ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  '_MSG_')], 'SMS__', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'SMS_TYPE_SIID'],
-['Texts Root (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TEXT_', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'TEXT_ICON_PATH',         'TEXT_SIID'],
+['Texts Root (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TEXT_', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
+                                                                                                               'SI_IS_SELECTABLE'],                'TEXT_ICON_PATH',         'TEXT_SIID'],
 ['Grammar Attributes (type)',    ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'GRATT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'GRAMMAR_ATTR_SIID'],
 ['Lemma (type)',                 ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'LEMMA', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
                                                                                                                'SI_IS_ICON_TYPE'],                 'LEMMA_ICON_PATH',        'LEMMA_SIID'],
@@ -416,7 +417,8 @@ g_vertices = [
 ['Stephanus Section (type)',     ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'STPSC', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'STEPHANUS_SIID'],
 ['Text Version (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TXTVR', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'TXTVR_SIID'],
 ['Notes (type)',                 ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TXTNT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'TXTNT_SIID'],
-['Text Chunk (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXTCK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'TEXT_CHUNK_ICON_PATH',   'TEXT_CHUNK_SIID'],
+['Text Chunk (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXTCK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
+                                                                                                               'SI_IS_SELECTABLE'],                'TEXT_CHUNK_ICON_PATH',   'TEXT_CHUNK_SIID'],
 ['Book (type)',                  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TXTBK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'BOOK_ICON_PATH',         'TEXT_BOOK_SIID'],
 ['Sentence (type)',              ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXSNT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'SENTENCE_ICON_PATH',     'TEXT_SENTENCE_SIID'],
 ['Highlight (type)',             ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHLT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'HIGHLIGHTER_ICON_PATH',  'TEXT_HIGHLIGHT_SIID'],
@@ -839,20 +841,32 @@ if __name__ == '__main__':
                      f'    qCDebug(g_cat_silence) << QString("Creating example Republic highlight categories");\n' +
                      f'    M1Store::Item_lv2* l_republic_highlight_cat_1 = M1Store::Item_lv2::getNew(\n' +
                      f'        // vertex flags\n' +
-                     f'        M1Env::FULL_VERTEX,\n' +
+                     f'        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,\n' +
                      f'        // label\n' +
-                     f'        "Category 1");\n')
-    l_plato_code +=   '    l_republic_highlight_cat_1->setType("FOLDR");\n'
+                     f'        "Category 1",\n' +
+                     f'        // Special Item flag\n' +
+                     f'        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,\n' +
+                     f'        // mnemonic\n' +
+                     f'        "RCTG1",\n' +
+                     f'        // icon path\n' +
+                     f'        nullptr);\n')
+    l_plato_code +=   '    l_republic_highlight_cat_1->setType("TYPE_");\n'
     l_plato_code +=   '    l_republic_highlight_cat_1->setType("TXHLC");\n'
     l_plato_code +=  f'    l_republic_highlight_cat_1->setFieldVertex("#f78a38", M1Env::HLCLR_SIID);\n' # light orange
     l_plato_code +=   '    l_republic_highlight_cat->linkTo(l_republic_highlight_cat_1, "OWNS_");\n\n'
 
     l_plato_code += (f'    M1Store::Item_lv2* l_republic_highlight_cat_2 = M1Store::Item_lv2::getNew(\n' +
                      f'        // vertex flags\n' +
-                     f'        M1Env::FULL_VERTEX,\n' +
+                     f'        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,\n' +
                      f'        // label\n' +
-                     f'        "Category 2");\n')
-    l_plato_code +=   '    l_republic_highlight_cat_2->setType("FOLDR");\n'
+                     f'        "Category 2",\n' +
+                     f'        // Special Item flag\n' +
+                     f'        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,\n' +
+                     f'        // mnemonic\n' +
+                     f'        "RCTG2",\n' +
+                     f'        // icon path\n' +
+                     f'        nullptr);\n')
+    l_plato_code +=   '    l_republic_highlight_cat_2->setType("TYPE_");\n'
     l_plato_code +=   '    l_republic_highlight_cat_2->setType("TXHLC");\n'
     l_plato_code +=  f'    l_republic_highlight_cat_2->setFieldVertex("#3883f7", M1Env::HLCLR_SIID);\n'  # light blue
     l_plato_code +=   '    l_republic_highlight_cat->linkTo(l_republic_highlight_cat_2, "OWNS_");\n\n'
@@ -895,7 +909,7 @@ if __name__ == '__main__':
                          f'    qCDebug(g_cat_silence) << QString("Creating Republic version {l_version} node");\n' +
                          f'    M1Store::Item_lv2* l_version_{l_version.lower()} = M1Store::Item_lv2::getNew(\n' +
                          f'        // vertex flags\n' +
-                         f'        M1Env::FULL_VERTEX  | M1Env::IS_SPECIAL,\n' +
+                         f'        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,\n' +
                          f'        // label\n' +
                          f'        "{l_version} v.",\n' +
                          f'        // Special Item flags\n' +

@@ -653,7 +653,7 @@ void M1Env::GraphInit::init_base(){
         // label
         "Texts Root (type)",
         // Special Item flag
-        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE | M1Env::SI_IS_SELECTABLE,
         // mnemonic
         "TEXT_",
         // icon path
@@ -797,7 +797,7 @@ void M1Env::GraphInit::init_base(){
         // label
         "Text Chunk (type)",
         // Special Item flag
-        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE | M1Env::SI_IS_SELECTABLE,
         // mnemonic
         "TXTCK",
         // icon path
@@ -19302,20 +19302,32 @@ void M1Env::GraphInit::init_plato(){
     qCDebug(g_cat_silence) << QString("Creating example Republic highlight categories");
     M1Store::Item_lv2* l_republic_highlight_cat_1 = M1Store::Item_lv2::getNew(
         // vertex flags
-        M1Env::FULL_VERTEX,
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "Category 1");
-    l_republic_highlight_cat_1->setType("FOLDR");
+        "Category 1",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "RCTG1",
+        // icon path
+        nullptr);
+    l_republic_highlight_cat_1->setType("TYPE_");
     l_republic_highlight_cat_1->setType("TXHLC");
     l_republic_highlight_cat_1->setFieldVertex("#f78a38", M1Env::HLCLR_SIID);
     l_republic_highlight_cat->linkTo(l_republic_highlight_cat_1, "OWNS_");
 
     M1Store::Item_lv2* l_republic_highlight_cat_2 = M1Store::Item_lv2::getNew(
         // vertex flags
-        M1Env::FULL_VERTEX,
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "Category 2");
-    l_republic_highlight_cat_2->setType("FOLDR");
+        "Category 2",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "RCTG2",
+        // icon path
+        nullptr);
+    l_republic_highlight_cat_2->setType("TYPE_");
     l_republic_highlight_cat_2->setType("TXHLC");
     l_republic_highlight_cat_2->setFieldVertex("#3883f7", M1Env::HLCLR_SIID);
     l_republic_highlight_cat->linkTo(l_republic_highlight_cat_2, "OWNS_");
@@ -19412,7 +19424,7 @@ void M1Env::GraphInit::init_plato(){
     qCDebug(g_cat_silence) << QString("Creating Republic version Greek node");
     M1Store::Item_lv2* l_version_greek = M1Store::Item_lv2::getNew(
         // vertex flags
-        M1Env::FULL_VERTEX  | M1Env::IS_SPECIAL,
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
         "Greek v.",
         // Special Item flags
@@ -26816,7 +26828,7 @@ void M1Env::GraphInit::init_plato(){
     qCDebug(g_cat_silence) << QString("Creating Republic version Jowett node");
     M1Store::Item_lv2* l_version_jowett = M1Store::Item_lv2::getNew(
         // vertex flags
-        M1Env::FULL_VERTEX  | M1Env::IS_SPECIAL,
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
         "Jowett v.",
         // Special Item flags
@@ -35895,7 +35907,7 @@ void M1Env::GraphInit::init_plato(){
     qCDebug(g_cat_silence) << QString("Creating Republic version Shorey node");
     M1Store::Item_lv2* l_version_shorey = M1Store::Item_lv2::getNew(
         // vertex flags
-        M1Env::FULL_VERTEX  | M1Env::IS_SPECIAL,
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
         "Shorey v.",
         // Special Item flags

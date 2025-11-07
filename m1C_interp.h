@@ -8,6 +8,7 @@
 #include <QDrag>
 #include <QVBoxLayout>
 #include <QTimer>
+#include <QTextEdit>
 
 namespace M1MidPlane{
     class Interp;
@@ -94,6 +95,8 @@ private:
     virtual QString displayText();
     virtual bool diplayOpenClose(){ return true; }
 
+    QTextEdit* m_text_edit = nullptr;
+
     void initiateDrag();
     void emitSignals();
     // static InterpStaticConstructor cm_the_init;
@@ -131,6 +134,7 @@ public:
 public slots:
     void create_descendant();
     void handleMouseHold();
+    void save_text_edit();
 signals:
     void gotoVertex(M1Store::Item_lv2* p_new_vertex, M1MidPlane::Interp* p_sender);
     void emitHtml(const QString& p_html);

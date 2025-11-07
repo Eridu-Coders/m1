@@ -51,7 +51,7 @@ M1UI::MainWindow::MainWindow(QWidget *p_parent) : QMainWindow(p_parent){
         l_et_combo->addItem(*M1Store::Storage::getQIcon(l_special->specialId()), l_special->mnemonic());
     }
     for(const M1Store::SpecialItem* l_special : M1Store::Storage::getSelectableVertexTypes()) {
-        qDebug() << l_special->mnemonic();
+        //qDebug() << l_special->mnemonic();
         l_vt_combo->addItem(*M1Store::Storage::getQIcon(l_special->specialId()), l_special->mnemonic());
     }
 

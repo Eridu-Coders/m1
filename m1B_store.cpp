@@ -838,6 +838,10 @@ QList<M1Store::SpecialItem*>& M1Store::Storage::getSelectableVertexTypes(){
     l_ret_vertices.clear();
     for(M1Env::SpecialItemID l_special_id = 0; l_special_id < cm_next_special; l_special_id++){
         M1Store::SpecialItem* l_special_item = getSpecialItemPointer(l_special_id);
+        qDebug() << l_special_item->mnemonic()
+                 << (l_special_item->flags() & M1Env::SI_IS_SELECTABLE)
+                 << (l_special_item->flags() & M1Env::SI_EDGE_TYPE)
+                 << ((l_special_item->flags() & M1Env::SI_IS_SELECTABLE) && !(l_special_item->flags() & M1Env::SI_EDGE_TYPE));
         if((l_special_item->flags() & M1Env::SI_IS_SELECTABLE) && !(l_special_item->flags() & M1Env::SI_EDGE_TYPE)) l_ret_vertices.append(l_special_item);
     }
 

@@ -105,7 +105,7 @@ void M1UI::BasePassageItem::dropEvent(QGraphicsSceneDragDropEvent *p_event){
 }
 
 QString M1UI::BasePassageItem::highlight(M1Store::Item_lv2* p_chunk, M1Store::Item_lv2* p_category, M1Store::Item_lv2* p_color){
-    qCDebug(g_cat_passages_panel) << QString("highlight") << m_id << this->text() << p_category->text() << p_color->text();
+    qCDebug(g_cat_interp_drag) << QString("highlight") << m_id << this->text() << p_category->text() << p_color->text();
 
     m_color = p_color->text();
     this->update(this->boundingRect());
@@ -336,8 +336,7 @@ void M1UI::PassageEditor::select_from_to(const int p_from, const int p_to){
 QString M1UI::PassageEditor::bake_highlight(M1Store::Item_lv2* p_highlight_vertex, M1Store::Item_lv2* p_category, M1Store::Item_lv2* p_color){
     qCDebug(g_cat_passages_panel).noquote() << QString("bake_highlight") << m_id << p_category->text() << p_color->text() << m_current_start->dbgShort();
     M1Store::Item_lv2* l_version = m_current_start->find_edge(M1Env::ISA_SIID, M1Env::TXTVR_SIID, true)->getTarget_lv2();
-    // qCDebug(g_cat_main_window) << QString("version") << ((l_version == nullptr) ? "nullptr" : l_version->getTarget_lv2()->dbgShort());
-    qCDebug(g_cat_passages_panel).noquote() << QString("version") << l_version->text();
+    qCDebug(g_cat_passages_panel).noquote() << QString("version") << l_version->text() << m_from_sel << m_to_sel;
 
     M1Store::Item_lv2* l_highlight_chunk = p_highlight_vertex->create_descendant(
         M1Store::OWNS_SIID,
@@ -345,13 +344,12 @@ QString M1UI::PassageEditor::bake_highlight(M1Store::Item_lv2* p_highlight_verte
         M1Store::TEXT_HIGHLIGHT_CHUNK_SIID);
     l_highlight_chunk->setType(l_version->specialItemId());
 
-    QStringList l_ret_list;
+    QStringList l_word_list;
     if(m_from_sel >= 0)
-        // reverse order bc each edge is added below AUTO
-        for(int i=m_to_sel; i>=m_from_sel; i--) l_ret_list.append(m_item_list.at(i)->highlight(l_highlight_chunk, p_category, p_color));
+        for(int i = m_from_sel; i <= m_to_sel; i++) l_word_list.append(m_item_list.at(i)->highlight(l_highlight_chunk, p_category, p_color));
     this->unselect_all();
 
-    return l_ret_list.join(" ");
+    return M1Store::Storage::maxLength(l_word_list.join(" "), 36);
 }
 
 // PassagesPanel ---------------------------------------------------------------------------------------------------------------------------------------
@@ -437,8 +435,9 @@ void M1UI::PassagesPanel::highlight(){
 
     M1Store::Item_lv2* l_highlight_vertex = m_highlight_folder->create_descendant(M1Env::OWNS_SIID, "", M1Env::TEXT_HIGHLIGHT_SIID);
 
-
     M1Store::Item_lv2* l_category = m_cat_list[m_current_cat];
+    qCDebug(g_cat_interp_drag) << QString("l_category") << l_category->specialItemId();
+    l_highlight_vertex->setType(l_category->specialItemId());
     M1Store::Item_lv2* l_color = l_category->getFieldEdge(M1Store::HLCLR_SIID)->getTarget_lv2();
 
     QStringList l_ret_list;

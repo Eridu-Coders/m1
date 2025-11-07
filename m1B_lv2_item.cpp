@@ -1,6 +1,7 @@
 #include "m1A_env.h"
 #include "m1B_lv2_item.h"
 #include "m1B_store.h"
+#include "m1B_graph_init.h"
 
 Q_LOGGING_CATEGORY(g_cat_lv2_members, "lv2.members_access")
 Q_LOGGING_CATEGORY(g_cat_lv2_constructors, "lv2.constructors")
@@ -353,24 +354,21 @@ QString M1Store::Item_lv2::dbgString(){
     switch(flags() & ITEM_NATURE_MASK){
     case FULL_VERTEX:{
             // add the rest to the returned string
-            QString l_text(text());
-
-            return l_ret +
-                        //       ------------------------------ LV2 ------------------------------------------------------
-                        QString("--------------------------- FULL VERTEX -------------------------------------------------\n") +
-                        QString("%1\n%2\n%3\n%4\n%5\n%6\n%7\n%8\n%9")
-                           .arg(QString("m_flags_extra        : 0b%1").arg(flagsExtra(), 64, 2, QLatin1Char('0')))
-                           .arg(QString("m_creation_date      : %1").arg(creationDate().toString("dd/MM/yyyy hh:mm:ss")))
-                           .arg(QString("m_lastmod_date       : %1").arg(lastmodDate().toString("dd/MM/yyyy hh:mm:ss")))
-                           .arg(QString("m_incoming_edges     : %1").arg(incomingEdges()))
-                           .arg(QString("m_first_edge         : 0x%1 / %2").arg(firstEdge_item_id(), 16, 16, QLatin1Char('0')).arg(firstEdge_item_id()))
-                           .arg(QString("m_auto_edge          : 0x%1 / %2").arg(autoEdge_item_id(), 16, 16, QLatin1Char('0')).arg(autoEdge_item_id()))
-                           .arg(QString("m_first_edge_special : 0x%1 / %2").arg(firstEdgeSpecial_item_id(), 16, 16, QLatin1Char('0')).arg(firstEdgeSpecial_item_id()))
-                           .arg(QString("m_string_id          : 0x%1 / %2").arg(string_id(), 16, 16, QLatin1Char('0')).arg(string_id()))
-                           .arg(QString("text                 : [%1] %2%3")
-                                    .arg(l_text.length())
-                                    .arg(l_text.left(100))
-                                    .arg(l_text.length() > 100 ? "..." : "")) + l_edges + "\n===== END =====";
+        QString l_text;
+        return l_ret +
+                    //       ------------------------------ LV2 ------------------------------------------------------
+                    QString("--------------------------- FULL VERTEX -------------------------------------------------\n") +
+                    QString("%1\n%2\n%3\n%4\n%5\n%6\n%7\n%8\n%9")
+                       .arg(QString("m_flags_extra        : 0b%1").arg(flagsExtra(), 64, 2, QLatin1Char('0')))
+                       .arg(QString("m_creation_date      : %1").arg(creationDate().toString("dd/MM/yyyy hh:mm:ss")))
+                       .arg(QString("m_lastmod_date       : %1").arg(lastmodDate().toString("dd/MM/yyyy hh:mm:ss")))
+                       .arg(QString("m_incoming_edges     : %1").arg(incomingEdges()))
+                       .arg(QString("m_first_edge         : 0x%1 / %2").arg(firstEdge_item_id(), 16, 16, QLatin1Char('0')).arg(firstEdge_item_id()))
+                       .arg(QString("m_auto_edge          : 0x%1 / %2").arg(autoEdge_item_id(), 16, 16, QLatin1Char('0')).arg(autoEdge_item_id()))
+                       .arg(QString("m_first_edge_special : 0x%1 / %2").arg(firstEdgeSpecial_item_id(), 16, 16, QLatin1Char('0')).arg(firstEdgeSpecial_item_id()))
+                       .arg(QString("m_string_id          : 0x%1 / %2").arg(string_id(), 16, 16, QLatin1Char('0')).arg(string_id()))
+                       .arg(QString("text                 : [%1] 2")
+                            .arg(l_text.length()).arg(M1Store::Storage::maxLength(l_text, 100))) + l_edges + "\n===== END =====";
         }
         break;
     case SIMPLE_VERTEX:{
@@ -401,6 +399,7 @@ QString M1Store::Item_lv2::dbgString(){
         }
         break;
     case SIMPLE_EDGE:{
+            QString l_text = this->text();
             return l_ret +
                         //       ------------------------------ LV2 -----------------------------------------------------
                         QString("-------------------------- SIMPLE EDGE -------------------------------------------------\n") +
@@ -408,7 +407,7 @@ QString M1Store::Item_lv2::dbgString(){
                             .arg(QString("m_v_origin           : 0x%1 %2").arg(origin_item_id(), 16, 16, QLatin1Char('0')).arg(origin_item_id()))
                             .arg(QString("m_e_previous         : 0x%1 %2").arg(previous_item_id(), 16, 16, QLatin1Char('0')).arg(previous_item_id()))
                             .arg(QString("m_e_next             : 0x%1 %2").arg(next_item_id(), 16, 16, QLatin1Char('0')).arg(next_item_id()))
-                            .arg(QString("text                 : %1").arg(text()));
+                            .arg(QString("text                 : [%1] 2").arg(l_text.length()).arg(M1Store::Storage::maxLength(l_text, 100)));
         }
         break;
     }
@@ -985,7 +984,9 @@ M1Store::Item_lv2* M1Store::Item_lv2::create_descendant(
     l_new_vertex->setText(p_label);
 
     // link this to it
-    this->linkTo(l_new_vertex, p_edge_type);
+    // unless it is an ITO from this vertex down to the new one and this is the type vertex corresponding to p_vertex_type
+    if( !((p_edge_type == M1Env::ITO_SIID) && (this->specialItemId() == p_vertex_type)) )
+        this->linkTo(l_new_vertex, p_edge_type);
 
     M1_FUNC_EXIT
     return l_new_vertex;

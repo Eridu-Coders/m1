@@ -4,6 +4,7 @@
 #include "m1B_store.h"
 #include "m1B_lv2_item.h"
 #include "m1D_tree_display.h"
+#include "m1D_passages_panel.h"
 
 #include <QPainter>
 #include <QResizeEvent>
@@ -11,6 +12,11 @@
 #include <QGraphicsSceneDragDropEvent>
 #include <QMimeData>
 #include <QDrag>
+#include <QGraphicsSimpleTextItem>
+#include <QGraphicsView>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QComboBox>
 
 // g_cat_interp_base
 Q_LOGGING_CATEGORY(g_cat_interp_base, "interp.base")
@@ -228,22 +234,36 @@ QString M1MidPlane::Interp::getHtml(){
     return QString("<html>\n<Head></Head>\n<body>\n%1</body>\n</html>\n").arg(base_html_fragment(m_myself));
 }
 
-#include <QGraphicsSimpleTextItem>
-#include <QGraphicsView>
-
 QWidget *M1MidPlane::Interp::get_edit_widget(){
-    qCDebug(g_cat_interp_base) << "Emitting <emitEdit> for" << m_myself->text();
-    qCDebug(g_cat_interp_base) << QString("text: %1").arg(m_myself->dbgShort());
+    qCDebug(g_cat_interp_drag) << QString("text: %1").arg(m_myself->dbgShort());
 
-    QGraphicsScene* l_scene = new QGraphicsScene();
+    QWidget* l_panel_widget = new QWidget();
+    QVBoxLayout* l_panel_layout = new QVBoxLayout();
+    l_panel_widget->setLayout(l_panel_layout);
 
-    QGraphicsSimpleTextItem* l_item = new QGraphicsSimpleTextItem(QString(m_myself->dbgShort()));
-    static QFont f("Noto Mono", 12);
-    l_item->setFont(f);
-    l_scene->addItem(l_item);
-    l_scene->setBackgroundBrush(Qt::white);
+    QWidget* l_button_bar = new QWidget(l_panel_widget);
+    l_panel_layout->addWidget(l_button_bar);
+    QHBoxLayout* l_bar_layout = new QHBoxLayout();
+    l_button_bar->setLayout(l_bar_layout);
 
-    return new QGraphicsView(l_scene);
+    QPushButton* l_btn0 = new QPushButton("Save", l_button_bar);
+    l_bar_layout->addWidget(l_btn0);
+    l_bar_layout->addStretch(1);
+    QObject::connect(l_btn0, &QPushButton::clicked,
+                     this, &M1MidPlane::Interp::save_text_edit);
+
+    m_text_edit = new QTextEdit(l_panel_widget);
+    l_panel_layout->addWidget(m_text_edit);
+    m_text_edit->setPlainText(m_myself->getTarget_lv2()->text());
+
+    return l_panel_widget;
+}
+void M1MidPlane::Interp::save_text_edit(){
+    qCDebug(g_cat_interp_drag) << "Saving text edit field: " << m_text_edit->toPlainText();
+    m_myself->getTarget_lv2()->setText(m_text_edit->toPlainText());
+    m_td_parent->repaint();
+    this->emitSignals();
+    this->m_proxy->setFocus(Qt::OtherFocusReason);
 }
 
 void M1MidPlane::Interp::focusInEvent(QFocusEvent *p_event){
@@ -360,6 +380,7 @@ void M1MidPlane::Interp::dropEvent(QDropEvent *p_event){
 
 void M1MidPlane::Interp::contextMenuEvent(QContextMenuEvent *p_event) {
     qCDebug(g_cat_interp_drag) << QString("Context menu request") << m_myself->text();
+    m_hold_timer.stop();
 
     QMenu l_context_menu(m_proxy);
     QAction *l_new_descendant_action = l_context_menu.addAction("Create New Descendant");
@@ -571,21 +592,28 @@ QString si_html_fragment(M1Store::Item_lv2* p_si){
     QString l_html_lines;
     QString l_html_translations;
     QString l_html_bhashyas;
+    QStringList l_raw;
     for(M1Store::Item_lv2_iterator it = p_si->getIteratorTop(); !it.beyondEnd(); it.next()){
         if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_WFW_UNIT_SIID))
             l_html_wfw += tu_html_fragment(it.at()->getTarget_lv2());
-        if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_SLOKA_LINE_SIID))
+        else if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_SLOKA_LINE_SIID))
             l_html_lines += QString("<p style=\"margin: 0; padding: 0;\">%1</p>\n").arg(it.at()->getTarget_lv2()->text());
-        if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_SLOKA_TRANSLATION_SIID))
+        else if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_SLOKA_TRANSLATION_SIID))
             l_html_translations += bt_html_fragment(it.at()->getTarget_lv2());
-        if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_SLOKA_BHASHYA_SIID))
+        else if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_SLOKA_BHASHYA_SIID))
             l_html_bhashyas += bt_html_fragment(it.at()->getTarget_lv2());
+        else if(it.at()->isFullEdge() && !it.at()->isOfType(M1Env::BLNGS_SIID) )
+            l_raw.append(it.at()->getTarget_lv2()->text());
     }
-    QString l_html = QString("<p style=\"font-weight: bold;\">%1</p>")
-                         .arg(p_si->text()) +
-                     QString("<div style=\"margin-bottom: 1em;\">%1</div>\n<div style=\"margin-bottom: 1em; background-color: SeaShell;\">%2</div>\n")
-                         .arg(l_html_lines)
-                         .arg(l_html_wfw) + l_html_translations + l_html_bhashyas;
+    QString l_html;
+    if((l_html_wfw + l_html_lines + l_html_translations + l_html_bhashyas).length() > 0)
+        l_html = QString("<p style=\"font-weight: bold;\">%1</p>\n") .arg(p_si->text()) +
+                 QString("<div style=\"margin-bottom: 1em;\">%1</div>\n<div style=\"margin-bottom: 1em; background-color: SeaShell;\">%2</div>\n")
+                        .arg(l_html_lines)
+                        .arg(l_html_wfw)
+                 + l_html_translations + l_html_bhashyas;
+    else
+        l_html = QString("<span style=\"font-family: 'Noto Serif', 'Times New Roman', serif;\">") + l_raw.join(" ") + "</span>";
 
     return l_html;
 }
@@ -593,7 +621,7 @@ bool M1MidPlane::SectionInterp::wantIt(M1Store::Item_lv2* p_myself){
     return p_myself->isFullEdge() && p_myself->getTarget_lv2()->isOfType(M1Env::TEXT_CHUNK_SIID);
 }
 QString M1MidPlane::SectionInterp::getHtml(){
-    QString l_html = si_html_fragment(m_myself->getTarget_lv2());
+    QString l_html = "<div>" + si_html_fragment(m_myself->getTarget_lv2()) + "<div>\n";
     l_html += base_html_fragment(m_myself);
     return g_html_template.arg(l_html);
 }
@@ -647,11 +675,6 @@ QString M1MidPlane::SentenceInterp::getHtml(){
     return g_html_template.arg(l_html);
 }
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#include <QVBoxLayout>
-#include <QPushButton>
-#include <QComboBox>
-
-#include "m1D_passages_panel.h"
 
 QWidget *M1MidPlane::SentenceInterp::get_edit_widget(){
     // find previous Stephanus Number
@@ -810,12 +833,22 @@ bool M1MidPlane::TextInterp::wantIt(M1Store::Item_lv2* p_myself){
 QString M1MidPlane::TextInterp::getHtml(){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("TextInterp::getHtml()"))
     QString l_html = QString("<h1>Title: %1</h1>\n").arg(m_myself->getTarget_lv2()->text());
+
+    QStringList l_frags;
     M1Store::Item_lv2* l_folder = m_myself->getTarget_lv2()->find_edge_target(M1Store::FOLDER_SIID);
-    l_folder = l_folder->getTarget_lv2();
-    for(M1Store::Item_lv2_iterator it = l_folder->getIteratorTop(); !it.beyondEnd(); it.next()){
-        if(it.at()->getTarget_lv2()->isOfType(M1Store::TEXT_CHUNK_SIID))
-            l_html += si_html_fragment(it.at()->getTarget_lv2());
+    if(l_folder != nullptr){
+        l_folder = l_folder->getTarget_lv2();
+        for(M1Store::Item_lv2_iterator it = l_folder->getIteratorTop(); !it.beyondEnd(); it.next()){
+            if(it.at()->getTarget_lv2()->isOfType(M1Store::TEXT_CHUNK_SIID))
+                l_frags.append(si_html_fragment(it.at()->getTarget_lv2()));
+        }
     }
+    if(l_frags.count() == 0)
+        for(M1Store::Item_lv2_iterator it = m_myself->getTarget_lv2()->getIteratorTop(); !it.beyondEnd(); it.next())
+            if(it.at()->getTarget_lv2()->isOfType(M1Store::TEXT_CHUNK_SIID))
+                l_frags.append(si_html_fragment(it.at()->getTarget_lv2()));
+
+    l_html += l_frags.join(" ");
     l_html += base_html_fragment(m_myself);
     M1_FUNC_EXIT
     return g_html_template.arg(l_html);
@@ -867,10 +900,13 @@ M1MidPlane::HighlightChunkInterp::HighlightChunkInterp(M1Store::Item_lv2* p_myse
 QString M1MidPlane::HighlightChunkInterp::displayText(){
     QString l_ret(m_myself->getTarget_lv2()->text());
     l_ret += " : ";
+    QStringList l_word_list;
     for(M1Store::Item_lv2_iterator it = m_myself->getTarget_lv2()->getIteratorTop(); !it.beyondEnd(); it.next())
         if(it.at()->getTarget_lv2()->isOfType(M1Store::OCCUR_SIID))
-            l_ret += M1MidPlane::SentenceInterp::occur_to_text(it.at()->getTarget_lv2()) + " ";
+            l_word_list.append(M1MidPlane::SentenceInterp::occur_to_text(it.at()->getTarget_lv2()));
 
+    std::reverse(l_word_list.begin(), l_word_list.end());
+    l_ret += l_word_list.join(" ");
     return l_ret.trimmed();
 }
 QString hc_html_fragment(M1Store::Item_lv2* p_si){
@@ -884,6 +920,7 @@ QString hc_html_fragment(M1Store::Item_lv2* p_si){
     M1Store::Item_lv2* l_version = p_si->find_edge(M1Env::ISA_SIID, M1Env::TXTVR_SIID, true);
     if(l_version != nullptr) l_version_txt = l_version->getTarget_lv2()->text();
 
+    std::reverse(l_word_list.begin(), l_word_list.end());
     M1_FUNC_EXIT
     return QString("<p>%1 (%2)</p>").arg(l_word_list.join(" ")).arg(l_version_txt);
 }
@@ -917,7 +954,19 @@ QString M1MidPlane::HighlightInterp::getHtml(){
         if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_HIGHLIGHT_CHUNK_SIID))
             l_chunk_list.append(hc_html_fragment(it.at()->getTarget_lv2()));
 
-    QString l_html = "<p>" + l_chunk_list.join("</p>\n<p>") + "</p>\n";
+
+    M1Store::Item_lv2* l_category_edge = m_myself->getTarget_lv2()->find_edge(M1Env::ISA_SIID, M1Env::TEXT_HIGHLIGHT_CAT_SIID, true);
+    QString l_cat_html;
+    if(l_category_edge != nullptr){
+        M1Store::Item_lv2* l_color_edge = l_category_edge->getTarget_lv2()->find_edge(M1Env::HLCLR_SIID, M1Env::HLCLR_SIID);
+        if(l_color_edge != nullptr)
+            l_cat_html = QString("Highlight (<span style=\"background-color:%1;\">%2</span>)")
+                             .arg(l_color_edge->getTarget_lv2()->text())
+                             .arg(l_category_edge->getTarget_lv2()->text());
+    }
+
+    QString l_html = QString("<div style=\"font-family: 'Noto Serif', 'Times New Roman', serif;\"><p>%1</p>").arg(l_cat_html) +
+                     "<p>" + l_chunk_list.join("</p>\n<p>") + "</p></div>\n";
     l_html += "<hr/>\n" + base_html_fragment(m_myself);
     M1_FUNC_EXIT
     return g_html_template.arg(l_html);;
