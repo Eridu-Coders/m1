@@ -89,6 +89,8 @@ M1Env::SpecialItemID M1Env::TEXT_HIGHLIGHT_CAT_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_HIGHLIGHT_FLDR_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_HIGHLIGHT_CAT_FLDR_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_HIGHLIGHT_CHUNK_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::TEXT_HIGHLIGHT_QUOTE_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::SLOKA_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_SLOKA_LINE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_WORD_DREF_INRIA_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_SLOKA_TRANSLATION_SIID = G_NONEX_SI_ID;
@@ -256,6 +258,8 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::TEXT_HIGHLIGHT_FLDR_SIID = M1Store::Storage::getSpecialID("TXHLF");
     M1Env::TEXT_HIGHLIGHT_CAT_FLDR_SIID = M1Store::Storage::getSpecialID("TXHCF");
     M1Env::TEXT_HIGHLIGHT_CHUNK_SIID = M1Store::Storage::getSpecialID("TXHCK");
+    M1Env::TEXT_HIGHLIGHT_QUOTE_SIID = M1Store::Storage::getSpecialID("TXHQT");
+    M1Env::SLOKA_SIID = M1Store::Storage::getSpecialID("TXSLK");
     M1Env::TEXT_SLOKA_LINE_SIID = M1Store::Storage::getSpecialID("SLKLN");
     M1Env::TEXT_WORD_DREF_INRIA_SIID = M1Store::Storage::getSpecialID("INRIA");
     M1Env::TEXT_SLOKA_TRANSLATION_SIID = M1Store::Storage::getSpecialID("SLTRN");
@@ -911,6 +915,21 @@ void M1Env::GraphInit::init_base(){
         M1Env::HL_CHUNK_ICON_PATH);
     l_txhck->setType("TYPE_");
 
+    // creation of "Highlight Quotation (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[TXHQT]-Highlight Quotation (type)> item");
+    M1Store::Item_lv2* l_txhqt = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Highlight Quotation (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE | M1Env::SI_EDGE_TYPE | M1Env::SI_IS_SELECTABLE,
+        // mnemonic
+        "TXHQT",
+        // icon path
+        M1Env::HL_QUOTE_ICON_PATH);
+    l_txhqt->setType("TYPE_");
+
     // creation of "His Divine Grace A. C. Bhaktivedanta Swami Prabhupada"
     qCDebug(g_cat_silence) << QString("Creating <[PPRAB]-His Divine Grace A. C. Bhaktivedanta Swami Prabhupada> item");
     M1Store::Item_lv2* l_pprab = M1Store::Item_lv2::getNew(
@@ -958,6 +977,21 @@ void M1Env::GraphInit::init_base(){
         nullptr);
     l_pgamb->setType("PERSN");
     l_pgamb->linkTo(l_home, "BLNGS", nullptr, true);
+
+    // creation of "Sloka (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[TXSLK]-Sloka (type)> item");
+    M1Store::Item_lv2* l_txslk = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Sloka (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "TXSLK",
+        // icon path
+        M1Env::SLOKA_ICON_PATH);
+    l_txslk->setType("TYPE_");
 
     // creation of "Sloka Lines (type)"
     qCDebug(g_cat_silence) << QString("Creating <[SLKLN]-Sloka Lines (type)> item");

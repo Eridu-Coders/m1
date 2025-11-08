@@ -376,6 +376,9 @@ g_special_vertices = [
     # --------------------------- WROTE / WRTBY ---------------------------
     ['WROTE', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'TEXT_WROTE_ICON_PATH',      'TEXT_WROTE_SIID',
     ('WRTBY', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'TEXT_WRITTEN_BY_ICON_PATH', 'TEXT_WRITTEN_BY_SIID'), 'Special Vertex ID (Edge type) wrote / written by'],
+    # --------------------------- WROTE / WRTBY ---------------------------
+    ['WROTE', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'TEXT_WROTE_ICON_PATH',      'TEXT_WROTE_SIID',
+    ('WRTBY', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'TEXT_WRITTEN_BY_ICON_PATH', 'TEXT_WRITTEN_BY_SIID'), 'Special Vertex ID (Edge type) wrote / written by'],
     ['OCCUR', ['SI_IS_TYPE', 'SI_EDGE_TYPE',
                'SI_IS_SPECIAL_EDGE'],                      'OCCURRENCE_ICON_PATH',      'OCCUR_SIID', None,      'Special Vertex ID (Edge type) of occurrence edges'],
     ['WFORM', 'SI_IS_TYPE | SI_IS_ICON_TYPE',              'WFORM_ICON_PATH',           'WFORM_SIID', None,      'Special Vertex ID (Vertex type) of word form vertices'],
@@ -426,6 +429,8 @@ g_vertices = [
 ['Highlight Folder (type)',      ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHLF', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'TEXT_HIGHLIGHT_FLDR_SIID'],
 ['Highlight Categories Folder',  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHCF', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'TEXT_HIGHLIGHT_CAT_FLDR_SIID'],
 ['Highlight Chunk',              ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHCK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  "HL_CHUNK_ICON_PATH",     'TEXT_HIGHLIGHT_CHUNK_SIID'],
+['Highlight Quotation (type)',   ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHQT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE', 'SI_EDGE_TYPE',
+                                                                                                               'SI_IS_SELECTABLE'],                "HL_QUOTE_ICON_PATH",     'TEXT_HIGHLIGHT_QUOTE_SIID'],
 ]
 
 g_special_vertices_gita = [
@@ -448,6 +453,7 @@ g_vertices_gita = [
 ['His Divine Grace A. C. Bhaktivedanta Swami Prabhupada', ['FULL_VERTEX',  'IS_SPECIAL'], ['PERSN'], [('BLNGS',  'HOME_')], 'PPRAB', '0', None, None],
 ['Swami Sri Sivananda Saraswati'                        , ['FULL_VERTEX',  'IS_SPECIAL'], ['PERSN'], [('BLNGS',  'HOME_')], 'PSIVA', '0', None, None],
 ['Swami Gambirananda',                                    ['FULL_VERTEX',  'IS_SPECIAL'], ['PERSN'], [('BLNGS',  'HOME_')], 'PGAMB', '0', None, None],
+['Sloka (type)',                                          ['FULL_VERTEX',  'IS_SPECIAL'], ['TYPE_'], None,                  'TXSLK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], 'SLOKA_ICON_PATH', 'SLOKA_SIID'],
 ['Sloka Lines (type)',                                    ['FULL_VERTEX',  'IS_SPECIAL'], ['TYPE_'], [('BLNGS',  'HOME_')], 'SLKLN', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],
  'TEXT_SLOKA_LINE_ICON_PATH', 'TEXT_SLOKA_LINE_SIID'],
 ['INRIA Dictionary Reference (type)',                     ['FULL_VERTEX',  'IS_SPECIAL'], ['TYPE_'], [('BLNGS',  'HOME_')], 'INRIA', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],

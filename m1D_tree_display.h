@@ -34,12 +34,15 @@ namespace M1UI{
         M1MidPlane::Interp* m_old_interp = nullptr;
         QWidget* m_scroll_area_widget = nullptr;
         QVBoxLayout* m_vb_layout = nullptr;
+        M1MidPlane::Interp* m_being_dragged = nullptr;
     public:
         explicit TreeDisplay(QWidget *p_parent, MainWindow *p_main_window);
 
         virtual void paintEvent(QPaintEvent *);
         M1Store::SpecialItem* newEdgeType();
         M1Store::SpecialItem* newVertexType();
+        void setBeingDragged(M1MidPlane::Interp* p_being_dragged){m_being_dragged = p_being_dragged;}
+        void restoreAcceptDrop();
         // virtual void mouseMoveEvent(QMouseEvent *p_event);
     public slots:
         void gotoVertex(M1Store::Item_lv2* p_new_vertex, M1MidPlane::Interp* p_sender);

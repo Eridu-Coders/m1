@@ -6,9 +6,28 @@
 #include <QWidget>
 #include <QGraphicsScene>
 #include <QDrag>
+#include <QEvent>
 #include <QVBoxLayout>
 #include <QTimer>
 #include <QTextEdit>
+
+class MyEventFilter : public QObject
+{
+    Q_OBJECT
+public:
+    explicit MyEventFilter(QObject *p_parent = nullptr) : QObject(p_parent) {}
+
+protected:
+    bool eventFilter(QObject *p_watched, QEvent *p_event) override
+    {
+        if (p_watched->isWidgetType() && (p_event->type() == QEvent::FocusIn || p_event->type() == QEvent::FocusOut)) {
+            qCDebug(g_cat_interp_drag) << "focus event: " << p_event << " intercepted";
+            return true;
+        }
+        return QObject::eventFilter(p_watched, p_event); // Pass unhandled events to the base class
+    }
+};
+
 
 namespace M1MidPlane{
     class Interp;
@@ -24,7 +43,7 @@ private:
     M1MidPlane::Interp* m_main_instance;
 public:
     InterpProxyWidget(M1MidPlane::Interp* p_main_instance, QWidget* p_parent) : QWidget(p_parent){m_main_instance = p_main_instance;}
-    ~InterpProxyWidget();
+    //~InterpProxyWidget();
 
     virtual void paintEvent(QPaintEvent* p_event);
     virtual void resizeEvent(QResizeEvent *p_event);
@@ -58,7 +77,7 @@ class Interp : public QObject
     friend class FieldInterp;
     friend class AutoInterp;
     friend class SectionBeginEnd;
-    friend class SectionInterp;
+    friend class ChunkInterp;
     friend class UrlInterp;
     friend class BhashyaTranslation;
     friend class TextInterp;
@@ -67,6 +86,8 @@ class Interp : public QObject
     friend class BookInterp;
     friend class HighlightChunkInterp;
     friend class HighlightInterp;
+    friend class SlokaInterp;
+    friend class HighlightQuotationInterp;
     // friend class InterpStaticConstructor;
 private:
     M1Store::Item_lv2* m_myself;
@@ -124,11 +145,12 @@ public:
     virtual void setFocus(Qt::FocusReason p_reason){m_proxy->setFocus(p_reason);}
 
     // virtual void mouseMoveEvent(QMouseEvent *p_event);
-    void deleteProxyLater();
-
     virtual QWidget *get_edit_widget();
 
+    void deleteProxy();
+    void invalidateProxy();
     void restore_acept_drops();
+    void blockFocusEvents();
 
     virtual QString dbgString(){return "Interp for: " + m_myself->dbgShort();}
 public slots:
@@ -143,9 +165,9 @@ signals:
 
 class Drag : public QDrag{
 private:
-    Interp* m_origin;
+    M1UI::TreeDisplay* m_td_parent;
 public:
-    Drag(Interp *p_drag_source) : QDrag(p_drag_source){m_origin = p_drag_source;}
+    Drag(Interp* p_source, M1UI::TreeDisplay* p_td_parent) : QDrag(p_source){m_td_parent = p_td_parent;}
     virtual ~Drag();
 };
 
@@ -185,13 +207,25 @@ public:
     // virtual void paintEvent(QPaintEvent* p_event);
 };
 
-class SectionInterp : public Interp
+class ChunkInterp : public Interp
 {
     Q_OBJECT
 public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
 
-    SectionInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
+    ChunkInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
+    virtual QString getHtml();
+    // virtual QString displayText();
+    // virtual void paintEvent(QPaintEvent* p_event);
+};
+
+class SlokaInterp : public Interp
+{
+    Q_OBJECT
+public:
+    static bool wantIt(M1Store::Item_lv2* p_myself);
+
+    SlokaInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
     virtual QString getHtml();
     // virtual QString displayText();
     // virtual void paintEvent(QPaintEvent* p_event);
@@ -256,7 +290,7 @@ public:
     // virtual void paintEvent(QPaintEvent* p_event);
 };
 
-class SentenceInterp : public SectionInterp
+class SentenceInterp : public ChunkInterp
 {
     Q_OBJECT
 public:
@@ -268,7 +302,7 @@ public:
     virtual QWidget *get_edit_widget();
 };
 
-class BookInterp : public SectionInterp
+class BookInterp : public ChunkInterp
 {
     Q_OBJECT
 public:
@@ -296,6 +330,17 @@ public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
 
     HighlightInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
+    virtual QString displayText();
+    virtual QString getHtml();
+};
+
+class HighlightQuotationInterp : public Interp
+{
+    Q_OBJECT
+public:
+    static bool wantIt(M1Store::Item_lv2* p_myself);
+
+    HighlightQuotationInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
     virtual QString displayText();
     virtual QString getHtml();
 };

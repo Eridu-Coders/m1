@@ -103,6 +103,7 @@ namespace M1Env{
     static const char* TAG_ICON_PATH = "../Icons/Nlp-Tag.svg";                          // *
 
     static const char* TEXT_CHUNK_ICON_PATH = "../Icons/Section.svg";                   // *
+    static const char* SLOKA_ICON_PATH = "../Icons/Sloka.svg";                          // *
     static const char* TW_SECTION_2_OCC_BEGIN_ICON_PATH = "../Icons/Sec-Begin.svg";     // *
     static const char* TW_SECTION_2_OCC_END_ICON_PATH = "../Icons/Sec-End.svg";         // *
     static const char* TEXT_WFW_UNIT_ICON_PATH = "../Icons/TranslUnit.svg";             // *
@@ -119,6 +120,7 @@ namespace M1Env{
     static const char* SENTENCE_ICON_PATH = "../Icons/Sentence.svg";                    // *
     static const char* HIGHLIGHTER_ICON_PATH = "../Icons/Highlighter.svg";              // *
     static const char* HL_CHUNK_ICON_PATH = "../Icons/Highlighter2.svg";                // *
+    static const char* HL_QUOTE_ICON_PATH = "../Icons/Quote.svg";                       // *
 
     static const bool SKIP_HEAVY_CHECKING = true; ///< true --> skip time-consuming Q_ASSERT in setType() and linkTo()
 } // end of M1Env namespace

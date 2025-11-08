@@ -7,10 +7,6 @@
 #include "m1B_graph_init.h"
 #include "m1B_lv2_item.h"
 
-#include <typeinfo>
-#include <iostream>
-#include <string>
-
 Q_LOGGING_CATEGORY(g_cat_tree_display, "tree_display")
 
 M1UI::TreeDisplay::TreeDisplay(QWidget *p_parent, MainWindow *p_main_window) : QScrollArea{p_parent}{
@@ -156,9 +152,16 @@ void M1UI::TreeDisplay::addInterp(M1Store::Item_lv2* p_root){
     qCDebug(g_cat_tree_display) << "Font height : " << this->fontMetrics().height();
     M1_FUNC_EXIT
 }
+
 void M1UI::TreeDisplay::gotoVertex(M1Store::Item_lv2* p_new_vertex, M1MidPlane::Interp* p_sender){
     M1_FUNC_ENTRY(g_cat_interp_drag, QString("gotoVertex %1").arg(p_new_vertex == nullptr ? m_root->dbgShort() : p_new_vertex->dbgShort()))
 
+    m_being_dragged = nullptr;
+
+    // blocks focus events
+    MyEventFilter *l_filter = new MyEventFilter(this);
+    this->installEventFilter(l_filter);
+    // blocks update / repaint events
     this->setUpdatesEnabled(false);
     qCDebug(g_cat_interp_drag) << "before m_interp_list delete" << m_vb_layout->count() << m_scroll_area_widget->children().count();
     if(m_old_interp != nullptr){
@@ -166,18 +169,23 @@ void M1UI::TreeDisplay::gotoVertex(M1Store::Item_lv2* p_new_vertex, M1MidPlane::
         delete m_old_interp;
         m_old_interp = nullptr;
     }
+    for(M1MidPlane::Interp *l_interp : std::as_const(m_interp_list)) l_interp->blockFocusEvents();
     for(M1MidPlane::Interp *l_interp : std::as_const(m_interp_list)){
-        l_interp->deleteProxyLater();
-        if(l_interp == p_sender)
+        l_interp->deleteProxy();
+        if(l_interp == p_sender){
+            qCDebug(g_cat_interp_drag) << "skipping seletion of sender: " << p_sender->dbgString();
             m_old_interp = l_interp;
+        }
         else
             delete l_interp;
     }
+
     qCDebug(g_cat_interp_drag) << "before clear" << m_vb_layout->count() << m_scroll_area_widget->children().count();
     m_interp_list.clear();
     // remove stretch item at end
     m_vb_layout->removeItem(m_vb_layout->itemAt(0));
     qCDebug(g_cat_interp_drag) << "after clear" << m_vb_layout->count() << m_scroll_area_widget->children().count();
+
     for(int i=0; i<m_vb_layout->count(); i++)
         qCDebug(g_cat_interp_drag) << "Layout" << i << m_vb_layout->itemAt(i)->spacerItem() << m_vb_layout->itemAt(i)->widget();
     for(int i=0; i<this->widget()->children().count(); i++)
@@ -187,9 +195,12 @@ void M1UI::TreeDisplay::gotoVertex(M1Store::Item_lv2* p_new_vertex, M1MidPlane::
         addInterp(m_root);
     else
         addInterp(p_new_vertex);
-    this->setUpdatesEnabled(true);
 
-    qCDebug(g_cat_interp_drag) << "after new filling" << m_vb_layout->children().count() << m_scroll_area_widget->children().count();
+    this->setUpdatesEnabled(true);
+    this->removeEventFilter(l_filter);
+    delete l_filter;
+
+    qCDebug(g_cat_interp_drag) << "after new filling" << m_vb_layout->count() << m_scroll_area_widget->children().count() << m_interp_list.count();
     M1_FUNC_EXIT
 }
 

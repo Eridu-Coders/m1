@@ -118,6 +118,10 @@ extern M1Env::SpecialItemID TEXT_HIGHLIGHT_FLDR_SIID;
 extern M1Env::SpecialItemID TEXT_HIGHLIGHT_CAT_FLDR_SIID;
 // [TXHCK] Special Vertex ID of "Highlight Chunk"
 extern M1Env::SpecialItemID TEXT_HIGHLIGHT_CHUNK_SIID;
+// [TXHQT] Special Vertex ID of "Highlight Quotation (type)"
+extern M1Env::SpecialItemID TEXT_HIGHLIGHT_QUOTE_SIID;
+// [TXSLK] Special Vertex ID of "Sloka (type)"
+extern M1Env::SpecialItemID SLOKA_SIID;
 // [SLKLN] Special Vertex ID of "Sloka Lines (type)"
 extern M1Env::SpecialItemID TEXT_SLOKA_LINE_SIID;
 // [INRIA] Special Vertex ID of "INRIA Dictionary Reference (type)"

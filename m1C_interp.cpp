@@ -42,7 +42,6 @@ void M1UI::InterpProxyWidget::dragMoveEvent(QDragMoveEvent *p_event){m_main_inst
 void M1UI::InterpProxyWidget::dragLeaveEvent(QDragLeaveEvent *p_event){m_main_instance->dragLeaveEvent(p_event);}
 void M1UI::InterpProxyWidget::dropEvent(QDropEvent *p_event){m_main_instance->dropEvent(p_event);}
 
-
 // ------------------------------------ Interp Base Class -----------------------------------------------------
 void M1MidPlane::Interp::init(){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Init Interp class members"))
@@ -65,8 +64,8 @@ M1MidPlane::Interp* M1MidPlane::Interp::getInterp(M1Store::Item_lv2* p_myself, Q
         l_ret = new FieldInterp(p_myself, p_vb, p_parent, p_depth);
     else if(SectionBeginEnd::wantIt(p_myself))
         l_ret = new SectionBeginEnd(p_myself, p_vb, p_parent, p_depth);
-    else if(SectionInterp::wantIt(p_myself))
-        l_ret = new SectionInterp(p_myself, p_vb, p_parent, p_depth);
+    else if(ChunkInterp::wantIt(p_myself))
+        l_ret = new ChunkInterp(p_myself, p_vb, p_parent, p_depth);
     else if(UrlInterp::wantIt(p_myself))
         l_ret = new UrlInterp(p_myself, p_vb, p_parent, p_depth);
     else if(BhashyaTranslation::wantIt(p_myself))
@@ -81,9 +80,13 @@ M1MidPlane::Interp* M1MidPlane::Interp::getInterp(M1Store::Item_lv2* p_myself, Q
         l_ret = new BookInterp(p_myself, p_vb, p_parent, p_depth);
     else if(HighlightChunkInterp::wantIt(p_myself))
         l_ret = new HighlightChunkInterp(p_myself, p_vb, p_parent, p_depth);
+    else if(HighlightQuotationInterp::wantIt(p_myself))
+        l_ret = new HighlightQuotationInterp(p_myself, p_vb, p_parent, p_depth);
     else if(HighlightInterp::wantIt(p_myself))
         l_ret = new HighlightInterp(p_myself, p_vb, p_parent, p_depth);
-    else{ // BookInterp
+    else if(SlokaInterp::wantIt(p_myself))
+        l_ret = new SlokaInterp(p_myself, p_vb, p_parent, p_depth);
+    else{ // HighlightQuotationInterp SlokaInterp
         qCDebug(g_cat_interp_base) << "default Interp()";
         l_ret = new Interp(p_myself, p_vb, p_parent, p_depth);
     }
@@ -135,20 +138,33 @@ M1MidPlane::Interp::Interp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI:
 }
 
 // proxy invalidation
+/*
 M1UI::InterpProxyWidget::~InterpProxyWidget(){
-    qCDebug(g_cat_interp_base) << "Invalidation of proxy in: " << m_main_instance->dbgString();
+    qCDebug(g_cat_interp_drag) << "proxy deletion for: " << m_main_instance->dbgString();
+    // m_main_instance->invalidateProxy();
 }
-void M1MidPlane::Interp::deleteProxyLater(){
-    qCDebug(g_cat_interp_drag) << "Proxy deleteLater()" << dbgString();
-    m_proxy->parentWidget()->layout()->removeWidget(m_proxy);
-    m_proxy->setParent(nullptr);
-    m_proxy->deleteLater();
+*/
+void M1MidPlane::Interp::invalidateProxy(){
+    qCDebug(g_cat_interp_drag) << "Invalidation of proxy in: " << this->dbgString();
     m_proxy = nullptr;
 }
-M1MidPlane::Interp::~Interp(){
-    qCDebug(g_cat_interp_drag) << dbgString() << "deleted";
+void M1MidPlane::Interp::deleteProxy(){
+    if(m_proxy != nullptr){
+        qCDebug(g_cat_interp_drag) << "Proxy delete" << dbgString();
+        m_proxy->parentWidget()->layout()->removeWidget(m_proxy);
+        m_proxy->setParent(nullptr);
+        m_proxy->deleteLater();
+        // delete m_proxy;
+        m_proxy = nullptr;
+    }
 }
-
+M1MidPlane::Interp::~Interp(){
+    qCDebug(g_cat_interp_drag) << Interp::dbgString() << "deleted";
+}
+void M1MidPlane::Interp::blockFocusEvents(){
+    MyEventFilter *l_filter = new MyEventFilter(m_proxy);
+    m_proxy->installEventFilter(l_filter);
+}
 
 void M1MidPlane::Interp::paintOC(QPainter& p){
     if(m_myself->flags() & M1Env::EDGE_IS_OPEN)
@@ -163,38 +179,39 @@ QString M1MidPlane::Interp::displayText(){
 
 void M1MidPlane::Interp::paintEvent(QPaintEvent* p_event){
     qCDebug(g_cat_interp_base) << m_myself->dbgShort() << " painting: " << p_event->rect();
-    QPainter p(m_proxy);
-    // edge type icon
-    M1Store::Storage::getQIcon(m_myself->getIconTypeMember())->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
-    // open/close icon
-    if(diplayOpenClose()) paintOC(p);
-    // target type icon
-    M1Store::Storage::getQIcon(m_myself->getTarget_lv2()->getIconTypeMember())->paint(
-        &p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
+    if(m_proxy != nullptr){
+        QPainter p(m_proxy);
+        // edge type icon
+        M1Store::Storage::getQIcon(m_myself->getIconTypeMember())->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
+        // open/close icon
+        if(diplayOpenClose()) paintOC(p);
+        // target type icon
+        M1Store::Storage::getQIcon(m_myself->getTarget_lv2()->getIconTypeMember())->paint(
+            &p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
 
-    // text
-    p.setPen(Qt::white);
-    p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), this->displayText());
+        // text
+        p.setPen(Qt::white);
+        p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), this->displayText());
 
-    // drag markers
-    p.setPen(QPen(QBrush(Qt::red), 2.0));
-    if(m_drag_top){
-        p.drawLine(1, 1, m_proxy->width()-1, 1);
-        if(!m_drag_bottom)
-            for(int x = m_proxy->width()/4; x < m_proxy->width()-4; x += m_proxy->width()/4)
-                p.drawPolygon(QList<QPoint>() << QPoint(x, 2) << QPoint(x-4, 10) << QPoint(x+4, 10));
-        else{
-            p.setBrush(QBrush(QColor(255, 0, 0, 63)));
-            p.drawRect(m_proxy->rect());
+        // drag markers
+        p.setPen(QPen(QBrush(Qt::darkRed), 2.0));
+        if(m_drag_top){
+            p.drawLine(1, 1, m_proxy->width()-1, 1);
+            if(!m_drag_bottom)
+                for(int x = m_proxy->width()/4; x < m_proxy->width()-4; x += m_proxy->width()/4)
+                    p.drawPolygon(QList<QPoint>() << QPoint(x, 2) << QPoint(x-4, 10) << QPoint(x+4, 10));
+            else{
+                p.setBrush(QBrush(QColor(255, 0, 0, 63)));
+                p.drawRect(m_proxy->rect());
+            }
+        }
+        if(m_drag_bottom){
+            p.drawLine(0, m_proxy->height()-2, m_proxy->width()-1, m_proxy->height()-2);
+            if(!m_drag_top)
+                for(int x = m_proxy->width()/4; x < m_proxy->width()-4; x += m_proxy->width()/4)
+                    p.drawPolygon(QList<QPoint>() << QPoint(x, m_proxy->height()-2) << QPoint(x-4, m_proxy->height()-10) << QPoint(x+4, m_proxy->height()-10));
         }
     }
-    if(m_drag_bottom){
-        p.drawLine(0, m_proxy->height()-2, m_proxy->width()-1, m_proxy->height()-2);
-        if(!m_drag_top)
-            for(int x = m_proxy->width()/4; x < m_proxy->width()-4; x += m_proxy->width()/4)
-                p.drawPolygon(QList<QPoint>() << QPoint(x, m_proxy->height()-2) << QPoint(x-4, m_proxy->height()-10) << QPoint(x+4, m_proxy->height()-10));
-    }
-
     // qCDebug(g_cat_interp_drag) << "Accepting Drops" << this->acceptDrops() << m_myself->getTarget_lv2()->text();
 }
 void M1MidPlane::Interp::resizeEvent(QResizeEvent *p_event){
@@ -269,10 +286,12 @@ void M1MidPlane::Interp::save_text_edit(){
 void M1MidPlane::Interp::focusInEvent(QFocusEvent *p_event){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Interp::focusInEvent()"))
     qCDebug(g_cat_interp_drag) << "focus in: " << p_event->reason() << this->dbgString();
-    qCDebug(g_cat_interp_base) << " Background color: " << m_proxy->palette().color(QPalette::Window) << this->dbgString();
+    if(m_proxy != nullptr){
+        qCDebug(g_cat_interp_base) << " Background color: " << m_proxy->palette().color(QPalette::Window) << this->dbgString();
 
-    m_proxy->setAutoFillBackground(true);
-    m_proxy->repaint();
+        m_proxy->setAutoFillBackground(true);
+        m_proxy->repaint();
+    }
     M1_FUNC_EXIT
 }
 void M1MidPlane::Interp::focusOutEvent(QFocusEvent *p_event){
@@ -282,24 +301,29 @@ void M1MidPlane::Interp::focusOutEvent(QFocusEvent *p_event){
 }
 
 void M1MidPlane::Interp::initiateDrag(){
-    Drag *l_drag = new Drag(this);
+    Drag *l_drag = new Drag(this, m_td_parent);
 
-    QString l_payload = QString("%1").arg(m_myself->getTarget_lv2()->text());
+    QString l_payload = QString("%1").arg(m_myself->getTarget_lv2()->item_id());
     QMimeData *l_data = new QMimeData;
     l_data->setText(l_payload);
     qCDebug(g_cat_interp_drag) << QString("Drag INITIATION ") << m_proxy->acceptDrops() << l_payload << l_data->formats();
 
     l_drag->setMimeData(l_data);
     m_proxy->setAcceptDrops(false);
+    m_td_parent->setBeingDragged(this);
     l_drag->exec();
 }
 M1MidPlane::Drag::~Drag(){
     qCDebug(g_cat_interp_drag) << "DRAG end: " << this->mimeData()->text();
-    m_origin->restore_acept_drops();
+    m_td_parent->restoreAcceptDrop();
 }
 void M1MidPlane::Interp::restore_acept_drops(){
     qCDebug(g_cat_interp_drag) << "Accept drops again " << this->dbgString();
-    m_proxy->setAcceptDrops(true);
+    if(m_proxy != nullptr) m_proxy->setAcceptDrops(true);
+}
+void M1UI::TreeDisplay::restoreAcceptDrop(){
+    if(m_being_dragged != nullptr) m_being_dragged->restore_acept_drops();
+    m_being_dragged = nullptr;
 }
 
 void M1MidPlane::Interp::emitSignals(){
@@ -369,13 +393,19 @@ void M1MidPlane::Interp::dragLeaveEvent(QDragLeaveEvent *p_event){
 }
 void M1MidPlane::Interp::dropEvent(QDropEvent *p_event){
     qCDebug(g_cat_interp_drag) << QString("DROP p_event") << p_event->mimeData()->text() << p_event->mimeData()->formats() << m_myself->text();
+    M1Env::ItemID l_payload_item_id = QString(p_event->mimeData()->text()).toLongLong();
+    M1Store::Item_lv2* l_item_from = m_myself->getTarget_lv2();
+    M1Store::Item_lv2* l_item_to = M1Store::Item_lv2::getExisting(l_payload_item_id);
+    qCDebug(g_cat_interp_drag) << QString("Creating edge of type") << m_td_parent->newEdgeType()->mnemonic() <<
+        " From " << l_item_from->dbgShort() << " to " << l_item_to->dbgShort();
 
-    qCDebug(g_cat_interp_drag) << QString("Creating edge of type") << m_td_parent->newEdgeType()->mnemonic();
+    l_item_from->linkTo(l_item_to, m_td_parent->newEdgeType()->specialId());
 
     m_drag_top = false;
     m_drag_bottom = false;
 
-    m_proxy->repaint();
+    // m_proxy->repaint();
+    emit gotoVertex(nullptr, this);
 }
 
 void M1MidPlane::Interp::contextMenuEvent(QContextMenuEvent *p_event) {
@@ -452,7 +482,56 @@ void M1MidPlane::FieldInterp::paintEvent(QPaintEvent* p_event){
 }
 
 // ------------------------------------ TranslUnit -----------------------------------------------------
-QString g_html_template = "<html><Head></Head><body><div style=\"margin: 1em;\">\n%1</div></body></html>";
+QString g_html_template = QString("<html><Head>\n") +
+                          "<style>\n" +
+                          "/* Tooltip container */\n" +
+                          ".tooltip {\n" +
+                          "  position: relative;\n" +
+                          "  display: inline-block;\n" +
+                          "  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */\n" +
+                          "}\n" +
+                          "\n" +
+                          "/* Tooltip text */\n" +
+                          ".tooltip .tooltiptext {\n" +
+                          "  visibility: hidden;\n" +
+                          "  width: 800px;\n" +
+                          "  background-color: #555;\n" +
+                          "  color: #fff;\n" +
+                          "  text-align: center;\n" +
+                          "  padding: 5px 0;\n" +
+                          "  border-radius: 6px;\n" +
+                          "\n" +
+                          "  /* Position the tooltip text */\n" +
+                          "  position: absolute;\n" +
+                          "  z-index: 1;\n" +
+                          "  bottom: -200%;\n" +
+                          "  left: 50%;\n" +
+                          "  margin-left: -60px;\n" +
+                          "\n" +
+                          "  /* Fade in tooltip */\n" +
+                          "  opacity: 0;\n" +
+                          "  transition: opacity 0.3s;\n" +
+                          "}\n" +
+                          "\n" +
+                          "/* Tooltip arrow */\n" +
+                          ".tooltip .tooltiptext::after {\n" +
+                          "  content: "";\n" +
+                          "  position: absolute;\n" +
+                          "  top: 100%;\n" +
+                          "  left: 50%;\n" +
+                          "  margin-left: -5px;\n" +
+                          "  border-width: 5px;\n" +
+                          "  border-style: solid;\n" +
+                          "  border-color: #555 transparent transparent transparent;\n" +
+                          "}\n" +
+                          "\n" +
+                          "/* Show the tooltip text when you mouse over the tooltip container */\n" +
+                          ".tooltip:hover .tooltiptext {\n" +
+                          "  visibility: visible;\n" +
+                          "  opacity: 1;\n" +
+                          "}\n" +
+                          "</style>\n" +
+                          "</Head><body><div style=\"margin: 1em;\">\n%1</div></body></html>";
 QString g_transl_template = "<tr><td style=\"font-family: 'Noto Sans', Arial, sans-serif; text-align: center;\">%1 (%2)</td></tr>\n";
 
 QString tu_html_fragment(M1Store::Item_lv2* p_tu){
@@ -528,21 +607,7 @@ QString M1MidPlane::SectionBeginEnd::displayText(){
         .arg(m_myself->getTarget_lv2()->getTarget_lv2()->text())
         .arg(m_myself->getTarget_lv2()->getTarget_lv2()->getField(M1Store::TEXT_WORD_TRANSLIT_SIID));
 }
-/*
-void M1MidPlane::SectionBeginEnd::paintEvent(QPaintEvent* p_event){
-    M1_FUNC_ENTRY(g_cat_interp_base, QString("TranslUnit painting"))
 
-    QPainter p(this);
-    M1Store::Storage::getQIcon(m_myself->getIconTypeMember())->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
-    paintOC(p);
-    M1Store::Storage::getQIcon(m_myself->getTarget_lv2()->getTarget_lv2()->getIconTypeMember())->paint(
-        &p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
-    p.setPen(Qt::white);
-    p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), this->displayText());
-
-    M1_FUNC_EXIT
-}
-*/
 //------------------------------------ UrlInterp -----------------------------------------------------
 bool M1MidPlane::UrlInterp::wantIt(M1Store::Item_lv2* p_myself){
     return p_myself->isFullEdge() && p_myself->getTarget_lv2()->isOfType(M1Env::TEXT_URL_LINK_SIID);
@@ -586,13 +651,37 @@ M1MidPlane::BhashyaTranslation::BhashyaTranslation(M1Store::Item_lv2* p_myself, 
     M1_FUNC_EXIT
 }
 
-//------------------------------------ SectionInterp -----------------------------------------------------
-QString si_html_fragment(M1Store::Item_lv2* p_si){
+//------------------------------------ ChunkInterp -----------------------------------------------------
+QString ck_html_fragment(M1Store::Item_lv2* p_si){
+    QStringList l_raw;
+    for(M1Store::Item_lv2_iterator it = p_si->getIteratorTop(); !it.beyondEnd(); it.next()){
+        if(it.at()->isFullEdge() && !it.at()->isOfType(M1Env::BLNGS_SIID) )
+            l_raw.append(it.at()->getTarget_lv2()->text());
+    }
+
+    QString l_html = QString("<span style=\"font-family: 'Noto Serif', 'Times New Roman', serif;\">") + l_raw.join(" ") + "</span>";
+
+    return l_html;
+}
+bool M1MidPlane::ChunkInterp::wantIt(M1Store::Item_lv2* p_myself){
+    return p_myself->isFullEdge() && p_myself->getTarget_lv2()->isOfType(M1Env::TEXT_CHUNK_SIID);
+}
+QString M1MidPlane::ChunkInterp::getHtml(){
+    QString l_html = "<p>" + ck_html_fragment(m_myself->getTarget_lv2()) + "</p>\n";
+    l_html += base_html_fragment(m_myself);
+    return g_html_template.arg(l_html);
+}
+M1MidPlane::ChunkInterp::ChunkInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth) : Interp(p_myself, p_vb, p_parent, p_depth){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("ChunkInterp Constructor from: %1").arg(p_myself->dbgShort()))
+    M1_FUNC_EXIT
+}
+
+//------------------------------------ SlokaInterp -----------------------------------------------------
+QString sk_html_fragment(M1Store::Item_lv2* p_si){
     QString l_html_wfw;
     QString l_html_lines;
     QString l_html_translations;
     QString l_html_bhashyas;
-    QStringList l_raw;
     for(M1Store::Item_lv2_iterator it = p_si->getIteratorTop(); !it.beyondEnd(); it.next()){
         if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_WFW_UNIT_SIID))
             l_html_wfw += tu_html_fragment(it.at()->getTarget_lv2());
@@ -602,34 +691,29 @@ QString si_html_fragment(M1Store::Item_lv2* p_si){
             l_html_translations += bt_html_fragment(it.at()->getTarget_lv2());
         else if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_SLOKA_BHASHYA_SIID))
             l_html_bhashyas += bt_html_fragment(it.at()->getTarget_lv2());
-        else if(it.at()->isFullEdge() && !it.at()->isOfType(M1Env::BLNGS_SIID) )
-            l_raw.append(it.at()->getTarget_lv2()->text());
     }
-    QString l_html;
-    if((l_html_wfw + l_html_lines + l_html_translations + l_html_bhashyas).length() > 0)
-        l_html = QString("<p style=\"font-weight: bold;\">%1</p>\n") .arg(p_si->text()) +
+    QString l_html = QString("<p style=\"font-weight: bold;\">%1</p>\n") .arg(p_si->text()) +
                  QString("<div style=\"margin-bottom: 1em;\">%1</div>\n<div style=\"margin-bottom: 1em; background-color: SeaShell;\">%2</div>\n")
-                        .arg(l_html_lines)
-                        .arg(l_html_wfw)
+                     .arg(l_html_lines)
+                     .arg(l_html_wfw)
                  + l_html_translations + l_html_bhashyas;
-    else
-        l_html = QString("<span style=\"font-family: 'Noto Serif', 'Times New Roman', serif;\">") + l_raw.join(" ") + "</span>";
 
     return l_html;
 }
-bool M1MidPlane::SectionInterp::wantIt(M1Store::Item_lv2* p_myself){
-    return p_myself->isFullEdge() && p_myself->getTarget_lv2()->isOfType(M1Env::TEXT_CHUNK_SIID);
+bool M1MidPlane::SlokaInterp::wantIt(M1Store::Item_lv2* p_myself){
+    return p_myself->isFullEdge() && p_myself->getTarget_lv2()->isOfType(M1Env::SLOKA_SIID);
 }
-QString M1MidPlane::SectionInterp::getHtml(){
-    QString l_html = "<div>" + si_html_fragment(m_myself->getTarget_lv2()) + "<div>\n";
-    l_html += base_html_fragment(m_myself);
-    return g_html_template.arg(l_html);
-}
-M1MidPlane::SectionInterp::SectionInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth) : Interp(p_myself, p_vb, p_parent, p_depth){
-    M1_FUNC_ENTRY(g_cat_interp_base, QString("SectionInterp Constructor from: %1").arg(p_myself->dbgShort()))
+
+M1MidPlane::SlokaInterp::SlokaInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth) : Interp(p_myself, p_vb, p_parent, p_depth){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("SlokaInterp Constructor from: %1").arg(p_myself->dbgShort()))
     M1_FUNC_EXIT
 }
 
+QString M1MidPlane::SlokaInterp::getHtml(){
+    QString l_html = sk_html_fragment(m_myself->getTarget_lv2());
+    l_html += base_html_fragment(m_myself);
+    return g_html_template.arg(l_html);
+}
 //------------------------------------ SentenceInterp -----------------------------------------------------
 QString M1MidPlane::SentenceInterp::occur_to_text(const M1Store::Item_lv2* p_occur_edge){
     QString l_text(p_occur_edge->getTarget_lv2()->text());
@@ -663,7 +747,7 @@ bool M1MidPlane::SentenceInterp::wantIt(M1Store::Item_lv2* p_myself){
     M1_FUNC_EXIT
     return p_myself->isFullEdge() && p_myself->getTarget_lv2()->isOfType(M1Env::TEXT_SENTENCE_SIID);
 }
-M1MidPlane::SentenceInterp::SentenceInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth) : SectionInterp(p_myself, p_vb, p_parent, p_depth){
+M1MidPlane::SentenceInterp::SentenceInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth) : ChunkInterp(p_myself, p_vb, p_parent, p_depth){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("SentenceInterp Constructor from: %1").arg(p_myself->dbgShort()))
     M1_FUNC_EXIT
 }
@@ -744,9 +828,6 @@ QWidget *M1MidPlane::SentenceInterp::get_edit_widget(){
             l_cat_combo->addItem(QIcon(l_color_pixmap), l_cat->text());
         }
 
-    // qCDebug(g_cat_td_signals) << QString("l_btn1 sizePolicy") << l_btn1->sizePolicy();
-    // qCDebug(g_cat_td_signals) << QString("l_btn1 sizeHint") << l_btn1->sizeHint();
-
     l_bar_layout->addWidget(l_btn0);
     l_bar_layout->addWidget(l_btn1);
     l_bar_layout->addWidget(l_btn2);
@@ -797,7 +878,7 @@ QWidget *M1MidPlane::SentenceInterp::get_edit_widget(){
 bool M1MidPlane::BookInterp::wantIt(M1Store::Item_lv2* p_myself){
     return p_myself->isFullEdge() && p_myself->getTarget_lv2()->isOfType(M1Env::TEXT_BOOK_SIID);
 }
-M1MidPlane::BookInterp::BookInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth) : SectionInterp(p_myself, p_vb, p_parent, p_depth){
+M1MidPlane::BookInterp::BookInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth) : ChunkInterp(p_myself, p_vb, p_parent, p_depth){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("BookInterp Constructor from: %1").arg(p_myself->dbgShort()))
     M1_FUNC_EXIT
 }
@@ -827,6 +908,36 @@ QString M1MidPlane::BookInterp::getHtml(){
     return g_html_template.arg(l_html);
 }
 //------------------------------------ TextInterp -----------------------------------------------------
+QString hc_html_fragment_words(M1Store::Item_lv2* p_si){
+    QStringList l_word_list;
+    for(M1Store::Item_lv2_iterator it = p_si->getIteratorTop(); !it.beyondEnd(); it.next())
+        if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::OCCUR_SIID))
+            l_word_list.append(M1MidPlane::SentenceInterp::occur_to_text(it.at()->getTarget_lv2()));
+
+    std::reverse(l_word_list.begin(), l_word_list.end());
+    return l_word_list.join(" ");
+}
+
+QString hq_html_fragment(M1Store::Item_lv2* p_si){
+    QStringList l_chunk_list;
+    bool l_is_first = true;
+    QString m_ground_text;
+    for(M1Store::Item_lv2_iterator it = p_si->getIteratorTop(); !it.beyondEnd(); it.next())
+        if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_HIGHLIGHT_CHUNK_SIID)){
+            if(l_is_first){
+                l_is_first = false;
+                m_ground_text = hc_html_fragment_words(it.at()->getTarget_lv2());
+            }
+            else
+                l_chunk_list.append(hc_html_fragment_words(it.at()->getTarget_lv2()));
+        }
+
+    return QString("<div class=\"tooltip\" style=\"font-style: italic; font-family: 'Noto Serif', 'Times New Roman', serif;\">%1").arg(m_ground_text) +
+           QString("<span class=\"tooltiptext\" style=\"font-style: italic; font-family: 'Noto Sans', 'Arial', sans-serif;\">%1</span>").arg(l_chunk_list.join("/")) +
+           "</div>";
+    // return QString("<span style=\"font-style: italic; font-family: 'Noto Serif', 'Times New Roman', serif;\">%1</span>").arg(l_chunk_list.join("/"));
+}
+
 bool M1MidPlane::TextInterp::wantIt(M1Store::Item_lv2* p_myself){
     return p_myself->isFullEdge() && p_myself->getTarget_lv2()->isOfType(M1Env::TEXT_SIID);
 }
@@ -839,17 +950,20 @@ QString M1MidPlane::TextInterp::getHtml(){
     if(l_folder != nullptr){
         l_folder = l_folder->getTarget_lv2();
         for(M1Store::Item_lv2_iterator it = l_folder->getIteratorTop(); !it.beyondEnd(); it.next()){
-            if(it.at()->getTarget_lv2()->isOfType(M1Store::TEXT_CHUNK_SIID))
-                l_frags.append(si_html_fragment(it.at()->getTarget_lv2()));
+            if(it.at()->getTarget_lv2()->isOfType(M1Store::SLOKA_SIID))
+                l_frags.append(sk_html_fragment(it.at()->getTarget_lv2()));
         }
     }
     if(l_frags.count() == 0)
-        for(M1Store::Item_lv2_iterator it = m_myself->getTarget_lv2()->getIteratorTop(); !it.beyondEnd(); it.next())
+        for(M1Store::Item_lv2_iterator it = m_myself->getTarget_lv2()->getIteratorTop(); !it.beyondEnd(); it.next()){
             if(it.at()->getTarget_lv2()->isOfType(M1Store::TEXT_CHUNK_SIID))
-                l_frags.append(si_html_fragment(it.at()->getTarget_lv2()));
+                l_frags.append(ck_html_fragment(it.at()->getTarget_lv2()));
+            else if(it.at()->isOfType(M1Store::TEXT_HIGHLIGHT_QUOTE_SIID))
+                l_frags.append(hq_html_fragment(it.at()->getTarget_lv2()));
+        }
 
     l_html += l_frags.join(" ");
-    l_html += base_html_fragment(m_myself);
+    l_html += "<hr/>\n" + base_html_fragment(m_myself);
     M1_FUNC_EXIT
     return g_html_template.arg(l_html);
 }
@@ -870,20 +984,6 @@ M1MidPlane::TextOccurrence::TextOccurrence(M1Store::Item_lv2* p_myself, QVBoxLay
 QString M1MidPlane::TextOccurrence::displayText(){
     return M1MidPlane::SentenceInterp::occur_to_text(m_myself->getTarget_lv2());
 }
-/*
-void M1MidPlane::TextOccurrence::paintEvent(QPaintEvent* p_event){
-    M1_FUNC_ENTRY(g_cat_interp_base, QString("TranslUnit painting"))
-    QPainter p(this);
-
-    M1Store::Storage::getQIcon(m_myself->getIconTypeMember())->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
-    paintOC(p);
-    M1Store::Storage::getQIcon(m_myself->getTarget_lv2()->getIconTypeMember())->paint(
-        &p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
-    p.setPen(Qt::white);
-    p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), this->displayText());
-    M1_FUNC_EXIT
-}
-*/
 
 //------------------------------------ HighlightChunkInterp -----------------------------------------------------
 bool M1MidPlane::HighlightChunkInterp::wantIt(M1Store::Item_lv2* p_myself){
@@ -909,20 +1009,15 @@ QString M1MidPlane::HighlightChunkInterp::displayText(){
     l_ret += l_word_list.join(" ");
     return l_ret.trimmed();
 }
+
 QString hc_html_fragment(M1Store::Item_lv2* p_si){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("p_si: %1").arg(p_si->text()))
-    QStringList l_word_list;
-    for(M1Store::Item_lv2_iterator it = p_si->getIteratorTop(); !it.beyondEnd(); it.next())
-        if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::OCCUR_SIID))
-            l_word_list.append(M1MidPlane::SentenceInterp::occur_to_text(it.at()->getTarget_lv2()));
-
     QString l_version_txt("No version");
     M1Store::Item_lv2* l_version = p_si->find_edge(M1Env::ISA_SIID, M1Env::TXTVR_SIID, true);
     if(l_version != nullptr) l_version_txt = l_version->getTarget_lv2()->text();
 
-    std::reverse(l_word_list.begin(), l_word_list.end());
     M1_FUNC_EXIT
-    return QString("<p>%1 (%2)</p>").arg(l_word_list.join(" ")).arg(l_version_txt);
+        return QString("<p>%1 (%2)</p>").arg(hc_html_fragment_words(p_si)).arg(l_version_txt);
 }
 QString M1MidPlane::HighlightChunkInterp::getHtml(){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Hilight chunk: %1").arg(m_myself->text()))
@@ -954,7 +1049,6 @@ QString M1MidPlane::HighlightInterp::getHtml(){
         if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_HIGHLIGHT_CHUNK_SIID))
             l_chunk_list.append(hc_html_fragment(it.at()->getTarget_lv2()));
 
-
     M1Store::Item_lv2* l_category_edge = m_myself->getTarget_lv2()->find_edge(M1Env::ISA_SIID, M1Env::TEXT_HIGHLIGHT_CAT_SIID, true);
     QString l_cat_html;
     if(l_category_edge != nullptr){
@@ -970,4 +1064,30 @@ QString M1MidPlane::HighlightInterp::getHtml(){
     l_html += "<hr/>\n" + base_html_fragment(m_myself);
     M1_FUNC_EXIT
     return g_html_template.arg(l_html);;
+}
+
+//------------------------------------ HighlightQuotationInterp -----------------------------------------------------
+bool M1MidPlane::HighlightQuotationInterp::wantIt(M1Store::Item_lv2* p_myself){
+    return p_myself->isFullEdge() &&
+           p_myself->isOfType(M1Env::TEXT_HIGHLIGHT_QUOTE_SIID) &&
+           p_myself->getTarget_lv2()->isOfType(M1Env::TEXT_HIGHLIGHT_SIID);
+}
+
+M1MidPlane::HighlightQuotationInterp::HighlightQuotationInterp(M1Store::Item_lv2* p_myself,
+                                                               QVBoxLayout* p_vb,
+                                                               M1UI::TreeDisplay* p_parent,
+                                                               int p_depth)  : Interp(p_myself, p_vb, p_parent, p_depth){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("HighlightQuotationInterp Constructor from: %1").arg(p_myself->dbgShort()))
+    M1_FUNC_EXIT
+}
+QString M1MidPlane::HighlightQuotationInterp::displayText(){
+    return m_myself->getTarget_lv2()->text();
+}
+QString M1MidPlane::HighlightQuotationInterp::getHtml(){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("QuotationInterp: %1").arg(m_myself->text()))
+    QString l_html = QString("<p>%1</p>").arg(hq_html_fragment(m_myself->getTarget_lv2()));
+    l_html += "<hr/>\n" + base_html_fragment(m_myself);
+    M1_FUNC_EXIT
+    return g_html_template.arg(l_html);;
+
 }
