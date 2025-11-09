@@ -394,12 +394,23 @@ void M1MidPlane::Interp::dragLeaveEvent(QDragLeaveEvent *p_event){
 void M1MidPlane::Interp::dropEvent(QDropEvent *p_event){
     qCDebug(g_cat_interp_drag) << QString("DROP p_event") << p_event->mimeData()->text() << p_event->mimeData()->formats() << m_myself->text();
     M1Env::ItemID l_payload_item_id = QString(p_event->mimeData()->text()).toLongLong();
-    M1Store::Item_lv2* l_item_from = m_myself->getTarget_lv2();
     M1Store::Item_lv2* l_item_to = M1Store::Item_lv2::getExisting(l_payload_item_id);
-    qCDebug(g_cat_interp_drag) << QString("Creating edge of type") << m_td_parent->newEdgeType()->mnemonic() <<
-        " From " << l_item_from->dbgShort() << " to " << l_item_to->dbgShort();
 
-    l_item_from->linkTo(l_item_to, m_td_parent->newEdgeType()->specialId());
+    if(m_drag_top && m_drag_bottom){
+        M1Store::Item_lv2* l_item_from = m_myself->getTarget_lv2();
+        qCDebug(g_cat_interp_drag) << QString("Creating edge of type") << m_td_parent->newEdgeType()->mnemonic() <<
+            " From " << l_item_from->dbgShort() << " to " << l_item_to->dbgShort();
+        l_item_from->linkTo(l_item_to, m_td_parent->newEdgeType()->specialId());
+    }
+    else{
+        M1Store::Item_lv2* l_item_from = m_myself->getOrigin_lv2();
+        qCDebug(g_cat_interp_drag) << QString("Creating edge of type") << m_td_parent->newEdgeType()->mnemonic() <<
+            " From " << l_item_from->dbgShort() << " to " << l_item_to->dbgShort();
+        if(m_drag_bottom)
+            l_item_from->linkTo(l_item_to, m_td_parent->newEdgeType()->specialId(), m_myself, false);
+        else
+            l_item_from->linkTo(l_item_to, m_td_parent->newEdgeType()->specialId(), m_myself->get_previous_lv2(), false);
+    }
 
     m_drag_top = false;
     m_drag_bottom = false;
