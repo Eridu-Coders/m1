@@ -62,18 +62,24 @@ extern M1Env::SpecialItemID TW_REV_SECTION_2_OCC_END_SIID;
 
 // [ROOT_] Special Vertex ID of "Global graph root"
 extern M1Env::SpecialItemID ROOT_SIID;
-// [HOME_] Special Vertex ID of "Home"
-extern M1Env::SpecialItemID HOME_SIID;
 // [TYPE_] Special Vertex ID of "Root of all types"
 extern M1Env::SpecialItemID TYPE_NODE_SIID;
 // [PERSN] Special Vertex ID of "Person (type)"
 extern M1Env::SpecialItemID PERS_TYPE_SIID;
 // [ORGN_] Special Vertex ID of "Organization (type)"
 extern M1Env::SpecialItemID ORG_TYPE_SIID;
-// [ME___] Special Vertex ID of "Me"
-extern M1Env::SpecialItemID ME_SIID;
+// [HOME_] Special Vertex ID of "Home"
+extern M1Env::SpecialItemID HOME_SIID;
+// [TEXT_] Special Vertex ID of "Texts Root (type)"
+extern M1Env::SpecialItemID TEXT_SIID;
+// [BGRT_] Special Vertex ID of "Baghavad Gita"
+extern M1Env::SpecialItemID BG_ROOT_SIID;
+// [REPRT] Special Vertex ID of "The Republic (Plato)"
+extern M1Env::SpecialItemID REPUBLIC_ROOT_SIID;
 // [_MSG_] Special Vertex ID of "Inboxes / Message Root Type"
 extern M1Env::SpecialItemID MSG_TYPE_SIID;
+// [ME___] Special Vertex ID of "Me"
+extern M1Env::SpecialItemID ME_SIID;
 // [EMAIL] Special Vertex ID of "Email Inbox"
 extern M1Env::SpecialItemID EMAIL_TYPE_SIID;
 // [WHTSP] Special Vertex ID of "Whatsapp Inbox"
@@ -84,8 +90,6 @@ extern M1Env::SpecialItemID DSCRD_TYPE_SIID;
 extern M1Env::SpecialItemID GCHAT_TYPE_SIID;
 // [SMS__] Special Vertex ID of "SMS Inbox"
 extern M1Env::SpecialItemID SMS_TYPE_SIID;
-// [TEXT_] Special Vertex ID of "Texts Root (type)"
-extern M1Env::SpecialItemID TEXT_SIID;
 // [GRATT] Special Vertex ID of "Grammar Attributes (type)"
 extern M1Env::SpecialItemID GRAMMAR_ATTR_SIID;
 // [LEMMA] Special Vertex ID of "Lemma (type)"

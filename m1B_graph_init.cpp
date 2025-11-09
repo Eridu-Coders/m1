@@ -61,18 +61,20 @@ M1Env::SpecialItemID M1Env::TW_SECTION_2_OCC_END_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TW_REV_SECTION_2_OCC_END_SIID = G_NONEX_SI_ID;
 
 M1Env::SpecialItemID M1Env::ROOT_SIID = G_NONEX_SI_ID;
-M1Env::SpecialItemID M1Env::HOME_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TYPE_NODE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::PERS_TYPE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::ORG_TYPE_SIID = G_NONEX_SI_ID;
-M1Env::SpecialItemID M1Env::ME_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::HOME_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::TEXT_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::BG_ROOT_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::REPUBLIC_ROOT_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::MSG_TYPE_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::ME_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::EMAIL_TYPE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::WHTSP_TYPE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::DSCRD_TYPE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::GCHAT_TYPE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::SMS_TYPE_SIID = G_NONEX_SI_ID;
-M1Env::SpecialItemID M1Env::TEXT_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::GRAMMAR_ATTR_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::LEMMA_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::NLENT_SIID = G_NONEX_SI_ID;
@@ -230,18 +232,20 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::TW_SECTION_2_OCC_END_SIID = M1Store::Storage::getSpecialID("HS2OE");
     M1Env::TW_REV_SECTION_2_OCC_END_SIID = M1Store::Storage::getSpecialID("OC2HE");
     M1Env::ROOT_SIID = M1Store::Storage::getSpecialID("ROOT_");
-    M1Env::HOME_SIID = M1Store::Storage::getSpecialID("HOME_");
     M1Env::TYPE_NODE_SIID = M1Store::Storage::getSpecialID("TYPE_");
     M1Env::PERS_TYPE_SIID = M1Store::Storage::getSpecialID("PERSN");
     M1Env::ORG_TYPE_SIID = M1Store::Storage::getSpecialID("ORGN_");
-    M1Env::ME_SIID = M1Store::Storage::getSpecialID("ME___");
+    M1Env::HOME_SIID = M1Store::Storage::getSpecialID("HOME_");
+    M1Env::TEXT_SIID = M1Store::Storage::getSpecialID("TEXT_");
+    M1Env::BG_ROOT_SIID = M1Store::Storage::getSpecialID("BGRT_");
+    M1Env::REPUBLIC_ROOT_SIID = M1Store::Storage::getSpecialID("REPRT");
     M1Env::MSG_TYPE_SIID = M1Store::Storage::getSpecialID("_MSG_");
+    M1Env::ME_SIID = M1Store::Storage::getSpecialID("ME___");
     M1Env::EMAIL_TYPE_SIID = M1Store::Storage::getSpecialID("EMAIL");
     M1Env::WHTSP_TYPE_SIID = M1Store::Storage::getSpecialID("WHTSP");
     M1Env::DSCRD_TYPE_SIID = M1Store::Storage::getSpecialID("DSCRD");
     M1Env::GCHAT_TYPE_SIID = M1Store::Storage::getSpecialID("GCHAT");
     M1Env::SMS_TYPE_SIID = M1Store::Storage::getSpecialID("SMS__");
-    M1Env::TEXT_SIID = M1Store::Storage::getSpecialID("TEXT_");
     M1Env::GRAMMAR_ATTR_SIID = M1Store::Storage::getSpecialID("GRATT");
     M1Env::LEMMA_SIID = M1Store::Storage::getSpecialID("LEMMA");
     M1Env::NLENT_SIID = M1Store::Storage::getSpecialID("NLENT");
@@ -476,22 +480,6 @@ void M1Env::GraphInit::init_base(){
         nullptr);
     l_root->setType("FOLDR");
 
-    // creation of "Home"
-    qCDebug(g_cat_silence) << QString("Creating <[HOME_]-Home> item");
-    M1Store::Item_lv2* l_home = M1Store::Item_lv2::getNew(
-        // vertex flags
-        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
-        // label
-        "Home",
-        // Special Item flag
-        0,
-        // mnemonic
-        "HOME_",
-        // icon path
-        nullptr);
-    l_home->setType("FOLDR");
-    l_home->linkTo(l_root, "BLNGS", nullptr, true);
-
     // creation of "Root of all types"
     qCDebug(g_cat_silence) << QString("Creating <[TYPE_]-Root of all types> item");
     M1Store::Item_lv2* l_type = M1Store::Item_lv2::getNew(
@@ -538,21 +526,69 @@ void M1Env::GraphInit::init_base(){
         M1Env::ORGANIZATION_ICON_PATH);
     l_orgn->setType("TYPE_");
 
-    // creation of "Me"
-    qCDebug(g_cat_silence) << QString("Creating <[ME___]-Me> item");
-    M1Store::Item_lv2* l_me = M1Store::Item_lv2::getNew(
+    // creation of "Home"
+    qCDebug(g_cat_silence) << QString("Creating <[HOME_]-Home> item");
+    M1Store::Item_lv2* l_home = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "Me",
+        "Home",
         // Special Item flag
         0,
         // mnemonic
-        "ME___",
+        "HOME_",
         // icon path
         nullptr);
-    l_me->setType("PERSN");
-    l_me->linkTo(l_home, "BLNGS", nullptr, true);
+    l_home->setType("FOLDR");
+    l_home->linkTo(l_root, "BLNGS", nullptr, true);
+
+    // creation of "Texts Root (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[TEXT_]-Texts Root (type)> item");
+    M1Store::Item_lv2* l_text = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Texts Root (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE | M1Env::SI_IS_SELECTABLE,
+        // mnemonic
+        "TEXT_",
+        // icon path
+        M1Env::TEXT_ICON_PATH);
+    l_text->setType("TYPE_");
+    l_text->linkTo(l_home, "BLNGS", nullptr, true);
+
+    // creation of "Baghavad Gita"
+    qCDebug(g_cat_silence) << QString("Creating <[BGRT_]-Baghavad Gita> item");
+    M1Store::Item_lv2* l_bgrt = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Baghavad Gita",
+        // Special Item flag
+        0,
+        // mnemonic
+        "BGRT_",
+        // icon path
+        nullptr);
+    l_bgrt->setType("FOLDR");
+    l_bgrt->linkTo(l_home, "BLNGS", nullptr, true);
+
+    // creation of "The Republic (Plato)"
+    qCDebug(g_cat_silence) << QString("Creating <[REPRT]-The Republic (Plato)> item");
+    M1Store::Item_lv2* l_reprt = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "The Republic (Plato)",
+        // Special Item flag
+        0,
+        // mnemonic
+        "REPRT",
+        // icon path
+        nullptr);
+    l_reprt->setType("FOLDR");
+    l_reprt->linkTo(l_home, "BLNGS", nullptr, true);
 
     // creation of "Inboxes / Message Root Type"
     qCDebug(g_cat_silence) << QString("Creating <[_MSG_]-Inboxes / Message Root Type> item");
@@ -568,6 +604,23 @@ void M1Env::GraphInit::init_base(){
         // icon path
         nullptr);
     l_msg->setType("TYPE_");
+    l_msg->linkTo(l_home, "BLNGS", nullptr, true);
+
+    // creation of "Me"
+    qCDebug(g_cat_silence) << QString("Creating <[ME___]-Me> item");
+    M1Store::Item_lv2* l_me = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Me",
+        // Special Item flag
+        0,
+        // mnemonic
+        "ME___",
+        // icon path
+        nullptr);
+    l_me->setType("PERSN");
+    l_me->linkTo(l_home, "BLNGS", nullptr, true);
 
     // creation of "Email Inbox"
     qCDebug(g_cat_silence) << QString("Creating <[EMAIL]-Email Inbox> item");
@@ -649,22 +702,6 @@ void M1Env::GraphInit::init_base(){
     l_sms->setType("TYPE_");
     l_sms->linkTo(l_msg, "BLNGS", nullptr, true);
 
-    // creation of "Texts Root (type)"
-    qCDebug(g_cat_silence) << QString("Creating <[TEXT_]-Texts Root (type)> item");
-    M1Store::Item_lv2* l_text = M1Store::Item_lv2::getNew(
-        // vertex flags
-        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
-        // label
-        "Texts Root (type)",
-        // Special Item flag
-        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE | M1Env::SI_IS_SELECTABLE,
-        // mnemonic
-        "TEXT_",
-        // icon path
-        M1Env::TEXT_ICON_PATH);
-    l_text->setType("TYPE_");
-    l_text->linkTo(l_home, "BLNGS", nullptr, true);
-
     // creation of "Grammar Attributes (type)"
     qCDebug(g_cat_silence) << QString("Creating <[GRATT]-Grammar Attributes (type)> item");
     M1Store::Item_lv2* l_gratt = M1Store::Item_lv2::getNew(
@@ -679,7 +716,7 @@ void M1Env::GraphInit::init_base(){
         // icon path
         M1Env::FOLDER_ICON_PATH);
     l_gratt->setType("TYPE_");
-    l_gratt->linkTo(l_home, "BLNGS", nullptr, true);
+    l_gratt->linkTo(l_reprt, "BLNGS", nullptr, true);
 
     // creation of "Lemma (type)"
     qCDebug(g_cat_silence) << QString("Creating <[LEMMA]-Lemma (type)> item");
@@ -695,7 +732,7 @@ void M1Env::GraphInit::init_base(){
         // icon path
         M1Env::LEMMA_ICON_PATH);
     l_lemma->setType("TYPE_");
-    l_lemma->linkTo(l_home, "BLNGS", nullptr, true);
+    l_lemma->linkTo(l_reprt, "BLNGS", nullptr, true);
 
     // creation of "NLP Entity (type)"
     qCDebug(g_cat_silence) << QString("Creating <[NLENT]-NLP Entity (type)> item");
@@ -711,7 +748,7 @@ void M1Env::GraphInit::init_base(){
         // icon path
         M1Env::ENTITY_ICON_PATH);
     l_nlent->setType("TYPE_");
-    l_nlent->linkTo(l_home, "BLNGS", nullptr, true);
+    l_nlent->linkTo(l_reprt, "BLNGS", nullptr, true);
 
     // creation of "NLP Pos code (type)"
     qCDebug(g_cat_silence) << QString("Creating <[NLPOS]-NLP Pos code (type)> item");
@@ -727,7 +764,7 @@ void M1Env::GraphInit::init_base(){
         // icon path
         M1Env::POS_ICON_PATH);
     l_nlpos->setType("TYPE_");
-    l_nlpos->linkTo(l_home, "BLNGS", nullptr, true);
+    l_nlpos->linkTo(l_reprt, "BLNGS", nullptr, true);
 
     // creation of "NLP Tag code (type)"
     qCDebug(g_cat_silence) << QString("Creating <[NLTAG]-NLP Tag code (type)> item");
@@ -743,7 +780,7 @@ void M1Env::GraphInit::init_base(){
         // icon path
         M1Env::TAG_ICON_PATH);
     l_nltag->setType("TYPE_");
-    l_nltag->linkTo(l_home, "BLNGS", nullptr, true);
+    l_nltag->linkTo(l_reprt, "BLNGS", nullptr, true);
 
     // creation of "Stephanus Section (type)"
     qCDebug(g_cat_silence) << QString("Creating <[STPSC]-Stephanus Section (type)> item");
@@ -759,7 +796,7 @@ void M1Env::GraphInit::init_base(){
         // icon path
         M1Env::FOLDER_ICON_PATH);
     l_stpsc->setType("TYPE_");
-    l_stpsc->linkTo(l_home, "BLNGS", nullptr, true);
+    l_stpsc->linkTo(l_reprt, "BLNGS", nullptr, true);
 
     // creation of "Text Version (type)"
     qCDebug(g_cat_silence) << QString("Creating <[TXTVR]-Text Version (type)> item");
@@ -775,7 +812,7 @@ void M1Env::GraphInit::init_base(){
         // icon path
         M1Env::FOLDER_ICON_PATH);
     l_txtvr->setType("TYPE_");
-    l_txtvr->linkTo(l_home, "BLNGS", nullptr, true);
+    l_txtvr->linkTo(l_reprt, "BLNGS", nullptr, true);
 
     // creation of "Notes (type)"
     qCDebug(g_cat_silence) << QString("Creating <[TXTNT]-Notes (type)> item");
@@ -791,7 +828,7 @@ void M1Env::GraphInit::init_base(){
         // icon path
         M1Env::FOLDER_ICON_PATH);
     l_txtnt->setType("TYPE_");
-    l_txtnt->linkTo(l_home, "BLNGS", nullptr, true);
+    l_txtnt->linkTo(l_reprt, "BLNGS", nullptr, true);
 
     // creation of "Text Chunk (type)"
     qCDebug(g_cat_silence) << QString("Creating <[TXTCK]-Text Chunk (type)> item");
@@ -822,7 +859,7 @@ void M1Env::GraphInit::init_base(){
         // icon path
         M1Env::BOOK_ICON_PATH);
     l_txtbk->setType("TYPE_");
-    l_txtbk->linkTo(l_home, "BLNGS", nullptr, true);
+    l_txtbk->linkTo(l_reprt, "BLNGS", nullptr, true);
 
     // creation of "Sentence (type)"
     qCDebug(g_cat_silence) << QString("Creating <[TXSNT]-Sentence (type)> item");
@@ -868,7 +905,7 @@ void M1Env::GraphInit::init_base(){
         // icon path
         nullptr);
     l_txhlc->setType("TYPE_");
-    l_txhlc->linkTo(l_home, "BLNGS", nullptr, true);
+    l_txhlc->linkTo(l_reprt, "BLNGS", nullptr, true);
 
     // creation of "Highlight Folder (type)"
     qCDebug(g_cat_silence) << QString("Creating <[TXHLF]-Highlight Folder (type)> item");
@@ -944,7 +981,7 @@ void M1Env::GraphInit::init_base(){
         // icon path
         nullptr);
     l_pprab->setType("PERSN");
-    l_pprab->linkTo(l_home, "BLNGS", nullptr, true);
+    l_pprab->linkTo(l_bgrt, "BLNGS", nullptr, true);
 
     // creation of "Swami Sri Sivananda Saraswati"
     qCDebug(g_cat_silence) << QString("Creating <[PSIVA]-Swami Sri Sivananda Saraswati> item");
@@ -960,7 +997,7 @@ void M1Env::GraphInit::init_base(){
         // icon path
         nullptr);
     l_psiva->setType("PERSN");
-    l_psiva->linkTo(l_home, "BLNGS", nullptr, true);
+    l_psiva->linkTo(l_bgrt, "BLNGS", nullptr, true);
 
     // creation of "Swami Gambirananda"
     qCDebug(g_cat_silence) << QString("Creating <[PGAMB]-Swami Gambirananda> item");
@@ -976,7 +1013,7 @@ void M1Env::GraphInit::init_base(){
         // icon path
         nullptr);
     l_pgamb->setType("PERSN");
-    l_pgamb->linkTo(l_home, "BLNGS", nullptr, true);
+    l_pgamb->linkTo(l_bgrt, "BLNGS", nullptr, true);
 
     // creation of "Sloka (type)"
     qCDebug(g_cat_silence) << QString("Creating <[TXSLK]-Sloka (type)> item");
@@ -992,6 +1029,7 @@ void M1Env::GraphInit::init_base(){
         // icon path
         M1Env::SLOKA_ICON_PATH);
     l_txslk->setType("TYPE_");
+    l_txslk->linkTo(l_bgrt, "BLNGS", nullptr, true);
 
     // creation of "Sloka Lines (type)"
     qCDebug(g_cat_silence) << QString("Creating <[SLKLN]-Sloka Lines (type)> item");
@@ -1007,7 +1045,7 @@ void M1Env::GraphInit::init_base(){
         // icon path
         M1Env::TEXT_SLOKA_LINE_ICON_PATH);
     l_slkln->setType("TYPE_");
-    l_slkln->linkTo(l_home, "BLNGS", nullptr, true);
+    l_slkln->linkTo(l_bgrt, "BLNGS", nullptr, true);
 
     // creation of "INRIA Dictionary Reference (type)"
     qCDebug(g_cat_silence) << QString("Creating <[INRIA]-INRIA Dictionary Reference (type)> item");
@@ -1023,7 +1061,7 @@ void M1Env::GraphInit::init_base(){
         // icon path
         M1Env::FOLDER_ICON_PATH);
     l_inria->setType("TYPE_");
-    l_inria->linkTo(l_home, "BLNGS", nullptr, true);
+    l_inria->linkTo(l_bgrt, "BLNGS", nullptr, true);
 
     // creation of "Sloka Translation (type)"
     qCDebug(g_cat_silence) << QString("Creating <[SLTRN]-Sloka Translation (type)> item");
@@ -1039,7 +1077,7 @@ void M1Env::GraphInit::init_base(){
         // icon path
         M1Env::TEXT_SLOKA_TRANSLATION_ICON_PATH);
     l_sltrn->setType("TYPE_");
-    l_sltrn->linkTo(l_home, "BLNGS", nullptr, true);
+    l_sltrn->linkTo(l_bgrt, "BLNGS", nullptr, true);
 
     // creation of "Sloka Bhashya (type)"
     qCDebug(g_cat_silence) << QString("Creating <[SLBHS]-Sloka Bhashya (type)> item");
@@ -1055,7 +1093,7 @@ void M1Env::GraphInit::init_base(){
         // icon path
         M1Env::TEXT_SLOKA_BHASHYA_ICON_PATH);
     l_slbhs->setType("TYPE_");
-    l_slbhs->linkTo(l_home, "BLNGS", nullptr, true);
+    l_slbhs->linkTo(l_bgrt, "BLNGS", nullptr, true);
 
     // creation of "WfW Translation Unit (type)"
     qCDebug(g_cat_silence) << QString("Creating <[TRLUN]-WfW Translation Unit (type)> item");
@@ -1071,7 +1109,7 @@ void M1Env::GraphInit::init_base(){
         // icon path
         M1Env::TEXT_WFW_UNIT_ICON_PATH);
     l_trlun->setType("TYPE_");
-    l_trlun->linkTo(l_home, "BLNGS", nullptr, true);
+    l_trlun->linkTo(l_bgrt, "BLNGS", nullptr, true);
 
     // creation of "[Abbr]-abbreviation"
     qCDebug(g_cat_silence) << QString("Creating <[ABBR_]-[Abbr]-abbreviation> item");
@@ -6062,6 +6100,8 @@ void M1Env::GraphInit::init_plato(){
         // label
         "The Republic (Dialogue)");
     l_republic->setType("TEXT_");
+
+    l_republic->linkTo(M1Store::Item_lv2::getExisting("REPRT"), "BLNGS");
 
     // creation of Plato Person node
     qCDebug(g_cat_silence) << QString("Creating Plato node");

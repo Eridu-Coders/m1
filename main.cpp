@@ -240,7 +240,7 @@ int loadGita(){
                     l_title.toUtf8().constData()               // label
                 );
                 l_gita_text->setType(M1Env::TEXT_SIID);
-                // l_gita_text->linkTo(l_text_root, "BLNGS", nullptr, true);
+                l_gita_text->linkTo(M1Store::Item_lv2::getExisting("BGRT_"), "BLNGS", nullptr, true);
 
                 l_gita_sections = M1Store::Item_lv2::getNew(
                     M1Store::FULL_VERTEX,                            // category & attributes (flags)
