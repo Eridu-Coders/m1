@@ -49,6 +49,7 @@ namespace M1UI{
         void htmlReceive(const QString& p_html);
         void edgeTypeSelected(int p_index);
         void vertexTypeSelected(int p_index);
+        void goHome();
     signals:
         void emitHtml(const QString& p_html);
     };

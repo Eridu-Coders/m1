@@ -121,6 +121,7 @@ namespace M1Env{
     static const char* HIGHLIGHTER_ICON_PATH = "../Icons/Highlighter.svg";              // *
     static const char* HL_CHUNK_ICON_PATH = "../Icons/Highlighter2.svg";                // *
     static const char* HL_QUOTE_ICON_PATH = "../Icons/Quote.svg";                       // *
+    static const char* SLOKA_FOLDER_ICON_PATH = "../Icons/SlokaFolder.svg";             // *
 
     static const bool SKIP_HEAVY_CHECKING = true; ///< true --> skip time-consuming Q_ASSERT in setType() and linkTo()
 } // end of M1Env namespace

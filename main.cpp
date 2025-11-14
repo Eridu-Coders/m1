@@ -247,7 +247,7 @@ int loadGita(){
                     //M1Store::ItemType(M1Store::FOLDER_SIID),   // type folder
                     "Gītā Sloka"                                     // label
                 );
-                l_gita_sections->setType(M1Store::FOLDER_SIID);
+                l_gita_sections->setType(M1Env::TEXT_SLOKA_FLDR_SIID);
                 l_last_edge = l_gita_text->linkTo(l_gita_sections, "OWNS_", nullptr, false);
             }
             // creation of each sloka node in the sections folder
@@ -466,7 +466,7 @@ int loadGita(){
                     // M1Store::ItemType(M1Env::TEXT_SECTION_SIID), // type
                     l_label.toUtf8().constData()                       // label
                 );
-                l_unit->setType(M1Env::SLOKA_SIID);
+                // l_unit->setType(M1Env::SLOKA_SIID);
                 // additional type TEXT_WFW_UNIT_SIID
                 l_unit->setType(M1Env::TEXT_WFW_UNIT_SIID);
                 // connect to begin/end occurence edges

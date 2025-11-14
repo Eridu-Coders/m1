@@ -122,6 +122,8 @@ extern M1Env::SpecialItemID TEXT_HIGHLIGHT_FLDR_SIID;
 extern M1Env::SpecialItemID TEXT_HIGHLIGHT_CAT_FLDR_SIID;
 // [TXHCK] Special Vertex ID of "Highlight Chunk"
 extern M1Env::SpecialItemID TEXT_HIGHLIGHT_CHUNK_SIID;
+// [SKFLD] Special Vertex ID of "Sloka folder"
+extern M1Env::SpecialItemID TEXT_SLOKA_FLDR_SIID;
 // [TXHQT] Special Vertex ID of "Highlight Quotation (type)"
 extern M1Env::SpecialItemID TEXT_HIGHLIGHT_QUOTE_SIID;
 // [TXSLK] Special Vertex ID of "Sloka (type)"

@@ -428,6 +428,7 @@ g_vertices = [
 ['Highlight Folder (type)',      ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHLF', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'TEXT_HIGHLIGHT_FLDR_SIID'],
 ['Highlight Categories Folder',  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHCF', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'TEXT_HIGHLIGHT_CAT_FLDR_SIID'],
 ['Highlight Chunk',              ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHCK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  "HL_CHUNK_ICON_PATH",     'TEXT_HIGHLIGHT_CHUNK_SIID'],
+['Sloka folder',                 ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'SKFLD', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  "SLOKA_FOLDER_ICON_PATH", 'TEXT_SLOKA_FLDR_SIID'],
 ['Highlight Quotation (type)',   ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHQT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE', 'SI_EDGE_TYPE',
                                                                                                                'SI_IS_SELECTABLE'],                "HL_QUOTE_ICON_PATH",     'TEXT_HIGHLIGHT_QUOTE_SIID'],
 ]
@@ -942,6 +943,7 @@ if __name__ == '__main__':
             l_plato_code += (f'    // creation of Republic occurrence {l_occ_key} node\n' +
                              f'    qCDebug(g_cat_silence) << QString("Creating Republic occurrence {l_occ_key} node");\n' +
                              f'    l_cur_occ = l_republic->linkTo(l_form_array[{l_form_id}]->item_id(), "OCCUR", l_cur_occ, false);\n')
+            l_plato_code +=  f'    l_cur_occ->linkTo(l_cur_occ, "AUTO_");\n'
             l_plato_code +=  f'    l_cur_occ->setText("{l_occ_key[:15]}");\n'
             l_plato_code +=  f'    l_cur_occ->setType("{l_mnemo_ver}");\n'
             l_plato_code +=  f'    l_form_array[{l_form_id}]->linkTo(l_cur_occ, "OWNS_");\n'

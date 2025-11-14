@@ -11,6 +11,7 @@
 #include <QGraphicsView>
 #include <QMouseEvent>
 #include <QComboBox>
+#include <QPushButton>
 
 // g_cat_main_window
 Q_LOGGING_CATEGORY(g_cat_main_window, "main_window")
@@ -54,6 +55,8 @@ M1UI::MainWindow::MainWindow(QWidget *p_parent) : QMainWindow(p_parent){
         //qDebug() << l_special->mnemonic();
         l_vt_combo->addItem(*M1Store::Storage::getQIcon(l_special->specialId()), l_special->mnemonic());
     }
+    QPushButton* l_home_btn = new QPushButton("Home", l_buttons_bar);
+    l_bar_layout->addWidget(l_home_btn);
 
     l_panel_layout->addWidget(l_buttons_bar);
 
@@ -96,6 +99,8 @@ M1UI::MainWindow::MainWindow(QWidget *p_parent) : QMainWindow(p_parent){
                      l_tree_display_left, &M1UI::TreeDisplay::edgeTypeSelected);
     QObject::connect(l_vt_combo, &QComboBox::activated,
                      l_tree_display_left, &M1UI::TreeDisplay::vertexTypeSelected);
+    QObject::connect(l_home_btn, &QPushButton::clicked,
+                     l_tree_display_left, &M1UI::TreeDisplay::goHome);
 
     // this->setMouseTracking(true);
 

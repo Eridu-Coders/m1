@@ -91,7 +91,6 @@ class Interp : public QObject
     // friend class InterpStaticConstructor;
 private:
     M1Store::Item_lv2* m_myself;
-    // bool m_active;
     int m_depth;
     int m_target_height;
     int m_target_beseline;
@@ -111,12 +110,15 @@ private:
     static QIcon cm_open;
     static QIcon cm_closed;
 
+    QTextEdit* m_text_edit = nullptr;
+
+protected:
     void paintOC(QPainter& p);
     virtual QString getHtml();
     virtual QString displayText();
     virtual bool diplayOpenClose(){ return true; }
-
-    QTextEdit* m_text_edit = nullptr;
+    virtual QIcon* edgeIcon();
+    virtual QIcon* vertexIcon();
 
     void initiateDrag();
     void emitSignals();
@@ -177,6 +179,7 @@ class AutoInterp : public Interp
 public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
 
+    virtual QString getHtml();
     AutoInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
     virtual void paintEvent(QPaintEvent* p_event);
     virtual bool diplayOpenClose(){ return false; }
@@ -189,6 +192,9 @@ class FieldInterp : public Interp
 public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
 
+    virtual QIcon* edgeIcon();
+    virtual QIcon* vertexIcon();
+    virtual QString getHtml();
     FieldInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
     virtual QString displayText();
     virtual void paintEvent(QPaintEvent* p_event);
@@ -198,10 +204,9 @@ class TranslUnit : public Interp
 {
     Q_OBJECT
 public:
-    virtual QString getHtml();
-public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
 
+    virtual QString getHtml();
     TranslUnit(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
     virtual QString displayText();
     // virtual void paintEvent(QPaintEvent* p_event);
@@ -273,6 +278,7 @@ class SectionBeginEnd : public Interp
     Q_OBJECT
 public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
+    virtual QString getHtml();
 
     SectionBeginEnd(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
     virtual QString displayText();
@@ -285,6 +291,7 @@ class TextOccurrence : public Interp
 public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
 
+    virtual QString getHtml();
     TextOccurrence(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
     virtual QString displayText();
     // virtual void paintEvent(QPaintEvent* p_event);

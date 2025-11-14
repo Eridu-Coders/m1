@@ -866,7 +866,7 @@ bool M1Store::Item_lv2::isOfType(const char* p_mnemonic) const{
 /** @}*/
 // end of \defgroup IOT2
 
-M1Env::SpecialItemID M1Store::Item_lv2::getIconTypeMember(){
+M1Env::SpecialItemID M1Store::Item_lv2::getIconSITypeID(){
     M1_FUNC_ENTRY(g_cat_lv2_members, QString("get type ID in member for Icon display"))
     short l_ret = -1;
     for(int i=0; i<4; i++){

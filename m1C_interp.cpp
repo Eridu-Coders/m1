@@ -43,6 +43,57 @@ void M1UI::InterpProxyWidget::dragLeaveEvent(QDragLeaveEvent *p_event){m_main_in
 void M1UI::InterpProxyWidget::dropEvent(QDropEvent *p_event){m_main_instance->dropEvent(p_event);}
 
 // ------------------------------------ Interp Base Class -----------------------------------------------------
+QString g_html_template = QString(QString("<html><Head>\n") +
+                          "<style>\n" +
+                          "/* Tooltip container */\n" +
+                          ".tooltip {\n" +
+                          "  position: relative;\n" +
+                          "  display: inline-block;\n" +
+                          "  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */\n" +
+                          "}\n" +
+                          "\n" +
+                          "/* Tooltip text */\n" +
+                          ".tooltip .tooltiptext {\n" +
+                          "  visibility: hidden;\n" +
+                          "  width: 800px;\n" +
+                          "  background-color: #555;\n" +
+                          "  color: #fff;\n" +
+                          "  text-align: center;\n" +
+                          "  padding: 5px 0;\n" +
+                          "  border-radius: 6px;\n" +
+                          "\n" +
+                          "  /* Position the tooltip text */\n" +
+                          "  position: absolute;\n" +
+                          "  z-index: 1;\n" +
+                          "  bottom: -200%;\n" +
+                          "  left: 50%;\n" +
+                          "  margin-left: -60px;\n" +
+                          "\n" +
+                          "  /* Fade in tooltip */\n" +
+                          "  opacity: 0;\n" +
+                          "  transition: opacity 0.3s;\n" +
+                          "}\n" +
+                          "\n" +
+                          "/* Tooltip arrow */\n" +
+                          ".tooltip .tooltiptext::after {\n" +
+                          "  content: "";\n" +
+                          "  position: absolute;\n" +
+                          "  top: 100%;\n" +
+                          "  left: 50%;\n" +
+                          "  margin-left: -5px;\n" +
+                          "  border-width: 5px;\n" +
+                          "  border-style: solid;\n" +
+                          "  border-color: #555 transparent transparent transparent;\n" +
+                          "}\n" +
+                          "\n" +
+                          "/* Show the tooltip text when you mouse over the tooltip container */\n" +
+                          ".tooltip:hover .tooltiptext {\n" +
+                          "  visibility: visible;\n" +
+                          "  opacity: 1;\n" +
+                          "}\n" +
+                          "</style>\n" +
+                          "</Head><body><div style=\"margin: 1em;\">\n%1</div></body></html>");
+
 void M1MidPlane::Interp::init(){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Init Interp class members"))
     cm_open = QIcon("../Icons/Open.svg");
@@ -177,17 +228,23 @@ QString M1MidPlane::Interp::displayText(){
     return m_myself->getTarget_lv2()->text();
 }
 
+QIcon* M1MidPlane::Interp::edgeIcon(){
+    return M1Store::Storage::getQIcon(m_myself->getIconSITypeID());
+}
+QIcon* M1MidPlane::Interp::vertexIcon(){
+    return M1Store::Storage::getQIcon(m_myself->getTarget_lv2()->getIconSITypeID());
+}
+
 void M1MidPlane::Interp::paintEvent(QPaintEvent* p_event){
     qCDebug(g_cat_interp_base) << m_myself->dbgShort() << " painting: " << p_event->rect();
     if(m_proxy != nullptr){
         QPainter p(m_proxy);
         // edge type icon
-        M1Store::Storage::getQIcon(m_myself->getIconTypeMember())->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
+        this->edgeIcon()->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
         // open/close icon
         if(diplayOpenClose()) paintOC(p);
         // target type icon
-        M1Store::Storage::getQIcon(m_myself->getTarget_lv2()->getIconTypeMember())->paint(
-            &p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
+        this->vertexIcon()->paint(&p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
 
         // text
         p.setPen(Qt::white);
@@ -223,7 +280,7 @@ void M1MidPlane::Interp::mouseDoubleClickEvent(QMouseEvent *p_event){
     emit gotoVertex(m_myself->getTarget_lv2(), this);
 }
 
-QString base_html_fragment(M1Store::Item_lv2* p_myself){
+QString base_html_fragment(M1Store::Item_lv2* p_myself, const QString& p_class_name=QString()){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("base_html_fragment: %1").arg(p_myself->getTarget_lv2()->text()))
     QStringList l_edge_list;
     l_edge_list.append(QString("<tr><td>ID</td><td>:</td><td>%1</td></tr>\n").arg(p_myself->item_id()));
@@ -233,22 +290,25 @@ QString base_html_fragment(M1Store::Item_lv2* p_myself){
     if((p_myself->flags() & M1Env::ITEM_NATURE_MASK) == M1Env::FULL_EDGE){
         QString l_target_html = p_myself->getTarget_lv2()->dbgStringHtml();
         qCDebug(g_cat_tree_display) << l_target_html;
-        M1_FUNC_EXIT
-            l_html = QString("<p style=\"font-weight: bold;\">Edge:</p>\n%1\n").arg(l_edge_html) +
-               QString("<p style=\"font-weight: bold;\">Target:</p>\n<p>%1</p>\n").arg(l_target_html);
+        l_html =
+            QString("<p style=\"font-size: larger;\">%2</p>\n<p style=\"font-weight: bold;\">Edge:</p>\n%1\n")
+                     .arg(l_edge_html)
+                     .arg(p_class_name.length() > 0 ? p_class_name : "Interp Base") +
+                 QString("<p style=\"font-weight: bold;\">Target:</p>\n<p>%1</p>\n").arg(l_target_html);
     }else{
         // Simple Edge
         QString l_payload_html = p_myself->text();
         qCDebug(g_cat_tree_display) << l_payload_html;
-        M1_FUNC_EXIT
-            l_html = QString("<p style=\"font-weight: bold;\">Edge:</p>\n%1").arg(l_edge_html) +
-                QString("<p style=\"font-weight: bold;\">Payload: %1</p>\n").arg(l_payload_html);
+        l_html = QString("<p style=\"font-weight: bold;\">Edge:</p>\n%1").arg(l_edge_html) +
+            QString("<p style=\"font-weight: bold;\">Payload: %1</p>\n").arg(l_payload_html);
     }
-    return QString("<div style=\"font-family: 'Noto mono', Arial, sans-serif;\">%1</div>\n").arg(l_html);
+    M1_FUNC_EXIT
+    return QString("<div style=\"font-family: 'Noto mono', Courier New, monospace;\">%1</div>\n").arg(l_html);
 }
 
 QString M1MidPlane::Interp::getHtml(){
-    return QString("<html>\n<Head></Head>\n<body>\n%1</body>\n</html>\n").arg(base_html_fragment(m_myself));
+    return g_html_template.arg(base_html_fragment(m_myself));
+    // return QString("<html>\n<Head></Head>\n<body>\n%1</body>\n</html>\n").arg(base_html_fragment(m_myself));
 }
 
 QWidget *M1MidPlane::Interp::get_edit_widget(){
@@ -467,6 +527,9 @@ void M1MidPlane::AutoInterp::paintEvent(QPaintEvent* p_event){
     p.drawLine(QPoint(0, m_target_height-1), QPoint(m_proxy->width(), m_target_height-1));
 }
 
+QString M1MidPlane::AutoInterp::getHtml(){
+    return g_html_template.arg(base_html_fragment(m_myself, "AutoInterp"));
+}
 // ------------------------------------ FieldInterp -----------------------------------------------------
 bool M1MidPlane::FieldInterp::wantIt(M1Store::Item_lv2* p_myself){
     return p_myself->isSimpleEdge();
@@ -479,70 +542,29 @@ QString M1MidPlane::FieldInterp::displayText(){
     return QString("[%1] ").arg(m_myself->dbgTypeShort()) + m_myself->text();
 }
 
-void M1MidPlane::FieldInterp::paintEvent(QPaintEvent* p_event){
+QIcon* M1MidPlane::FieldInterp::edgeIcon(){
+    static QIcon ls_field_icon("../Icons/CrookedArrow.svg");
+    return &ls_field_icon;
+}
+QIcon* M1MidPlane::FieldInterp::vertexIcon(){
     static QIcon ls_field_icon("../Icons/Field.svg");
+    return &ls_field_icon;
+}
 
+void M1MidPlane::FieldInterp::paintEvent(QPaintEvent* p_event){
     QPainter p(m_proxy);
     // QString l_text = QString("[%1] ").arg(m_myself->dbgTypeShort()) + m_myself->text();
-    ls_field_icon.paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
+    this->edgeIcon()->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
     // M1MidPlane::Interp::cm_closed.paint(&p, m_target_padding + m_target_height, m_target_padding, m_icon_size, m_icon_size);
-    M1Store::Storage::getQIcon(m_myself->getIconTypeMember())->paint(
-        &p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
+    this->vertexIcon()->paint(&p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
     p.setPen(Qt::white);
     p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), this->displayText());
 }
+QString M1MidPlane::FieldInterp::getHtml(){
+    return g_html_template.arg(base_html_fragment(m_myself, "FieldInterp"));
+}
 
 // ------------------------------------ TranslUnit -----------------------------------------------------
-QString g_html_template = QString("<html><Head>\n") +
-                          "<style>\n" +
-                          "/* Tooltip container */\n" +
-                          ".tooltip {\n" +
-                          "  position: relative;\n" +
-                          "  display: inline-block;\n" +
-                          "  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */\n" +
-                          "}\n" +
-                          "\n" +
-                          "/* Tooltip text */\n" +
-                          ".tooltip .tooltiptext {\n" +
-                          "  visibility: hidden;\n" +
-                          "  width: 800px;\n" +
-                          "  background-color: #555;\n" +
-                          "  color: #fff;\n" +
-                          "  text-align: center;\n" +
-                          "  padding: 5px 0;\n" +
-                          "  border-radius: 6px;\n" +
-                          "\n" +
-                          "  /* Position the tooltip text */\n" +
-                          "  position: absolute;\n" +
-                          "  z-index: 1;\n" +
-                          "  bottom: -200%;\n" +
-                          "  left: 50%;\n" +
-                          "  margin-left: -60px;\n" +
-                          "\n" +
-                          "  /* Fade in tooltip */\n" +
-                          "  opacity: 0;\n" +
-                          "  transition: opacity 0.3s;\n" +
-                          "}\n" +
-                          "\n" +
-                          "/* Tooltip arrow */\n" +
-                          ".tooltip .tooltiptext::after {\n" +
-                          "  content: "";\n" +
-                          "  position: absolute;\n" +
-                          "  top: 100%;\n" +
-                          "  left: 50%;\n" +
-                          "  margin-left: -5px;\n" +
-                          "  border-width: 5px;\n" +
-                          "  border-style: solid;\n" +
-                          "  border-color: #555 transparent transparent transparent;\n" +
-                          "}\n" +
-                          "\n" +
-                          "/* Show the tooltip text when you mouse over the tooltip container */\n" +
-                          ".tooltip:hover .tooltiptext {\n" +
-                          "  visibility: visible;\n" +
-                          "  opacity: 1;\n" +
-                          "}\n" +
-                          "</style>\n" +
-                          "</Head><body><div style=\"margin: 1em;\">\n%1</div></body></html>";
 QString g_transl_template = "<tr><td style=\"font-family: 'Noto Sans', Arial, sans-serif; text-align: center;\">%1 (%2)</td></tr>\n";
 
 QString tu_html_fragment(M1Store::Item_lv2* p_tu){
@@ -601,7 +623,9 @@ QString M1MidPlane::TranslUnit::displayText(){
         .arg(m_myself->getTarget_lv2()->getField(M1Store::TEXT_WFW_TRANSL_SIID, true));
 }
 QString M1MidPlane::TranslUnit::getHtml(){
-    return g_html_template.arg(tu_html_fragment(m_myself->getTarget_lv2()));
+    return g_html_template.arg(tu_html_fragment(m_myself->getTarget_lv2()) +
+                               "<hr/>\n" +
+                               base_html_fragment(m_myself, "TranslUnit"));
 }
 
 // ------------------------------------ SectionBeginEnd -----------------------------------------------------
@@ -618,6 +642,9 @@ QString M1MidPlane::SectionBeginEnd::displayText(){
         .arg(m_myself->getTarget_lv2()->getTarget_lv2()->text())
         .arg(m_myself->getTarget_lv2()->getTarget_lv2()->getField(M1Store::TEXT_WORD_TRANSLIT_SIID));
 }
+QString M1MidPlane::SectionBeginEnd::getHtml(){
+    return g_html_template.arg(base_html_fragment(m_myself, "SectionBeginEnd"));
+}
 
 //------------------------------------ UrlInterp -----------------------------------------------------
 bool M1MidPlane::UrlInterp::wantIt(M1Store::Item_lv2* p_myself){
@@ -633,7 +660,11 @@ M1MidPlane::UrlInterp::UrlInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb,
     m_url = m_myself->getTarget_lv2()->getField(M1Env::TEXT_URL_LINK_SIID);
     M1_FUNC_EXIT
 }
-
+/*
+QString M1MidPlane::UrlInterp::getHtml(){
+    return g_html_template.arg("<p style=\"font-size: larger;\">UrlInterp</p>\n" + base_html_fragment(m_myself));
+}
+*/
 //------------------------------------ BhashyaTranslation -----------------------------------------------------
 QString bt_html_fragment(M1Store::Item_lv2* p_bt){
     M1Store::Item_lv2* l_author_edge = p_bt->find_edge_edge(M1Store::TEXT_WRITTEN_BY_SIID);
@@ -650,7 +681,9 @@ bool M1MidPlane::BhashyaTranslation::wantIt(M1Store::Item_lv2* p_myself){
                                       p_myself->getTarget_lv2()->isOfType(M1Env::TEXT_SLOKA_TRANSLATION_SIID));
 }
 QString M1MidPlane::BhashyaTranslation::getHtml(){
-    return g_html_template.arg(bt_html_fragment(m_myself->getTarget_lv2()));
+    return g_html_template.arg(bt_html_fragment(m_myself->getTarget_lv2()) +
+                               "<hr/>\n" +
+                               base_html_fragment(m_myself, "BhashyaTranslation"));
 }
 QString M1MidPlane::BhashyaTranslation::displayText(){
     QString l_text = m_myself->getTarget_lv2()->text();
@@ -679,7 +712,7 @@ bool M1MidPlane::ChunkInterp::wantIt(M1Store::Item_lv2* p_myself){
 }
 QString M1MidPlane::ChunkInterp::getHtml(){
     QString l_html = "<p>" + ck_html_fragment(m_myself->getTarget_lv2()) + "</p>\n";
-    l_html += base_html_fragment(m_myself);
+    l_html += "<hr/>\n" + base_html_fragment(m_myself, "ChunkInterp");
     return g_html_template.arg(l_html);
 }
 M1MidPlane::ChunkInterp::ChunkInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth) : Interp(p_myself, p_vb, p_parent, p_depth){
@@ -703,6 +736,7 @@ QString sk_html_fragment(M1Store::Item_lv2* p_si){
         else if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_SLOKA_BHASHYA_SIID))
             l_html_bhashyas += bt_html_fragment(it.at()->getTarget_lv2());
     }
+    qCDebug(g_cat_interp_drag) << QString("sk_html_fragment") << p_si->dbgShort() << l_html_wfw;
     QString l_html = QString("<p style=\"font-weight: bold;\">%1</p>\n") .arg(p_si->text()) +
                  QString("<div style=\"margin-bottom: 1em;\">%1</div>\n<div style=\"margin-bottom: 1em; background-color: SeaShell;\">%2</div>\n")
                      .arg(l_html_lines)
@@ -722,7 +756,7 @@ M1MidPlane::SlokaInterp::SlokaInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p
 
 QString M1MidPlane::SlokaInterp::getHtml(){
     QString l_html = sk_html_fragment(m_myself->getTarget_lv2());
-    l_html += base_html_fragment(m_myself);
+    l_html += "<hr/>\n" + base_html_fragment(m_myself, "SlokaInterp");
     return g_html_template.arg(l_html);
 }
 //------------------------------------ SentenceInterp -----------------------------------------------------
@@ -765,7 +799,7 @@ M1MidPlane::SentenceInterp::SentenceInterp(M1Store::Item_lv2* p_myself, QVBoxLay
 QString M1MidPlane::SentenceInterp::getHtml(){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Sent: %1").arg(m_myself->text()))
     QString l_html = st_html_fragment(m_myself->getTarget_lv2());
-    l_html += base_html_fragment(m_myself);
+    l_html += "<hr/>\n" + base_html_fragment(m_myself, "SentenceInterp");
     M1_FUNC_EXIT
     return g_html_template.arg(l_html);
 }
@@ -914,7 +948,7 @@ QString bk_html_fragment(M1Store::Item_lv2* p_si){
 QString M1MidPlane::BookInterp::getHtml(){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Bk: %1").arg(m_myself->getTarget_lv2()->text()))
     QString l_html = bk_html_fragment(m_myself->getTarget_lv2());
-    l_html += base_html_fragment(m_myself);
+    l_html += "<hr/>\n" + base_html_fragment(m_myself, "BookInterp");
     M1_FUNC_EXIT
     return g_html_template.arg(l_html);
 }
@@ -957,7 +991,8 @@ QString M1MidPlane::TextInterp::getHtml(){
     QString l_html = QString("<h1>Title: %1</h1>\n").arg(m_myself->getTarget_lv2()->text());
 
     QStringList l_frags;
-    M1Store::Item_lv2* l_folder = m_myself->getTarget_lv2()->find_edge_target(M1Store::FOLDER_SIID);
+    M1Store::Item_lv2* l_folder = m_myself->getTarget_lv2()->find_edge_target(M1Env::TEXT_SLOKA_FLDR_SIID);
+    qCDebug(g_cat_interp_drag) << QString("l_folder") << ((l_folder == nullptr) ? "" : l_folder->dbgShort());
     if(l_folder != nullptr){
         l_folder = l_folder->getTarget_lv2();
         for(M1Store::Item_lv2_iterator it = l_folder->getIteratorTop(); !it.beyondEnd(); it.next()){
@@ -974,7 +1009,7 @@ QString M1MidPlane::TextInterp::getHtml(){
         }
 
     l_html += l_frags.join(" ");
-    l_html += "<hr/>\n" + base_html_fragment(m_myself);
+    l_html += "<hr/>\n" + base_html_fragment(m_myself, "TextInterp");
     M1_FUNC_EXIT
     return g_html_template.arg(l_html);
 }
@@ -995,7 +1030,9 @@ M1MidPlane::TextOccurrence::TextOccurrence(M1Store::Item_lv2* p_myself, QVBoxLay
 QString M1MidPlane::TextOccurrence::displayText(){
     return M1MidPlane::SentenceInterp::occur_to_text(m_myself->getTarget_lv2());
 }
-
+QString M1MidPlane::TextOccurrence::getHtml(){
+    return g_html_template.arg(base_html_fragment(m_myself, "TextOccurrence"));
+}
 //------------------------------------ HighlightChunkInterp -----------------------------------------------------
 bool M1MidPlane::HighlightChunkInterp::wantIt(M1Store::Item_lv2* p_myself){
     return p_myself->isFullEdge() && p_myself->getTarget_lv2()->isOfType(M1Env::TEXT_HIGHLIGHT_CHUNK_SIID);
@@ -1033,7 +1070,7 @@ QString hc_html_fragment(M1Store::Item_lv2* p_si){
 QString M1MidPlane::HighlightChunkInterp::getHtml(){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Hilight chunk: %1").arg(m_myself->text()))
     QString l_html = QString("<p>%1</p>").arg(m_myself->getTarget_lv2()->text()) + hc_html_fragment(m_myself->getTarget_lv2());
-    l_html += "<hr/>\n" + base_html_fragment(m_myself);
+    l_html += "<hr/>\n" + base_html_fragment(m_myself, "HighlightChunkInterp");
     M1_FUNC_EXIT
     return g_html_template.arg(l_html);
 }
@@ -1072,7 +1109,7 @@ QString M1MidPlane::HighlightInterp::getHtml(){
 
     QString l_html = QString("<div style=\"font-family: 'Noto Serif', 'Times New Roman', serif;\"><p>%1</p>").arg(l_cat_html) +
                      "<p>" + l_chunk_list.join("</p>\n<p>") + "</p></div>\n";
-    l_html += "<hr/>\n" + base_html_fragment(m_myself);
+    l_html += "<hr/>\n" + base_html_fragment(m_myself, "HighlightInterp");
     M1_FUNC_EXIT
     return g_html_template.arg(l_html);;
 }
@@ -1097,7 +1134,7 @@ QString M1MidPlane::HighlightQuotationInterp::displayText(){
 QString M1MidPlane::HighlightQuotationInterp::getHtml(){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("QuotationInterp: %1").arg(m_myself->text()))
     QString l_html = QString("<p>%1</p>").arg(hq_html_fragment(m_myself->getTarget_lv2()));
-    l_html += "<hr/>\n" + base_html_fragment(m_myself);
+    l_html += "<hr/>\n" + base_html_fragment(m_myself, "HighlightQuotationInterp");
     M1_FUNC_EXIT
     return g_html_template.arg(l_html);;
 

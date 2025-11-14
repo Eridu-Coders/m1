@@ -153,6 +153,12 @@ void M1UI::TreeDisplay::addInterp(M1Store::Item_lv2* p_root){
     M1_FUNC_EXIT
 }
 
+void M1UI::TreeDisplay::goHome(){
+    M1_FUNC_ENTRY(g_cat_interp_drag, QString("go Home"))
+    gotoVertex(M1Store::Item_lv2::getExisting(M1Env::HOME_SIID), nullptr);
+    M1_FUNC_EXIT
+}
+
 void M1UI::TreeDisplay::gotoVertex(M1Store::Item_lv2* p_new_vertex, M1MidPlane::Interp* p_sender){
     M1_FUNC_ENTRY(g_cat_interp_drag, QString("gotoVertex %1").arg(p_new_vertex == nullptr ? m_root->dbgShort() : p_new_vertex->dbgShort()))
 
