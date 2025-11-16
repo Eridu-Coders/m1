@@ -15,7 +15,7 @@ For the moment, the software goes under the temporary moniker "m1". In due cours
 
 ## Prerequisites
 
-Linux is strongly recommended as a development platform for m1; Specifically [Ubuntu](https://en.wikipedia.org/wiki/Ubuntu) and its derivatives ([mint](https://en.wikipedia.org/wiki/Linux_Mint), etc.)
+Linux is strongly recommended as a development platform for m1; Specifically [Ubuntu](https://en.wikipedia.org/wiki/Ubuntu) or its derivatives ([mint](https://en.wikipedia.org/wiki/Linux_Mint), etc.)
 
 ### Lmdb
 
@@ -35,7 +35,7 @@ sudo apt install libboost-all-dev
 
 ### Qt
 
-[Qt](https://en.wikipedia.org/wiki/Qt_(software)) is a widely used GUI library for C++. In fact it is more than just a GUI toolkit; and includes an entire development environment complete with several IDE interfaces and even extensions to the C++ language itself (the so-called "[signals and slots](https://en.wikipedia.org/wiki/Signals_and_slots)").
+[Qt](https://en.wikipedia.org/wiki/Qt_(software)) is a widely used GUI library for C++. In fact it is more than just a GUI toolkit and includes an entire development environment complete with several IDE interfaces and even extensions to the C++ language itself (the so-called "[signals and slots](https://en.wikipedia.org/wiki/Signals_and_slots)").
 
 Qt has both a paid and an open-source version. The latter can be downloaded from [the company's website](https://www.qt.io/download-open-source).
 
@@ -63,3 +63,4 @@ This will load the sample data from the _Baghad Gita_ and Plato's _Republic_. Af
 ./m1
 ```
 
+![](https://github.com/Eridu-Coders/m1/blob/main/ShankhaChakra.png?raw=true)
