@@ -367,7 +367,7 @@ QString M1Store::Item_lv2::dbgString(){
                        .arg(QString("m_auto_edge          : 0x%1 / %2").arg(autoEdge_item_id(), 16, 16, QLatin1Char('0')).arg(autoEdge_item_id()))
                        .arg(QString("m_first_edge_special : 0x%1 / %2").arg(firstEdgeSpecial_item_id(), 16, 16, QLatin1Char('0')).arg(firstEdgeSpecial_item_id()))
                        .arg(QString("m_string_id          : 0x%1 / %2").arg(string_id(), 16, 16, QLatin1Char('0')).arg(string_id()))
-                       .arg(QString("text                 : [%1] 2")
+                       .arg(QString("text                 : [%1] %2")
                             .arg(l_text.length()).arg(M1Store::Storage::maxLength(l_text, 100))) + l_edges + "\n===== END =====";
         }
         break;
@@ -417,7 +417,7 @@ QString M1Store::Item_lv2::dbgString(){
 
 QString M1Store::Item_lv2::dbgStringHtml(){
     QString l_ret = QString("<p style=\"margin: 0;font-weight: bold;\">------------------------ LV2 ------------------------</p>\n") +
-                    QString("<table>\n%1\n%2\n%3\n</table>\n")
+                    QString("<table>\n%1%2%3</table>\n")
                         .arg(QString("<tr><td>m_id</td><td>:</td><td>0x%1 %2</td></tr>\n").arg(item_id(), 16, 16, QLatin1Char('0')).arg(item_id()))
                         .arg(QString("<tr><td>m_flags</td><td>:</td><td>0b%1</td></tr>\n").arg(flags(), 64, 2, QLatin1Char('0')))
                         .arg(QString("<tr><td>m_type</td><td>:</td><td>%1</td></tr>\n").arg(m_type.dbgStringHr(flags() & TYPE_IS_ITEM_ID)));
@@ -464,7 +464,7 @@ QString M1Store::Item_lv2::dbgStringHtml(){
             return l_ret +
                    //                                                 ------------------------ LV2 ------------------------
                    QString("<p style=\"margin: 0;font-weight: bold;\">-------------------- FULL VERTEX --------------------</p>\n") +
-                   QString("<table>%1\n%2\n%3\n%4\n%5\n%6\n%7\n%8\n%9<table>\n")
+                   QString("<table>\n%1%2%3%4%5%6%7%8<table>\n%9")
                        .arg(QString("<tr><td>m_flags_extra</td><td>:</td><td>0b%1</td></tr>\n").arg(flagsExtra(), 64, 2, QLatin1Char('0')))
                        .arg(QString("<tr><td>m_creation_date</td><td>:</td><td>%1</td></tr>\n").arg(creationDate().toString("dd/MM/yyyy hh:mm:ss")))
                        .arg(QString("<tr><td>m_lastmod_date</td><td>:</td><td>%1</td></tr>\n").arg(lastmodDate().toString("dd/MM/yyyy hh:mm:ss")))
@@ -473,7 +473,7 @@ QString M1Store::Item_lv2::dbgStringHtml(){
                        .arg(QString("<tr><td>m_auto_edge</td><td>:</td><td>0x%1 / %2</td></tr>\n").arg(autoEdge_item_id(), 16, 16, QLatin1Char('0')).arg(autoEdge_item_id()))
                        .arg(QString("<tr><td>m_first_edge_special</td><td>:</td><td>0x%1 / %2</td></tr>\n").arg(firstEdgeSpecial_item_id(), 16, 16, QLatin1Char('0')).arg(firstEdgeSpecial_item_id()))
                        .arg(QString("<tr><td>m_string_id</td><td>:</td><td>0x%1 / %2</td></tr>\n").arg(string_id(), 16, 16, QLatin1Char('0')).arg(string_id()))
-                       .arg(QString("<p style=\"margin: 0;\">text : [%1] %2%3</p>\n")
+                       .arg(QString("<p style=\"margin: 0;\">Text : [%1] %2%3</p>\n")
                                 .arg(l_text.length())
                                 .arg(l_text.left(100))
                                 .arg(l_text.length() > 100 ? "..." : "")) + l_edges;
@@ -968,7 +968,7 @@ M1Store::Item_lv2* M1Store::Item_lv2::create_descendant(
     const SpecialItemID p_vertex_type,
     Item_lv2* p_edge_above, const bool p_at_top){
 
-    M1_FUNC_ENTRY(g_cat_interp_drag,
+    M1_FUNC_ENTRY(g_cat_lv2_members,
                   QString("new descendant: %1 --{%2}--> [%3] %4")
                     .arg(this->dbgShort())
                     .arg(M1Store::Storage::getSpecialItemPointer(p_edge_type)->mnemonic())

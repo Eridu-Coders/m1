@@ -1128,13 +1128,13 @@ void M1Env::GraphInit::init_base(){
     l_trlun->setType("TYPE_");
     l_trlun->linkTo(l_bgrt, "BLNGS", nullptr, true);
 
-    // creation of "[Abbr]-abbreviation"
-    qCDebug(g_cat_silence) << QString("Creating <[ABBR_]-[Abbr]-abbreviation> item");
+    // creation of "Abbreviation"
+    qCDebug(g_cat_silence) << QString("Creating <[ABBR_]-Abbreviation> item");
     M1Store::Item_lv2* l_abbr = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[Abbr]-abbreviation",
+        "Abbreviation",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -1956,13 +1956,13 @@ void M1Env::GraphInit::init_base(){
     l_cster->setType("TYPE_");
     l_cster->setType("CASE_");
 
-    // creation of "[ConjType]-conjunction type"
-    qCDebug(g_cat_silence) << QString("Creating <[CTNJY]-[ConjType]-conjunction type> item");
+    // creation of "Conjunction type"
+    qCDebug(g_cat_silence) << QString("Creating <[CTNJY]-Conjunction type> item");
     M1Store::Item_lv2* l_ctnjy = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[ConjType]-conjunction type",
+        "Conjunction type",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -2066,13 +2066,13 @@ void M1Env::GraphInit::init_base(){
     l_clsin->setType("TYPE_");
     l_clsin->setType("CLSVT");
 
-    // creation of "[Definite]-definiteness or state"
-    qCDebug(g_cat_silence) << QString("Creating <[DEFIN]-[Definite]-definiteness or state> item");
+    // creation of "Definiteness or state"
+    qCDebug(g_cat_silence) << QString("Creating <[DEFIN]-Definiteness or state> item");
     M1Store::Item_lv2* l_defin = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[Definite]-definiteness or state",
+        "Definiteness or state",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -2288,13 +2288,13 @@ void M1Env::GraphInit::init_base(){
     l_dgsup->setType("TYPE_");
     l_dgsup->setType("DEGRE");
 
-    // creation of "[Deixis]-relative location encoded in demonstratives"
-    qCDebug(g_cat_silence) << QString("Creating <[DEIXI]-[Deixis]-relative location encoded in demonstratives> item");
+    // creation of "Relative location encoded in demonstratives"
+    qCDebug(g_cat_silence) << QString("Creating <[DEIXI]-Relative location encoded in demonstratives> item");
     M1Store::Item_lv2* l_deixi = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[Deixis]-relative location encoded in demonstratives",
+        "Relative location encoded in demonstratives",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -2415,13 +2415,13 @@ void M1Env::GraphInit::init_base(){
     l_dxrmt->setType("TYPE_");
     l_dxrmt->setType("DEIXI");
 
-    // creation of "[DeixisRef]-person to which deixis is relative"
-    qCDebug(g_cat_silence) << QString("Creating <[DRXSF]-[DeixisRef]-person to which deixis is relative> item");
+    // creation of "Person to which deixis is relative"
+    qCDebug(g_cat_silence) << QString("Creating <[DRXSF]-Person to which deixis is relative> item");
     M1Store::Item_lv2* l_drxsf = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[DeixisRef]-person to which deixis is relative",
+        "Person to which deixis is relative",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -2462,13 +2462,13 @@ void M1Env::GraphInit::init_base(){
     l_drxs2->setType("TYPE_");
     l_drxs2->setType("DRXSF");
 
-    // creation of "[Evident]-evidentiality"
-    qCDebug(g_cat_silence) << QString("Creating <[EVDNT]-[Evident]-evidentiality> item");
+    // creation of "Evidentiality"
+    qCDebug(g_cat_silence) << QString("Creating <[EVDNT]-Evidentiality> item");
     M1Store::Item_lv2* l_evdnt = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[Evident]-evidentiality",
+        "Evidentiality",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -2509,13 +2509,13 @@ void M1Env::GraphInit::init_base(){
     l_evnfh->setType("TYPE_");
     l_evnfh->setType("EVDNT");
 
-    // creation of "[ExtPos]-external part of speech"
-    qCDebug(g_cat_silence) << QString("Creating <[EPXTS]-[ExtPos]-external part of speech> item");
+    // creation of "External part of speech"
+    qCDebug(g_cat_silence) << QString("Creating <[EPXTS]-External part of speech> item");
     M1Store::Item_lv2* l_epxts = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[ExtPos]-external part of speech",
+        "External part of speech",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -2684,13 +2684,13 @@ void M1Env::GraphInit::init_base(){
     l_sconj->setType("TYPE_");
     l_sconj->setType("EPXTS");
 
-    // creation of "[Foreign]-is this a foreign word?"
-    qCDebug(g_cat_silence) << QString("Creating <[FOREI]-[Foreign]-is this a foreign word?> item");
+    // creation of "Is this a foreign word?"
+    qCDebug(g_cat_silence) << QString("Creating <[FOREI]-Is this a foreign word?> item");
     M1Store::Item_lv2* l_forei = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[Foreign]-is this a foreign word?",
+        "Is this a foreign word?",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -3033,13 +3033,13 @@ void M1Env::GraphInit::init_base(){
     l_mdsub->setType("TYPE_");
     l_mdsub->setType("MOOD_");
 
-    // creation of "[NounClass]-noun class"
-    qCDebug(g_cat_silence) << QString("Creating <[NCNLS]-[NounClass]-noun class> item");
+    // creation of "Noun class"
+    qCDebug(g_cat_silence) << QString("Creating <[NCNLS]-Noun class> item");
     M1Store::Item_lv2* l_ncnls = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[NounClass]-noun class",
+        "Noun class",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -3608,13 +3608,13 @@ void M1Env::GraphInit::init_base(){
     l_ncw12->setType("TYPE_");
     l_ncw12->setType("NCNLS");
 
-    // creation of "[NumType]-numeral type"
-    qCDebug(g_cat_silence) << QString("Creating <[NTMYP]-[NumType]-numeral type> item");
+    // creation of "Numeral type"
+    qCDebug(g_cat_silence) << QString("Creating <[NTMYP]-Numeral type> item");
     M1Store::Item_lv2* l_ntmyp = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[NumType]-numeral type",
+        "Numeral type",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -4068,13 +4068,13 @@ void M1Env::GraphInit::init_base(){
     l_plpos->setType("TYPE_");
     l_plpos->setType("PLRTY");
 
-    // creation of "[Polite]-politeness"
-    qCDebug(g_cat_silence) << QString("Creating <[POLIT]-[Polite]-politeness> item");
+    // creation of "Politeness"
+    qCDebug(g_cat_silence) << QString("Creating <[POLIT]-Politeness> item");
     M1Store::Item_lv2* l_polit = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[Polite]-politeness",
+        "Politeness",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -4147,13 +4147,13 @@ void M1Env::GraphInit::init_base(){
     l_plinf->setType("TYPE_");
     l_plinf->setType("POLIT");
 
-    // creation of "[Poss]-possessive"
-    qCDebug(g_cat_silence) << QString("Creating <[POSS_]-[Poss]-possessive> item");
+    // creation of "Possessive"
+    qCDebug(g_cat_silence) << QString("Creating <[POSS_]-Possessive> item");
     M1Store::Item_lv2* l_poss = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[Poss]-possessive",
+        "Possessive",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -4178,13 +4178,13 @@ void M1Env::GraphInit::init_base(){
     l_psyes->setType("TYPE_");
     l_psyes->setType("POSS_");
 
-    // creation of "[PronType]-pronominal type"
-    qCDebug(g_cat_silence) << QString("Creating <[PTRNY]-[PronType]-pronominal type> item");
+    // creation of "Pronominal type"
+    qCDebug(g_cat_silence) << QString("Creating <[PTRNY]-Pronominal type> item");
     M1Store::Item_lv2* l_ptrny = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[PronType]-pronominal type",
+        "Pronominal type",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -4369,13 +4369,13 @@ void M1Env::GraphInit::init_base(){
     l_pttot->setType("TYPE_");
     l_pttot->setType("PTRNY");
 
-    // creation of "[Reflex]-reflexive"
-    qCDebug(g_cat_silence) << QString("Creating <[REFLE]-[Reflex]-reflexive> item");
+    // creation of "Reflexive"
+    qCDebug(g_cat_silence) << QString("Creating <[REFLE]-Reflexive> item");
     M1Store::Item_lv2* l_refle = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[Reflex]-reflexive",
+        "Reflexive",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -4495,13 +4495,13 @@ void M1Env::GraphInit::init_base(){
     l_tnprs->setType("TYPE_");
     l_tnprs->setType("TENSE");
 
-    // creation of "[Typo]-is this a misspelled word?"
-    qCDebug(g_cat_silence) << QString("Creating <[TYPO_]-[Typo]-is this a misspelled word?> item");
+    // creation of "Is this a misspelled word?"
+    qCDebug(g_cat_silence) << QString("Creating <[TYPO_]-Is this a misspelled word?> item");
     M1Store::Item_lv2* l_typo = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[Typo]-is this a misspelled word?",
+        "Is this a misspelled word?",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -4526,13 +4526,13 @@ void M1Env::GraphInit::init_base(){
     l_tyyes->setType("TYPE_");
     l_tyyes->setType("TYPO_");
 
-    // creation of "[VerbForm]-form of verb or deverbative"
-    qCDebug(g_cat_silence) << QString("Creating <[VFRBR]-[VerbForm]-form of verb or deverbative> item");
+    // creation of "Form of verb or deverbative"
+    qCDebug(g_cat_silence) << QString("Creating <[VFRBR]-Form of verb or deverbative> item");
     M1Store::Item_lv2* l_vfrbr = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[VerbForm]-form of verb or deverbative",
+        "Form of verb or deverbative",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -4669,13 +4669,13 @@ void M1Env::GraphInit::init_base(){
     l_vfvnn->setType("TYPE_");
     l_vfvnn->setType("VFRBR");
 
-    // creation of "[VerbType]-verb type"
-    qCDebug(g_cat_silence) << QString("Creating <[VTRBY]-[VerbType]-verb type> item");
+    // creation of "Verb type"
+    qCDebug(g_cat_silence) << QString("Creating <[VTRBY]-Verb type> item");
     M1Store::Item_lv2* l_vtrby = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[VerbType]-verb type",
+        "Verb type",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic

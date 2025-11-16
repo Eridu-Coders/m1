@@ -90,6 +90,10 @@ class Interp : public QObject
     friend class HighlightQuotationInterp;
     // friend class InterpStaticConstructor;
 private:
+    static QIcon cm_open;
+    static QIcon cm_closed;
+    static QList<M1Store::Item_lv2*> cm_gratt;
+
     M1Store::Item_lv2* m_myself;
     int m_depth;
     int m_target_height;
@@ -106,9 +110,6 @@ private:
     bool m_block_emit = false;
 
     QTimer m_hold_timer;
-
-    static QIcon cm_open;
-    static QIcon cm_closed;
 
     QTextEdit* m_text_edit = nullptr;
 

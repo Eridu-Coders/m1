@@ -112,7 +112,7 @@ M1UI::MainWindow::MainWindow(QWidget *p_parent) : QMainWindow(p_parent){
 
 /*
 void M1UI::MainWindow::mouseMoveEvent(QMouseEvent *p_event){
-    qCDebug(g_cat_interp_drag) << QString("mouse move event") << p_event->position();
+    qCDebug(g_cat_main_window) << QString("mouse move event") << p_event->position();
 }*/
 
 void M1UI::MainWindow::htmlReceive(const QString& p_html){
@@ -129,7 +129,7 @@ void M1UI::MainWindow::htmlReceive(const QString& p_html){
 }
 
 void M1UI::MainWindow::editReceive(QWidget *p_edit_widget){
-    M1_FUNC_ENTRY(g_cat_interp_drag, QString("Item"));
+    M1_FUNC_ENTRY(g_cat_main_window, QString("Item"));
 
     if(m_tab_widget->count() > 0)
         m_tab_widget->removeTab(EDIT_TAB_INDEX);

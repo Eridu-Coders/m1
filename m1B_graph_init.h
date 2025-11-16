@@ -138,7 +138,7 @@ extern M1Env::SpecialItemID TEXT_SLOKA_TRANSLATION_SIID;
 extern M1Env::SpecialItemID TEXT_SLOKA_BHASHYA_SIID;
 // [TRLUN] Special Vertex ID of "WfW Translation Unit (type)"
 extern M1Env::SpecialItemID TEXT_WFW_UNIT_SIID;
-// [ABBR_] Special Vertex ID of "[Abbr]-abbreviation"
+// [ABBR_] Special Vertex ID of "Abbreviation"
 extern M1Env::SpecialItemID ABBR__SIID;
 // [ANMCY] Special Vertex ID of "Animacy"
 extern M1Env::SpecialItemID ANMCY_SIID;
@@ -146,31 +146,31 @@ extern M1Env::SpecialItemID ANMCY_SIID;
 extern M1Env::SpecialItemID ASPCT_SIID;
 // [CASE_] Special Vertex ID of "Case"
 extern M1Env::SpecialItemID CASE__SIID;
-// [CTNJY] Special Vertex ID of "[ConjType]-conjunction type"
+// [CTNJY] Special Vertex ID of "Conjunction type"
 extern M1Env::SpecialItemID CTNJY_SIID;
 // [CLSVT] Special Vertex ID of "Clusivity"
 extern M1Env::SpecialItemID CLSVT_SIID;
-// [DEFIN] Special Vertex ID of "[Definite]-definiteness or state"
+// [DEFIN] Special Vertex ID of "Definiteness or state"
 extern M1Env::SpecialItemID DEFIN_SIID;
 // [DEGRE] Special Vertex ID of "Degree"
 extern M1Env::SpecialItemID DEGRE_SIID;
-// [DEIXI] Special Vertex ID of "[Deixis]-relative location encoded in demonstratives"
+// [DEIXI] Special Vertex ID of "Relative location encoded in demonstratives"
 extern M1Env::SpecialItemID DEIXI_SIID;
-// [DRXSF] Special Vertex ID of "[DeixisRef]-person to which deixis is relative"
+// [DRXSF] Special Vertex ID of "Person to which deixis is relative"
 extern M1Env::SpecialItemID DRXSF_SIID;
-// [EVDNT] Special Vertex ID of "[Evident]-evidentiality"
+// [EVDNT] Special Vertex ID of "Evidentiality"
 extern M1Env::SpecialItemID EVDNT_SIID;
-// [EPXTS] Special Vertex ID of "[ExtPos]-external part of speech"
+// [EPXTS] Special Vertex ID of "External part of speech"
 extern M1Env::SpecialItemID EPXTS_SIID;
-// [FOREI] Special Vertex ID of "[Foreign]-is this a foreign word?"
+// [FOREI] Special Vertex ID of "Is this a foreign word?"
 extern M1Env::SpecialItemID FOREI_SIID;
 // [GENDE] Special Vertex ID of "Gender"
 extern M1Env::SpecialItemID GENDE_SIID;
 // [MOOD_] Special Vertex ID of "Mood"
 extern M1Env::SpecialItemID MOOD__SIID;
-// [NCNLS] Special Vertex ID of "[NounClass]-noun class"
+// [NCNLS] Special Vertex ID of "Noun class"
 extern M1Env::SpecialItemID NCNLS_SIID;
-// [NTMYP] Special Vertex ID of "[NumType]-numeral type"
+// [NTMYP] Special Vertex ID of "Numeral type"
 extern M1Env::SpecialItemID NTMYP_SIID;
 // [NUMBE] Special Vertex ID of "Number"
 extern M1Env::SpecialItemID NUMBE_SIID;
@@ -178,21 +178,21 @@ extern M1Env::SpecialItemID NUMBE_SIID;
 extern M1Env::SpecialItemID PERSO_SIID;
 // [PLRTY] Special Vertex ID of "Polarity"
 extern M1Env::SpecialItemID PLRTY_SIID;
-// [POLIT] Special Vertex ID of "[Polite]-politeness"
+// [POLIT] Special Vertex ID of "Politeness"
 extern M1Env::SpecialItemID POLIT_SIID;
-// [POSS_] Special Vertex ID of "[Poss]-possessive"
+// [POSS_] Special Vertex ID of "Possessive"
 extern M1Env::SpecialItemID POSS__SIID;
-// [PTRNY] Special Vertex ID of "[PronType]-pronominal type"
+// [PTRNY] Special Vertex ID of "Pronominal type"
 extern M1Env::SpecialItemID PTRNY_SIID;
-// [REFLE] Special Vertex ID of "[Reflex]-reflexive"
+// [REFLE] Special Vertex ID of "Reflexive"
 extern M1Env::SpecialItemID REFLE_SIID;
 // [TENSE] Special Vertex ID of "Tense"
 extern M1Env::SpecialItemID TENSE_SIID;
-// [TYPO_] Special Vertex ID of "[Typo]-is this a misspelled word?"
+// [TYPO_] Special Vertex ID of "Is this a misspelled word?"
 extern M1Env::SpecialItemID TYPO__SIID;
-// [VFRBR] Special Vertex ID of "[VerbForm]-form of verb or deverbative"
+// [VFRBR] Special Vertex ID of "Form of verb or deverbative"
 extern M1Env::SpecialItemID VFRBR_SIID;
-// [VTRBY] Special Vertex ID of "[VerbType]-verb type"
+// [VTRBY] Special Vertex ID of "Verb type"
 extern M1Env::SpecialItemID VTRBY_SIID;
 // [VOICE] Special Vertex ID of "Voice"
 extern M1Env::SpecialItemID VOICE_SIID;

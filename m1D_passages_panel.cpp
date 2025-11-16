@@ -105,7 +105,7 @@ void M1UI::BasePassageItem::dropEvent(QGraphicsSceneDragDropEvent *p_event){
 }
 
 QString M1UI::BasePassageItem::highlight(M1Store::Item_lv2* p_chunk, M1Store::Item_lv2* p_category, M1Store::Item_lv2* p_color){
-    qCDebug(g_cat_interp_drag) << QString("highlight") << m_id << this->text() << p_category->text() << p_color->text();
+    qCDebug(g_cat_passages_panel) << QString("highlight") << m_id << this->text() << p_category->text() << p_color->text();
 
     m_color = p_color->text();
     this->update(this->boundingRect());
@@ -436,7 +436,7 @@ void M1UI::PassagesPanel::highlight(){
     M1Store::Item_lv2* l_highlight_vertex = m_highlight_folder->create_descendant(M1Env::OWNS_SIID, "", M1Env::TEXT_HIGHLIGHT_SIID);
 
     M1Store::Item_lv2* l_category = m_cat_list[m_current_cat];
-    qCDebug(g_cat_interp_drag) << QString("l_category") << l_category->specialItemId();
+    qCDebug(g_cat_passages_panel) << QString("l_category") << l_category->specialItemId();
     l_highlight_vertex->setType(l_category->specialItemId());
     M1Store::Item_lv2* l_color = l_category->getFieldEdge(M1Store::HLCLR_SIID)->getTarget_lv2();
 

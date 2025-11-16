@@ -144,6 +144,7 @@ Q_DECLARE_LOGGING_CATEGORY(g_cat_tree_display)          ///< TreeDisplay widget 
 Q_DECLARE_LOGGING_CATEGORY(g_cat_passages_panel)        ///< Passages panel UI class
 Q_DECLARE_LOGGING_CATEGORY(g_cat_interp_base)           ///< Base class of the Interp hierarchy
 Q_DECLARE_LOGGING_CATEGORY(g_cat_interp_drag)           ///< Drag/Drop in the Interp hierarchy
+Q_DECLARE_LOGGING_CATEGORY(g_cat_interp_dev)            ///< General purpose dev debug cat for the Interp hierarchy
 Q_DECLARE_LOGGING_CATEGORY(g_cat_main_window)           ///< MainWindow widget class
 Q_DECLARE_LOGGING_CATEGORY(g_cat_main)                  ///< messages from main of complete (non-test) build (including XML loaders)
 

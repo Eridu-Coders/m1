@@ -838,7 +838,7 @@ QList<M1Store::SpecialItem*>& M1Store::Storage::getSelectableVertexTypes(){
     l_ret_vertices.clear();
     for(M1Env::SpecialItemID l_special_id = 0; l_special_id < cm_next_special; l_special_id++){
         M1Store::SpecialItem* l_special_item = getSpecialItemPointer(l_special_id);
-        qDebug() << l_special_item->mnemonic()
+        qCDebug(g_cat_store) << l_special_item->mnemonic()
                  << (l_special_item->flags() & M1Env::SI_IS_SELECTABLE)
                  << (l_special_item->flags() & M1Env::SI_EDGE_TYPE)
                  << ((l_special_item->flags() & M1Env::SI_IS_SELECTABLE) && !(l_special_item->flags() & M1Env::SI_EDGE_TYPE));
@@ -1082,6 +1082,7 @@ void M1Store::Storage::dbgDump(){
 
     // dump Constants
     qCDebug(g_cat_silence) << QString("================ Constants dump ========");
+    /*
     qCDebug(g_cat_silence) << QString("ROOT_SIID  = 0x%1").arg(M1Store::ROOT_SIID, 4, 16, QChar('0'));
     qCDebug(g_cat_silence) << QString("HOME_SIID  = 0x%1").arg(M1Store::HOME_SIID, 4, 16, QChar('0'));
     qCDebug(g_cat_silence) << QString("ISA_SIID   = 0x%1").arg(M1Store::ISA_SIID, 4, 16, QChar('0'));
@@ -1090,6 +1091,7 @@ void M1Store::Storage::dbgDump(){
     qCDebug(g_cat_silence) << QString("BLNGS_SIID = 0x%1").arg(M1Store::BLNGS_SIID, 4, 16, QChar('0'));
     qCDebug(g_cat_silence) << QString("TEXT_SIID  = 0x%1").arg(M1Store::TEXT_SIID, 4, 16, QChar('0'));
     qCDebug(g_cat_silence) << QString("FORM_SIID  = 0x%1").arg(M1Store::WFORM_SIID, 4, 16, QChar('0'));
+    */
 
     // dump special items table
     qCDebug(g_cat_silence) << QString("========= Special Items dump ========");
@@ -1098,13 +1100,14 @@ void M1Store::Storage::dbgDump(){
         qCDebug(g_cat_silence) << getSpecialItemPointer(i)->dbgString();
 
     // dump items --------------------------------------------------------------
+    /*
     qCDebug(g_cat_silence) << QString("========= Items dump ================");
 
     for(ItemID i = 0; i < cm_next_item; i++){
         Item_lv2* l_item = Item_lv2::getExisting(i);
         qCDebug(g_cat_silence) << QString("0x%1 ").arg(i, 16, 16, QChar('0')) + l_item->dbgShort();
     }
-
+    */
     /*
     // dump vertices --------------------------------------------------------------
     qCDebug(g_cat_silence) << QString("========= Vertices dump =============");

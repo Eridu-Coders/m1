@@ -520,9 +520,10 @@ if __name__ == '__main__':
         print(l_mn_class, l_name_class)
 
         # ['Email Inbox', ['FULL_VERTEX',  'IS_SPECIAL'], ['TYPE_'], [('BLNGS',  '_MSG_')], 'EMAIL', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], None, 'EMAIL_TYPE_SIID'],
-        l_vertex_label = (f'[{l_name_class}]-{l_label_class}'[:64]
-                          if l_name_class.lower() != l_label_class.lower()
-                          else l_name_class[:64])
+        # l_vertex_label = (f'[{l_name_class}]-{l_label_class}'[:64]
+        #                           if l_name_class.lower() != l_label_class.lower()
+        #                           else l_name_class[:64])
+        l_vertex_label = l_label_class.capitalize()
         l_ssid_attr = f'{l_mn_class}_SIID'
         l_attr_class_ssid_list.append(l_ssid_attr)
         g_vertices.append([
@@ -541,8 +542,9 @@ if __name__ == '__main__':
             l_attr_2_mn[l_attr_key] = l_mn_attr
 
             l_vertex_label = f'[{l_name_attr}]-{l_label_attr}'[:62] \
-                             if l_name_attr.lower() != l_label_attr.lower() \
-                             else l_name_attr[:62]
+                if l_name_attr.lower() != l_label_attr.lower() \
+                else l_name_attr[:62]
+
             g_vertices.append([
                 l_vertex_label,
                 ['FULL_VERTEX',  'IS_SPECIAL'],

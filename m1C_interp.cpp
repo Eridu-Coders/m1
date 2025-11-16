@@ -18,7 +18,8 @@
 #include <QPushButton>
 #include <QComboBox>
 
-// g_cat_interp_base
+// g_cat_interp_dev
+Q_LOGGING_CATEGORY(g_cat_interp_dev, "interp.dev")
 Q_LOGGING_CATEGORY(g_cat_interp_base, "interp.base")
 // g_cat_interp_drag
 Q_LOGGING_CATEGORY(g_cat_interp_drag, "interp.drag")
@@ -45,6 +46,8 @@ void M1UI::InterpProxyWidget::dropEvent(QDropEvent *p_event){m_main_instance->dr
 // ------------------------------------ Interp Base Class -----------------------------------------------------
 QString g_html_template = QString(QString("<html><Head>\n") +
                           "<style>\n" +
+                          "table.wb {border: 1px solid black;border-collapse: collapse;}\n"
+                          "td.wb, th.wb {border: 1px solid black;border-collapse: collapse; padding: 0.5em 0.5em 0.5em 0.5em}\n"
                           "/* Tooltip container */\n" +
                           ".tooltip {\n" +
                           "  position: relative;\n" +
@@ -94,12 +97,22 @@ QString g_html_template = QString(QString("<html><Head>\n") +
                           "</style>\n" +
                           "</Head><body><div style=\"margin: 1em;\">\n%1</div></body></html>");
 
+QList<M1Store::Item_lv2*> M1MidPlane::Interp::cm_gratt;
+
 void M1MidPlane::Interp::init(){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Init Interp class members"))
     cm_open = QIcon("../Icons/Open.svg");
     Q_ASSERT_X( !cm_open.isNull(), "Interp::init()", "Open link Icon failed to load");
     cm_closed = QIcon("../Icons/Closed.svg");
     Q_ASSERT_X( !cm_closed.isNull(), "Interp::init()", "Closed link Icon failed to load");
+
+    M1Store::Item_lv2* l_gratt = M1Store::Item_lv2::getExisting(M1Store::GRAMMAR_ATTR_SIID);
+    qCDebug(g_cat_interp_dev) << "l_gratt" << l_gratt->text();
+    for(M1Store::Item_lv2_iterator it = l_gratt->getIteratorTop(); !it.beyondEnd(); it.next())
+        if(it.at()->isFullEdge() && it.at()->isOfType(M1Env::ITO_SIID) ){
+            qCDebug(g_cat_interp_dev) << it.at()->dbgShort();
+            cm_gratt.append(it.at()->getTarget_lv2());
+        }
 
     M1_FUNC_EXIT
 }
@@ -151,7 +164,7 @@ M1MidPlane::Interp::Interp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI:
 
     m_proxy = new M1UI::InterpProxyWidget(this, p_tree->widget());
     p_vb->addWidget(m_proxy);
-    qCDebug(g_cat_interp_drag) << "proxy added" << p_vb->count() << p_tree->widget()->children().count() << p_myself->dbgShort();
+    qCDebug(g_cat_interp_base) << "proxy added" << p_vb->count() << p_tree->widget()->children().count() << p_myself->dbgShort();
 
     m_td_parent = p_tree;
 
@@ -210,7 +223,7 @@ void M1MidPlane::Interp::deleteProxy(){
     }
 }
 M1MidPlane::Interp::~Interp(){
-    qCDebug(g_cat_interp_drag) << Interp::dbgString() << "deleted";
+    qCDebug(g_cat_interp_base) << Interp::dbgString() << "deleted";
 }
 void M1MidPlane::Interp::blockFocusEvents(){
     MyEventFilter *l_filter = new MyEventFilter(m_proxy);
@@ -312,7 +325,7 @@ QString M1MidPlane::Interp::getHtml(){
 }
 
 QWidget *M1MidPlane::Interp::get_edit_widget(){
-    qCDebug(g_cat_interp_drag) << QString("text: %1").arg(m_myself->dbgShort());
+    qCDebug(g_cat_interp_base) << QString("text: %1").arg(m_myself->dbgShort());
 
     QWidget* l_panel_widget = new QWidget();
     QVBoxLayout* l_panel_layout = new QVBoxLayout();
@@ -336,7 +349,7 @@ QWidget *M1MidPlane::Interp::get_edit_widget(){
     return l_panel_widget;
 }
 void M1MidPlane::Interp::save_text_edit(){
-    qCDebug(g_cat_interp_drag) << "Saving text edit field: " << m_text_edit->toPlainText();
+    qCDebug(g_cat_interp_base) << "Saving text edit field: " << m_text_edit->toPlainText();
     m_myself->getTarget_lv2()->setText(m_text_edit->toPlainText());
     m_td_parent->repaint();
     this->emitSignals();
@@ -480,7 +493,7 @@ void M1MidPlane::Interp::dropEvent(QDropEvent *p_event){
 }
 
 void M1MidPlane::Interp::contextMenuEvent(QContextMenuEvent *p_event) {
-    qCDebug(g_cat_interp_drag) << QString("Context menu request") << m_myself->text();
+    qCDebug(g_cat_interp_base) << QString("Context menu request") << m_myself->text();
     m_hold_timer.stop();
 
     QMenu l_context_menu(m_proxy);
@@ -494,7 +507,7 @@ void M1MidPlane::Interp::contextMenuEvent(QContextMenuEvent *p_event) {
 void M1MidPlane::Interp::create_descendant(){
     M1Store::SpecialItem* l_new_edge_type = m_td_parent->newEdgeType();
     M1Store::SpecialItem* l_new_vertex_type = m_td_parent->newVertexType();
-    qCDebug(g_cat_interp_drag) << QString("Create New Descendant") << m_myself->text() <<
+    qCDebug(g_cat_interp_base) << QString("Create New Descendant") << m_myself->text() <<
         "Edge Type:" << l_new_edge_type->mnemonic() <<
         "Vertex Type:" << l_new_vertex_type->mnemonic();
 
@@ -736,7 +749,7 @@ QString sk_html_fragment(M1Store::Item_lv2* p_si){
         else if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_SLOKA_BHASHYA_SIID))
             l_html_bhashyas += bt_html_fragment(it.at()->getTarget_lv2());
     }
-    qCDebug(g_cat_interp_drag) << QString("sk_html_fragment") << p_si->dbgShort() << l_html_wfw;
+    qCDebug(g_cat_interp_base) << QString("sk_html_fragment") << p_si->dbgShort() << l_html_wfw;
     QString l_html = QString("<p style=\"font-weight: bold;\">%1</p>\n") .arg(p_si->text()) +
                  QString("<div style=\"margin-bottom: 1em;\">%1</div>\n<div style=\"margin-bottom: 1em; background-color: SeaShell;\">%2</div>\n")
                      .arg(l_html_lines)
@@ -819,6 +832,7 @@ QWidget *M1MidPlane::SentenceInterp::get_edit_widget(){
             l_section = l_section->getTarget_lv2();
             break;
         }
+        if(l_current_edge->previous_item_id() == M1Store::G_VOID_ITEM_ID) break;
         l_current_edge = l_current_edge->get_previous_lv2();
         // l_current_edge = l_current_edge->getNext_lv2();
     }
@@ -992,7 +1006,7 @@ QString M1MidPlane::TextInterp::getHtml(){
 
     QStringList l_frags;
     M1Store::Item_lv2* l_folder = m_myself->getTarget_lv2()->find_edge_target(M1Env::TEXT_SLOKA_FLDR_SIID);
-    qCDebug(g_cat_interp_drag) << QString("l_folder") << ((l_folder == nullptr) ? "" : l_folder->dbgShort());
+    qCDebug(g_cat_interp_base) << QString("l_folder") << ((l_folder == nullptr) ? "" : l_folder->dbgShort());
     if(l_folder != nullptr){
         l_folder = l_folder->getTarget_lv2();
         for(M1Store::Item_lv2_iterator it = l_folder->getIteratorTop(); !it.beyondEnd(); it.next()){
@@ -1020,6 +1034,51 @@ M1MidPlane::TextInterp::TextInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_v
 }
 
 //------------------------------------ TextOccurrence -----------------------------------------------------
+QStringList textOccData(M1Store::Item_lv2* p_occ){
+    QStringList l_ret;
+    M1Store::Item_lv2* l_snt = p_occ->find_edge(M1Store::BLNGS_SIID, M1Store::TEXT_SENTENCE_SIID);
+    M1Store::Item_lv2* l_book = l_snt->getTarget_lv2()->find_edge(M1Store::BLNGS_SIID, M1Store::TEXT_BOOK_SIID);
+
+    // sentence name
+    l_ret.append(l_snt == nullptr ? "" : l_snt->getTarget_lv2()->text());
+
+    // book name
+    l_ret.append(l_book == nullptr ? "" : l_book->getTarget_lv2()->text());
+
+    // section
+    M1Store::Item_lv2* l_sec_search_occ = p_occ;
+    M1Store::Item_lv2* l_sec_edge = nullptr;
+    while(true){
+        // qCDebug(g_cat_interp_dev).noquote() << QString("l_sec_search_occ") << l_sec_search_occ->dbgShort();
+        l_sec_edge = l_sec_search_occ->find_edge(M1Env::BLNGS_SIID, M1Env::STEPHANUS_SIID);
+        if(l_sec_edge != nullptr){
+            qCDebug(g_cat_interp_dev).noquote() << QString("l_sec_edge") << l_sec_edge->dbgShort();
+            l_ret.append(l_sec_edge->getTarget_lv2()->text());
+            break;
+        }
+        if(l_sec_search_occ->previous_item_id() == M1Store::G_VOID_ITEM_ID) break;
+        l_sec_search_occ = l_sec_search_occ->get_previous_lv2();
+    }
+    if(l_ret.length() < 3) l_ret.append("{No Stephanus Section Found}");
+
+    // neighborhood
+    M1Store::Item_lv2* l_nig_search_occ = p_occ;
+    for(int i=0; i<5; i++)
+        if(l_nig_search_occ->previous_item_id() == M1Store::G_VOID_ITEM_ID) break;
+        else l_nig_search_occ = l_nig_search_occ->get_previous_lv2();
+    QStringList l_words;
+    for(int i=0; i<11; i++)
+        if(l_nig_search_occ->next_item_id() == M1Store::G_VOID_ITEM_ID) break;
+        else{
+            if(l_nig_search_occ == p_occ) l_words.append(QString("<b>%1</b>").arg(M1MidPlane::SentenceInterp::occur_to_text(l_nig_search_occ)));
+            else l_words.append(M1MidPlane::SentenceInterp::occur_to_text(l_nig_search_occ));
+            l_nig_search_occ = l_nig_search_occ->get_next_lv2();
+        }
+    l_ret.append(l_words.join(" "));
+
+    return l_ret;
+}
+
 bool M1MidPlane::TextOccurrence::wantIt(M1Store::Item_lv2* p_myself){
     return p_myself->isFullEdge() && p_myself->getTarget_lv2()->isOfType(M1Env::OCCUR_SIID);
 }
@@ -1031,7 +1090,76 @@ QString M1MidPlane::TextOccurrence::displayText(){
     return M1MidPlane::SentenceInterp::occur_to_text(m_myself->getTarget_lv2());
 }
 QString M1MidPlane::TextOccurrence::getHtml(){
-    return g_html_template.arg(base_html_fragment(m_myself, "TextOccurrence"));
+    M1Store::Item_lv2* l_form = m_myself->getTarget_lv2()->getTarget_lv2();
+    QStringList l_occ_data = textOccData(m_myself->getTarget_lv2());
+    QString l_html = QString("<p>Occurrence of “<b>%1</b>” in [%2] of %3 (Stephanus Section: <span style=\"color: maroon;\">%4</span>) of <span style=\"font-style: italic;\">%5</span></p>\n")
+                         .arg(l_form->text()).arg(l_occ_data[0]).arg(l_occ_data[1]).arg(l_occ_data[2])
+                         .arg(m_myself->getTarget_lv2()->getOrigin_lv2()->text());
+
+    l_html += "<table class=\"wb\" style=\"border: 1px solid black; border-collapse: collapse; font-size:smaller;\">\n";
+    l_html += "<tr><th class=\"wb\">Attribute</th><th class=\"wb\">Value</th><tr/>\n";
+    QStringList l_other_attr;
+    for(M1Store::Item_lv2_iterator it = m_myself->getTarget_lv2()->getIteratorSpecial(); !it.beyondEnd(); it.next())
+        if(it.at()->isOfType(M1Store::ISA_SIID)){
+            M1Store::Item_lv2* l_type = it.at()->getTarget_lv2();
+            qCDebug(g_cat_interp_dev) << QString("ISA edge") << l_type->text() << " / " << it.at()->dbgShort();
+
+            if(l_type->isOfType(M1Store::NLPOS_SIID))
+                l_html += QString("<tr class=\"wb\"><td class=\"wb\" style=\"background-color: #cccccc; font-weight: bold;\">Coarse Grained POS</td>") +
+                          QString("<td class=\"wb\">%1</td></tr>\n").arg(l_type->text());
+
+            if(l_type->isOfType(M1Store::NLTAG_SIID))
+                l_html += QString("<tr class=\"wb\"><td class=\"wb\" style=\"background-color: #cccccc; font-weight: bold;\">Fine Grained POS</td>") +
+                          QString("<td class=\"wb\">%1</td></tr>\n").arg(l_type->text());
+
+            for(M1Store::Item_lv2_iterator it2 = l_type->getIteratorSpecial(); !it2.beyondEnd(); it2.next())
+                if(it2.at()->isOfType(M1Store::ISA_SIID) && it2.at()->getTarget_lv2()->isOfType(M1Store::GRAMMAR_ATTR_SIID)){
+                    M1Store::Item_lv2* l_gratt = it2.at()->getTarget_lv2();
+                    qCDebug(g_cat_interp_dev) << QString("   gratt") << l_gratt->dbgShort();
+                    l_other_attr.append(QString("<tr class=\"wb\"><td class=\"wb\" style=\"background-color: #cccccc; font-weight: bold;\">%1</td><td class=\"wb\">%2</td></tr>").arg(l_gratt->text()).arg(l_type->text()));
+                    break;
+                }
+        }
+    l_html += l_other_attr.join("\n") + "</table>\n";
+
+    l_html += QString("<p>Neighborhood: %1</p>\n").arg(l_occ_data[3]);
+
+    M1Store::Item_lv2* l_lemma = l_form->find_edge(M1Env::BLNGS_SIID, M1Env::LEMMA_SIID);
+    if(l_lemma == nullptr)
+        l_html += "<p>No Lemma</p>";
+    else{
+        l_lemma = l_lemma->getTarget_lv2();
+        // qCDebug(g_cat_interp_base).noquote() << QString("l_lemma->text()") << l_lemma->text();
+        M1Store::Item_lv2* l_pos_lemma = l_lemma->find_edge(M1Env::ISA_SIID, M1Env::NLPOS_SIID, true);
+        l_html += QString("<p>Lemma: <b>%1</b> (%2)</p>\n")
+                      .arg(l_lemma->text())
+                      .arg(l_pos_lemma == nullptr ? "<No POS tag>" : l_pos_lemma->getTarget_lv2()->text());
+    }
+
+    l_html += "<p>Other occurrences of this Lemma:</p>\n";
+    l_html += "<table class=\"wb\" style=\"border: 1px solid black; border-collapse: collapse; font-size:smaller;\">\n";
+    qCDebug(g_cat_interp_dev).noquote() << QString("l_html") << l_html;
+    for(M1Store::Item_lv2_iterator l_it_1 = l_lemma->getIteratorTop(); !l_it_1.beyondEnd(); l_it_1.next())
+        if(l_it_1.at()->getTarget_lv2()->isOfType(M1Store::WFORM_SIID)){
+            M1Store::Item_lv2* l_form = l_it_1.at()->getTarget_lv2();
+            qCDebug(g_cat_interp_dev) << QString("l_form") << l_form->dbgShort();
+            for(M1Store::Item_lv2_iterator l_it_2 = l_form->getIteratorTop(); !l_it_2.beyondEnd(); l_it_2.next())
+                if(l_it_2.at()->getTarget_lv2()->isOfType(M1Store::OCCUR_SIID)){
+                    M1Store::Item_lv2* l_occ = l_it_2.at()->getTarget_lv2();
+                    QStringList l_occ_data = textOccData(l_occ);
+                    l_html += QString("<tr><td class=\"wb\">%1</td><td class=\"wb\">%2</td><td class=\"wb\">%3</td><td class=\"wb\" style=\"color: maroon;\">%4</td><td class=\"wb\">%5</td></tr>\n")
+                                  .arg(l_form->text())
+                                  .arg(l_occ_data[1])
+                                  .arg(l_occ_data[0])
+                                  .arg(l_occ_data[2])
+                                  .arg(l_occ_data[3]);
+                    qCDebug(g_cat_interp_dev) << QString("l_occ") << l_occ->dbgShort();
+                }
+        }
+
+    l_html += "</table>\n";
+
+    return g_html_template.arg(l_html + "<hr/>\n" + base_html_fragment(m_myself, "TextOccurrence"));
 }
 //------------------------------------ HighlightChunkInterp -----------------------------------------------------
 bool M1MidPlane::HighlightChunkInterp::wantIt(M1Store::Item_lv2* p_myself){
