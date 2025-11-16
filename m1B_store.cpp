@@ -792,19 +792,18 @@ void M1Store::Storage::loadIcons(){
 
     for(QString& l_icon_path: cm_icon_path){
         QIcon* l_icon = new QIcon(l_icon_path);
-        Q_ASSERT_X( !l_icon->isNull(),
-                   "Storage::loadIcons()",
+        Q_ASSERT_X( !l_icon->isNull(), "Storage::loadIcons()",
                    QString("Icon [%1] failed to load").arg(l_icon_path).toUtf8());
         cm_type_icon.append(l_icon);
     }
 
     M1_FUNC_EXIT
 }
-void M1Store::Storage::appendDefaultIcon(){cm_type_icon.append(new QIcon("../Icons/Folder.svg"));}
+void M1Store::Storage::appendDefaultIcon(){cm_type_icon.append(new QIcon("../m1_src/Icons/Folder.svg"));}
 QIcon* M1Store::Storage::getQIcon(SpecialItemID p_si_id){
     M1_FUNC_ENTRY(g_cat_store, QString("Get Icon for [%1]").arg(getSpecialItemPointer(p_si_id)->mnemonic()))
 
-    static QIcon* l_unknown_icon = new QIcon("../Icons/Unknown.svg");
+    static QIcon* l_unknown_icon = new QIcon("../m1_src/Icons/Unknown.svg");
 
     QIcon* l_ret = nullptr;
     if(p_si_id == M1Env::G_VOID_SI_ID)

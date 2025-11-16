@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="Слой_2"
+   data-name="Слой 2"
+   viewBox="0 0 100 100"
+   version="1.1"
+   sodipodi:docname="Url.svg"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs9" />
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="8.71"
+     inkscape:cx="49.942595"
+     inkscape:cy="50.057405"
+     inkscape:window-width="2560"
+     inkscape:window-height="1358"
+     inkscape:window-x="1920"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Слой_2" />
+  <title
+     id="title2">Монтажная область 6</title>
+  <path
+     d="M 98.304508,16.773218 83.488524,1.7300345 a 5.2752984,5.3561936 0 0 0 -7.461458,0 L 47.927785,30.26021 a 5.2752984,5.3561936 0 0 0 0,7.575877 l 6.178277,6.23683 -10.182276,10.338418 -6.760461,-6.840003 a 5.2871797,5.3682571 0 0 0 -7.473339,0 L 1.5907051,76.089443 a 5.2871797,5.3682571 0 0 0 0,7.587941 L 16.394808,98.720567 a 5.2990609,5.3803206 0 0 0 7.47334,0 l 28.09928,-28.518111 a 5.2871797,5.3682571 0 0 0 0,-7.587941 l -5.548568,-5.633654 10.182276,-10.37461 6.142633,6.23683 a 5.2752984,5.3561936 0 0 0 7.461459,0 l 28.09928,-28.493986 a 5.2752984,5.3561936 0 0 0 0,-7.575877 z M 49.448592,65.159913 a 1.7227888,1.7492074 0 0 1 0,2.473017 L 21.349311,96.163105 a 1.7227888,1.7492074 0 0 1 -2.435667,0 L 4.1095415,81.131986 a 1.7227888,1.7492074 0 0 1 0,-2.473017 L 32.208822,50.128793 a 1.7227888,1.7492074 0 0 1 2.435667,0 l 6.736698,6.840004 -8.138691,8.263497 a 1.7821954,1.8095248 0 1 0 2.518835,2.557462 l 8.138693,-8.263497 z M 95.785671,21.731316 67.686391,50.321809 a 1.7465515,1.7733344 0 0 1 -2.37626,0 l -6.190159,-6.248892 8.720876,-8.854609 a 1.7821954,1.8095248 0 0 0 -2.518836,-2.557461 l -8.720876,8.854608 -6.142633,-6.236829 a 1.7109076,1.7371439 0 0 1 0,-2.4127 L 78.545902,4.2874963 a 1.7109076,1.7371439 0 0 1 2.37626,0 L 95.785671,19.33068 a 1.7109076,1.7371439 0 0 1 0,2.4127 z"
+     id="path4"
+     style="stroke-width:1.19721;fill:#d9d9d9;fill-opacity:1" />
+  <metadata
+     id="metadata968">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Монтажная область 6</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>

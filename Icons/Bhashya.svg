@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 24 24"
+   id="edit"
+   version="1.1"
+   sodipodi:docname="Bhashya.svg"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs7" />
+  <sodipodi:namedview
+     id="namedview5"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="36.291667"
+     inkscape:cx="11.986223"
+     inkscape:cy="11.986223"
+     inkscape:window-width="2560"
+     inkscape:window-height="1358"
+     inkscape:window-x="1920"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="edit" />
+  <path
+     d="m 3.6110207,19.272358 h 5.0844622 a 1.1991656,1.2029534 0 0 0 0.8514076,-0.348856 l 8.2982265,-8.336468 v 0 l 3.40563,-3.3442107 a 1.1991656,1.2029534 0 0 0 0,-1.7081939 L 16.166285,0.37395907 a 1.1991656,1.2029534 0 0 0 -1.702815,0 L 11.081822,3.7783174 v 0 L 2.7596131,12.114785 a 1.1991656,1.2029534 0 0 0 -0.347758,0.854097 v 5.100523 a 1.1991656,1.2029534 0 0 0 1.1991656,1.202953 z M 15.314877,2.9242204 18.708516,6.3285787 17.005701,8.0367726 13.612062,4.6324143 Z M 4.8101863,13.462093 11.921238,6.3285787 15.314877,9.7329369 8.203825,16.866451 H 4.8101863 Z M 22.797671,21.678265 H 1.2126895 a 1.1991657,1.2029535 0 0 0 0,2.405907 H 22.797671 a 1.1991657,1.2029535 0 0 0 0,-2.405907 z"
+     id="path2"
+     style="stroke-width:1.20106;fill:#d9d9d9;fill-opacity:1" />
+</svg>

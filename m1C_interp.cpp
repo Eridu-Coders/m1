@@ -101,9 +101,9 @@ QList<M1Store::Item_lv2*> M1MidPlane::Interp::cm_gratt;
 
 void M1MidPlane::Interp::init(){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Init Interp class members"))
-    cm_open = QIcon("../Icons/Open.svg");
+    cm_open = QIcon("../m1_src/Icons/Open.svg");
     Q_ASSERT_X( !cm_open.isNull(), "Interp::init()", "Open link Icon failed to load");
-    cm_closed = QIcon("../Icons/Closed.svg");
+    cm_closed = QIcon("../m1_src/Icons/Closed.svg");
     Q_ASSERT_X( !cm_closed.isNull(), "Interp::init()", "Closed link Icon failed to load");
 
     M1Store::Item_lv2* l_gratt = M1Store::Item_lv2::getExisting(M1Store::GRAMMAR_ATTR_SIID);
@@ -556,11 +556,11 @@ QString M1MidPlane::FieldInterp::displayText(){
 }
 
 QIcon* M1MidPlane::FieldInterp::edgeIcon(){
-    static QIcon ls_field_icon("../Icons/CrookedArrow.svg");
+    static QIcon ls_field_icon("../m1_src/Icons/CrookedArrow.svg");
     return &ls_field_icon;
 }
 QIcon* M1MidPlane::FieldInterp::vertexIcon(){
-    static QIcon ls_field_icon("../Icons/Field.svg");
+    static QIcon ls_field_icon("../m1_src/Icons/Field.svg");
     return &ls_field_icon;
 }
 

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   fill="#000000"
+   width="128"
+   height="128"
+   viewBox="0 0 36 36"
+   version="1.1"
+   preserveAspectRatio="xMidYMid meet"
+   id="svg14"
+   sodipodi:docname="Highlighter2.svg"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs18" />
+  <sodipodi:namedview
+     id="namedview16"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="6.8046875"
+     inkscape:cx="63.926521"
+     inkscape:cy="63.926521"
+     inkscape:window-width="2560"
+     inkscape:window-height="1358"
+     inkscape:window-x="1920"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg14" />
+  <title
+     id="title2">highlighter-line</title>
+  <path
+     d="m 15.467929,27.147449 a 1.1909553,1.1149307 0 0 1 -0.845578,-0.32333 L 6.9525987,19.643966 A 1.1909553,1.1149307 0 0 1 6.6072216,18.852365 1.1909553,1.1149307 0 0 1 6.9525987,18.060764 L 24.018988,2.0392098 a 6.6149527,6.1926873 0 1 1 9.348999,8.7633552 l -17.05448,16.021554 a 1.1909553,1.1149307 0 0 1 -0.845578,0.32333 z M 9.5131525,18.852365 15.467929,24.427018 31.736378,9.2416621 a 4.2159818,3.9468547 0 0 0 0,-5.5746535 4.3231677,4.0471984 0 0 0 -5.954776,0 z"
+     class="clr-i-outline clr-i-outline-path-1"
+     id="path4"
+     style="fill:#d9d9d9;fill-opacity:1;stroke-width:1.15232" />
+  <path
+     d="M 8.9891322,29.622595 A 1.1909553,1.1149307 0 0 1 8.143554,29.310415 L 4.3086779,25.709189 A 1.1909553,1.1149307 0 0 1 4.0466677,24.493914 l 2.6439208,-6.065223 a 1.1909553,1.1149307 0 0 1 1.9412571,-0.367927 l 7.6816614,7.180154 a 1.1909553,1.1149307 0 0 1 -0.393015,1.839635 l -6.4787968,2.475146 a 1.5839705,1.4828578 0 0 1 -0.452563,0.0669 z M 6.5476738,24.650004 9.2749615,27.192046 13.359938,25.631143 8.2269208,20.825792 Z"
+     class="clr-i-outline clr-i-outline-path-2"
+     id="path6"
+     style="fill:#d9d9d9;fill-opacity:1;stroke-width:1.15232" />
+  <path
+     d="M 7.2741566,31.540276 H 1.3193801 A 1.1909553,1.1149307 0 0 1 0.31897763,29.812134 L 4.1538537,24.304376 a 1.1909553,1.1149307 0 0 1 1.8459807,-0.178389 l 3.8229665,3.590077 a 1.1909553,1.1149307 0 0 1 0.071457,1.505156 L 8.1792823,31.138901 A 1.1909553,1.1149307 0 0 1 7.2741566,31.540276 Z M 3.5107378,29.310415 H 6.7144076 L 7.3456139,28.57456 5.3209899,26.679178 Z"
+     class="clr-i-outline clr-i-outline-path-3"
+     id="path8"
+     style="fill:#d9d9d9;fill-opacity:1;stroke-width:1.15232" />
+  <rect
+     x="0.27133936"
+     y="32.655209"
+     width="7.3046708"
+     height="3.3447921"
+     class="clr-i-outline clr-i-outline-path-4"
+     id="rect10"
+     style="fill:#d9d9d9;fill-opacity:1;stroke-width:0.521033" />
+  <rect
+     x="9.6223173"
+     y="32.631062"
+     width="7.3046708"
+     height="3.3447921"
+     class="clr-i-outline clr-i-outline-path-4"
+     id="rect10-3"
+     style="fill:#d9d9d9;fill-opacity:1;stroke-width:0.521033" />
+  <rect
+     x="28.324272"
+     y="32.631062"
+     width="7.3046708"
+     height="3.3447921"
+     class="clr-i-outline clr-i-outline-path-4"
+     id="rect10-3-6"
+     style="fill:#d9d9d9;fill-opacity:1;stroke-width:0.521033" />
+  <rect
+     x="18.973295"
+     y="32.631062"
+     width="7.3046708"
+     height="3.3447921"
+     class="clr-i-outline clr-i-outline-path-4"
+     id="rect10-3-6-7"
+     style="fill:#d9d9d9;fill-opacity:1;stroke-width:0.521033" />
+  <rect
+     x="0"
+     y="0"
+     width="36"
+     height="36"
+     fill-opacity="0"
+     id="rect12" />
+  <metadata
+     id="metadata843">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>highlighter-line</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>
