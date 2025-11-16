@@ -10,3 +10,56 @@ At its core is a graph database (NOSQL) which is a natural fit for the graph of 
 # Naming
 
 For the moment, the software goes under the temporary moniker "m1". In due course, a suitable name should be chosen.
+
+# Installation
+
+## Prerequisites
+
+Linux is strongly recommended as a development platform for m1; Specifically [Ubuntu](https://en.wikipedia.org/wiki/Ubuntu) and its derivatives ([mint](https://en.wikipedia.org/wiki/Linux_Mint), etc.)
+
+### Lmdb
+
+[Lmdb](https://en.wikipedia.org/wiki/Lightning_Memory-Mapped_Database) is a widely used key/value dabase library with C++ bindings. On Ubuntu, and Ubuntu-derived, Linux distributions, Lmdb installation is done with:
+```
+sudo apt install liblmdb-dev
+``` 
+
+m1 uses Lmdb to store ancillary data and strings. Its main storage space uses the same memory-mapped OS feature as Lmdb, but not Lmdb itself.
+
+### Boost
+
+[Boost](https://en.wikipedia.org/wiki/Boost_(C%2B%2B_libraries)) is a widely used general-purpose set of C++ libraries. On Ubuntu, and Ubuntu-derived, Linux distributions, Boost installation is done with:
+```
+sudo apt install libboost-all-dev
+```
+
+### Qt
+
+[Qt](https://en.wikipedia.org/wiki/Qt_(software)) is a widely used GUI library for C++. In fact it is more than just a GUI toolkit; and includes an entire development environment complete with several IDE interfaces and even extensions to the C++ language itself (the so-called "[signals and slots](https://en.wikipedia.org/wiki/Signals_and_slots)").
+
+Qt has both a paid and an open-source version. The latter can be downloaded from [the company's website](https://www.qt.io/download-open-source).
+
+**CAUTION**: Qt's regional mirrors are not always reliable (especially in India), and one of the better ones, from the US or Europe, should sometimes be manually chosen (as a CMD line option passed to the installer). See [this page](https://download.qt.io/static/mirrorlist/mirmon/) or [this one](https://download.qt.io/static/mirrorlist/) for a list of Qt mirrors.
+
+## Source Download
+
+As usual with any GitHub repo: 
+```
+git clone https://github.com/Eridu-Coders/m1.git
+```
+
+## m1 Compilation
+
+Load the project (the `CMakeLists.txt` file) into the _Qt Creator_ IDE and launch the compilation from the there, in Debug (many runtime messages) or Release mode (faster). In Release mode, the option `-DQT_NO_DEBUG_OUTPUT` in `CMAKE_CXX_FLAGS` should be added to the options list in advanced mode ("Projects" tab of the IDE), to disable the runtime messages.
+
+![](https://github.com/Eridu-Coders/m1/blob/main/m1_Screenshot_02.png?raw=true)
+
+Launch the application with the command (in the Debug or Release build directory):
+```
+./m1 -rpg
+```
+This will load the sample data from the _Baghad Gita_ and Plato's _Republic_. Afterwards, the application can be re-launched without the load process (and therefore without erasing your data) with:
+```
+./m1
+```
+
