@@ -1,0 +1,667 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+<teiHeader xml:lang="en">
+<titleStmt>
+<title>
+Bhagavad-gītā with 2 word for word translations, 2 sloka global translations and 2 commentaries (Bhashya) in English
+</title>
+</titleStmt>
+</teiHeader>
+<text xml:lang="en, sk">
+<s>
+<ref cRef="BG 12.1">Bhagavad-gītā Chapter 12, Sloka 1</ref>
+<urlLink label="BG 12.1 at BG As It Is">https://vedabase.io/en/library/bg/12/1/</urlLink>
+<urlLink label="BG 12.1 at Gita Supersite">https://www.gitasupersite.iitk.ac.in/srimad?language=dv&amp;field_chapter_value=12&amp;field_nsutra_value=1&amp;ecsiva=1&amp;etsiva=1&amp;etpurohit=1&amp;etgb=1&amp;setgb=1&amp;etssa=1&amp;etradi=1</urlLink>
+<lg type="sloka">
+<l>अर्जुन उवाच एवं सततयुक्ता ये भक्तास्त्वां पर्युपासते</l>
+<l>ये चाप्यक्षरमव्यक्तं तेषां के योगवित्तमा:</l>
+</lg>
+<w xml:id="BG_12.1.01" lemma="अर्जुन">अर्जुनः<interp type="transliteration" standard="ISO 15919">arjunaḥ</interp><dict-ref dict-name="INRIA">arjuna</dict-ref></w>
+<w xml:id="BG_12.1.02" lemma="वच्">उवाच<interp type="transliteration" standard="ISO 15919">uvāca</interp><dict-ref dict-name="INRIA">vac</dict-ref></w>
+<w xml:id="BG_12.1.03" lemma="एवम्">एवम्<interp type="transliteration" standard="ISO 15919">evam</interp><dict-ref dict-name="INRIA">evam</dict-ref></w>
+<w xml:id="BG_12.1.04" lemma="सतत">सतत<interp type="transliteration" standard="ISO 15919">satata</interp><dict-ref dict-name="INRIA">satata</dict-ref></w>
+<w xml:id="BG_12.1.05" lemma="युक्त-युज्१">युक्ताः<interp type="transliteration" standard="ISO 15919">yuktāḥ</interp><dict-ref dict-name="INRIA">yukta-yuj#1</dict-ref></w>
+<w xml:id="BG_12.1.06" lemma="यद्">ये<interp type="transliteration" standard="ISO 15919">ye</interp><dict-ref dict-name="INRIA">yad</dict-ref></w>
+<w xml:id="BG_12.1.07" lemma="भक्त-भज्">भक्ताः<interp type="transliteration" standard="ISO 15919">bhaktāḥ</interp><dict-ref dict-name="INRIA">bhakta-bhaj</dict-ref></w>
+<w xml:id="BG_12.1.08" lemma="युष्मद्">त्वाम्<interp type="transliteration" standard="ISO 15919">tvām</interp><dict-ref dict-name="INRIA">yu.smad</dict-ref></w>
+<w xml:id="BG_12.1.09" lemma="परि-उप-आस्२">पर्युपासते<interp type="transliteration" standard="ISO 15919">paryupāsate</interp><dict-ref dict-name="INRIA">pari-upa-aas#2</dict-ref></w>
+<w xml:id="BG_12.1.10" lemma="यद्">ये<interp type="transliteration" standard="ISO 15919">ye</interp><dict-ref dict-name="INRIA">yad</dict-ref></w>
+<w xml:id="BG_12.1.11" lemma="च">च<interp type="transliteration" standard="ISO 15919">ca</interp><dict-ref dict-name="INRIA">ca</dict-ref></w>
+<w xml:id="BG_12.1.12" lemma="च">अपि<interp type="transliteration" standard="ISO 15919">api</interp><dict-ref dict-name="INRIA">api</dict-ref></w>
+<w xml:id="BG_12.1.13" lemma="क्षर">अक्षरम्<interp type="transliteration" standard="ISO 15919">akṣaram</interp><dict-ref dict-name="INRIA">k.sara</dict-ref></w>
+<w xml:id="BG_12.1.14" lemma="अव्यक्त">अव्यक्तम्<interp type="transliteration" standard="ISO 15919">avyaktam</interp><dict-ref dict-name="INRIA">avyakta</dict-ref></w>
+<w xml:id="BG_12.1.15" lemma="तद्">तेषाम्<interp type="transliteration" standard="ISO 15919">teṣām</interp><dict-ref dict-name="INRIA">tad</dict-ref></w>
+<w xml:id="BG_12.1.16" lemma="किम्">के<interp type="transliteration" standard="ISO 15919">ke</interp><dict-ref dict-name="INRIA">kim</dict-ref></w>
+<w xml:id="BG_12.1.17" lemma="योग">योग<interp type="transliteration" standard="ISO 15919">yoga</interp><dict-ref dict-name="INRIA">yoga</dict-ref></w>
+<w xml:id="BG_12.1.18" lemma="वित्तम">वित्तमाः<interp type="transliteration" standard="ISO 15919">vittamāḥ</interp><dict-ref dict-name="INRIA">vittama</dict-ref></w>
+<span type="wfw-tu" from="BG_12.1.01" to="BG_12.1.02">
+<interp type="wfw-tr" source="prabhupada">Arjuna said</interp>
+</span>
+<span type="wfw-tu" from="BG_12.1.03" to="BG_12.1.03">
+<interp type="wfw-tr" source="prabhupada">thus</interp>
+<interp type="wfw-tr" source="sivananda">thus</interp>
+</span>
+<span type="wfw-tu" from="BG_12.1.04" to="BG_12.1.04">
+<interp type="wfw-tr" source="prabhupada">always</interp>
+</span>
+<span type="wfw-tu" from="BG_12.1.04" to="BG_12.1.05">
+<interp type="wfw-tr" source="sivananda">ever steadfast</interp>
+</span>
+<span type="wfw-tu" from="BG_12.1.05" to="BG_12.1.05">
+<interp type="wfw-tr" source="prabhupada">engaged</interp>
+</span>
+<span type="wfw-tu" from="BG_12.1.06" to="BG_12.1.06">
+<interp type="wfw-tr" source="prabhupada">those who</interp>
+<interp type="wfw-tr" source="sivananda">who</interp>
+</span>
+<span type="wfw-tu" from="BG_12.1.07" to="BG_12.1.07">
+<interp type="wfw-tr" source="prabhupada">devotees</interp>
+<interp type="wfw-tr" source="sivananda">devotees</interp>
+</span>
+<span type="wfw-tu" from="BG_12.1.08" to="BG_12.1.08">
+<interp type="wfw-tr" source="prabhupada">You</interp>
+<interp type="wfw-tr" source="sivananda">Thee</interp>
+</span>
+<span type="wfw-tu" from="BG_12.1.09" to="BG_12.1.09">
+<interp type="wfw-tr" source="prabhupada">properly worship</interp>
+<interp type="wfw-tr" source="sivananda">worship</interp>
+</span>
+<span type="wfw-tu" from="BG_12.1.10" to="BG_12.1.10">
+<interp type="wfw-tr" source="prabhupada">those who</interp>
+<interp type="wfw-tr" source="sivananda">who</interp>
+</span>
+<span type="wfw-tu" from="BG_12.1.11" to="BG_12.1.11">
+<interp type="wfw-tr" source="prabhupada">also</interp>
+<interp type="wfw-tr" source="sivananda">and</interp>
+</span>
+<span type="wfw-tu" from="BG_12.1.12" to="BG_12.1.12">
+<interp type="wfw-tr" source="prabhupada">again</interp>
+<interp type="wfw-tr" source="sivananda">also</interp>
+</span>
+<span type="wfw-tu" from="BG_12.1.13" to="BG_12.1.13">
+<interp type="wfw-tr" source="prabhupada">beyond the senses</interp>
+<interp type="wfw-tr" source="sivananda">the imperishable</interp>
+</span>
+<span type="wfw-tu" from="BG_12.1.14" to="BG_12.1.14">
+<interp type="wfw-tr" source="prabhupada">the unmanifested</interp>
+<interp type="wfw-tr" source="sivananda">the unmanifested</interp>
+</span>
+<span type="wfw-tu" from="BG_12.1.15" to="BG_12.1.15">
+<interp type="wfw-tr" source="prabhupada">of them</interp>
+<interp type="wfw-tr" source="sivananda">of them</interp>
+</span>
+<span type="wfw-tu" from="BG_12.1.16" to="BG_12.1.16">
+<interp type="wfw-tr" source="prabhupada">who</interp>
+<interp type="wfw-tr" source="sivananda">who</interp>
+</span>
+<span type="wfw-tu" from="BG_12.1.17" to="BG_12.1.18">
+<interp type="wfw-tr" source="prabhupada">the most perfect in knowledge of yoga.</interp>
+<interp type="wfw-tr" source="sivananda">better versed in Yoga.</interp>
+</span>
+<interp type="translation" source="prabhupada">Arjuna inquired: Which are considered to be more perfect, those who are always properly engaged in Your devotional service or those who worship the impersonal Brahman, the unmanifested?</interp>
+<interp type="bhashya" source="prabhupada">Kṛṣṇa has now explained about the personal, the impersonal and the universal and has described all kinds of devotees and yogīs. Generally, the transcendentalists can be divided into two classes. One is the impersonalist, and the other is the personalist. The personalist devotee engages himself with all energy in the service of the Supreme Lord. The impersonalist also engages himself, not directly in the service of Kṛṣṇa but in meditation on the impersonal Brahman, the unmanifested.
+
+We find in this chapter that of the different processes for realization of the Absolute Truth, bhakti-yoga, devotional service, is the highest. If one at all desires to have the association of the Supreme Personality of Godhead, then he must take to devotional service.
+
+Those who worship the Supreme Lord directly by devotional service are called personalists. Those who engage themselves in meditation on the impersonal Brahman are called impersonalists. Arjuna is here questioning which position is better. There are different ways to realize the Absolute Truth, but Kṛṣṇa indicates in this chapter that bhakti-yoga, or devotional service to Him, is the highest of all. It is the most direct, and it is the easiest means for association with the Godhead.
+
+In the Second Chapter of Bhagavad-gītā, the Supreme Lord explained that a living entity is not the material body; he is a spiritual spark. And the Absolute Truth is the spiritual whole. In the Seventh Chapter He spoke of the living entity as being part and parcel of the supreme whole and recommended that he transfer his attention fully to the whole. Then again in the Eighth Chapter it was said that anyone who thinks of Kṛṣṇa at the time of quitting his body is at once transferred to the spiritual sky, to the abode of Kṛṣṇa. And at the end of the Sixth Chapter the Lord clearly said that of all yogīs, one who always thinks of Kṛṣṇa within himself is considered the most perfect. So in practically every chapter the conclusion has been that one should be attached to the personal form of Kṛṣṇa, for that is the highest spiritual realization.
+
+Nevertheless, there are those who are not attached to the personal form of Kṛṣṇa. They are so firmly detached that even in the preparation of commentaries to Bhagavad-gītā they want to distract other people from Kṛṣṇa and transfer all devotion to the impersonal brahma-jyotir. They prefer to meditate on the impersonal form of the Absolute Truth, which is beyond the reach of the senses and is not manifest.
+
+And so, factually, there are two classes of transcendentalists. Now Arjuna is trying to settle the question of which process is easier and which of the classes is most perfect. In other words, he is clarifying his own position because he is attached to the personal form of Kṛṣṇa. He is not attached to the impersonal Brahman. He wants to know whether his position is secure. The impersonal manifestation, either in this material world or in the spiritual world of the Supreme Lord, is a problem for meditation. Actually, one cannot perfectly conceive of the impersonal feature of the Absolute Truth. Therefore Arjuna wants to say, “What is the use of such a waste of time?” Arjuna experienced in the Eleventh Chapter that to be attached to the personal form of Kṛṣṇa is best because he could thus understand all other forms at the same time and there was no disturbance to his love for Kṛṣṇa. This important question asked of Kṛṣṇa by Arjuna will clarify the distinction between the impersonal and personal conceptions of the Absolute Truth.</interp>
+<interp type="bhashya" source="sivananda">The twelfth discourse goes to prove that Bhakti Yoga or the Yoga of devotion is much easier than Jnana Yoga or the Yoga of knowledge. In Bhakti Yoga the devotee establishes a near and dear relationship with the Lord. He cultivates slowly and one of the five Bhavas (attitudes) according to his temperament, taste and capacity. The five attitudes are the Santa Bhava (the attitutde of peaceful adoration) Dasya Bhava (the attitude of servant towards the master) Sakhya Bhava (the attitude of a friend) Vatsalya Bhava (the attitude of a parent to the child) and Madhurya Bhava (the attitutde of the lover towards the beloved). The devotee adopts these attitudes towards the Lord. The last (Madhurya Bhava) is the culmination of devotion. It is merging or absorption in the Lord.The devotee adores the Lord. He constantly remembers Him (Smarana). He sings His Name (Kirtana). He speaks of His glories. He repeats His Name. He chants His Mantra (Japa). He prays and prostrates himself. He hears His Lilas (divine plays). He does total, ungrudging and unconditional selfsurrender, obtains His grace, hols communion wih, and eventually gets absorbed in Him.The devotee begins by worshipping the idols or the symbols of God. Then he performs internal worship of the Form. Ultimately he is led to the supreme worship of the allpervading Brahman (Para Puja).Thus As declared in the last verse of the previous chapter.Avyaktam The unmanifested, i.e., incomprehensible to the senses, transcending all limiting adjuncts. The unmanifested Brahman is beyond all limitations. That which is visible to the senses is called Vyakta or manifest.The hearts of the devotees are wholly fixed on Thee. They worship Thee with all their heart and soul.There are others who worship the unmanifested Brahman which is beyond time, space and causation, which is attributeless, which is eternal and indefinable, which is beyond the reach of speech and mind. These are the wise sages.Of these two, the devotees and the men of knowledge -- who are the better knowers of Yoga (Cf.XI.55)</interp>
+<interp type="translation" source="gambirananda">Arjuna said Those devotees who, being thus ever dedicated, meditate on You, and those again (who meditate) on the Immutable, the Unmanifested-of them, who are the best experiencers of yoga [(Here) yoga means samadhi, spiritual absorption.] ?</interp>
+</s>
+<s>
+<ref cRef="BG 12.2">Bhagavad-gītā Chapter 12, Sloka 2</ref>
+<urlLink label="BG 12.2 at BG As It Is">https://vedabase.io/en/library/bg/12/2/</urlLink>
+<urlLink label="BG 12.1 at Gita Supersite">https://www.gitasupersite.iitk.ac.in/srimad?language=dv&amp;field_chapter_value=12&amp;field_nsutra_value=2&amp;ecsiva=1&amp;etsiva=1&amp;etpurohit=1&amp;etgb=1&amp;setgb=1&amp;etssa=1&amp;etradi=1</urlLink>
+<lg type="sloka">
+<l>श्रीभगवानुवाच मय्यावेश्य मनो ये मां नित्ययुक्ता उपासते</l>
+<l>श्रद्धया परयोपेतास्ते मे युक्ततमा मता:</l>
+</lg>
+<w xml:id="BG_12.2.01" lemma="श्री">श्री<interp type="transliteration" standard="ISO 15919">śrī</interp><dict-ref dict-name="INRIA">zrii</dict-ref></w>
+<w xml:id="BG_12.2.02" lemma="भगवत्">भगवान्<interp type="transliteration" standard="ISO 15919">bhagavān</interp><dict-ref dict-name="INRIA">bhagavat</dict-ref></w>
+<w xml:id="BG_12.2.03" lemma="वच्">उवाच<interp type="transliteration" standard="ISO 15919">uvāca</interp><dict-ref dict-name="INRIA">vac</dict-ref></w>
+<w xml:id="BG_12.2.04" lemma="अस्मद्">मयि<interp type="transliteration" standard="ISO 15919">mayi</interp><dict-ref dict-name="INRIA">asmad</dict-ref></w>
+<w xml:id="BG_12.2.05" lemma="आ-वेश्य-आ-विश्१-आ-आ-विश्१">आवेश्य<interp type="transliteration" standard="ISO 15919">āveśya</interp><dict-ref dict-name="INRIA">aa-vezya-aa-viz#1-aa-aa-viz#1</dict-ref></w>
+<w xml:id="BG_12.2.06" lemma="मनस्">मनः<interp type="transliteration" standard="ISO 15919">manaḥ</interp><dict-ref dict-name="INRIA">manas</dict-ref></w>
+<w xml:id="BG_12.2.07" lemma="यद्">ये<interp type="transliteration" standard="ISO 15919">ye</interp><dict-ref dict-name="INRIA">yad</dict-ref></w>
+<w xml:id="BG_12.2.08" lemma="अस्मद्">माम्<interp type="transliteration" standard="ISO 15919">mām</interp><dict-ref dict-name="INRIA">asmad</dict-ref></w>
+<w xml:id="BG_12.2.09" lemma="नित्य">नित्य<interp type="transliteration" standard="ISO 15919">nitya</interp><dict-ref dict-name="INRIA">nitya</dict-ref></w>
+<w xml:id="BG_12.2.10" lemma="युक्त-युज्१">युक्ताः<interp type="transliteration" standard="ISO 15919">yuktāḥ</interp><dict-ref dict-name="INRIA">yukta-yuj#1</dict-ref></w>
+<w xml:id="BG_12.2.11" lemma="उप-आस्२">उपासते<interp type="transliteration" standard="ISO 15919">upāsate</interp><dict-ref dict-name="INRIA">upa-aas#2</dict-ref></w>
+<w xml:id="BG_12.2.12" lemma="श्रद्धा२">श्रद्धया<interp type="transliteration" standard="ISO 15919">śraddhayā</interp><dict-ref dict-name="INRIA">zraddhaa#2</dict-ref></w>
+<w xml:id="BG_12.2.13" lemma="पर">परया<interp type="transliteration" standard="ISO 15919">parayā</interp><dict-ref dict-name="INRIA">para</dict-ref></w>
+<w xml:id="BG_12.2.14" lemma="तद्-युष्मद्">ते<interp type="transliteration" standard="ISO 15919">te</interp><dict-ref dict-name="INRIA">tad-yu.smad</dict-ref></w>
+<w xml:id="BG_12.2.15" lemma="अस्मद्">मे<interp type="transliteration" standard="ISO 15919">me</interp><dict-ref dict-name="INRIA">asmad</dict-ref></w>
+<w xml:id="BG_12.2.16" lemma="युक्ततम">युक्ततमाः<interp type="transliteration" standard="ISO 15919">yuktatamāḥ</interp><dict-ref dict-name="INRIA">yuktatama</dict-ref></w>
+<w xml:id="BG_12.2.17" lemma="मत-मन्">मताः<interp type="transliteration" standard="ISO 15919">matāḥ</interp><dict-ref dict-name="INRIA">mata-man</dict-ref></w>
+<span type="wfw-tu" from="BG_12.2.01" to="BG_12.2.03">
+<interp type="wfw-tr" source="prabhupada">the Supreme Personality of Godhead said</interp>
+</span>
+<span type="wfw-tu" from="BG_12.2.04" to="BG_12.2.04">
+<interp type="wfw-tr" source="prabhupada">upon Me</interp>
+<interp type="wfw-tr" source="sivananda">on Me</interp>
+</span>
+<span type="wfw-tu" from="BG_12.2.05" to="BG_12.2.05">
+<interp type="wfw-tr" source="prabhupada">fixing</interp>
+<interp type="wfw-tr" source="sivananda">fixing</interp>
+</span>
+<span type="wfw-tu" from="BG_12.2.06" to="BG_12.2.06">
+<interp type="wfw-tr" source="prabhupada">the mind</interp>
+<interp type="wfw-tr" source="sivananda">the mind</interp>
+</span>
+<span type="wfw-tu" from="BG_12.2.07" to="BG_12.2.07">
+<interp type="wfw-tr" source="prabhupada">those who</interp>
+<interp type="wfw-tr" source="sivananda">who</interp>
+</span>
+<span type="wfw-tu" from="BG_12.2.08" to="BG_12.2.08">
+<interp type="wfw-tr" source="prabhupada">Me</interp>
+<interp type="wfw-tr" source="sivananda">Me</interp>
+</span>
+<span type="wfw-tu" from="BG_12.2.09" to="BG_12.2.09">
+<interp type="wfw-tr" source="prabhupada">always</interp>
+</span>
+<span type="wfw-tu" from="BG_12.2.09" to="BG_12.2.10">
+<interp type="wfw-tr" source="sivananda">ever steadfast</interp>
+</span>
+<span type="wfw-tu" from="BG_12.2.10" to="BG_12.2.10">
+<interp type="wfw-tr" source="prabhupada">engaged</interp>
+</span>
+<span type="wfw-tu" from="BG_12.2.11" to="BG_12.2.11">
+<interp type="wfw-tr" source="prabhupada">worship</interp>
+<interp type="wfw-tr" source="sivananda">worship</interp>
+</span>
+<span type="wfw-tu" from="BG_12.2.12" to="BG_12.2.12">
+<interp type="wfw-tr" source="prabhupada">with faith</interp>
+<interp type="wfw-tr" source="sivananda">with faith</interp>
+</span>
+<span type="wfw-tu" from="BG_12.2.13" to="BG_12.2.13">
+<interp type="wfw-tr" source="prabhupada">transcendental</interp>
+<interp type="wfw-tr" source="sivananda">supreme</interp>
+</span>
+<span type="wfw-tu" from="BG_12.2.14" to="BG_12.2.14">
+<interp type="wfw-tr" source="prabhupada">they</interp>
+<interp type="wfw-tr" source="sivananda">those</interp>
+</span>
+<span type="wfw-tu" from="BG_12.2.15" to="BG_12.2.15">
+<interp type="wfw-tr" source="prabhupada">by Me</interp>
+<interp type="wfw-tr" source="sivananda">of Me</interp>
+</span>
+<span type="wfw-tu" from="BG_12.2.16" to="BG_12.2.16">
+<interp type="wfw-tr" source="prabhupada">most perfect in yoga</interp>
+<interp type="wfw-tr" source="sivananda">the best versed in Yoga</interp>
+</span>
+<span type="wfw-tu" from="BG_12.2.17" to="BG_12.2.17">
+<interp type="wfw-tr" source="prabhupada">are considered.</interp>
+<interp type="wfw-tr" source="sivananda">(in My) opinion.</interp>
+</span>
+<interp type="translation" source="prabhupada">The Supreme Personality of Godhead said: Those who fix their minds on My personal form and are always engaged in worshiping Me with great and transcendental faith are considered by Me to be most perfect.</interp>
+<interp type="bhashya" source="prabhupada">In answer to Arjuna’s question, Kṛṣṇa clearly says that he who concentrates upon His personal form and who worships Him with faith and devotion is to be considered most perfect in yoga. For one in such Kṛṣṇa consciousness there are no material activities, because everything is done for Kṛṣṇa. A pure devotee is constantly engaged. Sometimes he chants, sometimes he hears or reads books about Kṛṣṇa, or sometimes he cooks prasādam or goes to the marketplace to purchase something for Kṛṣṇa, or sometimes he washes the temple or the dishes – whatever he does, he does not let a single moment pass without devoting his activities to Kṛṣṇa. Such action is in full samādhi.</interp>
+<interp type="bhashya" source="sivananda">Those devotees who fix their minds on Me in the Cosmi Form, the Supreme Lord and worship Me, ever harmonised and with intense and supreme faith, regarding Me as the Lord of all the masters of Yoga, who are free from attachment and other evil passions -- these, in My opinion, are the best versed in Yoga.They spend their days and nights in worshipping Me. They have no other thoughts except those,of Myself. They live for Me only. Therefore it is indeed proper to say that they are the best Yogins.Are not the others, those who contemplate the imperishable, formless, attributeless, alityless Supreme Brahman, the best of Yogins Listen now to what I have to say regarding them.</interp>
+<interp type="translation" source="gambirananda">The Blessed Lord said Those who meditate on Me by fixing their minds on Me with steadfast devotion (and) being endowed with supreme faith-they are considered to be the most perfect yogis according to Me.</interp>
+</s>
+<s>
+<ref cRef="BG 12.3">Bhagavad-gītā Chapter 12, Sloka 3</ref>
+<urlLink label="BG 12.3 at BG As It Is">https://vedabase.io/en/library/bg/12/3-4/</urlLink>
+<urlLink label="BG 12.3 at Gita Supersite">https://www.gitasupersite.iitk.ac.in/srimad?language=dv&amp;field_chapter_value=12&amp;field_nsutra_value=3&amp;ecsiva=1&amp;etsiva=1&amp;etpurohit=1&amp;etgb=1&amp;setgb=1&amp;etssa=1&amp;etradi=1</urlLink>
+<lg type="sloka">
+<l>ये त्वक्षरमनिर्देश्यमव्यक्तं पर्युपासते</l>
+<l>सर्वत्रगमचिन्त्यं च कूटस्थमचलं ध्रुवम्</l>
+</lg>
+<w xml:id="BG_12.3.01" lemma="यद्">ये<interp type="transliteration" standard="ISO 15919">ye</interp><dict-ref dict-name="INRIA">yad</dict-ref></w>
+<w xml:id="BG_12.3.02" lemma="तु">तु<interp type="transliteration" standard="ISO 15919">tu</interp><dict-ref dict-name="INRIA">tu</dict-ref></w>
+<w xml:id="BG_12.3.03" lemma="क्षर्">अक्षरम्<interp type="transliteration" standard="ISO 15919">akṣaram</interp><dict-ref dict-name="INRIA">k.sar</dict-ref></w>
+<w xml:id="BG_12.3.04" lemma="अनिर्देश्य">अनिर्देश्यम्<interp type="transliteration" standard="ISO 15919">anirdeśyam</interp><dict-ref dict-name="INRIA">anirdezya</dict-ref></w>
+<w xml:id="BG_12.3.05" lemma="अव्यक्त">अव्यक्तम्<interp type="transliteration" standard="ISO 15919">avyaktam</interp><dict-ref dict-name="INRIA">avyakta</dict-ref></w>
+<w xml:id="BG_12.3.06" lemma="परि-उप-आस्२">पर्युपासते<interp type="transliteration" standard="ISO 15919">paryupāsate</interp><dict-ref dict-name="INRIA">pari-upa-aas#2</dict-ref></w>
+<w xml:id="BG_12.3.07" lemma="सर्वत्र">सर्वत्र<interp type="transliteration" standard="ISO 15919">sarvatra</interp><dict-ref dict-name="INRIA">sarvatra</dict-ref></w>
+<w xml:id="BG_12.3.08" lemma="गम">गम<interp type="transliteration" standard="ISO 15919">gama</interp><dict-ref dict-name="INRIA">gama</dict-ref></w>
+<w xml:id="BG_12.3.09" lemma="चिन्त्य-चिन्त्">चिन्त्यम्<interp type="transliteration" standard="ISO 15919">cintyam</interp><dict-ref dict-name="INRIA">cintya-cint</dict-ref></w>
+<w xml:id="BG_12.3.10" lemma="च">च<interp type="transliteration" standard="ISO 15919">ca</interp><dict-ref dict-name="INRIA">ca</dict-ref></w>
+<w xml:id="BG_12.3.11" lemma="कूट">कूट<interp type="transliteration" standard="ISO 15919">kūṭa</interp><dict-ref dict-name="INRIA">kuu.ta</dict-ref></w>
+<w xml:id="BG_12.3.12" lemma="स्थ">स्थम्<interp type="transliteration" standard="ISO 15919">stham</interp><dict-ref dict-name="INRIA">stha</dict-ref></w>
+<w xml:id="BG_12.3.13" lemma="चल्">अचलम्<interp type="transliteration" standard="ISO 15919">acalam</interp><dict-ref dict-name="INRIA">cal</dict-ref></w>
+<w xml:id="BG_12.3.14" lemma="ध्रुव">ध्रुवम्<interp type="transliteration" standard="ISO 15919">dhruvam</interp><dict-ref dict-name="INRIA">dhruva</dict-ref></w>
+<span type="wfw-tu" from="BG_12.3.01" to="BG_12.3.01">
+<interp type="wfw-tr" source="prabhupada">those who</interp>
+<interp type="wfw-tr" source="sivananda">who</interp>
+</span>
+<span type="wfw-tu" from="BG_12.3.02" to="BG_12.3.02">
+<interp type="wfw-tr" source="prabhupada">but</interp>
+<interp type="wfw-tr" source="sivananda">verily</interp>
+</span>
+<span type="wfw-tu" from="BG_12.3.03" to="BG_12.3.03">
+<interp type="wfw-tr" source="prabhupada">that which is beyond the perception of the senses</interp>
+<interp type="wfw-tr" source="sivananda">the imperishable</interp>
+</span>
+<span type="wfw-tu" from="BG_12.3.04" to="BG_12.3.04">
+<interp type="wfw-tr" source="prabhupada">indefinite</interp>
+<interp type="wfw-tr" source="sivananda">the indefinable</interp>
+</span>
+<span type="wfw-tu" from="BG_12.3.05" to="BG_12.3.05">
+<interp type="wfw-tr" source="prabhupada">unmanifested</interp>
+<interp type="wfw-tr" source="sivananda">the unmanifested</interp>
+</span>
+<span type="wfw-tu" from="BG_12.3.06" to="BG_12.3.06">
+<interp type="wfw-tr" source="prabhupada">completely engage in worshiping</interp>
+<interp type="wfw-tr" source="sivananda">worship</interp>
+</span>
+<span type="wfw-tu" from="BG_12.3.09" to="BG_12.3.09">
+<interp type="wfw-tr" source="prabhupada">inconceivable</interp>
+<interp type="wfw-tr" source="sivananda">the unthinkable</interp>
+</span>
+<span type="wfw-tu" from="BG_12.3.10" to="BG_12.3.10">
+<interp type="wfw-tr" source="prabhupada">also</interp>
+<interp type="wfw-tr" source="sivananda">and</interp>
+</span>
+<span type="wfw-tu" from="BG_12.3.11" to="BG_12.3.12">
+<interp type="wfw-tr" source="prabhupada">unchanging</interp>
+<interp type="wfw-tr" source="sivananda">the unchangeable</interp>
+</span>
+<span type="wfw-tu" from="BG_12.3.13" to="BG_12.3.13">
+<interp type="wfw-tr" source="prabhupada">immovable</interp>
+<interp type="wfw-tr" source="sivananda">the immovable</interp>
+</span>
+<span type="wfw-tu" from="BG_12.3.14" to="BG_12.3.14">
+<interp type="wfw-tr" source="prabhupada">fixed</interp>
+<interp type="wfw-tr" source="sivananda">the eternal.</interp>
+</span>
+<interp type="translation" source="prabhupada">But those who fully worship the unmanifested, that which lies beyond the perception of the senses, the all-pervading, inconceivable, unchanging, fixed and immovable – the impersonal conception of the Absolute Truth –</interp>
+<interp type="bhashya" source="prabhupada" />
+<interp type="bhashya" source="sivananda">Anirdesyam That which cannot be actually shown or which cannot be defined -- the Akshaa or Satchidananda Para Brahman is beyond the reach of the mind and speech. Why can It not be defined Because It is unmanifested. It does not have the four alities of manifested beings, vi.z, Jati (caste such as Brahmana, Kshatriya, etc.), Guna (attributes such as blueness, whiteness, tallness, shortness, etc.), Kriya (reading, walking, etc.), and Sambandha (like the relation between father and son).The unmanifest Incomprehensible by any of the organs of knowledge not manifest to any of the organs of knowledge.Upasana (worship) means sitting near. It is approaching the chosen ideal or object of worship by meditating on it, in accordance with the teachings of the scriptures and the spiritual preceptor, and dwelling steadily in the current of that one thought like a threat of oil poured from one vessel to another. It means continous and uninterrupted contemplation of God.The imperishable Brahman is omnipresent, pervading everything like the ether. It is unthinkable, because It is unmanifest. Whatever is visible to the senses can be thought of by the mind also. That which can be grasped by the organs of knowledge can be thought of by the mind also. But the Supreme Being is invisible to the senses and so cannot be grasped by the organs of knowledge and is, therefore, unthinkable. All thoughts of God ultimately lead the aspirant to iescent meditation.It is Kutastha (unchangeable). Kutastha means remaining like a mass or a heap. Therefore It is immutable and eternal. Just as the anvil remains unchanged though the ironpieces which are beaten on the anvil change their shape, so also Brahman is unchanging though the forms are changing. Hence Brahman is called Kutastha. Kuta also means a thing which appears to be good externally but which is full of evil within. Hence it refers to that seed of Samsara, viz., ignorance, which is full of evil within and which is known as the Avyakrita (undifferentiated) in the Svetasvataropanishad (Mayam tu prakritim vidyat, Mayinam tu mahesvaram) and in the Gita (Mama maya duratyaya -- The illusion of Mine is hard to pierce -- VII.14). Another interpretation for Kutastha is that which is at the root of everything. He Who is seated in Maya as its witness, as its Lord, is Kutastha.Achalam Immovable, that which is free from change. Therefore the imperishable Brahman is Dhruvam, eternal. (Cf.VIII.21)</interp>
+<interp type="translation" source="gambirananda">Those, however, who meditate in every way on the Immutable, the Indefinable, the Unmanifest, which is all-pervading, incomprehensible, change-less, immovable and constant.-</interp>
+</s>
+<s>
+<ref cRef="BG 12.4">Bhagavad-gītā Chapter 12, Sloka 4</ref>
+<urlLink label="BG 12.4 at BG As It Is">https://vedabase.io/en/library/bg/12/3-4/</urlLink>
+<urlLink label="BG 12.4 at Gita Supersite">https://www.gitasupersite.iitk.ac.in/srimad?language=dv&amp;field_chapter_value=12&amp;field_nsutra_value=4&amp;ecsiva=1&amp;etsiva=1&amp;etpurohit=1&amp;etgb=1&amp;setgb=1&amp;etssa=1&amp;etradi=1</urlLink>
+<lg type="sloka">
+<l>सन्नियम्येन्द्रियग्रामं सर्वत्र समबुद्धय:</l>
+<l>ते प्राप्नुवन्ति मामेव सर्वभूतहिते रता:</l>
+</lg>
+<w xml:id="BG_12.4.01" lemma="सम्-नि-यम्य-सम्-नि-यम्">सन्नियम्य<interp type="transliteration" standard="ISO 15919">sanniyamya</interp><dict-ref dict-name="INRIA">sam-ni-yamya-sam-ni-yam</dict-ref></w>
+<w xml:id="BG_12.4.02" lemma="ग्राम">ग्रामम्<interp type="transliteration" standard="ISO 15919">grāmam</interp><dict-ref dict-name="INRIA">graama</dict-ref></w>
+<w xml:id="BG_12.4.03" lemma="सर्वत्र">सर्वत्र<interp type="transliteration" standard="ISO 15919">sarvatra</interp><dict-ref dict-name="INRIA">sarvatra</dict-ref></w>
+<w xml:id="BG_12.4.04" lemma="सम">सम<interp type="transliteration" standard="ISO 15919">sama</interp><dict-ref dict-name="INRIA">sama</dict-ref></w>
+<w xml:id="BG_12.4.05" lemma="बुद्धि">बुद्धयः<interp type="transliteration" standard="ISO 15919">buddhayaḥ</interp><dict-ref dict-name="INRIA">buddhi</dict-ref></w>
+<w xml:id="BG_12.4.06" lemma="तद्-युष्मद्">ते<interp type="transliteration" standard="ISO 15919">te</interp><dict-ref dict-name="INRIA">tad-yu.smad</dict-ref></w>
+<w xml:id="BG_12.4.07" lemma="प्र-प्र-आप्">प्राप्नुवन्ति<interp type="transliteration" standard="ISO 15919">prāpnuvanti</interp><dict-ref dict-name="INRIA">pra-pra-aap</dict-ref></w>
+<w xml:id="BG_12.4.08" lemma="अस्मद्">माम्<interp type="transliteration" standard="ISO 15919">mām</interp><dict-ref dict-name="INRIA">asmad</dict-ref></w>
+<w xml:id="BG_12.4.09" lemma="एव">एव<interp type="transliteration" standard="ISO 15919">eva</interp><dict-ref dict-name="INRIA">eva</dict-ref></w>
+<w xml:id="BG_12.4.10" lemma="सर्व">सर्व<interp type="transliteration" standard="ISO 15919">sarva</interp><dict-ref dict-name="INRIA">sarva</dict-ref></w>
+<w xml:id="BG_12.4.11" lemma="भूत-भू१">भूत<interp type="transliteration" standard="ISO 15919">bhūta</interp><dict-ref dict-name="INRIA">bhuuta-bhuu#1</dict-ref></w>
+<w xml:id="BG_12.4.12" lemma="हित१-हि२-हित२-धा१">हिते<interp type="transliteration" standard="ISO 15919">hite</interp><dict-ref dict-name="INRIA">hita#1-hi#2-hita#2-dhaa#1</dict-ref></w>
+<w xml:id="BG_12.4.13" lemma="रत-रम्">रताः<interp type="transliteration" standard="ISO 15919">ratāḥ</interp><dict-ref dict-name="INRIA">rata-ram</dict-ref></w>
+<span type="wfw-tu" from="BG_12.4.01" to="BG_12.4.01">
+<interp type="wfw-tr" source="prabhupada">controlling</interp>
+</span>
+<span type="wfw-tu" from="BG_12.4.02" to="BG_12.4.02">
+<interp type="wfw-tr" source="prabhupada">all the senses</interp>
+<interp type="wfw-tr" source="sivananda">the aggregate of the senses</interp>
+</span>
+<span type="wfw-tu" from="BG_12.4.03" to="BG_12.4.03">
+<interp type="wfw-tr" source="prabhupada">everywhere</interp>
+<interp type="wfw-tr" source="sivananda">everywhere</interp>
+</span>
+<span type="wfw-tu" from="BG_12.4.04" to="BG_12.4.05">
+<interp type="wfw-tr" source="prabhupada">equally disposed</interp>
+<interp type="wfw-tr" source="sivananda">evenminded</interp>
+</span>
+<span type="wfw-tu" from="BG_12.4.06" to="BG_12.4.06">
+<interp type="wfw-tr" source="prabhupada">they</interp>
+<interp type="wfw-tr" source="sivananda">they</interp>
+</span>
+<span type="wfw-tu" from="BG_12.4.07" to="BG_12.4.07">
+<interp type="wfw-tr" source="prabhupada">achieve</interp>
+<interp type="wfw-tr" source="sivananda">obtian</interp>
+</span>
+<span type="wfw-tu" from="BG_12.4.08" to="BG_12.4.08">
+<interp type="wfw-tr" source="prabhupada">Me</interp>
+<interp type="wfw-tr" source="sivananda">Me</interp>
+</span>
+<span type="wfw-tu" from="BG_12.4.09" to="BG_12.4.09">
+<interp type="wfw-tr" source="prabhupada">certainly</interp>
+<interp type="wfw-tr" source="sivananda">only</interp>
+</span>
+<span type="wfw-tu" from="BG_12.4.10" to="BG_12.4.12">
+<interp type="wfw-tr" source="prabhupada">for the welfare of all living entities</interp>
+<interp type="wfw-tr" source="sivananda">in the welfare of all beings</interp>
+</span>
+<span type="wfw-tu" from="BG_12.4.13" to="BG_12.4.13">
+<interp type="wfw-tr" source="prabhupada">engaged.</interp>
+<interp type="wfw-tr" source="sivananda">rejoicers.</interp>
+</span>
+<interp type="translation" source="prabhupada">by controlling the various senses and being equally disposed to everyone, such persons, engaged in the welfare of all, at last achieve Me.</interp>
+<interp type="bhashya" source="prabhupada">[3+4] Those who do not directly worship the Supreme Godhead, Kṛṣṇa, but who attempt to achieve the same goal by an indirect process, also ultimately achieve the same goal, Śrī Kṛṣṇa. “After many births the man of wisdom seeks refuge in Me, knowing that Vāsudeva is all.” When a person comes to full knowledge after many births, he surrenders unto Lord Kṛṣṇa. If one approaches the Godhead by the method mentioned in this verse, he has to control the senses, render service to everyone and engage in the welfare of all beings. It is inferred that one has to approach Lord Kṛṣṇa, otherwise there is no perfect realization. Often there is much penance involved before one fully surrenders unto Him.
+
+In order to perceive the Supersoul within the individual soul, one has to cease the sensual activities of seeing, hearing, tasting, working, etc. Then one comes to understand that the Supreme Soul is present everywhere. Realizing this, one envies no living entity – he sees no difference between man and animal because he sees soul only, not the outer covering. But for the common man, this method of impersonal realization is very difficult.</interp>
+<interp type="bhashya" source="sivananda">Those who are free from likes and dislikes (attraction and repulsion) can possess,eanimity of mind. Those who have destroyed ignorance which is the cause for exhilaration and grief, through the knowledge of the Self, those who are free from all kinds of sensual cravings through the constant practice of finding the defects or the evil in sensual pleasures can have evenness of mind. Those who are neither elated nor troubled when they get desirable or undesirable objects can possess evenness of mind.The two currents of love and hatred (likes and dislikes) make a man think of harming others. When these two are destroyed through meditation on the Self, the Yogi is intent on the welfare of others. He rejoices in doing service to the people. He plunges himself in service. He works constantly for the solidarity or wellbeing of this world. He gives fearlessness (Abhayadana) to all creatures. No creature is afraid of him. He becomes a Paramahamsa Sannyasi who gives shelter to all in his heart. He attains Selfrealisation. He becoes a knower of Brahman. The knower of Brahman becomes Brahman.By means of the control of the senses the Yogi closes the ten doors (the senses) and withdraws the senses from the sensual objects and fixes the mind on the innermost Self. Those who meditate on the imperishable transcendental Brahman, restraining and subduing the senses, regarding everything eally, rejoicing in the welfare of all beings -- these also come to Me. It needs no saying that they reach Myself, because I hold the wise as verily Myself (Cf.VII.18). Further it is not necessary to say that they are the best Yogins as they are one with Brahman Himself. (Cf.V.25XI.55)But --</interp>
+<interp type="translation" source="gambirananda">By fully controlling all the organs and always being even-minded, they, engaged in the welfare of all beings, attain Me alone.</interp>
+</s>
+<s>
+<ref cRef="BG 12.5">Bhagavad-gītā Chapter 12, Sloka 5</ref>
+<urlLink label="BG 12.5 at BG As It Is">https://vedabase.io/en/library/bg/12/5/</urlLink>
+<urlLink label="BG 12.5 at Gita Supersite">https://www.gitasupersite.iitk.ac.in/srimad?language=dv&amp;field_chapter_value=12&amp;field_nsutra_value=5&amp;ecsiva=1&amp;etsiva=1&amp;etpurohit=1&amp;etgb=1&amp;setgb=1&amp;etssa=1&amp;etradi=1</urlLink>
+<lg type="sloka">
+<l>क्ल‍ेशोऽधिकतरस्तेषामव्यक्तासक्तचेतसाम्</l>
+<l>अव्यक्ता हि गतिर्दु:खं देहवद्भ‍िरवाप्यते</l>
+</lg>
+<w xml:id="BG_12.5.01" lemma="क्लेश">क्लेशः<interp type="transliteration" standard="ISO 15919">kleśaḥ</interp><dict-ref dict-name="INRIA">kleza</dict-ref></w>
+<w xml:id="BG_12.5.02" lemma="तद्">तेषाम्<interp type="transliteration" standard="ISO 15919">teṣām</interp><dict-ref dict-name="INRIA">tad</dict-ref></w>
+<w xml:id="BG_12.5.03" lemma="अव्यक्त">अव्यक्त<interp type="transliteration" standard="ISO 15919">avyakta</interp><dict-ref dict-name="INRIA">avyakta</dict-ref></w>
+<w xml:id="BG_12.5.04" lemma="चेतस्">चेतसाम्<interp type="transliteration" standard="ISO 15919">cetasām</interp><dict-ref dict-name="INRIA">cetas</dict-ref></w>
+<w xml:id="BG_12.5.05" lemma="अव्यक्त">अव्यक्ताः<interp type="transliteration" standard="ISO 15919">avyaktāḥ</interp><dict-ref dict-name="INRIA">avyakta</dict-ref></w>
+<w xml:id="BG_12.5.06" lemma="हि१">हि<interp type="transliteration" standard="ISO 15919">hi</interp><dict-ref dict-name="INRIA">hi#1</dict-ref></w>
+<w xml:id="BG_12.5.07" lemma="गति">गतिः<interp type="transliteration" standard="ISO 15919">gatiḥ</interp><dict-ref dict-name="INRIA">gati</dict-ref></w>
+<w xml:id="BG_12.5.08" lemma="दुःख">दुःखम्<interp type="transliteration" standard="ISO 15919">duḥkham</interp><dict-ref dict-name="INRIA">du.hkha</dict-ref></w>
+<w xml:id="BG_12.5.09" lemma="देह">देह<interp type="transliteration" standard="ISO 15919">deha</interp><dict-ref dict-name="INRIA">deha</dict-ref></w>
+<w xml:id="BG_12.5.10" lemma="वस्३">वद्भिः<interp type="transliteration" standard="ISO 15919">vadbhiḥ</interp><dict-ref dict-name="INRIA">vas#3</dict-ref></w>
+<w xml:id="BG_12.5.11" lemma="अव-आप्-अव-इ">अवाप्यते<interp type="transliteration" standard="ISO 15919">avāpyate</interp><dict-ref dict-name="INRIA">ava-aap-ava-i</dict-ref></w>
+<span type="wfw-tu" from="BG_12.5.01" to="BG_12.5.01">
+<interp type="wfw-tr" source="prabhupada">trouble</interp>
+<interp type="wfw-tr" source="sivananda">the trouble</interp>
+</span>
+<span type="wfw-tu" from="BG_12.5.02" to="BG_12.5.02">
+<interp type="wfw-tr" source="prabhupada">of them</interp>
+<interp type="wfw-tr" source="sivananda">of those</interp>
+</span>
+<span type="wfw-tu" from="BG_12.5.03" to="BG_12.5.03">
+<interp type="wfw-tr" source="prabhupada">to the unmanifested</interp>
+</span>
+<span type="wfw-tu" from="BG_12.5.04" to="BG_12.5.04">
+<interp type="wfw-tr" source="prabhupada">of those whose minds</interp>
+<interp type="wfw-tr" source="sivananda">whose minds are set on the unmanifested</interp>
+</span>
+<span type="wfw-tu" from="BG_12.5.06" to="BG_12.5.06">
+<interp type="wfw-tr" source="prabhupada">certainly</interp>
+<interp type="wfw-tr" source="sivananda">for</interp>
+</span>
+<span type="wfw-tu" from="BG_12.5.07" to="BG_12.5.07">
+<interp type="wfw-tr" source="prabhupada">progress</interp>
+<interp type="wfw-tr" source="sivananda">goal</interp>
+</span>
+<span type="wfw-tu" from="BG_12.5.08" to="BG_12.5.08">
+<interp type="wfw-tr" source="prabhupada">with trouble</interp>
+<interp type="wfw-tr" source="sivananda">pain</interp>
+</span>
+<span type="wfw-tu" from="BG_12.5.09" to="BG_12.5.10">
+<interp type="wfw-tr" source="prabhupada">by the embodied</interp>
+<interp type="wfw-tr" source="sivananda">by the embodied</interp>
+</span>
+<span type="wfw-tu" from="BG_12.5.11" to="BG_12.5.11">
+<interp type="wfw-tr" source="prabhupada">is achieved.</interp>
+<interp type="wfw-tr" source="sivananda">is reached.</interp>
+</span>
+<interp type="translation" source="prabhupada">For those whose minds are attached to the unmanifested, impersonal feature of the Supreme, advancement is very troublesome. To make progress in that discipline is always difficult for those who are embodied.</interp>
+<interp type="bhashya" source="prabhupada">The group of transcendentalists who follow the path of the inconceivable, unmanifested, impersonal feature of the Supreme Lord are called jñāna-yogīs, and persons who are in full Kṛṣṇa consciousness, engaged in devotional service to the Lord, are called bhakti-yogīs. Now, here the difference between jñāna-yoga and bhakti-yoga is definitely expressed. The process of jñāna-yoga, although ultimately bringing one to the same goal, is very troublesome, whereas the path of bhakti-yoga, the process of being in direct service to the Supreme Personality of Godhead, is easier and is natural for the embodied soul. The individual soul is embodied since time immemorial. It is very difficult for him to simply theoretically understand that he is not the body. Therefore, the bhakti-yogī accepts the Deity of Kṛṣṇa as worshipable because there is some bodily conception fixed in the mind, which can thus be applied. Of course, worship of the Supreme Personality of Godhead in His form within the temple is not idol worship. There is evidence in the Vedic literature that worship may be saguṇa or nirguṇa – of the Supreme possessing or not possessing attributes. Worship of the Deity in the temple is saguṇa worship, for the Lord is represented by material qualities. But the form of the Lord, though represented by material qualities such as stone, wood or oil paint, is not actually material. That is the absolute nature of the Supreme Lord.
+
+A crude example may be given here. We may find some mailboxes on the street, and if we post our letters in those boxes, they will naturally go to their destination without difficulty. But any old box, or an imitation which we may find somewhere but which is not authorized by the post office, will not do the work. Similarly, God has an authorized representation in the Deity form, which is called arcā-vigraha. This arcā-vigraha is an incarnation of the Supreme Lord. God will accept service through that form. The Lord is omnipotent, all-powerful; therefore, by His incarnation as arcā-vigraha He can accept the services of the devotee, just to make it convenient for the man in conditioned life.
+
+So for a devotee there is no difficulty in approaching the Supreme immediately and directly, but for those who are following the impersonal way to spiritual realization the path is difficult. They have to understand the unmanifested representation of the Supreme through such Vedic literatures as the Upaniṣads, and they have to learn the language, understand the nonperceptual feelings, and realize all these processes. This is not very easy for a common man. A person in Kṛṣṇa consciousness, engaged in devotional service, simply by the guidance of the bona fide spiritual master, simply by offering regulative obeisances unto the Deity, simply by hearing the glories of the Lord, and simply by eating the remnants of foodstuffs offered to the Lord, realizes the Supreme Personality of Godhead very easily. There is no doubt that the impersonalists are unnecessarily taking a troublesome path with the risk of not realizing the Absolute Truth at the ultimate end. But the personalist, without any risk, trouble or difficulty, approaches the Supreme Personality directly. A similar passage appears in Śrīmad-Bhāgavatam. It is stated there that if one ultimately has to surrender unto the Supreme Personality of Godhead (this surrendering process is called bhakti), but instead takes the trouble to understand what is Brahman and what is not Brahman and spends his whole life in that way, the result is simply troublesome. Therefore it is advised here that one should not take up this troublesome path of self-realization, because there is uncertainty in the ultimate result.
+
+A living entity is eternally an individual soul, and if he wants to merge into the spiritual whole, he may accomplish the realization of the eternal and knowledgeable aspects of his original nature, but the blissful portion is not realized. By the grace of some devotee, such a transcendentalist, highly learned in the process of jñāna-yoga, may come to the point of bhakti-yoga, or devotional service. At that time, long practice in impersonalism also becomes a source of trouble, because he cannot give up the idea. Therefore an embodied soul is always in difficulty with the unmanifest, both at the time of practice and at the time of realization. Every living soul is partially independent, and one should know for certain that this unmanifested realization is against the nature of his spiritual, blissful self. One should not take up this process. For every individual living entity the process of Kṛṣṇa consciousness, which entails full engagement in devotional service, is the best way. If one wants to ignore this devotional service, there is the danger of turning to atheism. Thus the process of centering attention on the unmanifested, the inconceivable, which is beyond the approach of the senses, as already expressed in this verse, should never be encouraged at any time, especially in this age. It is not advised by Lord Kṛṣṇa.</interp>
+<interp type="bhashya" source="sivananda">Worshippers of the Saguna (alified) and the Nirguna (unalified) Brahman reach the same goal. But the latter path is very hard and arduous, because the aspirant has to give up attachment to the body from the very beginning of his spiritual practice.The embodied Those who identify themselves with their bodies. Identification with the body is Dehabhimana. The imperishable Brahman is very hard to reach for those who are attached to their bodies. Further, it is extremely difficult to fix the resltess mind on the formless and attributeless Brahman. Contemplation on the imperishable, attributeless Brahman demands a very sharp, onepointed and subtle intellect. The Upanishad says Drisyate tu agraya buddhya sukshmaya sukshmadarsibhih -- It is seen by subtle seers through their subtle intellect.He who meditates on the unmanifested should possess the four means. Then he will have to approach a Guru who is well versed in the scriptures and who is also established in Brahman. He will have to hear the Truth from him, then reflect and meditate on It.He who realises the Nirguna (attributeless) Brahman attains eternal bliss or Selfrealisation or Kaivalya (Moksha) which is preceded by the destruction of ignorance with its effects. He who realises the Saguna Brahman (Brahman with attributes) goes to Brahmaloka and enjoys all the wealth and powers of the Lord. He then gets initiation into the mysteries of the Absolute from Hiranyagarbha and without any effort and without the practice of hearing, reflection and meditation attains, through the grace of the Lord alone, the same state as attained by those who have realised the Nirguna Brahman. Through the knowledge of the Self, ignorance and its effects,are destroyed in the case of the worshippers of the Saguna Brahman also.</interp>
+<interp type="translation" source="gambirananda">For them who have their minds attached to the Unmanifested the struggle is greater; for, the Goal which is the Unmanifest is attained with difficulty by the embodied ones.</interp>
+</s>
+<s>
+<ref cRef="BG 12.6">Bhagavad-gītā Chapter 12, Sloka 6</ref>
+<urlLink label="BG 12.6 at BG As It Is">https://vedabase.io/en/library/bg/12/6-7/</urlLink>
+<urlLink label="BG 12.6 at Gita Supersite">https://www.gitasupersite.iitk.ac.in/srimad?language=dv&amp;field_chapter_value=12&amp;field_nsutra_value=6&amp;ecsiva=1&amp;etsiva=1&amp;etpurohit=1&amp;etgb=1&amp;setgb=1&amp;etssa=1&amp;etradi=1</urlLink>
+<lg type="sloka">
+<l>ये तु सर्वाणि कर्माणि मयि सन्न्यस्य मत्परा:</l>
+<l>अनन्येनैव योगेन मां ध्यायन्त उपासते</l>
+</lg>
+<w xml:id="BG_12.6.01" lemma="यद्">ये<interp type="transliteration" standard="ISO 15919">ye</interp><dict-ref dict-name="INRIA">yad</dict-ref></w>
+<w xml:id="BG_12.6.02" lemma="तु">तु<interp type="transliteration" standard="ISO 15919">tu</interp><dict-ref dict-name="INRIA">tu</dict-ref></w>
+<w xml:id="BG_12.6.03" lemma="सर्व">सर्वाणि<interp type="transliteration" standard="ISO 15919">sarvāṇi</interp><dict-ref dict-name="INRIA">sarva</dict-ref></w>
+<w xml:id="BG_12.6.04" lemma="कर्मन्">कर्माणि<interp type="transliteration" standard="ISO 15919">karmāṇi</interp><dict-ref dict-name="INRIA">karman</dict-ref></w>
+<w xml:id="BG_12.6.05" lemma="अस्मद्">मयि<interp type="transliteration" standard="ISO 15919">mayi</interp><dict-ref dict-name="INRIA">asmad</dict-ref></w>
+<w xml:id="BG_12.6.06" lemma="सम्-नि-सम्-नि-अस्२">सन्न्यस्य<interp type="transliteration" standard="ISO 15919">sannyasya</interp><dict-ref dict-name="INRIA">sam-ni-sam-ni-as#2</dict-ref></w>
+<w xml:id="BG_12.6.07" lemma="मत्पर">मत्पराः<interp type="transliteration" standard="ISO 15919">matparāḥ</interp><dict-ref dict-name="INRIA">matpara</dict-ref></w>
+<w xml:id="BG_12.6.08" lemma="अनन्य">अनन्येन<interp type="transliteration" standard="ISO 15919">ananyena</interp><dict-ref dict-name="INRIA">ananya</dict-ref></w>
+<w xml:id="BG_12.6.09" lemma="योग">योगेन<interp type="transliteration" standard="ISO 15919">yogena</interp><dict-ref dict-name="INRIA">yoga</dict-ref></w>
+<w xml:id="BG_12.6.10" lemma="अस्मद्">माम्<interp type="transliteration" standard="ISO 15919">mām</interp><dict-ref dict-name="INRIA">asmad</dict-ref></w>
+<w xml:id="BG_12.6.11" lemma="ध्या">ध्यायन्तः<interp type="transliteration" standard="ISO 15919">dhyāyantaḥ</interp><dict-ref dict-name="INRIA">dhyaa</dict-ref></w>
+<w xml:id="BG_12.6.12" lemma="उप-आस्२">उपासते<interp type="transliteration" standard="ISO 15919">upāsate</interp><dict-ref dict-name="INRIA">upa-aas#2</dict-ref></w>
+<span type="wfw-tu" from="BG_12.6.01" to="BG_12.6.01">
+<interp type="wfw-tr" source="prabhupada">those who</interp>
+<interp type="wfw-tr" source="sivananda">who</interp>
+</span>
+<span type="wfw-tu" from="BG_12.6.02" to="BG_12.6.02">
+<interp type="wfw-tr" source="prabhupada">but</interp>
+<interp type="wfw-tr" source="sivananda">but</interp>
+</span>
+<span type="wfw-tu" from="BG_12.6.03" to="BG_12.6.03">
+<interp type="wfw-tr" source="prabhupada">all</interp>
+<interp type="wfw-tr" source="sivananda">all</interp>
+</span>
+<span type="wfw-tu" from="BG_12.6.04" to="BG_12.6.04">
+<interp type="wfw-tr" source="prabhupada">activities</interp>
+<interp type="wfw-tr" source="sivananda">actions</interp>
+</span>
+<span type="wfw-tu" from="BG_12.6.05" to="BG_12.6.05">
+<interp type="wfw-tr" source="prabhupada">unto Me</interp>
+<interp type="wfw-tr" source="sivananda">in Me</interp>
+</span>
+<span type="wfw-tu" from="BG_12.6.06" to="BG_12.6.06">
+<interp type="wfw-tr" source="prabhupada">giving up</interp>
+</span>
+<span type="wfw-tu" from="BG_12.6.07" to="BG_12.6.07">
+<interp type="wfw-tr" source="prabhupada">being attached to Me</interp>
+<interp type="wfw-tr" source="sivananda">regarding Me as the supreme goal</interp>
+</span>
+<span type="wfw-tu" from="BG_12.6.08" to="BG_12.6.08">
+<interp type="wfw-tr" source="prabhupada">without division</interp>
+<interp type="wfw-tr" source="sivananda">singleminded</interp>
+</span>
+<span type="wfw-tu" from="BG_12.6.09" to="BG_12.6.09">
+<interp type="wfw-tr" source="prabhupada">by practice of such bhakti-yoga</interp>
+<interp type="wfw-tr" source="sivananda">with the Yoga</interp>
+</span>
+<span type="wfw-tu" from="BG_12.6.10" to="BG_12.6.10">
+<interp type="wfw-tr" source="prabhupada">upon Me</interp>
+<interp type="wfw-tr" source="sivananda">Me</interp>
+</span>
+<span type="wfw-tu" from="BG_12.6.11" to="BG_12.6.11">
+<interp type="wfw-tr" source="prabhupada">meditating</interp>
+<interp type="wfw-tr" source="sivananda">meditating</interp>
+</span>
+<span type="wfw-tu" from="BG_12.6.12" to="BG_12.6.12">
+<interp type="wfw-tr" source="prabhupada">worship</interp>
+<interp type="wfw-tr" source="sivananda">worship.</interp>
+</span>
+<interp type="translation" source="prabhupada">But those who worship Me, giving up all their activities unto Me and being devoted to Me without deviation, engaged in devotional service and always meditating upon Me,</interp>
+<interp type="bhashya" source="prabhupada" />
+<interp type="bhashya" source="sivananda">Ananya Yoga Unswerving Yoga exclusive, having no other objects of worship or support save the Lord Samadhi.Even in Bhakti Yoga one should not abandon actions. He must perform actions but he will have to dedicate the merits or the fruits to the Lord. (Cf.IX.27)</interp>
+<interp type="translation" source="gambirananda">As for those who, having dedicated all actions to Me and accepted Me as the supreme, meditate by thinking of Me with single-minded concentration only-.</interp>
+</s>
+<s>
+<ref cRef="BG 12.7">Bhagavad-gītā Chapter 12, Sloka 7</ref>
+<lg type="sloka">
+<l>तेषामहं समुद्धर्ता मृत्युसंसारसागरात्</l>
+<l>भवामि न चिरात्पार्थ मय्यावेशितचेतसाम्</l>
+</lg>
+<w xml:id="BG_12.7.01" lemma="तद्">तेषाम्<interp type="transliteration" standard="ISO 15919">teṣām</interp><dict-ref dict-name="INRIA">tad</dict-ref></w>
+<w xml:id="BG_12.7.02" lemma="अस्मद्">अहम्<interp type="transliteration" standard="ISO 15919">aham</interp><dict-ref dict-name="INRIA">asmad</dict-ref></w>
+<w xml:id="BG_12.7.03" lemma="सम्-उत्-हृ१">समुद्धर्ता<interp type="transliteration" standard="ISO 15919">samuddhartā</interp><dict-ref dict-name="INRIA">sam-ut-h.r#1</dict-ref></w>
+<w xml:id="BG_12.7.04" lemma="मृत्यु">मृत्यु<interp type="transliteration" standard="ISO 15919">mṛtyu</interp><dict-ref dict-name="INRIA">m.rtyu</dict-ref></w>
+<w xml:id="BG_12.7.05" lemma="संसार">संसार<interp type="transliteration" standard="ISO 15919">saṃsāra</interp><dict-ref dict-name="INRIA">sa.msaara</dict-ref></w>
+<w xml:id="BG_12.7.06" lemma="सागर">सागरात्<interp type="transliteration" standard="ISO 15919">sāgarāt</interp><dict-ref dict-name="INRIA">saagara</dict-ref></w>
+<w xml:id="BG_12.7.07" lemma="भू१">भवामि<interp type="transliteration" standard="ISO 15919">bhavāmi</interp><dict-ref dict-name="INRIA">bhuu#1</dict-ref></w>
+<w xml:id="BG_12.7.08" lemma="न">न<interp type="transliteration" standard="ISO 15919">na</interp><dict-ref dict-name="INRIA">na</dict-ref></w>
+<w xml:id="BG_12.7.09" lemma="चिर">चिरात्<interp type="transliteration" standard="ISO 15919">cirāt</interp><dict-ref dict-name="INRIA">cira</dict-ref></w>
+<w xml:id="BG_12.7.10" lemma="पार्थ">पार्थ<interp type="transliteration" standard="ISO 15919">pārtha</interp><dict-ref dict-name="INRIA">paartha</dict-ref></w>
+<w xml:id="BG_12.7.11" lemma="अस्मद्">मयि<interp type="transliteration" standard="ISO 15919">mayi</interp><dict-ref dict-name="INRIA">asmad</dict-ref></w>
+<w xml:id="BG_12.7.12" lemma="आ-आ-विश्१">आवेशित<interp type="transliteration" standard="ISO 15919">āveśita</interp><dict-ref dict-name="INRIA">aa-aa-viz#1</dict-ref></w>
+<w xml:id="BG_12.7.13" lemma="चेतस्">चेतसाम्<interp type="transliteration" standard="ISO 15919">cetasām</interp><dict-ref dict-name="INRIA">cetas</dict-ref></w>
+<span type="wfw-tu" from="BG_12.7.01" to="BG_12.7.01">
+<interp type="wfw-tr" source="prabhupada">of them</interp>
+<interp type="wfw-tr" source="sivananda">for them</interp>
+</span>
+<span type="wfw-tu" from="BG_12.7.02" to="BG_12.7.02">
+<interp type="wfw-tr" source="prabhupada">I</interp>
+<interp type="wfw-tr" source="sivananda">I</interp>
+</span>
+<span type="wfw-tu" from="BG_12.7.03" to="BG_12.7.03">
+<interp type="wfw-tr" source="prabhupada">the deliverer</interp>
+<interp type="wfw-tr" source="sivananda">the saviour</interp>
+</span>
+<span type="wfw-tu" from="BG_12.7.04" to="BG_12.7.04">
+<interp type="wfw-tr" source="prabhupada">of death</interp>
+</span>
+<span type="wfw-tu" from="BG_12.7.04" to="BG_12.7.06">
+<interp type="wfw-tr" source="sivananda">out of the ocean of the mortal Samsara</interp>
+</span>
+<span type="wfw-tu" from="BG_12.7.06" to="BG_12.7.06">
+<interp type="wfw-tr" source="prabhupada">from the ocean</interp>
+</span>
+<span type="wfw-tu" from="BG_12.7.07" to="BG_12.7.07">
+<interp type="wfw-tr" source="prabhupada">I become</interp>
+<interp type="wfw-tr" source="sivananda">(I) become</interp>
+</span>
+<span type="wfw-tu" from="BG_12.7.08" to="BG_12.7.08">
+<interp type="wfw-tr" source="prabhupada">not</interp>
+</span>
+<span type="wfw-tu" from="BG_12.7.08" to="BG_12.7.09">
+<interp type="wfw-tr" source="sivananda">ere long</interp>
+</span>
+<span type="wfw-tu" from="BG_12.7.09" to="BG_12.7.09">
+<interp type="wfw-tr" source="prabhupada">after a long time</interp>
+</span>
+<span type="wfw-tu" from="BG_12.7.10" to="BG_12.7.10">
+<interp type="wfw-tr" source="prabhupada">O son of Pṛthā</interp>
+<interp type="wfw-tr" source="sivananda">O Arjuna</interp>
+</span>
+<span type="wfw-tu" from="BG_12.7.11" to="BG_12.7.11">
+<interp type="wfw-tr" source="prabhupada">upon Me</interp>
+<interp type="wfw-tr" source="sivananda">in Me</interp>
+</span>
+<span type="wfw-tu" from="BG_12.7.12" to="BG_12.7.12">
+<interp type="wfw-tr" source="prabhupada">fixed</interp>
+</span>
+<span type="wfw-tu" from="BG_12.7.12" to="BG_12.7.13">
+<interp type="wfw-tr" source="sivananda">of those whose minds are set.</interp>
+</span>
+<span type="wfw-tu" from="BG_12.7.13" to="BG_12.7.13">
+<interp type="wfw-tr" source="prabhupada">of those whose minds.</interp>
+</span>
+<interp type="translation" source="prabhupada">having fixed their minds upon Me, O son of Pṛthā – for them I am the swift deliverer from the ocean of birth and death.</interp>
+<interp type="bhashya" source="prabhupada">[6+7] It is explicitly stated here that the devotees are very fortunate to be delivered very soon from material existence by the Lord. In pure devotional service one comes to the realization that God is great and that the individual soul is subordinate to Him. His duty is to render service to the Lord – and if he does not, then he will render service to māyā.
+
+As stated before, the Supreme Lord can be appreciated only by devotional service. Therefore, one should be fully devoted. One should fix his mind fully on Kṛṣṇa in order to achieve Him. One should work only for Kṛṣṇa. It does not matter in what kind of work one engages, but that work should be done only for Kṛṣṇa. That is the standard of devotional service. The devotee does not desire any achievement other than pleasing the Supreme Personality of Godhead. His life’s mission is to please Kṛṣṇa, and he can sacrifice everything for Kṛṣṇa’s satisfaction, just as Arjuna did in the Battle of Kurukṣetra. The process is very simple: one can devote himself in his occupation and engage at the same time in chanting Hare Kṛṣṇa, Hare Kṛṣṇa, Kṛṣṇa Kṛṣṇa, Hare Hare/ Hare Rāma, Hare Rāma, Rāma Rāma, Hare Hare. Such transcendental chanting attracts the devotee to the Personality of Godhead.
+
+The Supreme Lord herein promises that without delay He will deliver a pure devotee thus engaged from the ocean of material existence. Those who are advanced in yoga practice can willfully transfer the soul to whatever planet they like by the yoga process, and others take the opportunity in various ways, but as far as the devotee is concerned, it is clearly stated here that the Lord Himself takes him. The devotee does not need to wait to become very experienced in order to transfer himself to the spiritual sky.
+
+In the Varāha Purāṇa this verse appears:
+
+nayāmi paramaṁ sthānam
+arcir-ādi-gatiṁ vinā
+garuḍa-skandham āropya
+yatheccham anivāritaḥ
+
+The purport of this verse is that a devotee does not need to practice aṣṭāṅga-yoga in order to transfer his soul to the spiritual planets. The responsibility is taken by the Supreme Lord Himself. He clearly states here that He Himself becomes the deliverer. A child is completely cared for by his parents, and thus his position is secure. Similarly, a devotee does not need to endeavor to transfer himself by yoga practice to other planets. Rather, the Supreme Lord, by His great mercy, comes at once, riding on His bird carrier Garuḍa, and at once delivers the devotee from material existence. Although a man who has fallen in the ocean may struggle very hard and may be very expert in swimming, he cannot save himself. But if someone comes and picks him up from the water, then he is easily rescued. Similarly, the Lord picks up the devotee from this material existence. One simply has to practice the easy process of Kṛṣṇa consciousness and fully engage himself in devotional service. Any intelligent man should always prefer the process of devotional service to all other paths. In the Nārāyaṇīya this is confirmed as follows:
+
+yā vai sādhana-sampattiḥ
+puruṣārtha-catuṣṭaye
+tayā vinā tad āpnoti
+naro nārāyaṇāśrayaḥ
+
+The purport of this verse is that one should not engage in the different processes of fruitive activity or cultivate knowledge by the mental speculative process. One who is devoted to the Supreme Personality can attain all the benefits derived from other yogic processes, speculation, rituals, sacrifices, charities, etc. That is the specific benediction of devotional service.
+
+Simply by chanting the holy name of Kṛṣṇa – Hare Kṛṣṇa, Hare Kṛṣṇa, Kṛṣṇa Kṛṣṇa, Hare Hare/ Hare Rāma, Hare Rāma, Rāma Rāma, Hare Hare – a devotee of the Lord can approach the supreme destination easily and happily, but this destination cannot be approached by any other process of religion.
+
+The conclusion of Bhagavad-gītā is stated in the Eighteenth Chapter:
+
+sarva-dharmān parityajya
+mām ekaṁ śaraṇaṁ vraja
+ahaṁ tvāṁ sarva-pāpebhyo
+mokṣayiṣyāmi mā śucaḥ
+
+One should give up all other processes of self-realization and simply execute devotional service in Kṛṣṇa consciousness. That will enable one to reach the highest perfection of life. There is no need for one to consider the sinful actions of his past life, because the Supreme Lord fully takes charge of him. Therefore one should not futilely try to deliver himself in spiritual realization. Let everyone take shelter of the supreme omnipotent Godhead, Kṛṣṇa. That is the highest perfection of life.</interp>
+<interp type="bhashya" source="sivananda">Mortal Samsara The round of birth and death. The devotee who does total, unconditional, and ungrudging selfsurrender to the Lord, who places himself completely at the mercy of the Lord, and who fixes of actions by offering them to the Lord and who thus destroys any power in the actions to bear fruit, and who has abandoned even the idea of liberation, is soon lifted by the Lord from the mortal plane to the abode of Immortality.I redeem such persons who have become Macchitta i.e., mind united with Me, from the ocean of the mortal world or worldly life, without delay. (Cf.X.10.11XII.6and7)</interp>
+<interp type="translation" source="gambirananda">O son of Prtha, for them who have their minds absorbed in Me, I become, without delay, the Deliverer from the sea of the world which is fraught with death.</interp>
+<urlLink label="BG 12.7 at BG As It Is">https://vedabase.io/en/library/bg/12/6-7/</urlLink>
+<urlLink label="BG 12.7 at Gita Supersite">https://www.gitasupersite.iitk.ac.in/srimad?language=dv&amp;field_chapter_value=12&amp;field_nsutra_value=7&amp;ecsiva=1&amp;etsiva=1&amp;etpurohit=1&amp;etgb=1&amp;setgb=1&amp;etssa=1&amp;etradi=1</urlLink>
+</s>
+<s>
+<ref cRef="BG 12.8">Bhagavad-gītā Chapter 12, Sloka 8</ref>
+<urlLink label="BG 12.8 at BG As It Is">https://vedabase.io/en/library/bg/12/8/</urlLink>
+<urlLink label="BG 12.8 at Gita Supersite">https://www.gitasupersite.iitk.ac.in/srimad?language=dv&amp;field_chapter_value=12&amp;field_nsutra_value=8&amp;ecsiva=1&amp;etsiva=1&amp;etpurohit=1&amp;etgb=1&amp;setgb=1&amp;etssa=1&amp;etradi=1</urlLink>
+<lg type="sloka">
+<l>मय्येव मन आधत्स्व मयि बुद्धिं निवेशय</l>
+<l>निवसिष्यसि मय्येव अत ऊर्ध्वं न संशय:</l>
+</lg>
+<w xml:id="BG_12.8.01" lemma="अस्मद्">मयि<interp type="transliteration" standard="ISO 15919">mayi</interp><dict-ref dict-name="INRIA">asmad</dict-ref></w>
+<w xml:id="BG_12.8.02" lemma="एव">एव<interp type="transliteration" standard="ISO 15919">eva</interp><dict-ref dict-name="INRIA">eva</dict-ref></w>
+<w xml:id="BG_12.8.03" lemma="मनस्">मनः<interp type="transliteration" standard="ISO 15919">manaḥ</interp><dict-ref dict-name="INRIA">manas</dict-ref></w>
+<w xml:id="BG_12.8.04" lemma="आ-धा१">आधत्स्व<interp type="transliteration" standard="ISO 15919">ādhatsva</interp><dict-ref dict-name="INRIA">aa-dhaa#1</dict-ref></w>
+<w xml:id="BG_12.8.05" lemma="अस्मद्">मयि<interp type="transliteration" standard="ISO 15919">mayi</interp><dict-ref dict-name="INRIA">asmad</dict-ref></w>
+<w xml:id="BG_12.8.06" lemma="बुद्धि">बुद्धिम्<interp type="transliteration" standard="ISO 15919">buddhim</interp><dict-ref dict-name="INRIA">buddhi</dict-ref></w>
+<w xml:id="BG_12.8.07" lemma="नि-विश्१">निवेशय<interp type="transliteration" standard="ISO 15919">niveśaya</interp><dict-ref dict-name="INRIA">ni-viz#1</dict-ref></w>
+<w xml:id="BG_12.8.08" lemma="नि-वस्१">निवसिष्यसि<interp type="transliteration" standard="ISO 15919">nivasiṣyasi</interp><dict-ref dict-name="INRIA">ni-vas#1</dict-ref></w>
+<w xml:id="BG_12.8.09" lemma="अस्मद्">मयि<interp type="transliteration" standard="ISO 15919">mayi</interp><dict-ref dict-name="INRIA">asmad</dict-ref></w>
+<w xml:id="BG_12.8.10" lemma="एव">एव<interp type="transliteration" standard="ISO 15919">eva</interp><dict-ref dict-name="INRIA">eva</dict-ref></w>
+<w xml:id="BG_12.8.11" lemma="अतस्">अतः<interp type="transliteration" standard="ISO 15919">ataḥ</interp><dict-ref dict-name="INRIA">atas</dict-ref></w>
+<w xml:id="BG_12.8.12" lemma="ऊर्ध्व">ऊर्ध्वम्<interp type="transliteration" standard="ISO 15919">ūrdhvam</interp><dict-ref dict-name="INRIA">uurdhva</dict-ref></w>
+<w xml:id="BG_12.8.13" lemma="न">न<interp type="transliteration" standard="ISO 15919">na</interp><dict-ref dict-name="INRIA">na</dict-ref></w>
+<w xml:id="BG_12.8.14" lemma="संशय">संशयः<interp type="transliteration" standard="ISO 15919">saṃśayaḥ</interp><dict-ref dict-name="INRIA">sa.mzaya</dict-ref></w>
+<span type="wfw-tu" from="BG_12.8.01" to="BG_12.8.01">
+<interp type="wfw-tr" source="prabhupada">upon Me</interp>
+<interp type="wfw-tr" source="sivananda">in Me</interp>
+</span>
+<span type="wfw-tu" from="BG_12.8.02" to="BG_12.8.02">
+<interp type="wfw-tr" source="prabhupada">certainly</interp>
+<interp type="wfw-tr" source="sivananda">only</interp>
+</span>
+<span type="wfw-tu" from="BG_12.8.03" to="BG_12.8.03">
+<interp type="wfw-tr" source="prabhupada">mind</interp>
+<interp type="wfw-tr" source="sivananda">the mind</interp>
+</span>
+<span type="wfw-tu" from="BG_12.8.04" to="BG_12.8.04">
+<interp type="wfw-tr" source="prabhupada">fix</interp>
+<interp type="wfw-tr" source="sivananda">fix</interp>
+</span>
+<span type="wfw-tu" from="BG_12.8.05" to="BG_12.8.05">
+<interp type="wfw-tr" source="prabhupada">upon Me</interp>
+<interp type="wfw-tr" source="sivananda">in Me</interp>
+</span>
+<span type="wfw-tu" from="BG_12.8.06" to="BG_12.8.06">
+<interp type="wfw-tr" source="prabhupada">intelligence</interp>
+<interp type="wfw-tr" source="sivananda">(thy) intellect</interp>
+</span>
+<span type="wfw-tu" from="BG_12.8.07" to="BG_12.8.07">
+<interp type="wfw-tr" source="prabhupada">apply</interp>
+<interp type="wfw-tr" source="sivananda">place</interp>
+</span>
+<span type="wfw-tu" from="BG_12.8.08" to="BG_12.8.08">
+<interp type="wfw-tr" source="prabhupada">you will live</interp>
+<interp type="wfw-tr" source="sivananda">thou shalt live</interp>
+</span>
+<span type="wfw-tu" from="BG_12.8.09" to="BG_12.8.09">
+<interp type="wfw-tr" source="prabhupada">in Me</interp>
+<interp type="wfw-tr" source="sivananda">in Me</interp>
+</span>
+<span type="wfw-tu" from="BG_12.8.10" to="BG_12.8.10">
+<interp type="wfw-tr" source="prabhupada">certainly</interp>
+<interp type="wfw-tr" source="sivananda">alone</interp>
+</span>
+<span type="wfw-tu" from="BG_12.8.11" to="BG_12.8.12">
+<interp type="wfw-tr" source="prabhupada">thereafter</interp>
+<interp type="wfw-tr" source="sivananda">hereafter</interp>
+</span>
+<span type="wfw-tu" from="BG_12.8.13" to="BG_12.8.13">
+<interp type="wfw-tr" source="prabhupada">never</interp>
+<interp type="wfw-tr" source="sivananda">not</interp>
+</span>
+<span type="wfw-tu" from="BG_12.8.14" to="BG_12.8.14">
+<interp type="wfw-tr" source="sivananda">doubt.</interp>
+</span>
+<interp type="translation" source="prabhupada">Just fix your mind upon Me, the Supreme Personality of Godhead, and engage all your intelligence in Me. Thus you will live in Me always, without a doubt.</interp>
+<interp type="bhashya" source="prabhupada">One who is engaged in Lord Kṛṣṇa’s devotional service lives in a direct relationship with the Supreme Lord, so there is no doubt that his position is transcendental from the very beginning. A devotee does not live on the material plane – he lives in Kṛṣṇa. The holy name of the Lord and the Lord are nondifferent; therefore when a devotee chants Hare Kṛṣṇa, Kṛṣṇa and His internal potency are dancing on the tongue of the devotee. When he offers Kṛṣṇa food, Kṛṣṇa directly accepts these eatables, and the devotee becomes Kṛṣṇa-ized by eating the remnants. One who does not engage in such service cannot understand how this is so, although this is a process recommended in the Bhagavad-gītā and in other Vedic literatures.</interp>
+<interp type="bhashya" source="sivananda">Fix thy mind means thy purposes and thoughts in Me the Lord in the Cosmic Form. Give up entirely all thoughts of sensual objects. Fix in Me thy intellect also -- the faculty which resolves and determines.What will be the result then Thou shalt undoubtedly live in Me as Myself. O Arjuna, of this there is no doubt whatsoever.The Yoga of meditation is described in this verse. (Cf.VIII.7X.9XI.34XVIII.65)</interp>
+<interp type="translation" source="gambirananda">Fix the mind on Me alone; in Me alone rest the intellect. There is no doubt that hereafter you will dwell in Me alone. [For the sake of metre, eva and atah (in the second line of the verse) are not joined together (to form evatah).]</interp>
+</s>
+</text>
+</TEI>
