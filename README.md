@@ -50,7 +50,7 @@ git clone https://github.com/Eridu-Coders/m1.git
 
 ## m1 Compilation
 
-Load the project (the `CMakeLists.txt` file) into the _Qt Creator_ IDE and launch the compilation from the there, in Debug (many runtime messages) or Release mode (faster). In Release mode, the option `-DQT_NO_DEBUG_OUTPUT` in `CMAKE_CXX_FLAGS` should be added to the options list in advanced mode ("Projects" tab of the IDE), to disable the runtime messages.
+Load the project (the `CMakeLists.txt` file) into the _Qt Creator_ IDE and launch the compilation from there, in Debug (many runtime messages) or Release mode (faster). In Release mode, the option `-DQT_NO_DEBUG_OUTPUT` in `CMAKE_CXX_FLAGS` should be added to the options list in advanced mode ("Projects" tab of the IDE), to disable the runtime messages.
 
 ![](https://github.com/Eridu-Coders/m1/blob/main/m1_Screenshot_02.png?raw=true)
 
