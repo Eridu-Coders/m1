@@ -54,6 +54,8 @@ Load the project (the `CMakeLists.txt` file) into the _Qt Creator_ IDE and launc
 
 ![](https://github.com/Eridu-Coders/m1/blob/main/m1_Screenshot_02.png?raw=true)
 
+Also, make sure that the build directories are at the same level as `m1_src`, so that the executables can access the icon `svg` files within that directory.
+
 Launch the application with the command (in the Debug or Release build directory):
 ```
 ./m1 -rpg
