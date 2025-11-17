@@ -16,6 +16,9 @@ namespace po = boost::program_options;
 
 Q_LOGGING_CATEGORY(g_cat_main, "m1_main")
 
+// cloc count
+// cloc --by-file-by-lang --exclude-content="M1Env::GraphInit::init_base()" --include-lang=C++,"C/C++ Header",Python --fullpath --not-match-d='^build.*|.*stringcase.*' *
+
 QRegularExpression g_re_punc(R"(^(\W*)(\w+)(\W*))");
 QRegularExpression g_re_space(R"(\s+)");
 

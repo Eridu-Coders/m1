@@ -549,14 +549,17 @@ QString M1MidPlane::AutoInterp::getHtml(){
 }
 // ------------------------------------ FieldInterp -----------------------------------------------------
 bool M1MidPlane::FieldInterp::wantIt(M1Store::Item_lv2* p_myself){
-    return p_myself->isSimpleEdge();
+    return p_myself->isSimpleEdge() || p_myself->getTarget_lv2()->isSimpleVertex();
 }
 M1MidPlane::FieldInterp::FieldInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth) : Interp(p_myself, p_vb, p_parent, p_depth){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("FieldInterp Constructor from: %1").arg(p_myself->dbgShort()))
     M1_FUNC_EXIT
 }
 QString M1MidPlane::FieldInterp::displayText(){
-    return QString("[%1] ").arg(m_myself->dbgTypeShort()) + m_myself->text();
+    if(m_myself->isSimpleEdge())
+        return QString("e[%1] ").arg(m_myself->dbgTypeShort()) + m_myself->text();
+    else
+        return QString("v[%1] ").arg(m_myself->getTarget_lv2()->dbgTypeShort()) + m_myself->getTarget_lv2()->text();
 }
 
 QIcon* M1MidPlane::FieldInterp::edgeIcon(){
