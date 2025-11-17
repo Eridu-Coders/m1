@@ -94,7 +94,7 @@ private:
     static QIcon cm_closed;
     static QList<M1Store::Item_lv2*> cm_gratt;
 
-    M1Store::Item_lv2* m_myself;
+    // M1Store::Item_lv2* m_myself;
     int m_depth;
     int m_target_height;
     int m_target_beseline;
@@ -112,8 +112,9 @@ private:
     QTimer m_hold_timer;
 
     QTextEdit* m_text_edit = nullptr;
-
 protected:
+    M1Store::Item_lv2* m_myself;
+
     void paintOC(QPainter& p);
     virtual QString getHtml();
     virtual QString displayText();
@@ -297,6 +298,31 @@ public:
     virtual QString displayText();
     // virtual void paintEvent(QPaintEvent* p_event);
 };
+
+class TextLemma : public Interp
+{
+    Q_OBJECT
+public:
+    static bool wantIt(M1Store::Item_lv2* p_myself);
+
+    virtual QString getHtml();
+    TextLemma(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
+    // virtual QString displayText();
+    // virtual void paintEvent(QPaintEvent* p_event);
+};
+
+class TextWForm : public Interp
+{
+    Q_OBJECT
+public:
+    static bool wantIt(M1Store::Item_lv2* p_myself);
+
+    virtual QString getHtml();
+    TextWForm(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
+    // virtual QString displayText();
+    // virtual void paintEvent(QPaintEvent* p_event);
+};
+
 
 class SentenceInterp : public ChunkInterp
 {

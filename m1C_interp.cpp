@@ -150,7 +150,11 @@ M1MidPlane::Interp* M1MidPlane::Interp::getInterp(M1Store::Item_lv2* p_myself, Q
         l_ret = new HighlightInterp(p_myself, p_vb, p_parent, p_depth);
     else if(SlokaInterp::wantIt(p_myself))
         l_ret = new SlokaInterp(p_myself, p_vb, p_parent, p_depth);
-    else{ // HighlightQuotationInterp SlokaInterp
+    else if(TextLemma::wantIt(p_myself))
+        l_ret = new TextLemma(p_myself, p_vb, p_parent, p_depth);
+    else if(TextWForm::wantIt(p_myself))
+        l_ret = new TextWForm(p_myself, p_vb, p_parent, p_depth);
+    else{ // HighlightQuotationInterp SlokaInterp TextLemma TextWForm
         qCDebug(g_cat_interp_base) << "default Interp()";
         l_ret = new Interp(p_myself, p_vb, p_parent, p_depth);
     }
@@ -1079,6 +1083,42 @@ QStringList textOccData(M1Store::Item_lv2* p_occ){
     return l_ret;
 }
 
+QString lemma_html_fragment(M1Store::Item_lv2* p_lemma){
+    QString l_html;
+    if(p_lemma == nullptr)
+        return("<p>No Lemma</p>");
+
+    // qCDebug(g_cat_interp_base).noquote() << QString("l_lemma->text()") << l_lemma->text();
+    M1Store::Item_lv2* l_pos_lemma = p_lemma->find_edge(M1Env::ISA_SIID, M1Env::NLPOS_SIID, true);
+    l_html += QString("<p>Lemma: <b>%1</b> (%2)</p>\n")
+                  .arg(p_lemma->text())
+                  .arg(l_pos_lemma == nullptr ? "<No POS tag>" : l_pos_lemma->getTarget_lv2()->text());
+
+    l_html += "<p>Other occurrences of this Lemma:</p>\n";
+    l_html += "<table class=\"wb\" style=\"border: 1px solid black; border-collapse: collapse; font-size:smaller;\">\n";
+    qCDebug(g_cat_interp_dev).noquote() << QString("l_html") << l_html;
+    for(M1Store::Item_lv2_iterator l_it_1 = p_lemma->getIteratorTop(); !l_it_1.beyondEnd(); l_it_1.next())
+        if(l_it_1.at()->getTarget_lv2()->isOfType(M1Store::WFORM_SIID)){
+            M1Store::Item_lv2* l_form = l_it_1.at()->getTarget_lv2();
+            qCDebug(g_cat_interp_dev) << QString("l_form") << l_form->dbgShort();
+            for(M1Store::Item_lv2_iterator l_it_2 = l_form->getIteratorTop(); !l_it_2.beyondEnd(); l_it_2.next())
+                if(l_it_2.at()->getTarget_lv2()->isOfType(M1Store::OCCUR_SIID)){
+                    M1Store::Item_lv2* l_occ = l_it_2.at()->getTarget_lv2();
+                    QStringList l_occ_data = textOccData(l_occ);
+                    l_html += QString("<tr><td class=\"wb\">%1</td><td class=\"wb\">%2</td><td class=\"wb\">%3</td><td class=\"wb\" style=\"color: maroon;\">%4</td><td class=\"wb\">%5</td></tr>\n")
+                                  .arg(l_form->text())
+                                  .arg(l_occ_data[1])
+                                  .arg(l_occ_data[0])
+                                  .arg(l_occ_data[2])
+                                  .arg(l_occ_data[3]);
+                    qCDebug(g_cat_interp_dev) << QString("l_occ") << l_occ->dbgShort();
+                }
+        }
+
+    l_html += "</table>\n";
+    return l_html;
+}
+
 bool M1MidPlane::TextOccurrence::wantIt(M1Store::Item_lv2* p_myself){
     return p_myself->isFullEdge() && p_myself->getTarget_lv2()->isOfType(M1Env::OCCUR_SIID);
 }
@@ -1129,6 +1169,13 @@ QString M1MidPlane::TextOccurrence::getHtml(){
         l_html += "<p>No Lemma</p>";
     else{
         l_lemma = l_lemma->getTarget_lv2();
+        l_html += lemma_html_fragment(l_lemma);
+    }
+    /*
+    if(l_lemma == nullptr)
+        l_html += "<p>No Lemma</p>";
+    else{
+        l_lemma = l_lemma->getTarget_lv2();
         // qCDebug(g_cat_interp_base).noquote() << QString("l_lemma->text()") << l_lemma->text();
         M1Store::Item_lv2* l_pos_lemma = l_lemma->find_edge(M1Env::ISA_SIID, M1Env::NLPOS_SIID, true);
         l_html += QString("<p>Lemma: <b>%1</b> (%2)</p>\n")
@@ -1158,8 +1205,45 @@ QString M1MidPlane::TextOccurrence::getHtml(){
         }
 
     l_html += "</table>\n";
-
+    */
     return g_html_template.arg(l_html + "<hr/>\n" + base_html_fragment(m_myself, "TextOccurrence"));
+}
+
+//------------------------------------ TextLemma -----------------------------------------------------
+bool M1MidPlane::TextLemma::wantIt(M1Store::Item_lv2* p_myself){
+    return p_myself->isFullEdge() && p_myself->getTarget_lv2()->isOfType(M1Env::LEMMA_SIID);
+}
+
+QString M1MidPlane::TextLemma::getHtml(){
+    return g_html_template.arg(lemma_html_fragment(m_myself->getTarget_lv2()) + "<hr/>\n" + base_html_fragment(m_myself, "TextLemma"));
+}
+M1MidPlane::TextLemma::TextLemma(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth) : Interp(p_myself, p_vb, p_parent, p_depth){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("TextLemma Constructor from: %1").arg(p_myself->dbgShort()))
+    M1_FUNC_EXIT
+}
+
+//------------------------------------ TextLemma -----------------------------------------------------
+bool M1MidPlane::TextWForm::wantIt(M1Store::Item_lv2* p_myself){
+    return p_myself->isFullEdge() && p_myself->getTarget_lv2()->isOfType(M1Env::WFORM_SIID);
+}
+
+QString M1MidPlane::TextWForm::getHtml(){
+    M1Store::Item_lv2* l_pos_wform = m_myself->getTarget_lv2()->find_edge(M1Env::ISA_SIID, M1Env::NLPOS_SIID, true);
+    QString l_html = QString("<p>Word Form: <b>%1</b>%2</p>\n")
+                         .arg(m_myself->getTarget_lv2()->text())
+                         .arg(l_pos_wform == nullptr ? "" : QString(" (%1)").arg(l_pos_wform->getTarget_lv2()->text()));
+
+    M1Store::Item_lv2* l_lemma_edge = m_myself->getTarget_lv2()->find_edge(M1Env::BLNGS_SIID, M1Env::LEMMA_SIID);
+    if(l_lemma_edge == nullptr)
+        l_html += "<p>No Lemma</p>\n";
+    else
+        l_html += lemma_html_fragment(l_lemma_edge->getTarget_lv2());
+
+    return g_html_template.arg(l_html + "<hr/>\n" + base_html_fragment(m_myself, "TextWForm"));
+}
+M1MidPlane::TextWForm::TextWForm(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth) : Interp(p_myself, p_vb, p_parent, p_depth){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("TextWForm Constructor from: %1").arg(p_myself->dbgShort()))
+    M1_FUNC_EXIT
 }
 //------------------------------------ HighlightChunkInterp -----------------------------------------------------
 bool M1MidPlane::HighlightChunkInterp::wantIt(M1Store::Item_lv2* p_myself){
