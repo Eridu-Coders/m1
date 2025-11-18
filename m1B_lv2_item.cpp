@@ -8,9 +8,13 @@ Q_LOGGING_CATEGORY(g_cat_lv2_constructors, "lv2.constructors")
 Q_LOGGING_CATEGORY(g_cat_lv2_iterators, "lv2.iterators")
 
 // ---------------------------------- Constructors and instantiation from mmap() data -------------------------------------------
+/** \defgroup LV2 Level 2 Item - Class M1Store::Item_lv2
+ *  @{
+ */
 
 /**********************************************************/
 /** \defgroup I2Inst Item_lv2 Instantiation and destruction
+ *  \ingroup LV2
  *  @{
  */
 
@@ -239,8 +243,7 @@ M1Store::Item_lv2::~Item_lv2(){
 
     M1_FUNC_EXIT
 }
-/** @}*/
-// end \defgroup I2Inst
+/** @}*/ // end \defgroup I2Inst
 
 // ---------------------------------- Debug data -------------------------------------------
 /**
@@ -582,7 +585,7 @@ QString M1Store::Item_lv2::dbgHalf(){
 
 /*******************************************************************************/
 /** \defgroup LV2retLV2p Item_lv2 methods returning newly instanciated Item_lv2*
- *
+ *  \ingroup LV2
  *  Most of these methods can return a nullptr (if the underlying ItemID is G_VOID_ITEM_ID).
  *  As a result, they have to be called within if() constructs to properly treat this case (see e.g. recurGraph())
  *
@@ -788,9 +791,12 @@ bool M1Store::Item_lv2::isOfType(const Item_lv2* p_type_lv2) const{
     return l_ret;
 }
 /***********************************************************************************************************/
-/** \defgroup IOT2 Tests type values stored in Item_lv0::m_type AND ALSO the types embodied by ISA/ITO edges
+/** \defgroup IOT2 Type Testing (Both in Item_lv0::m_type and in ISA edges)
+ *  \ingroup LV2
+ *  Tests type values stored in Item_lv0::m_type AND ALSO the types embodied by ISA/ITO edges
  *  @{
  */
+
 /**
  * @brief M1Store::Item_lv2::isOfType
  * @param p_type_item_id
@@ -880,6 +886,7 @@ M1Env::SpecialItemID M1Store::Item_lv2::getIconSITypeID(){
 }
 /******************************************/
 /** \defgroup LITO linking items with edges
+ *  \ingroup LV2
  *
  * The new edge is positioned below p_edge_above if this parameter is provided or at the top if p_at_top is set.
  * In case of conflict between these 2 parameters, p_edge_above is given preference.
@@ -893,6 +900,7 @@ M1Env::SpecialItemID M1Store::Item_lv2::getIconSITypeID(){
  * top of the appropriate ring of the target element.
  * @{
  */
+
 /**
  * @brief link an item to another
  *
@@ -1415,6 +1423,8 @@ M1Store::Item_lv2* M1Store::Item_lv2::find_edge_target(const M1Env::SpecialItemI
     M1_FUNC_EXIT
     return l_ret;
 }
+
+/** @}*/ // end \defgroup LV2
 
 /***************************************/
 /**

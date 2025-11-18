@@ -799,11 +799,13 @@ void M1Store::Storage::loadIcons(){
 
     M1_FUNC_EXIT
 }
-void M1Store::Storage::appendDefaultIcon(){cm_type_icon.append(new QIcon("../m1_src/Icons/Folder.svg"));}
+
+void M1Store::Storage::appendDefaultIcon(){cm_type_icon.append(new QIcon(M1Env::FOLDER_ICON_PATH));}
+
 QIcon* M1Store::Storage::getQIcon(SpecialItemID p_si_id){
     M1_FUNC_ENTRY(g_cat_store, QString("Get Icon for [%1]").arg(getSpecialItemPointer(p_si_id)->mnemonic()))
 
-    static QIcon* l_unknown_icon = new QIcon("../m1_src/Icons/Unknown.svg");
+    static QIcon* l_unknown_icon = new QIcon(M1Env::UNKOWN_ICON_PATH);
 
     QIcon* l_ret = nullptr;
     if(p_si_id == M1Env::G_VOID_SI_ID)
@@ -1293,7 +1295,7 @@ void M1Store::Storage::saveUtilities(MDB_txn *p_txn){
 
         // get UTF8 version of string to store as a char* sequence
         QByteArray l_utf8_bytes = cm_icon_path[l_siid].toUtf8();
-        l_data.mv_size = l_utf8_bytes.length() + 1; // +1 so that the null termination character also stored
+        l_data.mv_size = l_utf8_bytes.length() + 1; // +1 so that the null termination character is also stored
         l_data.mv_data = l_utf8_bytes.data();
 
         // storing next string

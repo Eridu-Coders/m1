@@ -376,6 +376,7 @@ g_special_vertices = [
     # --------------------------- WROTE / WRTBY ---------------------------
     ['WROTE', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'TEXT_WROTE_ICON_PATH',      'TEXT_WROTE_SIID',
     ('WRTBY', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'TEXT_WRITTEN_BY_ICON_PATH', 'TEXT_WRITTEN_BY_SIID'), 'Special Vertex ID (Edge type) wrote / written by'],
+    # ---------------------------------------------------------------------
     ['OCCUR', ['SI_IS_TYPE', 'SI_EDGE_TYPE',
                'SI_IS_SPECIAL_EDGE'],                      'OCCURRENCE_ICON_PATH',      'OCCUR_SIID', None,      'Special Vertex ID (Edge type) of occurrence edges'],
     ['WFORM', 'SI_IS_TYPE | SI_IS_ICON_TYPE',              'WFORM_ICON_PATH',           'WFORM_SIID', None,      'Special Vertex ID (Vertex type) of word form vertices'],

@@ -8,16 +8,24 @@
 #include "m1A_env.h"
 #include "m1A_constants.h"
 
+// default inits for static members
 bool M1Env::M1EnvStatic::cm_block = false;
+QTextStream* M1Env::M1EnvStatic::cm_debug_stream = 0;
+QFile* M1Env::M1EnvStatic::cm_debug_file = 0;
+QString M1Env::M1EnvStatic::cm_normal_filter;
+/// stack to contain the nested categories of corresponding entry()/exit() pairs
+std::stack<QString> M1Env::M1EnvStatic::cm_current_category;
+int M1Env::M1EnvStatic::cm_depth = 0;
+QStringList M1Env::M1EnvStatic::cm_list_excluded_catergory_for_screen;
 
 /**
  * @brief M1Store::M1Env::myMessageHandler message handler callback for Qt debug infra
- * @param p_type log level
+ * @param p_type Qt log level (Debug/Warning/Critical/Fatal)
  * @param p_context function name, file, line, etc
- * @param p_msg the message
+ * @param p_msg the error message
  */
 void M1Env::M1EnvStatic::myMessageHandler(QtMsgType p_type, const QMessageLogContext &p_context, const QString & p_msg){
-    if( cm_block ) return;
+    if( M1Env::M1EnvStatic::cm_block ) return;
 
     sendToLogChannels(p_type,
                       p_msg,
@@ -25,40 +33,17 @@ void M1Env::M1EnvStatic::myMessageHandler(QtMsgType p_type, const QMessageLogCon
                       p_context.file,
                       p_context.line,
                       p_context.function);
-    /*
-    // Level message decoding
-    QString l_level;
-    if(p_type == QtDebugMsg) l_level = "Debug";
-    else if(p_type == QtWarningMsg) l_level = "Warning";
-    else if(p_type == QtCriticalMsg) l_level = "Critical";
-    else if(p_type == QtFatalMsg) l_level = "Fatal";
-
-    // remove double quotes from message if any (more double quotes will be added below)
-    QString l_msg = (p_msg.at(0) == '"' && p_msg.at(p_msg.length()-1) == '"') ? p_msg.sliced(1, p_msg.length()-2) : p_msg;
-
-    // CSV message
-    l_msg.replace("\"", "\"\""); // double quote escape
-    QString l_txt_csv = QString("\"%1\";\"%2\";\"%3\";\"%4\";\"%5\";\"%6\";\"%7\"")
-                            .arg(l_level, p_context.category, QDateTime::currentDateTime().toString("dd-MM-yyyy hh:mm:ss.zzz"))
-                            .arg(p_context.function, indentSpace() + l_msg)
-                            //.arg(p_context.function, indentSpace() + l_msg + QString(" [cm_depth = %1]").arg(cm_depth))
-                            .arg(p_context.file).arg(p_context.line);
-
-    // CSV message to stream
-    *cm_debug_stream << l_txt_csv << Qt::endl;
-
-    if(! cm_list_excluded_catergory_for_screen.contains(p_context.category)){
-        // message for screen debug
-        QString l_txt_screen = QString("[%1] [%2] %3 (%4 %5:%6) %7")
-                                   .arg(l_level, p_context.category, QDateTime::currentDateTime().toString("hh:mm:ss.zzz"))
-                                   .arg(p_context.file, p_context.function)
-                                   .arg(p_context.line).arg(l_msg);
-
-        // screen message to screen
-        std::cout << l_txt_screen.toStdString() << std::endl << std::flush;
-    }*/
 }
 
+/**
+ * @brief M1Env::M1EnvStatic::sendToLogChannels
+ * @param p_type
+ * @param p_msg
+ * @param p_cat
+ * @param p_file
+ * @param p_line
+ * @param p_func_deco
+ */
 void M1Env::M1EnvStatic::sendToLogChannels(QtMsgType p_type,
                                            const QString & p_msg,
                                            const QString & p_cat,
@@ -88,12 +73,6 @@ void M1Env::M1EnvStatic::sendToLogChannels(QtMsgType p_type,
 
     if(! cm_list_excluded_catergory_for_screen.contains(p_cat)){
         // message for screen debug
-        /*
-        QString l_txt_screen = QString("[%1] [%2] %3 (%4 %5:%6) %7")
-                                   .arg(l_level, p_cat, QDateTime::currentDateTime().toString("hh:mm:ss.zzz"))
-                                   .arg(p_file, p_func_deco)
-                                   .arg(p_line).arg(l_msg);
-        */
         QString l_txt_screen = QString("[%1] [%2] %3 (%4:%5) %6")
                                    .arg(l_level, p_cat, QDateTime::currentDateTime().toString("hh:mm:ss.zzz"))
                                    .arg(p_func_deco)
@@ -104,22 +83,13 @@ void M1Env::M1EnvStatic::sendToLogChannels(QtMsgType p_type,
     }
 }
 
-
-int M1Env::M1EnvStatic::cm_depth = 0;
-
-QStringList M1Env::M1EnvStatic::cm_list_excluded_catergory_for_screen;
-
 void M1Env::M1EnvStatic::addExcludeCatergoryForScreen(QString p_cat){
     cm_list_excluded_catergory_for_screen.append(p_cat);
 }
 
-
 QString M1Env::M1EnvStatic::indentSpace(){
     return QString("...").repeated(cm_depth) + QString("%1").arg(cm_depth, 2);
 }
-
-/// stack to contain the nested categories of corresponding entry()/exit() pairs
-std::stack<QString> M1Env::M1EnvStatic::cm_current_category;
 
 /**
  * @brief M1Env::M1EnvStatic::entry
@@ -209,8 +179,6 @@ void M1Env::M1EnvStatic::close(){
     cm_block = true;
 }
 
-QString M1Env::M1EnvStatic::cm_normal_filter;
-
 void M1Env::M1EnvStatic::setNormalFilter(const QString& p_filter){
     cm_normal_filter = p_filter;
     setSilentMode(false);
@@ -226,6 +194,3 @@ void M1Env::M1EnvStatic::setSilentMode(bool p_set){
         QLoggingCategory::setFilterRules(cm_normal_filter);
 }
 
-// default inits for static members
-QTextStream* M1Env::M1EnvStatic::cm_debug_stream = 0;
-QFile* M1Env::M1EnvStatic::cm_debug_file = 0;

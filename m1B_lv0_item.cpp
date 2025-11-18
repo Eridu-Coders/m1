@@ -177,6 +177,11 @@ QString M1Store::SpecialItem::dbgString() const {
 // ----------------------------- M1Store::Item -------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------
 
+/** \defgroup LV0 Level 0 Item - Class M1Store::Item_lv0
+ *  Tests whether an item is of a type contained in the m_type field (4x SpecialItemID)
+ *  @{
+ */
+
 /**
  * @brief get the ID of this Item
  * @return the ID
@@ -354,7 +359,9 @@ void M1Store::Item_lv0::setType_member_item_id(const M1Store::ItemID p_type_item
     M1_FUNC_EXIT
 }
 
-/** \defgroup IOT0 Only tests whether an item is of a type contained in the m_type field (4x SpecialItemID)
+/** \defgroup IOT0 Type Testing (only from m_type)
+ *  \ingroup LV0
+ *  Tests whether an item is of a type contained in the m_type field (4x SpecialItemID)
  *  @{
  */
 /**
@@ -1214,6 +1221,8 @@ QString M1Store::Item_lv0::dbgShort() const{
             return "";
     }
 }
+
+/** @} end group LV0 */
 
 // QDebug serialization : calls dbgString() for ItemType and SpecialItem, but dbgShort for Item_lv0
 QDebug operator<<(QDebug d, M1Store::ItemType p){return d << p.dbgString().toUtf8().constData();}

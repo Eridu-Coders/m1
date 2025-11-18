@@ -44,8 +44,8 @@ namespace M1Store{
         /// mnemonic --> special id and ItemID --> special id associative arrays
         static std::map<QString, SpecialItem*> cm_mnemonic_to_special;
         static std::map<ItemID, SpecialItem*> cm_item_id_to_special;
-        static char *cm_special_mmap_base;                  ///< base address of the mmapped space for special items(char* to make pointer arithmetic possible)
-        static char *cm_item_mmap_base;                     ///< base address of the mmapped space for items (char* to make pointer arithmetic possible)
+        static char *cm_special_mmap_base;                  ///< base address of the mmapped space for special items (type = char* to make pointer arithmetic possible)
+        static char *cm_item_mmap_base;                     ///< base address of the mmapped space for items (type = char* to make pointer arithmetic possible)
         static unsigned long cm_item_next_upper_excluded;   ///< Excluded upper bound for cm_next_item within this mmap() size
 
         /// special item ID --> icon vector

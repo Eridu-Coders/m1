@@ -8,6 +8,11 @@
 #include <stack>
 #include <exception>
 
+/**
+ * \defgroup EntryExit function Entry and Exit macros
+ * @ingroup DebugLog
+ * @{
+ */
 #ifndef QT_NO_DEBUG_OUTPUT
 #define M1_FUNC_ENTRY(a, b) M1Env::M1EnvStatic::entry(a, b, __FILE__, __LINE__, __PRETTY_FUNCTION__, __FUNCTION__);
 #define M1_FUNC_EXIT M1Env::M1EnvStatic::exit(__FILE__, __LINE__, __PRETTY_FUNCTION__, __FUNCTION__);
@@ -15,9 +20,13 @@
 #define M1_FUNC_ENTRY(a, b)
 #define M1_FUNC_EXIT
 #endif
+/**@}*/ //end of EntryExit
 
 namespace M1Env{
 
+/**
+ * @brief The M1Exception class
+ */
 class M1Exception : public std::exception{
 private:
     QString m_message;
@@ -33,6 +42,10 @@ public:
     virtual char* what(){return m_tmp.data();}
 };
 
+/**
+ * @brief The M1EnvStatic class
+ * @ingroup DebugLog
+ */
 class M1EnvStatic{
     private:
         // static variables for the CSV output

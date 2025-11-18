@@ -11,7 +11,7 @@ namespace M1Store{
 using namespace M1Env;
     // ----------------------------------------- ItemType ----------------------------------------------------
     /**
-     * @brief Union struct for Item types. Either 4 16-bit short types or an regular ItemID
+     * @brief Union struct for Item types. Either 4 16-bit short types or an regular (64-bit) ItemID
      */
     class ItemType{
         friend class Item_lv0;
@@ -234,16 +234,21 @@ using namespace M1Env;
     /**
      * @brief The Special Item class - Quick access for types, anchor nodes, etc - 32 bytes long.
      * Instances of this class live in the special items mmap() area
+     *
+     * @todo Remove m_si_id from SpecialItem and m_item_id from Item_lv0
+     * @todo bring m_mnemonic to 6 chars, to add \0 at the end
+     * @todo Add a string ID to SpecialItem, as a label
      */
     class SpecialItem{
     private:
         FlagField m_flags;                  ///< [8] flags
         ItemID m_item_id;                   ///< [8] ItemID of corresponding item (= G_VOID_ID if none)
         SpecialItemID m_si_id;              ///< [2] 16 bit special item id
-        char m_mnemonic[5];                 ///< [5] menmonic
         SpecialItemID m_si_id_reciprocal;   ///< [2] 16 bit special item id of the reciprocal type (for edge types only, SI_HAS_RECIPROCAL must be set)
-        StringID m_icon_path;               ///< [4] path to icon (stored in the general string table
-        char m_extra[3];                    ///< [3] extra data storage field (len = 3 to make total 32)
+        // StringID_16 m_icon_path;            ///< [2] path to icon (stored in the general string table)
+        // StringID m_icon_path;               ///< [4] path to icon (stored in the general string table)
+        char m_mnemonic[5];                 ///< [5] menmonic
+        char m_extra[7];                    ///< [5] extra data storage field (len = 3 to make total 32)
     public:
         static SpecialItem* cm_dummy;
         /**

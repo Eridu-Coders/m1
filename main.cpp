@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     l_desc.add_options()
         ("help,h", "produce help message")
         ("load-gita,g", "Load Bhagavad Gita test data")
-        ("load-plato,p", "Load The Republic of Plato")
+        ("load-plato,p", "Load The Republic of Plato test data")
         ("reset,r", "Reset (empty) storage")
     ;
 
