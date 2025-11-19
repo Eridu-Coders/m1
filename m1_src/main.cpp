@@ -169,7 +169,7 @@ int loadGita(){
     QMap<QString, M1Store::Item_lv2*> l_id_2_occ;
 
     // XMl input file
-    QFile l_fin_gita("../m1_src/BG12-TEI+.xml");
+    QFile l_fin_gita("../BG12-TEI+.xml");
     qCDebug(g_cat_main) << "Exists: " << l_fin_gita.exists();
 
     // the xml stream parse

@@ -628,7 +628,7 @@ if __name__ == '__main__':
     # print(l_declaration)
     # print(l_initialization)
 
-    with open('m1B_graph_init.h', 'w') as l_fout:
+    with open('src/m1B_graph_init.h', 'w') as l_fout:
         l_fout.write(g_declaration_template.replace('__EXTERN_DECL__', l_extern_declaration))
 
     # main code
@@ -1017,7 +1017,7 @@ if __name__ == '__main__':
     for l_ssid in l_attr_class_ssid_list:
         l_initialization += f'    M1Env::GraphInit::cm_gram_attr_list.append(M1Env::{l_ssid});\n'
 
-    with open('m1B_graph_init.cpp', 'w') as l_fout:
+    with open('src/m1B_graph_init.cpp', 'w') as l_fout:
         l_fout.write(g_implementation_template
                      .replace('__PSEUDO_DECLARE__', l_declaration.strip())
                      .replace('__PSEUDO_INIT__', l_initialization.strip())
@@ -1028,69 +1028,3 @@ if __name__ == '__main__':
     for l_count, l_mn in sorted([(l_mnemo_dict[l_mn], l_mn) for l_mn in l_mnemo_dict.keys()]):
         if l_count > 1:
             print(l_mn, l_count)
-
-    # Tags
-    #     for l_tag_key in g_nlp_tag_dict.keys():
-    #         l_mn = f'NT{l_tag_key.upper()}'
-    #         if len(l_mn) < 5:
-    #             l_mn = f'NTG{l_tag_key.upper()}'
-    #         print(f'{(l_mn, l_tag_key, g_nlp_tag_dict[l_tag_key])},')
-
-    # g_nlp_tag_dict = {
-    #     ".": "punctuation mark, sentence closer",
-    #     ",": "punctuation mark, comma",
-    #     "-LRB-": "left round bracket",
-    #     "-RRB-": "right round bracket",
-    #     "``": "opening quotation mark",
-    #     '""': "closing quotation mark",
-    #     "''": "closing quotation mark",
-    #     ":": "punctuation mark, colon or ellipsis",
-    #     "$": "symbol, currency",
-    #     "#": "symbol, number sign",
-    #     "AFX": "affix",
-    #     "CC": "conjunction, coordinating",
-    #     "CD": "cardinal number",
-    #     "DT": "determiner",
-    #     "EX": "existential there",
-    #     "FW": "foreign word",
-    #     "HYPH": "punctuation mark, hyphen",
-    #     "IN": "conjunction, subordinating or preposition",
-    #     "JJ": "adjective (English), other noun-modifier (Chinese)",
-    #     "JJR": "adjective, comparative",
-    #     "JJS": "adjective, superlative",
-    #     "LS": "list item marker",
-    #     "MD": "verb, modal auxiliary",
-    #     "NIL": "missing tag",
-    #     "NN": "noun, singular or mass",
-    #     "NNP": "noun, proper singular",
-    #     "NNPS": "noun, proper plural",
-    #     "NNS": "noun, plural",
-    #     "PDT": "predeterminer",
-    #     "POS": "possessive ending",
-    #     "PRP": "pronoun, personal",
-    #     "PRP$": "pronoun, possessive",
-    #     "RB": "adverb",
-    #     "RBR": "adverb, comparative",
-    #     "RBS": "adverb, superlative",
-    #     "RP": "adverb, particle",
-    #     "TO": 'infinitival "to"',
-    #     "UH": "interjection",
-    #     "VB": "verb, base form",
-    #     "VBD": "verb, past tense",
-    #     "VBG": "verb, gerund or present participle",
-    #     "VBN": "verb, past participle",
-    #     "VBP": "verb, non-3rd person singular present",
-    #     "VBZ": "verb, 3rd person singular present",
-    #     "WDT": "wh-determiner",
-    #     "WP": "wh-pronoun, personal",
-    #     "WP$": "wh-pronoun, possessive",
-    #     "WRB": "wh-adverb",
-    #     "SP": "space (English), sentence-final particle (Chinese)",
-    #     "ADD": "email",
-    #     "NFP": "superfluous punctuation",
-    #     "GW": "additional word in multi-word expression",
-    #     "XX": "unknown",
-    #     "BES": 'auxiliary "be"',
-    #     "HVS": 'forms of "have"',
-    #     "_SP": "whitespace"
-    # }

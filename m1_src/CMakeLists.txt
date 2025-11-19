@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.16)
 
 project(m1 VERSION 0.1 LANGUAGES CXX)
 
@@ -12,12 +12,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Qt6 REQUIRED COMPONENTS Core)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
-find_package(GTest REQUIRED)
 find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
 find_package(Qt6 REQUIRED COMPONENTS WebEngineWidgets)
 find_package(Qt6 REQUIRED COMPONENTS Core)
 
 set(PROJECT_SOURCES
+        main.cpp
         m1A_constants.h
         m1A_env.h
         m1A_env.cpp
@@ -31,23 +31,23 @@ set(PROJECT_SOURCES
         m1B_lv1_item.cpp
         m1B_lv2_item.h
         m1B_lv2_item.cpp
-        m1C_interp.h 
+        m1C_interp.h
         m1C_interp.cpp
         m1D_main_window.h
         m1D_main_window.cpp
         m1D_tree_display.h
         m1D_tree_display.cpp
-        main.cpp
+        m1D_passages_panel.h
+        m1D_passages_panel.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(m1
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        m1D_passages_panel.h m1D_passages_panel.cpp
     )
 # Define target properties for Android with Qt 6 as:
-#    set_property(TARGET m1 APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
+#    set_property(TARGET m1_src APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
 #                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
 # For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
 else()
@@ -64,14 +64,14 @@ else()
     endif()
 endif()
 
-target_link_libraries(m1 PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6::WebEngineWidgets gtest gtest_main lmdb ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(m1 PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6::WebEngineWidgets lmdb ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 target_link_libraries(m1 PRIVATE Qt6::Core)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
 if(${QT_VERSION} VERSION_LESS 6.1.0)
-  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.m1)
+  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.m1_src)
 endif()
 set_target_properties(m1 PROPERTIES
     ${BUNDLE_ID_OPTION}
