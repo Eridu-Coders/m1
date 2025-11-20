@@ -18,7 +18,7 @@ void M1Store::Item_lv1::initializeMembers(){
 
 void M1Store::Item_lv1::setFlags(const FlagField p_flags, const bool p_force_init){
     M1_FUNC_ENTRY(g_cat_lv1_members, "Entry")
-    M1Store::Item_lv0::setFlags(p_flags, p_force_init);
+    M1Store::Item_lv0::setFlags_lv0(p_flags, p_force_init);
     M1_FUNC_EXIT
 }
 void M1Store::Item_lv1::setFlag(const FlagField p_flag, const bool p_force_init){
@@ -45,7 +45,7 @@ void M1Store::Item_lv1::setType_member_item_id(const ItemID p_type_item_id){
 
 void M1Store::Item_lv1::setFlagsExtra(const FlagField p_flags){
     M1_FUNC_ENTRY(g_cat_lv1_members, "Entry")
-    M1Store::Item_lv0::setFlagsExtra(p_flags);
+    M1Store::Item_lv0::setFlagsExtra_lv0(p_flags);
     M1_FUNC_EXIT
 }
 void M1Store::Item_lv1::setFlagExtra(const FlagField p_flag){
@@ -61,58 +61,58 @@ void M1Store::Item_lv1::unSetFlagExtra(const FlagField p_flag){
 
 void M1Store::Item_lv1::setOrigin(const ItemID p_origin){
     M1_FUNC_ENTRY(g_cat_lv1_members, "Entry")
-    M1Store::Item_lv0::setOrigin(p_origin);
+    M1Store::Item_lv0::setOrigin_lv0(p_origin);
     M1_FUNC_EXIT
 }
 void M1Store::Item_lv1::setTarget(const ItemID p_target){
     M1_FUNC_ENTRY(g_cat_lv1_members, "Entry")
-    M1Store::Item_lv0::setTarget(p_target);
+    M1Store::Item_lv0::setTarget_lv0(p_target);
     M1_FUNC_EXIT
 }
 void M1Store::Item_lv1::setPrevious(const ItemID p_previous){
     M1_FUNC_ENTRY(g_cat_lv1_members, "Entry")
-    M1Store::Item_lv0::setPrevious(p_previous);
+    M1Store::Item_lv0::setPrevious_lv0(p_previous);
     M1_FUNC_EXIT
 }
 void M1Store::Item_lv1::setNext(const ItemID p_next){
     M1_FUNC_ENTRY(g_cat_lv1_members, "Entry")
-    M1Store::Item_lv0::setNext(p_next);
+    M1Store::Item_lv0::setNext_lv0(p_next);
     M1_FUNC_EXIT
 }
 void M1Store::Item_lv1::setReciprocal(const ItemID p_reciprocal){
     M1_FUNC_ENTRY(g_cat_lv1_members, "Entry")
-    M1Store::Item_lv0::setReciprocal(p_reciprocal);
+    M1Store::Item_lv0::setReciprocal_lv0(p_reciprocal);
     M1_FUNC_EXIT
 }
 void M1Store::Item_lv1::setFirstEdge(const ItemID p_first_edge){
     M1_FUNC_ENTRY(g_cat_lv1_members, "Entry")
-    M1Store::Item_lv0::setFirstEdge(p_first_edge);
+    M1Store::Item_lv0::setFirstEdge_lv0(p_first_edge);
     M1_FUNC_EXIT
 }
 void M1Store::Item_lv1::setAutoEdge(const ItemID p_first_edge){
     M1_FUNC_ENTRY(g_cat_lv1_members, "Entry")
-    M1Store::Item_lv0::setAutoEdge(p_first_edge);
+    M1Store::Item_lv0::setAutoEdge_lv0(p_first_edge);
     M1_FUNC_EXIT
 }
 void M1Store::Item_lv1::setFirstEdgeSpecial(const ItemID p_first_edge_special){
     M1_FUNC_ENTRY(g_cat_lv1_members, "Entry")
-    M1Store::Item_lv0::setFirstEdgeSpecial(p_first_edge_special);
+    M1Store::Item_lv0::setFirstEdgeSpecial_lv0(p_first_edge_special);
     M1_FUNC_EXIT
 }
 void M1Store::Item_lv1::setCreationDate(const QDateTime& p_date){
     M1_FUNC_ENTRY(g_cat_lv1_members, "Entry")
-    M1Store::Item_lv0::setCreationDate(p_date);
+    M1Store::Item_lv0::setCreationDate_lv0(p_date);
     M1_FUNC_EXIT
 }
 void M1Store::Item_lv1::setLastmodDate(const QDateTime& p_date){
     M1_FUNC_ENTRY(g_cat_lv1_members, "Entry")
-    M1Store::Item_lv0::setLastmodDate(p_date);
+    M1Store::Item_lv0::setLastmodDate_lv0(p_date);
     M1_FUNC_EXIT
 }
 
 void M1Store::Item_lv1::setIncomingEdges(const ItemCounter p_incoming_edges){
     M1_FUNC_ENTRY(g_cat_lv1_members, "Entry")
-    M1Store::Item_lv0::setIncomingEdges(p_incoming_edges);
+    M1Store::Item_lv0::setIncomingEdges_lv0(p_incoming_edges);
     M1_FUNC_EXIT
 }
 void M1Store::Item_lv1::addIncomingEdges(const ItemCounter p_add){
@@ -123,6 +123,6 @@ void M1Store::Item_lv1::addIncomingEdges(const ItemCounter p_add){
 
 void M1Store::Item_lv1::setText(const QString& p_text){
     M1_FUNC_ENTRY(g_cat_lv1_members, "Entry")
-    M1Store::Item_lv0::setText(p_text);
+    M1Store::Item_lv0::setText_lv0(p_text);
     M1_FUNC_EXIT
 }

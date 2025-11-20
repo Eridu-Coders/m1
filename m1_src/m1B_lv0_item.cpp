@@ -20,11 +20,11 @@ Q_LOGGING_CATEGORY(g_cat_lv0_special_item, "lv0.special_item")
 // --------------------------------------------------------------------------------------------------------
 
 /**
- * @brief Constructor 2 - set all 4 short types at once
- * @param p_0 4 types
- * @param p_1 4 types
- * @param p_2 4 types
- * @param p_3 4 types
+ * @brief Constructor 3 - set all 4 short types at once
+ * @param p_0 4 SpecialItemID to be assigned to thes slot
+ * @param p_1 4 SpecialItemID to be assigned to thes slot
+ * @param p_2 4 SpecialItemID to be assigned to thes slot
+ * @param p_3 4 SpecialItemID to be assigned to thes slot
  */
 M1Store::ItemType::ItemType(const SpecialItemID p_0, const SpecialItemID p_1, const SpecialItemID p_2, const SpecialItemID p_3) {
     t.m_type_short[0] = p_0;
@@ -60,36 +60,6 @@ M1Store::SpecialItemID M1Store::ItemType::getSpecialType(const unsigned int p_in
 
     M1_FUNC_EXIT
     return t.m_type_short[p_index];
-}
-
-/**
- * @brief low-level debug representation
- * @return the debug string
- */
-QString M1Store::ItemType::dbgString() const{
-    return QString("4s[0x%1 0x%2 0x%3 0x%4]-id[0x%7 %8]")
-        .arg(t.m_type_short[0], 4, 16, QLatin1Char('0'))
-        .arg(t.m_type_short[1], 4, 16, QLatin1Char('0'))
-        .arg(t.m_type_short[2], 4, 16, QLatin1Char('0'))
-        .arg(t.m_type_short[3], 4, 16, QLatin1Char('0'))
-        .arg(t.m_type_item, 16, 16, QLatin1Char('0'))
-        .arg(t.m_type_item);
-}
-
-/**
- * @brief Human readable debug string
- * @return
- */
-QString M1Store::ItemType::dbgStringHr(bool p_is_item_id) const{
-    if(p_is_item_id)
-        return QString("<II %1>").arg(Item_lv2::getExisting(t.m_type_item)->text());
-    else
-        return QString("<4SI %1/%2/%3/%4>")
-            .arg(t.m_type_short[0] == M1Env::G_VOID_SI_ID ? "" : Storage::getSpecialItemPointer(t.m_type_short[0])->mnemonic())
-            .arg(t.m_type_short[1] == M1Env::G_VOID_SI_ID ? "" : Storage::getSpecialItemPointer(t.m_type_short[1])->mnemonic())
-            .arg(t.m_type_short[2] == M1Env::G_VOID_SI_ID ? "" : Storage::getSpecialItemPointer(t.m_type_short[2])->mnemonic())
-            .arg(t.m_type_short[3] == M1Env::G_VOID_SI_ID ? "" : Storage::getSpecialItemPointer(t.m_type_short[3])->mnemonic())
-            .replace("<4SI >", "<4SI None>");
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -153,6 +123,41 @@ void M1Store::SpecialItem::setAttr(const ItemID p_item_id, const SpecialItemID p
 // ---------------------------------------------------------------------------------------------------------
 // ----------------------------- Debug ---------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------
+
+/** \defgroup DebugLv0 Level 0 Debug messages
+ *  @ingroup DebugLog
+ * @{
+ */
+
+/**
+ * @brief low-level debug representation
+ * @return the debug string
+ */
+QString M1Store::ItemType::dbgString() const{
+    return QString("4s[0x%1 0x%2 0x%3 0x%4]-id[0x%7 %8]")
+    .arg(t.m_type_short[0], 4, 16, QLatin1Char('0'))
+        .arg(t.m_type_short[1], 4, 16, QLatin1Char('0'))
+        .arg(t.m_type_short[2], 4, 16, QLatin1Char('0'))
+        .arg(t.m_type_short[3], 4, 16, QLatin1Char('0'))
+        .arg(t.m_type_item, 16, 16, QLatin1Char('0'))
+        .arg(t.m_type_item);
+}
+
+/**
+ * @brief Human readable debug string
+ * @return
+ */
+QString M1Store::ItemType::dbgStringHr(bool p_is_item_id) const{
+    if(p_is_item_id)
+        return QString("<II %1>").arg(Item_lv2::getExisting(t.m_type_item)->text());
+    else
+        return QString("<4SI %1/%2/%3/%4>")
+            .arg(t.m_type_short[0] == M1Env::G_VOID_SI_ID ? "" : Storage::getSpecialItemPointer(t.m_type_short[0])->mnemonic())
+            .arg(t.m_type_short[1] == M1Env::G_VOID_SI_ID ? "" : Storage::getSpecialItemPointer(t.m_type_short[1])->mnemonic())
+            .arg(t.m_type_short[2] == M1Env::G_VOID_SI_ID ? "" : Storage::getSpecialItemPointer(t.m_type_short[2])->mnemonic())
+            .arg(t.m_type_short[3] == M1Env::G_VOID_SI_ID ? "" : Storage::getSpecialItemPointer(t.m_type_short[3])->mnemonic())
+            .replace("<4SI >", "<4SI None>");
+}
 
 /**
  * @brief Debug string of the form <si id> <mnemonic> <item id> <flags (in binary)> (+ the mnemonic of the reciprocal, if any)
@@ -272,6 +277,10 @@ QString M1Store::Item_lv0::dbgTypeShort() const{
     }
 }
 
+/**
+ * @brief M1Store::Item_lv0::dbgShort
+ * @return short debug string
+ */
 QString M1Store::Item_lv0::dbgShort() const{
     switch(flags() & ITEM_NATURE_MASK){
     case FULL_VERTEX:
@@ -304,3 +313,4 @@ QDebug operator<<(QDebug d, M1Store::Item_lv0* p){return d << p->dbgShort().toUt
 QDebug operator<<(QDebug d, M1Store::SpecialItem p){return d << p.dbgString().toUtf8().constData();}
 QDebug operator<<(QDebug d, M1Store::SpecialItem* p){return d << p->dbgString().toUtf8().constData();}
 
+/**@}*/ //end of DebugLv0
