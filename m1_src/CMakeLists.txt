@@ -27,6 +27,7 @@ set(PROJECT_SOURCES
         m1B_store.cpp
         m1B_lv0_item.h
         m1B_lv0_item.cpp
+        m1B_lv0_item_members.cpp
         m1B_lv1_item.h
         m1B_lv1_item.cpp
         m1B_lv2_item.h
