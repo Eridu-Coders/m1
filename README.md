@@ -71,7 +71,7 @@ To generate the documentation with [Doxygen](https://en.wikipedia.org/wiki/Doxyg
 ```
 doxygen Doxyfile
 ```
-from the project Root directory. The creates the directory `Doc`. Load the file `Doc/html/index.htm` to view the documentation.
+from the project Root directory. The creates the directory `Doc`. Load the file `Doc/html/index.htm` into your browser to view the documentation.
 
 
 ![](https://github.com/Eridu-Coders/m1/blob/main/ShankhaChakra.png?raw=true)
