@@ -67,7 +67,7 @@ This will load the sample data from the _Baghad Gita_ and Plato's _Republic_. Af
 
 # Documentation
 
-To generate the documentation with Doxygen, make sure it is installed (`sudo apt install doxygen`), and then run:
+To generate the documentation with [Doxygen](https://en.wikipedia.org/wiki/Doxygen), make sure it is installed (`sudo apt install doxygen`), and then run:
 ```
 doxygen Doxyfile
 ```
