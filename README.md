@@ -1,11 +1,11 @@
-![](https://github.com/Eridu-Coders/m1/blob/main/ShankhaChakra.png?raw=true)
+![](https://github.com/Eridu-Coders/m1/blob/main/img/ShankhaChakra.png?raw=true)
 # Introduction
 
 This project, which is still unnamed, aims to create a software suite to help the Vaishnava scholar write _Bhashyas_ (commentaries) on ancient texts. Specifically, the goal is to preserve the links inherent in the quotations within each _Bhashya_ while retaining the ease of use of WYSIWIG tools like Microsoft Word and other wordprocessors.
 
 At its core is a graph database (NOSQL) which is a natural fit for the graph of quotations inherent in all _Bhashyas_ taken as a whole. The interface gives access to the texts both in a graph-structured way (left-hand panel on the screenshot below) and in a WYSIWIG fashion (right-hand panel).
 
-![](https://github.com/Eridu-Coders/m1/blob/main/m1_Screenshot_01.png?raw=true)
+![](https://github.com/Eridu-Coders/m1/blob/main/img/m1_Screenshot_01.png?raw=true)
 
 # Naming
 
@@ -52,7 +52,7 @@ git clone https://github.com/Eridu-Coders/m1.git
 
 Load the project (the `CMakeLists.txt` file) into the _Qt Creator_ IDE and launch the compilation from there, in Debug (many runtime messages) or Release mode (faster). In Release mode, the option `-DQT_NO_DEBUG_OUTPUT` in `CMAKE_CXX_FLAGS` should be added to the options list in advanced mode ("Projects" tab of the IDE), to disable the runtime messages.
 
-![](https://github.com/Eridu-Coders/m1/blob/main/m1_Screenshot_02.png?raw=true)
+![](https://github.com/Eridu-Coders/m1/blob/main/img/m1_Screenshot_02.png?raw=true)
 
 Also, make sure that the build directories are at the same level as `m1_src`, so that the executables can access the icon `svg` files within that directory.
 
