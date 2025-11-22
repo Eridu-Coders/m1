@@ -73,5 +73,10 @@ doxygen Doxyfile
 ```
 from the project Root directory. The creates the directory `Doc`. Load the file `Doc/html/index.htm` into your browser to view the documentation.
 
+# Data Model
+
+m1 graph database is organized according to the following model:
+
+![](https://github.com/Eridu-Coders/m1/blob/main/img/model.png?raw=true)
 
 ![](https://github.com/Eridu-Coders/m1/blob/main/ShankhaChakra.png?raw=true)
