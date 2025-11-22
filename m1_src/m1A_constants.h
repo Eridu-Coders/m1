@@ -228,4 +228,112 @@ Q_DECLARE_LOGGING_CATEGORY(g_cat_main)                  ///< messages from main 
 
 /**@}*/ //end of DebugLog
 
+/** \defgroup LV0 Level 0 Item - Class M1Store::Item_lv0 and others
+ *
+ *  Base storage level. Data as stored in the mmap() areas.
+ */
+
+// ---------------------------------- Constructors and instantiation from mmap() data -------------------------------------------
+/** \defgroup LV1 Level 1 Item - Class M1Store::Item_lv1
+ *
+ *  Data Store integrity maintenance level. This level takes care of the archive-logs which are replayed in case of a crash. Some higher level methodes
+ *  are alson taken care of at that level. There are no private members in M1Store::Item_lv1. The data it handles is still the same as M1Store::Item_lv0
+ */
+
+// ---------------------------------- Constructors and instantiation from mmap() data -------------------------------------------
+/** \defgroup LV2 Level 2 Item - Class M1Store::Item_lv2 + Iterastors
+ *
+ *  Graph manipulation API provided to the rest of the system. There are no private members in M1Store::Item_lv2.
+ *  The data it handles is still the same as in M1Store::Item_lv0 and M1Store::Item_lv1 (the 128 byte long union which lives in the mmap() area).
+ *
+ *  This clas cooperates with M1Store::Storage for the creation of new Items.
+ */
+
+/** \mainpage The M1 Project
+ * \image html ShankhaChakra.png
+ * # Introduction
+ *
+ * This project, which is still unnamed, aims to create a software suite to help the Vaishnava scholar write _Bhashyas_
+ * (commentaries) on ancient texts. Specifically, the goal is to preserve the links inherent in the quotations within
+ * each _Bhashya_ while retaining the ease of use of WYSIWIG tools like Microsoft Word and other wordprocessors.
+ *
+ * At its core is a graph database (NOSQL) which is a natural fit for the graph of quotations inherent in all _Bhashyas_
+ * taken as a whole. The interface gives access to the texts both in a graph-structured way (left-hand panel on the
+ * screenshot below) and in a WYSIWIG fashion (right-hand panel).
+ *
+ * \image html m1_Screenshot_01.png
+ *
+ * # Installation
+ *
+ * # Naming
+ *
+ * For the moment, the software goes under the temporary moniker "m1". In due course, a suitable name should be chosen.
+ *
+ * # Installation
+ *
+ * ## Prerequisites
+ *
+ * Linux is strongly recommended as a development platform for m1; Specifically [Ubuntu](https://en.wikipedia.org/wiki/Ubuntu)
+ * or its derivatives ([mint](https://en.wikipedia.org/wiki/Linux_Mint), etc.)
+ *
+ * ### Lmdb
+ *
+ * [Lmdb](https://en.wikipedia.org/wiki/Lightning_Memory-Mapped_Database) is a widely used key/value dabase library with
+ * C++ bindings. On Ubuntu, and Ubuntu-derived, Linux distributions, Lmdb installation is done with:
+ * ```
+ * sudo apt install liblmdb-dev
+ * ```
+ * m1 uses Lmdb to store ancillary data and strings. Its main storage space uses the same memory-mapped OS
+ * feature as Lmdb, but not Lmdb itself.
+ *
+ * ### Boost
+ *
+ * [Boost](https://en.wikipedia.org/wiki/Boost_(C%2B%2B_libraries)) is a widely used general-purpose set of C++
+ * libraries. On Ubuntu, and Ubuntu-derived, Linux distributions, Boost installation is done with:
+ * ```
+ * sudo apt install libboost-all-dev
+ * ```
+ *
+ * ### Qt
+ *
+ * [Qt](https://en.wikipedia.org/wiki/Qt_(software)) is a widely used GUI library for C++. In fact it is more
+ * than just a GUI toolkit and includes an entire development environment complete with several IDE interfaces
+ * and even extensions to the C++ language itself (the so-called "[signals and slots](https://en.wikipedia.org/wiki/Signals_and_slots)").
+ *
+ * Qt has both a paid and an open-source version. The latter can be downloaded from [the company's website](https://www.qt.io/download-open-source).
+ *
+ * **CAUTION**: Qt's regional mirrors are not always reliable (especially in India), and one of the better ones, from the US or
+ * Europe, should sometimes be manually chosen (as a CMD line option passed to the installer).
+ * See [this page](https://download.qt.io/static/mirrorlist/mirmon/) or [this one](https://download.qt.io/static/mirrorlist/) for a list of Qt mirrors.
+ * ## Source Download
+ *
+ * As usual with any GitHub repo:
+ * ```
+ * git clone https://github.com/Eridu-Coders/m1.git
+ * ```
+ *
+ * ## m1 Compilation
+ *
+ * Load the project (the `CMakeLists.txt` file) into the _Qt Creator_ IDE and launch the compilation from there,
+ * in Debug (many runtime messages) or Release mode (faster). In Release mode, the option `-DQT_NO_DEBUG_OUTPUT`
+ * in `CMAKE_CXX_FLAGS` should be added to the options list in advanced mode ("Projects" tab of the IDE), to disable the runtime messages.
+ *
+ * \image html m1_Screenshot_02.png
+ *
+ * Also, make sure that the build directories are at the same level as `m1_src`, so that the executables can access the
+ * icon `svg` files within that directory.
+ *
+ * Launch the application with the command (in the Debug or Release build directory):
+ * ```
+ * ./m1 -rpg
+ * ```
+ *
+ * This will load the sample data from the _Baghad Gita_ and Plato's _Republic_. Afterwards, the application can be re-launched without
+ * the load process (and therefore without erasing your data) with:
+ * ```
+ * ./m1
+ * ```
+ *
+ * \image html ShankhaChakra.png
+ */
 #endif // M1_CONSTANTS_H

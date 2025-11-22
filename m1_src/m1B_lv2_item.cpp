@@ -7,11 +7,6 @@ Q_LOGGING_CATEGORY(g_cat_lv2_members, "lv2.members_access")
 Q_LOGGING_CATEGORY(g_cat_lv2_constructors, "lv2.constructors")
 Q_LOGGING_CATEGORY(g_cat_lv2_iterators, "lv2.iterators")
 
-// ---------------------------------- Constructors and instantiation from mmap() data -------------------------------------------
-/** \defgroup LV2 Level 2 Item - Class M1Store::Item_lv2
- *  @{
- */
-
 /**********************************************************/
 /** \defgroup I2Inst Item_lv2 Instantiation and destruction
  *  \ingroup LV2
@@ -33,7 +28,7 @@ M1Store::Item_lv2* M1Store::Item_lv2::getNew(const FlagField p_flags, const Item
                                               .arg(p_flags, 64, 2, QLatin1Char('0'))               // %1
                                               .arg(p_type.dbgStringHr(p_flags & TYPE_IS_ITEM_ID))) // %2
 
-    M1Store::Item_lv2* l_item_lv2 = static_cast<Item_lv2*>(M1Store::Storage::getNewItemPointer_lv0(p_flags, p_type));
+    M1Store::Item_lv2* l_item_lv2 = static_cast<Item_lv2*>(M1Store::Storage::getNewItemPointer_lv1(p_flags, p_type));
     // build default edges
     l_item_lv2->defaultEdges();
 
@@ -60,8 +55,8 @@ void M1Store::Item_lv2::defaultEdges(){
                                                                   G_VOID_SI_ID,
                                                                   G_VOID_SI_ID));
         // loops onto this vertex
-        l_auto_edge->setTarget(item_id());
-        l_auto_edge->setOrigin(item_id());
+        l_auto_edge->setTarget_lv1(item_id());
+        l_auto_edge->setOrigin_lv1(item_id());
 
         // it is the first edge so it links to itself
         // !! no longer needed bc done by default below !!
@@ -69,8 +64,8 @@ void M1Store::Item_lv2::defaultEdges(){
         // l_auto_edge->setNext(l_auto_edge->item_id());
 
         // attach this edge as the first ordinary one
-        this->setFirstEdge(l_auto_edge->item_id());
-        this->setAutoEdge(l_auto_edge->item_id());
+        this->setFirstEdge_lv1(l_auto_edge->item_id());
+        this->setAutoEdge_lv1(l_auto_edge->item_id());
 
         qCDebug(g_cat_lv2_constructors) << QString("created edge: %1").arg(l_auto_edge->dbgShort());
         // create type edges if required
@@ -99,8 +94,8 @@ void M1Store::Item_lv2::loopNextPrevious(){
     M1_FUNC_ENTRY(g_cat_lv2_constructors, QString("Loop back previous/next onto itself ID=[%1]").arg(item_id()))
     Q_ASSERT_X((flags() & ITEM_NATURE_MASK) == FULL_EDGE || (flags() & ITEM_NATURE_MASK) == SIMPLE_EDGE,
                "Item_lv2::loopNextPrevious()", "not edge (full or simple)");
-    this->setPrevious(this->item_id());
-    this->setNext(this->item_id());
+    this->setPrevious_lv1(this->item_id());
+    this->setNext_lv1(this->item_id());
     M1_FUNC_EXIT
 }
 /**
@@ -151,7 +146,7 @@ M1Store::Item_lv2* M1Store::Item_lv2::getNew(const FlagField p_flags, const char
     
     M1Store::Item_lv2* l_item_lv2 = getNew(p_flags, M1Store::ItemType());
     qCDebug(g_cat_lv2_constructors) << QString("Setting text to: %1").arg(p_label);
-    l_item_lv2->setText(p_label);
+    l_item_lv2->setText_lv1(p_label);
 
     qCDebug(g_cat_lv2_constructors) << QString("New: %1").arg(l_item_lv2->dbgShort());
     M1_FUNC_EXIT
@@ -207,7 +202,7 @@ M1Store::Item_lv2* M1Store::Item_lv2::getExisting(const ItemID p_item_id){
     Item_lv2* l_ret = nullptr;
     // p_item_id can be G_VOID_ITEM_ID
     if(p_item_id != G_VOID_ITEM_ID){
-        l_ret = static_cast<Item_lv2*>(M1Store::Storage::getItemPointer_lv0(p_item_id));
+        l_ret = static_cast<Item_lv2*>(M1Store::Storage::getItemPointer_lv1(p_item_id));
         qCDebug(g_cat_lv2_constructors) << QString("Existing: %1").arg(l_ret->dbgShort());
     }
     M1_FUNC_EXIT
@@ -924,8 +919,8 @@ M1Store::Item_lv2* M1Store::Item_lv2::linkTo(Item_lv2* p_target, const SpecialIt
     // the new edge from this item to the target
     M1Store::Item_lv2* l_new_edge =
         getNew(FULL_EDGE, M1Store::ItemType(p_type_edge));
-    l_new_edge->setTarget(p_target->item_id());
-    l_new_edge->setOrigin(this->item_id());
+    l_new_edge->setTarget_lv1(p_target->item_id());
+    l_new_edge->setOrigin_lv1(this->item_id());
 
     // creation of a reciprocal edge if necessary
     if(M1Store::Storage::getSpecialItemPointer(p_type_edge)->flags() & SI_HAS_RECIPROCAL){
@@ -933,12 +928,12 @@ M1Store::Item_lv2* M1Store::Item_lv2::linkTo(Item_lv2* p_target, const SpecialIt
         SpecialItemID l_reciprocal_type_si_id = M1Store::Storage::getSpecialItemPointer(p_type_edge)->reciprocalSpecialId();
         M1Store::Item_lv2* l_new_edge_reciprocal =
             getNew(FULL_EDGE, M1Store::ItemType(l_reciprocal_type_si_id));
-        l_new_edge_reciprocal->setOrigin(p_target->item_id());
-        l_new_edge_reciprocal->setTarget(this->item_id());
+        l_new_edge_reciprocal->setOrigin_lv1(p_target->item_id());
+        l_new_edge_reciprocal->setTarget_lv1(this->item_id());
 
         // mutual reciprocal hook-up of the 2 edges
-        l_new_edge->setReciprocal(l_new_edge_reciprocal->item_id());
-        l_new_edge_reciprocal->setReciprocal(l_new_edge->item_id());
+        l_new_edge->setReciprocal_lv1(l_new_edge_reciprocal->item_id());
+        l_new_edge_reciprocal->setReciprocal_lv1(l_new_edge->item_id());
 
         qCDebug(g_cat_lv2_members) << QString("Reciprocal edge created: %1 --> %2")
                                           .arg(l_new_edge->dbgTypeShort())
@@ -989,7 +984,7 @@ M1Store::Item_lv2* M1Store::Item_lv2::create_descendant(
     // the new vertex
     M1Store::Item_lv2* l_new_vertex =
         getNew(M1Store::FULL_VERTEX, M1Store::ItemType(p_vertex_type));
-    l_new_vertex->setText(p_label);
+    l_new_vertex->setText_lv1(p_label);
 
     // link this to it
     // unless it is an ITO from this vertex down to the new one and this is the type vertex corresponding to p_vertex_type
@@ -1024,7 +1019,7 @@ bool M1Store::Item_lv2::setField(const QString& p_content,
 
     if(p_force_new || l_field_edge == nullptr){
         l_field_edge = getNew(M1Env::SIMPLE_EDGE, M1Store::ItemType(p_field_type_si->specialId()));
-        l_field_edge->setOrigin(this->item_id());
+        l_field_edge->setOrigin_lv1(this->item_id());
         // below AUTO edge
         this->installFullEdge(l_field_edge, G_VOID_SI_ID, nullptr, false);
     }
@@ -1063,7 +1058,7 @@ M1Store::Item_lv2* M1Store::Item_lv2::setFieldInternal(const QString& p_content,
         if(p_edge){
             // Simple Edge field
             l_field_edge = getNew(M1Env::SIMPLE_EDGE, M1Store::ItemType(p_field_type_si->specialId()));
-            l_field_edge->setOrigin(this->item_id());
+            l_field_edge->setOrigin_lv1(this->item_id());
             // below AUTO edge
             this->installFullEdge(l_field_edge, G_VOID_SI_ID, nullptr, false);
         }
@@ -1078,11 +1073,11 @@ M1Store::Item_lv2* M1Store::Item_lv2::setFieldInternal(const QString& p_content,
     // set content value
     if(p_edge)
         // will always work regardless of p_content's length bc simple edges accept arbitrary length strings
-        l_field_edge->setText(p_content);
+        l_field_edge->setText_lv1(p_content);
     else {
         // content must fit in a Simple Vertex text area
         Q_ASSERT_X(p_content.length() < M1Env::SIMPLE_VERTEX_TEXT_LEN, "Item_lv2::linkTo()", "content too big for a simple vertex");
-        l_field_edge->getTarget_lv2()->setText(p_content);
+        l_field_edge->getTarget_lv2()->setText_lv1(p_content);
     }
 
     M1_FUNC_EXIT
@@ -1262,10 +1257,10 @@ void M1Store::Item_lv2::installFullEdge(Item_lv2* p_new_edge, const SpecialItemI
         // the edge becomes the new first edge of the appropriate ring
         if(l_edge_is_special)
             // add to the special edge ring
-            this->setFirstEdgeSpecial(l_new_edge_id);
+            this->setFirstEdgeSpecial_lv1(l_new_edge_id);
         else
             // add to the ordinary edge ring
-            this->setFirstEdge(l_new_edge_id);
+            this->setFirstEdge_lv1(l_new_edge_id);
     }
 
     qCDebug(g_cat_lv2_constructors) << QString("%1 Installed").arg(p_new_edge->dbgShort());
@@ -1283,11 +1278,11 @@ void M1Store::Item_lv2::insertEdgeBelow(Item_lv2* p_new_edge, Item_lv2* p_edge_a
     M1Store::Item_lv2* l_next_edge = p_edge_above->get_next_lv2();
 
     // appropriate next/previous hookups
-    p_new_edge->setPrevious(p_edge_above->item_id());
-    p_new_edge->setNext(l_next_edge->item_id());
+    p_new_edge->setPrevious_lv1(p_edge_above->item_id());
+    p_new_edge->setNext_lv1(l_next_edge->item_id());
 
-    p_edge_above->setNext(p_new_edge->item_id());
-    l_next_edge->setPrevious(p_new_edge->item_id());
+    p_edge_above->setNext_lv1(p_new_edge->item_id());
+    l_next_edge->setPrevious_lv1(p_new_edge->item_id());
 
     M1_FUNC_EXIT
 }
@@ -1429,7 +1424,7 @@ M1Store::Item_lv2* M1Store::Item_lv2::find_edge_target(const M1Env::SpecialItemI
 /***************************************/
 /**
  * \defgroup ITER Iterators
- *
+ * \ingroup LV2
  * @{
  */
 

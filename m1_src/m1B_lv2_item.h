@@ -7,12 +7,16 @@
 #include "m1B_store.h"
 
 namespace M1Store{
-    /**
-     * @brief The Item_lv2 class handles the basic interactions between items, i.e. mainly their connections by means of edges.
-     */
 class Item_lv2_iterator_base;
 class Item_lv2_iterator;
 
+/**
+ * @brief Main access interface to the graph storage used by the rest of the system.
+ *
+ * The Item_lv2 class also handles the basic interactions between items, i.e. mainly their connections by means of edges (Which are also items in their own right).
+ *
+ * \ingroup LV2
+ */
 class Item_lv2 : public Item_lv1 {
     private:
         static void dbgRecurGraph(const ItemID p_item_id, std::set<ItemID>& p_already_expanded, const QString& p_left);
@@ -185,6 +189,7 @@ class Item_lv2 : public Item_lv1 {
 
 /**
  * @brief Base class --> scans through ALL edges (no filter)
+ * \ingroup LV2
  */
 class Item_lv2_iterator_base{
         friend class Item_lv2;
@@ -209,6 +214,7 @@ class Item_lv2_iterator_base{
 
 /**
  * @brief Edge type filter iterator --> scans only thoses edges that match the filter
+ * \ingroup LV2
  */
 class Item_lv2_iterator_edge_type : public Item_lv2_iterator_base{
         friend class Item_lv2;
@@ -229,6 +235,7 @@ class Item_lv2_iterator_edge_type : public Item_lv2_iterator_base{
 
 /**
  * @brief Wrapper class for Item_lv2_iterator_base and derived classes
+ * \ingroup LV2
  *
  * This wrapper is needed because I want to be able to instantiate iterators as local variables (not pointers), so that
  * they are automatically deleted (freed) when leaving the block. If Item_lv2_iterator_base classes were directly instantiated
@@ -254,7 +261,12 @@ class Item_lv2_iterator{
 
 } // end namespace M1Store
 
+/**
+ * \defgroup OperatorOverload_lv2 << Operator overloading for debug purposes (Item_lv2)
+ * @ingroup DebugLog
+ * @{
+ */
     QDebug operator<<(QDebug d, M1Store::Item_lv2 p);
     QDebug operator<<(QDebug d, M1Store::Item_lv2* p);
-
+/**@}*/ //end of OperatorOverload_lv2
 #endif // M1_LV2_STORE_H

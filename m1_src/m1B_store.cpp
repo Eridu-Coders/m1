@@ -344,13 +344,13 @@ void M1Store::Storage::mmapSync(){
  * @param p_item_id the ItemID
  * @return the pointer
  */
-M1Store::Item_lv0* M1Store::Storage::getItemPointer_lv0(ItemID p_item_id){
+M1Store::Item_lv1* M1Store::Storage::getItemPointer_lv1(ItemID p_item_id){
     M1_FUNC_ENTRY(g_cat_store, QString("getItemPointer_lv0 from ItemID: 0x%1").arg(p_item_id, 16, 16, QChar('0')))
     Q_ASSERT_X(p_item_id < cm_next_item, "M1Store::Storage::getItemPointer_lv0()", "p_item_id out of bounds");
 
     // shift left by 7 bits = mult by 128
     M1_FUNC_EXIT
-    return (Item_lv0*)(cm_item_mmap_base + (p_item_id << 7));
+    return (Item_lv1*)(cm_item_mmap_base + (p_item_id << 7));
 }
 
 /**
@@ -375,7 +375,7 @@ M1Store::SpecialItem* M1Store::Storage::getSpecialItemPointer(const SpecialItemI
  * @param p_type ItemType value for initialization
  * @return pointer to the new Item_lv0
  */
-M1Store::Item_lv0* M1Store::Storage::getNewItemPointer_lv0(const FlagField p_flags, const ItemType& p_type){
+M1Store::Item_lv1* M1Store::Storage::getNewItemPointer_lv1(const FlagField p_flags, const ItemType& p_type){
     M1_FUNC_ENTRY(g_cat_store, QString("initialize new item: flags 0b%1 type %2").arg(p_flags, 64, 2, QChar('0')).arg(p_type.dbgString()))
     // get new item ID and increment the top ItemID counter
     ItemID l_id = cm_next_item++;
@@ -387,9 +387,9 @@ M1Store::Item_lv0* M1Store::Storage::getNewItemPointer_lv0(const FlagField p_fla
     );
 
     // get the pointer inside the mmap() area
-    Item_lv0* l_ret = getItemPointer_lv0(l_id);
+    Item_lv1* l_ret = getItemPointer_lv1(l_id);
     // initialize members (depending on category determined from flags), including the new ItemID
-    l_ret->initializeMembers(l_id, p_flags, p_type);
+    l_ret->initializeMembers_lv1(l_id, p_flags, p_type);
 
     M1_FUNC_EXIT
     return l_ret;

@@ -354,7 +354,7 @@ QWidget *M1MidPlane::Interp::get_edit_widget(){
 }
 void M1MidPlane::Interp::save_text_edit(){
     qCDebug(g_cat_interp_base) << "Saving text edit field: " << m_text_edit->toPlainText();
-    m_myself->getTarget_lv2()->setText(m_text_edit->toPlainText());
+    m_myself->getTarget_lv2()->setText_lv1(m_text_edit->toPlainText());
     m_td_parent->repaint();
     this->emitSignals();
     this->m_proxy->setFocus(Qt::OtherFocusReason);

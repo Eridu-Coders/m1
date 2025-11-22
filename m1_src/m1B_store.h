@@ -15,6 +15,7 @@
 namespace fs = boost::filesystem;
 
 #include "m1B_lv0_item.h"
+#include "m1B_lv1_item.h"
 
 namespace M1Store{
     // ----------------------------------------- Storage ----------------------------------------------------
@@ -78,8 +79,8 @@ namespace M1Store{
         static void mmapSync();
         static void storeShutDown();
 
-        static Item_lv0* getItemPointer_lv0(const ItemID p_item_id);
-        static Item_lv0* getNewItemPointer_lv0(const FlagField p_flags, const ItemType& p_type);
+        static Item_lv1* getItemPointer_lv1(const ItemID p_item_id);
+        static Item_lv1* getNewItemPointer_lv1(const FlagField p_flags, const ItemType& p_type);
 
         static SpecialItem* getSpecialItemPointer(const SpecialItemID p_si_id);
         static SpecialItem* getSpecialItemPointer(const ItemID p_item_id);

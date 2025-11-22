@@ -65,4 +65,13 @@ This will load the sample data from the _Baghad Gita_ and Plato's _Republic_. Af
 ./m1
 ```
 
+# Documentation
+
+To generate the documentation with Doxygen, make sure it is installed (`sudo apt install doxygen`), and then run:
+```
+doxygen Doxyfile
+```
+from the project Root directory. The creates the directory `Doc`. Load the file `Doc/html/index.htm` to view the documentation.
+
+
 ![](https://github.com/Eridu-Coders/m1/blob/main/ShankhaChakra.png?raw=true)

@@ -443,7 +443,7 @@ void M1UI::PassagesPanel::highlight(){
     QStringList l_ret_list;
     for(int i = 0; i < m_pe_list.count(); i++) l_ret_list.append(m_pe_list.at(i)->bake_highlight(l_highlight_vertex, l_category, l_color));
 
-    l_highlight_vertex->setText(l_ret_list.join("/"));
+    l_highlight_vertex->setText_lv1(l_ret_list.join("/"));
 }
 
 // Scene & View ---------------------------------------------------------------------------------------------------------------------------------------

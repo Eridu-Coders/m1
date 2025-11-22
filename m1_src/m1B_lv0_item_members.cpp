@@ -10,6 +10,7 @@
 
 #include "m1A_env.h"
 #include "m1B_store.h"
+#include "m1B_lv1_item.h"
 
 Q_LOGGING_CATEGORY(g_cat_lv0_members, "lv0.members_access")
 
@@ -33,7 +34,7 @@ Q_LOGGING_CATEGORY(g_cat_lv0_members, "lv0.members_access")
  * @param p_type ItemType instance
  */
 M1Store::Item_lv0::Item_lv0(const ItemID p_item_id, const FlagField p_flags, const ItemType& p_type){
-    initializeMembers(p_item_id, p_flags, p_type);
+    initializeMembers_lv0(p_item_id, p_flags, p_type);
 }
 
 /**
@@ -42,7 +43,7 @@ M1Store::Item_lv0::Item_lv0(const ItemID p_item_id, const FlagField p_flags, con
  * @param p_flags flags
  * @param p_type type
  */
-void M1Store::Item_lv0::initializeMembers(const M1Store::ItemID p_item_id, const M1Store::FlagField p_flags, const M1Store::ItemType& p_type){
+void M1Store::Item_lv0::initializeMembers_lv0(const M1Store::ItemID p_item_id, const M1Store::FlagField p_flags, const M1Store::ItemType& p_type){
     M1_FUNC_ENTRY(g_cat_lv0_members, QString("Item initialization p_id: 0x%1, p_flags: 0b%2, p_type: %3")
                       .arg(p_item_id, 16, 16, QLatin1Char('0'))   // %1
                       .arg(p_flags, 64, 2, QLatin1Char('0'))      // %2
@@ -51,7 +52,7 @@ void M1Store::Item_lv0::initializeMembers(const M1Store::ItemID p_item_id, const
     m_item_id = p_item_id;
     m_flags = p_flags;
     m_type = p_type;
-    initializeMembers();
+    initializeMembers_lv0();
 
     M1_FUNC_EXIT
 }
@@ -59,7 +60,7 @@ void M1Store::Item_lv0::initializeMembers(const M1Store::ItemID p_item_id, const
 /**
  * @brief Initialization of branch-specific members members
  */
-void M1Store::Item_lv0::initializeMembers(){
+void M1Store::Item_lv0::initializeMembers_lv0(){
     M1_FUNC_ENTRY(g_cat_lv0_members, QString("Initializing members ..."))
 
     if((m_flags & ITEM_NATURE_MASK) == FULL_EDGE){
@@ -147,7 +148,7 @@ void M1Store::Item_lv0::setFlags_lv0(const M1Store::FlagField p_flags, const boo
         // initalize as 4 void special types (TYPE_IS_ITEM_ID has just been set to 0)
         m_type.initSpecials();
         // initialize other members
-        initializeMembers();
+        initializeMembers_lv0();
     }
 
     M1_FUNC_EXIT
@@ -157,21 +158,23 @@ void M1Store::Item_lv0::setFlags_lv0(const M1Store::FlagField p_flags, const boo
  * @param p_flag the flag
  * @param p_force_init true -> force initialization of other fields
  */
-void M1Store::Item_lv0::setFlag(const M1Store::FlagField p_flag, const bool p_force_init){
-    M1_FUNC_ENTRY(g_cat_lv0_members, QString("Setting flag %1 (0b%2)").arg(p_flag).arg(p_flag, 64, 2, QLatin1Char('0')))
+void M1Store::Item_lv1::setFlag(const M1Store::FlagField p_flag, const bool p_force_init){
+    M1_FUNC_ENTRY(g_cat_lv1_members, QString("Setting flag %1 (0b%2)").arg(p_flag).arg(p_flag, 64, 2, QLatin1Char('0')))
     Q_ASSERT_X(M1Store::Item_lv0::count_1_bits(p_flag) == 1,
                "M1Store::Item_lv0::setFlag(M1Store::FlagField, bool)",
                "p_flag must have exactly one bit set");
 
-    M1Store::FlagField l_old_flags = m_flags;
-    m_flags = m_flags | p_flag;
-    if( (((l_old_flags & ITEM_NATURE_MASK) ^ (m_flags & ITEM_NATURE_MASK)) > 0) || p_force_init ){
+    M1Store::FlagField l_old_flags = flags();
+    M1Store::FlagField l_flags = flags() | p_flag;
+    if( (((l_old_flags & ITEM_NATURE_MASK) ^ (l_flags & ITEM_NATURE_MASK)) > 0) || p_force_init ){
         // erase all other flags
-        m_flags = m_flags & ITEM_NATURE_MASK;
+        l_flags = l_flags & ITEM_NATURE_MASK;
+        setFlags_lv1(l_flags);
         // initalize as 4 void special types (TYPE_IS_ITEM_ID has just been set to 0)
-        m_type.initSpecials();
+        ItemType l_type; // calls l_type.initSpecials();
+        setType_member_lv1(l_type);
         // initialize other members
-        initializeMembers();
+        initializeMembers_lv1();
     }
 
     M1_FUNC_EXIT
@@ -181,25 +184,28 @@ void M1Store::Item_lv0::setFlag(const M1Store::FlagField p_flag, const bool p_fo
  * @param p_flag the flag
  * @param p_force_init true -> force initialization of other fields
  */
-void M1Store::Item_lv0::unSetFlag(const M1Store::FlagField p_flag, const bool p_force_init){
-    M1_FUNC_ENTRY(g_cat_lv0_members, QString("Unsetting flag %1 (0b%2)").arg(p_flag).arg(p_flag, 64, 2, QLatin1Char('0')))
+void M1Store::Item_lv1::unSetFlag(const M1Store::FlagField p_flag, const bool p_force_init){
+    M1_FUNC_ENTRY(g_cat_lv1_members, QString("Unsetting flag %1 (0b%2)").arg(p_flag).arg(p_flag, 64, 2, QLatin1Char('0')))
     Q_ASSERT_X(M1Store::Item_lv0::count_1_bits(p_flag) == 1,
                "M1Store::Item_lv0::unSetFlag(M1Store::FlagField, bool)",
                "p_flag must have exactly one bit set");
 
-    M1Store::FlagField l_old_flags = m_flags;
-    m_flags = m_flags & (~p_flag);
-    if( (((l_old_flags & ITEM_NATURE_MASK) ^ (m_flags & ITEM_NATURE_MASK)) > 0) || p_force_init ){
+    M1Store::FlagField l_old_flags = flags();
+    M1Store::FlagField l_flags = flags() & (~p_flag);
+    if( (((l_old_flags & ITEM_NATURE_MASK) ^ (l_flags & ITEM_NATURE_MASK)) > 0) || p_force_init ){
         // erase all other flags
-        m_flags = m_flags & ITEM_NATURE_MASK;
+        l_flags = l_flags & ITEM_NATURE_MASK;
+        setFlags_lv1(l_flags);
         // initalize as 4 void special types (TYPE_IS_ITEM_ID has just been set to 0)
-        m_type.initSpecials();
+        ItemType l_type; // calls l_type.initSpecials();
+        setType_member_lv1(l_type);
         // initialize other members
-        initializeMembers();
+        initializeMembers_lv1();
     }
 
     M1_FUNC_EXIT
 }
+
 // number of bits == 1 in a flag field (for set/unset flags)
 unsigned short M1Store::Item_lv0::count_1_bits(const M1Store::FlagField p_flag){
     unsigned int l_ret = 0;
@@ -226,10 +232,10 @@ M1Store::FlagField M1Store::Item_lv0::flags() const {
  * @brief M1Store::Item_lv0::storeSpecialItemID
  * @param p_si_id
  */
-void M1Store::Item_lv0::storeSpecialItemID(const SpecialItemID p_si_id){
+void M1Store::Item_lv1::storeSpecialItemID(const SpecialItemID p_si_id){
     FlagField l_id_as_flags = p_si_id;
     l_id_as_flags = l_id_as_flags << 48;
-    this->setFlags_lv0( (flags() & 0x0000FFFFFFFFFFFF) | l_id_as_flags);
+    this->setFlags_lv1( (flags() & 0x0000FFFFFFFFFFFF) | l_id_as_flags);
 }
 /**
  * @brief M1Store::Item_lv0::specialItemId
@@ -258,15 +264,25 @@ void M1Store::Item_lv0::setType_member_lv0(const ItemType& p_type){
 }
 
 /**
+ * @brief getter of lv0 private member m_type
+ * @return reference to m_type
+ */
+M1Store::ItemType& M1Store::Item_lv0::getType(){
+    return m_type;
+}
+
+/**
  * @brief set one of the 4 special types
  * @param p_index index of the one to set (0 to 3)
  * @param p_type the new value
  */
-void M1Store::Item_lv0::setType_member_si_id(const unsigned int p_index, const M1Store::SpecialItemID p_type){
-    M1_FUNC_ENTRY(g_cat_lv0_members, QString("Set special type %1 to %2").arg(p_index).arg(p_type))
+void M1Store::Item_lv1::setType_member_si_id(const unsigned int p_index, const M1Store::SpecialItemID p_type){
+    M1_FUNC_ENTRY(g_cat_lv1_members, QString("Set special type %1 to %2").arg(p_index).arg(p_type))
     Q_ASSERT(p_index < 4);
 
-    m_type.setSpecialType(p_index, p_type);
+    ItemType l_type = this->getType();
+    l_type.setSpecialType(p_index, p_type);
+    setType_member_lv1(l_type);
 
     M1_FUNC_EXIT
 }
@@ -301,9 +317,12 @@ M1Store::ItemID M1Store::Item_lv0::getType_item_id() const{
  * @brief set type as an ItemID
  * @param p_type the new type value
  */
-void M1Store::Item_lv0::setType_member_item_id(const M1Store::ItemID p_type_item_id){
-    M1_FUNC_ENTRY(g_cat_lv0_members, QString("Set Item ID type to 0x%1").arg(p_type_item_id, 16, 16, QLatin1Char('0')))
-    m_type = p_type_item_id;
+void M1Store::Item_lv1::setType_member_item_id(const M1Store::ItemID p_type_item_id){
+    M1_FUNC_ENTRY(g_cat_lv1_members, QString("Set Item ID type to 0x%1").arg(p_type_item_id, 16, 16, QLatin1Char('0')))
+
+    ItemType l_type;
+    l_type.setItemIDType(p_type_item_id);
+    setType_member_lv1(l_type);
 
     M1_FUNC_EXIT
 }
@@ -324,7 +343,7 @@ bool M1Store::Item_lv0::isOfType_member(const M1Store::ItemID p_type_item_id) co
 
 
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 /**
  * @brief test if item is of a given special type (using only the information in m_type)
@@ -343,7 +362,7 @@ bool M1Store::Item_lv0::isOfType_member(const M1Store::SpecialItemID p_type) con
 
 
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 /**
  * @brief test if item is of a given special type mnemonic (using only the information in m_type)
@@ -356,7 +375,7 @@ bool M1Store::Item_lv0::isOfType_member(const char* p_mnemonic) const{
 
     bool l_ret = M1Store::Item_lv0::isOfType_member(pi->specialId());
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 /** @} end group IOT0*/
 //**************************************************************************************************************************
@@ -385,18 +404,18 @@ void M1Store::Item_lv0::setFlagsExtra_lv0(const M1Store::FlagField p_flags){
  * @param p_flag the flag
  * @param p_force_init
  */
-void M1Store::Item_lv0::setFlagExtra(const M1Store::FlagField p_flag){
+void M1Store::Item_lv1::setFlagExtra(const M1Store::FlagField p_flag){
     M1_FUNC_ENTRY(g_cat_lv0_members, QString("Setting flag %1 (0b%2)").arg(p_flag).arg(p_flag, 64, 2, QLatin1Char('0')))
     Q_ASSERT_X(M1Store::Item_lv0::count_1_bits(p_flag) == 1,
                "M1Store::Item_lv0::setFlagExtra(M1Store::FlagField)",
                "p_flag must have exactly one bit set");
-    Q_ASSERT_X((m_flags & ITEM_IS_SIMPLE) == 0,
+    Q_ASSERT_X((flags() & ITEM_IS_SIMPLE) == 0,
                "M1Store::Item::setFlagExtra()",
                "simple items do not have an extra flag field");
-    if(m_flags & ITEM_IS_VERTEX)
-        p.v.f.m_flags_extra = p.v.f.m_flags_extra | p_flag;
-    else
-        p.e.f.m_flags_extra = p.e.f.m_flags_extra | p_flag;
+
+    M1Store::FlagField l_flags = flags();
+    l_flags = l_flags | p_flag;
+    setFlagsExtra_lv1(l_flags);
 
     M1_FUNC_EXIT
 }
@@ -405,18 +424,18 @@ void M1Store::Item_lv0::setFlagExtra(const M1Store::FlagField p_flag){
  * @param p_flag the flag
  * @param p_force_init
  */
-void M1Store::Item_lv0::unSetFlagExtra(const M1Store::FlagField p_flag){
+void M1Store::Item_lv1::unSetFlagExtra(const M1Store::FlagField p_flag){
     M1_FUNC_ENTRY(g_cat_lv0_members, QString("Setting flag %1 (0b%2)").arg(p_flag).arg(p_flag, 64, 2, QLatin1Char('0')))
     Q_ASSERT_X(M1Store::Item_lv0::count_1_bits(p_flag) == 1,
                "M1Store::Item_lv0::unSetFlagExtra(M1Store::FlagField)",
                "p_flag must have exactly one bit set");
-    Q_ASSERT_X((m_flags & ITEM_IS_SIMPLE) == 0,
+    Q_ASSERT_X((flags() & ITEM_IS_SIMPLE) == 0,
                "M1Store::Item::unSetFlagExtra()",
                "simple items do not have an extra flag field");
-    if(m_flags & ITEM_IS_VERTEX)
-        p.v.f.m_flags_extra = p.v.f.m_flags_extra & (~p_flag);
-    else
-        p.e.f.m_flags_extra = p.e.f.m_flags_extra & (~p_flag);
+
+    M1Store::FlagField l_flags = flags();
+    l_flags = l_flags & (~p_flag);
+    setFlagsExtra_lv1(l_flags);
 
     M1_FUNC_EXIT
 }
@@ -439,7 +458,7 @@ M1Store::FlagField M1Store::Item_lv0::flagsExtra() const {
     qCDebug(g_cat_lv0_members) << QString("--> %1 (0b%2)").arg(l_ret).arg(l_ret, 64, 2, QLatin1Char('0'));
 
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -474,7 +493,7 @@ M1Store::ItemID M1Store::Item_lv0::origin_item_id() const {
     qCDebug(g_cat_lv0_members) << QString("--> 0x%1 %2").arg(l_ret, 16, 16, QLatin1Char('0')).arg(l_ret);
 
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -491,7 +510,7 @@ void M1Store::Item_lv0::setTarget_lv0(const M1Store::ItemID p_target){
 
     p.e.f.m_v_target = p_target;
     // increase target's incoming edges counter
-    M1Store::Item_lv0* l_target_pointer = M1Store::Storage::getItemPointer_lv0(p_target);
+    M1Store::Item_lv0* l_target_pointer = M1Store::Storage::getItemPointer_lv1(p_target);
     if((l_target_pointer->flags() & ITEM_NATURE_MASK) == M1Env::FULL_EDGE || (l_target_pointer->flags() & ITEM_NATURE_MASK) == M1Env::FULL_VERTEX)
         l_target_pointer->setIncomingEdges_lv0(l_target_pointer->incomingEdges() + 1);
 
@@ -511,7 +530,7 @@ M1Store::ItemID M1Store::Item_lv0::target_item_id() const {
     qCDebug(g_cat_lv0_members) << QString("--> 0x%1 %2").arg(l_ret, 16, 16, QLatin1Char('0')).arg(l_ret);
 
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -547,7 +566,7 @@ M1Store::ItemID M1Store::Item_lv0::previous_item_id() const {
     qCDebug(g_cat_lv0_members) << QString("--> 0x%1 %2").arg(l_ret, 16, 16, QLatin1Char('0')).arg(l_ret);
 
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -579,7 +598,7 @@ M1Store::ItemID M1Store::Item_lv0::next_item_id() const {
     qCDebug(g_cat_lv0_members) << QString("--> 0x%1 %2").arg(l_ret, 16, 16, QLatin1Char('0')).arg(l_ret);
 
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -612,7 +631,7 @@ M1Store::ItemID M1Store::Item_lv0::reciprocal_item_id() const {
     qCDebug(g_cat_lv0_members) << QString("--> 0x%1 %2").arg(l_ret, 16, 16, QLatin1Char('0')).arg(l_ret);
 
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -644,7 +663,7 @@ M1Store::ItemID M1Store::Item_lv0::firstEdge_item_id() const {
     qCDebug(g_cat_lv0_members) << QString("--> 0x%1 %2").arg(l_ret, 16, 16, QLatin1Char('0')).arg(l_ret);
 
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -674,7 +693,7 @@ M1Store::ItemID M1Store::Item_lv0::autoEdge_item_id() const{
     qCDebug(g_cat_lv0_members) << QString("--> 0x%1 %2").arg(l_ret, 16, 16, QLatin1Char('0')).arg(l_ret);
 
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -706,7 +725,7 @@ M1Store::ItemID M1Store::Item_lv0::firstEdgeSpecial_item_id() const {
     qCDebug(g_cat_lv0_members) << QString("--> 0x%1 %2").arg(l_ret, 16, 16, QLatin1Char('0')).arg(l_ret);
 
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -738,7 +757,7 @@ QDateTime M1Store::Item_lv0::creationDate() const {
     qCDebug(g_cat_lv0_members) << QString("--> %1").arg(l_ret.toString("dd/MM/yyyy hh:mm:ss"));
 
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -770,7 +789,7 @@ QDateTime M1Store::Item_lv0::lastmodDate() const {
     qCDebug(g_cat_lv0_members) << QString("--> %1").arg(l_ret.toString("dd/MM/yyyy hh:mm:ss"));
 
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 /**
@@ -782,7 +801,7 @@ M1Env::StringID M1Store::Item_lv0::string_id() const{
     Q_ASSERT_X((m_flags & ITEM_NATURE_MASK) == FULL_VERTEX, "Item_lv0::string_id()", "accessing the string id on a non-full vertex");
     StringID l_ret = p.v.f.m_string_id;
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 // ---------------------------------------------------------------------------------------------------------
 // incoming edges count (not for simples)
@@ -813,18 +832,21 @@ M1Store::ItemCounter M1Store::Item_lv0::incomingEdges() const {
     qCDebug(g_cat_lv0_members) << QString("--> %1").arg(l_ret);
 
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 /**
  * @brief increment incoming edge counter (only for full items)
  * @param p_add the increment
  */
-void M1Store::Item_lv0::addIncomingEdges(M1Store::ItemCounter p_add){
+void M1Store::Item_lv1::addIncomingEdges(M1Store::ItemCounter p_add){
     M1_FUNC_ENTRY(g_cat_lv0_members, QString("incrementing incoming edges by %1").arg(p_add))
-    Q_ASSERT_X((m_flags & ITEM_IS_SIMPLE) == 0, "Item::addIncomingEdges()", "accessing the incoming edges counter on a non-full item");
+    Q_ASSERT_X((flags() & ITEM_IS_SIMPLE) == 0, "Item::addIncomingEdges()", "accessing the incoming edges counter on a non-full item");
 
-    if(m_flags & ITEM_IS_VERTEX) p.v.f.m_incoming_edges += p_add;
-    else p.e.f.m_incoming_edges += p_add;
+    M1Store::ItemCounter l_incoming_edges = incomingEdges();
+    l_incoming_edges += p_add;
+    setIncomingEdges_lv1(l_incoming_edges);
+    // if(flags() & ITEM_IS_VERTEX) p.v.f.m_incoming_edges += p_add;
+    // else p.e.f.m_incoming_edges += p_add;
 
     M1_FUNC_EXIT
 }
@@ -963,7 +985,7 @@ char* M1Store::Item_lv0::text() const {
     qCDebug(g_cat_lv0_members) << QString("--> [%1]").arg(l_ret);
 
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 /** @} end group TextLv0 */
 //**************************************************************************************************************************

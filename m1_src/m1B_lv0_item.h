@@ -8,11 +8,6 @@
 
 namespace M1Store{
 
-/** \defgroup LV0 Level 0 Item - Class M1Store::Item_lv0 and others
- *
- *  Base storage level. Data as stored in the mmap() areas.
- */
-
 using namespace M1Env;
     // ----------------------------------------- ItemType ----------------------------------------------------
     /**
@@ -167,10 +162,10 @@ using namespace M1Env;
             }e; ///< Simple/Full Edges branches
         }p; ///< Rest of the payload (branch-specific)
         /**@}*/ //end of SpecMb
-
+    public:
         // number of bits == 1 in a flag field (for set/unset flags)
         static unsigned short count_1_bits(const FlagField p_flag);
-    public:
+
         /**
          * @brief Unused, except in tests
          *
@@ -183,13 +178,13 @@ using namespace M1Env;
 
         // ------------------------ Setters ---------------------------------------------------------
         // to be used in real situations when instantiating from an mmap() area pointer
-        void initializeMembers(const ItemID p_item_id,
+        void initializeMembers_lv0(const ItemID p_item_id,
                                const FlagField p_flags,
                                const ItemType& p_type);
-        void initializeMembers();
+        void initializeMembers_lv0();
 
-        void setFlags_lv0(const FlagField p_flags, const bool p_force_init = false);
         void setType_member_lv0(const ItemType& p_type);
+        void setFlags_lv0(const FlagField p_flags, const bool p_force_init = false);
         void setFlagsExtra_lv0(const FlagField p_flags);
         void setOrigin_lv0(const ItemID p_origin);
         void setTarget_lv0(const ItemID p_target);
@@ -204,16 +199,17 @@ using namespace M1Env;
         void setIncomingEdges_lv0(const ItemCounter p_incoming_edges);
         void setText_lv0(const QString& p_text);
 
-        void setFlag(const FlagField p_flag, const bool p_force_init = false);
-        void unSetFlag(const FlagField p_flag, const bool p_force_init = false);
-        void setType_member_si_id(const unsigned int p_index, const SpecialItemID p_type);
-        void setType_member_item_id(const ItemID p_type_item_id);
-        void setFlagExtra(const FlagField p_flag);
-        void unSetFlagExtra(const FlagField p_flag);
-        void storeSpecialItemID(const SpecialItemID p_si_id);
-        void addIncomingEdges(const ItemCounter p_add); // can be negative
+        // void setType_member_si_id(const unsigned int p_index, const SpecialItemID p_type);
+        // void setType_member_item_id(const ItemID p_type_item_id);
+        // void setFlag(const FlagField p_flag, const bool p_force_init = false);
+        // void unSetFlag(const FlagField p_flag, const bool p_force_init = false);
+        // void setFlagExtra(const FlagField p_flag);
+        // void unSetFlagExtra(const FlagField p_flag);
+        // void storeSpecialItemID(const SpecialItemID p_si_id);
+        // void addIncomingEdges(const ItemCounter p_add); // can be negative
 
         // ------------------------ Getters ---------------------------------------------------------
+        ItemType& getType();
         SpecialItemID specialItemId();
         ItemID item_id() const;
         FlagField flags() const;
@@ -299,6 +295,11 @@ using namespace M1Env;
 
 } // end namespace M1Store
 
+/**
+ * \defgroup OperatorOverload_lv0 << Operator overloading for debug purposes (Item_lv0)
+ * @ingroup DebugLog
+ * @{
+ */
     QDebug operator<<(QDebug d, M1Store::ItemType p);
     QDebug operator<<(QDebug d, M1Store::ItemType* p);
 
@@ -307,4 +308,5 @@ using namespace M1Env;
 
     QDebug operator<<(QDebug d, M1Store::SpecialItem p);
     QDebug operator<<(QDebug d, M1Store::SpecialItem* p);
+/**@}*/ //end of OperatorOverload_lv0
 #endif // M1_LV0_ITEM_H
