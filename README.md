@@ -79,6 +79,6 @@ m1's graph database is organized according to the following model:
 
 ![](https://github.com/Eridu-Coders/m1/blob/main/img/model.png?raw=true)
 
-The color purple represent the type relationships. Types are given a purple border and ISA/ITO edge are also represented in that color (with a dotted/solid style respectively)
+The color purple represents the type relationships. Types are given a purple border and ISA/ITO edge are also represented in that color (with a dotted/solid style respectively)
 
 ![](https://github.com/Eridu-Coders/m1/blob/main/img/ShankhaChakra.png?raw=true)

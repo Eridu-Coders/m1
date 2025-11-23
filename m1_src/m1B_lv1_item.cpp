@@ -3,11 +3,6 @@
 
 Q_LOGGING_CATEGORY(g_cat_lv1_members, "lv1.members_access")
 
-/**
- * \defgroup ArchivLog Storing of Achive Log data for replay in case of crash
- * \ingroup LV1
- * @{
- */
 void M1Store::Item_lv1::initializeMembers_lv1(const ItemID p_item_id,
                                           const FlagField p_flags,
                                           const ItemType p_type){
