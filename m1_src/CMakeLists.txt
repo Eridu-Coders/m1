@@ -33,6 +33,10 @@ set(PROJECT_SOURCES
         m1B_lv2_item.h
         m1B_lv2_item.cpp
         m1B_lv2_item_instantiation.cpp
+        m1B_lv2_item_debug.cpp
+        m1B_lv2_iterators.cpp
+        m1B_lv2_item_linking.cpp
+        m1B_lv2_item_types.cpp
         m1C_interp.h
         m1C_interp.cpp
         m1D_main_window.h
@@ -47,9 +51,6 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(m1
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        m1B_lv2_item_debug.cpp
-        m1B_lv2_iterators.cpp
-        m1B_lv2_item_linking.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET m1_src APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
