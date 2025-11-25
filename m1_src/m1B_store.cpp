@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <cmath>
 
 #include "m1A_env.h"
 #include "m1B_graph_init.h"
@@ -15,6 +16,7 @@
 #include "m1B_lv2_item.h"
 
 Q_LOGGING_CATEGORY(g_cat_store, "store.storage")
+Q_LOGGING_CATEGORY(g_cat_store_mmap, "store.mmap")
 Q_LOGGING_CATEGORY(g_cat_silence, "dump")
 
 // LMDB helper macros taken from the examples in the distrib.
@@ -25,9 +27,9 @@ Q_LOGGING_CATEGORY(g_cat_silence, "dump")
 #define EK(test) if(test) \
     {qCDebug(g_cat_store) << QString("kernel [errno]-msg: [%1]-%2").arg(errno).arg(strerror(errno)); qFatal("Aborting/kernel");}
 
-fs::path M1Store::Storage::cm_lmdb_dir;                 // path to storage directory
+fs::path M1Store::Storage::cm_lmdb_dir;                // path to storage directory
 fs::path M1Store::Storage::cm_mmap_filepath_specials;  // path to specials mmap() file
-fs::path M1Store::Storage::cm_mmap_filepath_items;     // path to items mmap() file
+// fs::path M1Store::Storage::cm_mmap_filepath_items;     // path to items mmap() file
 
 // class members holding the LMDB session data
 MDB_env* M1Store::Storage::cm_lmdb_env = NULL;  // LMDB environment
@@ -38,7 +40,10 @@ MDB_dbi M1Store::Storage::cm_dbi_string;        // string table handle
 M1Store::ItemID M1Store::Storage::cm_next_item{0};
 M1Store::ItemID M1Store::Storage::cm_next_string{0};
 M1Store::SpecialItemID M1Store::Storage::cm_next_special{0};
-unsigned long M1Store::Storage::cm_item_next_upper_excluded{M1Env::ITEMS_MMAP_INCREMENT_COUNT};
+M1Store::ItemID M1Store::Storage::cm_item_next_upper_excluded{0};
+M1Store::ItemID M1Store::Storage::cm_items_per_mmap_segment{0};
+unsigned int M1Store::Storage::cm_item_mmap_next_seg_id{0};
+unsigned long long M1Store::Storage::cm_item_mmap_seg_size{0};
 
 // current version of graph structure
 unsigned int M1Store::Storage::cm_current_version{0};
@@ -46,40 +51,11 @@ unsigned int M1Store::Storage::cm_current_version{0};
 // base address of the mmapped space for special items(char* to make pointer arithmetic possible)
 char* M1Store::Storage::cm_special_mmap_base;
 // base address of mmap segment (as char* to make pointer arithmetic possible in getItemSlotPointer())
-char* M1Store::Storage::cm_item_mmap_base;
+char* M1Store::Storage::cm_item_mmap_base[M1Store::Storage::ITEMS_SEGMENT_COUNT];
 
 // Mnemonic --> SpecialItem* associative array
 std::map<QString, M1Store::SpecialItem*> M1Store::Storage::cm_mnemonic_to_special;
 std::map<M1Env::ItemID, M1Store::SpecialItem*> M1Store::Storage::cm_item_id_to_special;
-
-// special item constants initialized in setConstants()
-// M1Env::SpecialItemID M1Env::TEXT_SIID = G_NONEX_SI_ID;
-
-/*
-M1Env::SpecialItemID M1Env::TEXT_WORD_SIID = G_NONEX_SI_ID;
-M1Env::SpecialItemID M1Env::TEXT_SECTION_SIID = G_NONEX_SI_ID;
-
-M1Env::SpecialItemID M1Env::TW_WORD_OCC_SIID = G_NONEX_SI_ID;
-M1Env::SpecialItemID M1Env::TW_REV_WORD_OCC_SIID = G_NONEX_SI_ID;
-M1Env::SpecialItemID M1Env::TW_SECTION_2_OCC_BEGIN_SIID = G_NONEX_SI_ID;
-M1Env::SpecialItemID M1Env::TW_SECTION_2_OCC_END_SIID = G_NONEX_SI_ID;
-M1Env::SpecialItemID M1Env::TW_REV_SECTION_2_OCC_BEGIN_SIID = G_NONEX_SI_ID;
-M1Env::SpecialItemID M1Env::TW_REV_SECTION_2_OCC_END_SIID = G_NONEX_SI_ID;
-
-M1Env::SpecialItemID M1Env::TEXT_SLOKA_BHASHYA_SIID = G_NONEX_SI_ID;
-M1Env::SpecialItemID M1Env::TEXT_SLOKA_TRANSLATION_SIID = G_NONEX_SI_ID;
-M1Env::SpecialItemID M1Env::TEXT_SLOKA_LINE_SIID = G_NONEX_SI_ID;
-M1Env::SpecialItemID M1Env::TEXT_WORD_TRANSLIT_SIID = G_NONEX_SI_ID;
-M1Env::SpecialItemID M1Env::TEXT_WORD_DICT_REF_SIID = G_NONEX_SI_ID;
-M1Env::SpecialItemID M1Env::TEXT_LEMMA_SIID = G_NONEX_SI_ID;
-M1Env::SpecialItemID M1Env::TEXT_WORD_DREF_INRIA_SIID = G_NONEX_SI_ID;
-
-M1Env::SpecialItemID M1Env::TEXT_WFW_UNIT_SIID = G_NONEX_SI_ID; // subtype of TEXT_SECTION_SIID
-M1Env::SpecialItemID M1Env::TEXT_WFW_TRANSL_SIID = G_NONEX_SI_ID;
-M1Env::SpecialItemID M1Env::TEXT_URL_LINK_SIID = G_NONEX_SI_ID;
-
-M1Env::SpecialItemID M1Env::TEXT_WROTE_SIID = G_NONEX_SI_ID;
-M1Env::SpecialItemID M1Env::TEXT_WRITTEN_BY_SIID = G_NONEX_SI_ID;*/
 
 /**
  * @brief initialize LMDB environment (util + string) and mmap() areas for items and specials.
@@ -88,10 +64,18 @@ M1Env::SpecialItemID M1Env::TEXT_WRITTEN_BY_SIID = G_NONEX_SI_ID;*/
  */
 void M1Store::Storage::storeSetUp(bool p_reset){
     M1_FUNC_ENTRY(g_cat_store, QString("Store set-up %1").arg(p_reset ? " (with reset)" : ""))
-    qCDebug(g_cat_store) << QString("cm_item_next_upper_excluded = %1").arg(cm_item_next_upper_excluded);
 
     // LMDB return code (for use with return code test macros)
     int l_rc;
+
+    cm_item_mmap_seg_size = 1 << ITEMS_MMAP_SEGMENT_SIZE_P2;
+    cm_items_per_mmap_segment = 1 << ITEMS_MMAP_INCREMENT_COUNT_P2;
+    cm_item_mmap_next_seg_id = m1_max(1, (unsigned int)ceil((double)cm_next_item / (double)cm_items_per_mmap_segment));
+    cm_item_next_upper_excluded = cm_items_per_mmap_segment * cm_item_mmap_next_seg_id;
+    qCDebug(g_cat_store_mmap) << QString("Items per segment: %1. Segment count: %2 --> next upper excluded: %3")
+                                .arg(cm_items_per_mmap_segment)
+                                .arg(cm_item_mmap_next_seg_id)
+                                .arg(cm_item_next_upper_excluded);
 
     // ------------------------------------ Directory creation -------------------------------------------------------------------------
     // create data directory if not exists
@@ -103,19 +87,23 @@ void M1Store::Storage::storeSetUp(bool p_reset){
     // path to special items mmap() file
     cm_mmap_filepath_specials = fs::path(M1Store::STORE_DATA_PATH) / fs::path(M1Store::LMDB_SPECIAL_MMAP_FILE);
     // path to item mmap() file
-    cm_mmap_filepath_items = fs::path(M1Store::STORE_DATA_PATH) / fs::path(M1Store::LMDB_ITEM_MMAP_FILE);
+    // cm_mmap_filepath_items = fs::path(M1Store::STORE_DATA_PATH) / fs::path(M1Store::LMDB_ITEM_MMAP_FILE);
 
     // ------------------------------------ Store reset -------------------------------------------------------------------------
     // if the reset flag has been passed to the function --> reset all storage elements
     if(p_reset){
-        qCDebug(g_cat_store) << QString("Resetting storage (p_reset = true)");
+        qCDebug(g_cat_store_mmap) << QString("Resetting storage (p_reset = true)");
         // erase LMDB files
         fs::remove_all(cm_lmdb_dir);
 
         if(fs::exists(cm_mmap_filepath_specials)) fs::remove(cm_mmap_filepath_specials);
-        if(fs::exists(cm_mmap_filepath_items)) fs::remove(cm_mmap_filepath_items);
-
-        cm_item_next_upper_excluded = ITEMS_MMAP_INCREMENT_COUNT;
+        // if(fs::exists(cm_mmap_filepath_items)) fs::remove(cm_mmap_filepath_items);
+        for(unsigned int l_seg_id = 0; l_seg_id < cm_item_mmap_next_seg_id; l_seg_id++){
+            QString l_filename = QString(M1Store::LMDB_ITEM_MMAP_FILE_TEMPLATE).arg(l_seg_id, 4, 16, QChar('0'));
+            qCDebug(g_cat_store_mmap) << QString("Deleting [%1]").arg(l_filename);
+            fs::path l_mmap_items_segment_filepath = fs::path(M1Store::STORE_DATA_PATH) / fs::path(l_filename.toStdString());
+            if(fs::exists(l_mmap_items_segment_filepath)) fs::remove(l_mmap_items_segment_filepath);
+        }
     }
 
     // create LMDB storage path if not exists (placed here bc of the remove_all() above, in case of reset)
@@ -132,7 +120,7 @@ void M1Store::Storage::storeSetUp(bool p_reset){
     E(mdb_env_set_maxdbs(cm_lmdb_env, 2));
 
     // 16 Gb Maximum Db size
-    E(mdb_env_set_mapsize(cm_lmdb_env, 16L * 1024 * 1024 * 1024));
+    E(mdb_env_set_mapsize(cm_lmdb_env, LMDB_MAX_SIZE));
 
     // open LMDB env and assign its directory (l_env_dir)
     E(mdb_env_open(cm_lmdb_env, cm_lmdb_dir.c_str(), 0, 0664));
@@ -165,17 +153,16 @@ void M1Store::Storage::storeSetUp(bool p_reset){
 
     // ------------------------------------ mmap() set-up -------------------------------------------------------------------------
     // mmap() init
-    qCDebug(g_cat_store) << "init mmap() storage ...";
+    qCDebug(g_cat_store_mmap) << QString("mmap() init ... ");
 
     // items
-    qCDebug(g_cat_store) << QString("cm_item_next_upper_excluded = %1").arg(cm_item_next_upper_excluded);
     openItemsMmap();
 
     // specials
-    unsigned long l_special_mmap_size = 65536 * sizeof(M1Store::SpecialItem);
+    unsigned long l_special_mmap_size = (1 << SPECIAL_ITEMS_COUNT_P2) * sizeof(M1Store::SpecialItem);
     int l_fd = open(cm_mmap_filepath_specials.c_str(), O_RDWR); // open storage in R/W mode
     if (l_fd == -1) {
-        qCDebug(g_cat_store) << QString("mmap() file [%1] does not exist. Creating it").arg(cm_mmap_filepath_specials.c_str());
+        qCDebug(g_cat_store_mmap) << QString("mmap() file [%1] does not exist. Creating it").arg(cm_mmap_filepath_specials.c_str());
         // failure to open --> assumes file does not exist --> creating it
         EK( (l_fd = open(cm_mmap_filepath_specials.c_str(), O_RDWR | O_CREAT, 0664)) < 0)
         // fill the file to the mmap() length (as per
@@ -187,7 +174,7 @@ void M1Store::Storage::storeSetUp(bool p_reset){
     // set up the memory map for special items
     cm_special_mmap_base = (char*)mmap(
         NULL,                               // placed anywhere in RAM by kernel
-        l_special_mmap_size,                  // size
+        l_special_mmap_size,                // size
         PROT_READ | PROT_WRITE,             // R/W allowed
         MAP_SHARED,                         // not private --> written to disk
         l_fd,                               // file descriptor
@@ -200,7 +187,7 @@ void M1Store::Storage::storeSetUp(bool p_reset){
 
     if(cm_special_mmap_base == MAP_FAILED){
         // mmap() error
-        qDebug() << QString("mmap() error (special items): [%1]-%2").arg(errno).arg(strerror(errno));
+        qCDebug(g_cat_store_mmap) << QString("mmap() error (special items): [%1]-%2").arg(errno).arg(strerror(errno));
         qFatal("Aborting / mmap() special items");
     }
     qCDebug(g_cat_store) << "init mmap() storage complete";
@@ -237,25 +224,7 @@ void M1Store::Storage::storeSetUp(bool p_reset){
     // special items ID constants
     qCDebug(g_cat_store) << "set SpecialItemID constants";
     M1Env::GraphInit::set_pseudo_constants();
-
-    qCDebug(g_cat_silence) << QString("ROOT_SIID                  = %1").arg(M1Store::ROOT_SIID);
-    qCDebug(g_cat_silence) << QString("HOME_SIID                  = %1").arg(M1Store::HOME_SIID);
-    qCDebug(g_cat_silence) << QString("AUTO_SIID                  = %1").arg(M1Store::AUTO_SIID);
-    qCDebug(g_cat_silence) << QString("FOLDER_SIID                = %1").arg(M1Store::FOLDER_SIID);
-    qCDebug(g_cat_silence) << QString("ISA_SIID                   = %1").arg(M1Store::ISA_SIID);
-    qCDebug(g_cat_silence) << QString("ITO_SIID                   = %1").arg(M1Store::ITO_SIID);
-    qCDebug(g_cat_silence) << QString("OWNS_SIID                  = %1").arg(M1Store::OWNS_SIID);
-    qCDebug(g_cat_silence) << QString("BLNGS_SIID                 = %1").arg(M1Store::BLNGS_SIID);
-
-    qCDebug(g_cat_silence) << QString("TEXT_SIID                  = %1").arg(M1Store::TEXT_SIID);
-    qCDebug(g_cat_silence) << QString("WFORM_SIID                 = %1").arg(M1Store::WFORM_SIID);
-    qCDebug(g_cat_silence) << QString("TEXT_CHUNK_SIID            = %1").arg(M1Store::TEXT_CHUNK_SIID);
-
-    qCDebug(g_cat_silence) << QString("TW_WORD_OCC                = %1").arg(M1Store::OCCUR_SIID);
-    qCDebug(g_cat_silence) << QString("TW_SECTION_2_OCC_BEGIN     = %1").arg(M1Store::TW_SECTION_2_OCC_BEGIN_SIID);
-    qCDebug(g_cat_silence) << QString("TW_SECTION_2_OCC_END       = %1").arg(M1Store::TW_SECTION_2_OCC_END_SIID);
-    qCDebug(g_cat_silence) << QString("TW_REV_SECTION_2_OCC_BEGIN = %1").arg(M1Store::TW_REV_SECTION_2_OCC_BEGIN_SIID);
-    qCDebug(g_cat_silence) << QString("TW_REV_SECTION_2_OCC_END   = %1").arg(M1Store::TW_REV_SECTION_2_OCC_END_SIID);
+    M1Env::GraphInit::dbg_dump_pseudo_constants();
 
     // re-allow logging
     M1Env::M1EnvStatic::setSilentMode(false);
@@ -268,41 +237,55 @@ void M1Store::Storage::storeSetUp(bool p_reset){
     M1_FUNC_EXIT
 }
 
-bool M1Store::Storage::lowSpaceMargin(){ return (cm_item_next_upper_excluded - cm_next_item) < (ITEMS_SPACE_MARGIN_FACTOR*ITEMS_MMAP_INCREMENT_COUNT); }
+/**
+ * @brief M1Store::Storage::openItemsMmap
+ */
 void M1Store::Storage::openItemsMmap(){
-    M1_FUNC_ENTRY(g_cat_store, QString("Opening Items mmap() area"))
-
-    // increase size if necessary
-    if(lowSpaceMargin()) cm_item_next_upper_excluded += ITEMS_MMAP_INCREMENT_COUNT;
+    M1_FUNC_ENTRY(g_cat_store_mmap, QString("Opening Items mmap() area"))
 
     // size of mmap() item area
-    qCDebug(g_cat_store) << QString("cm_item_next_upper_excluded = %1").arg(cm_item_next_upper_excluded);
-    qCDebug(g_cat_store) << QString("sizeof(M1Store::Item_lv0) = %1").arg(sizeof(M1Store::Item_lv0));
-    unsigned long long l_item_mmap_size = cm_item_next_upper_excluded * sizeof(M1Store::Item_lv0);
+    qCDebug(g_cat_store_mmap) << QString("sizeof(M1Store::Item_lv0) = %1").arg(sizeof(M1Store::Item_lv0));
 
-    qCDebug(g_cat_store) << QString("opening item mmap() file [%1] size = %2").arg(cm_mmap_filepath_items.c_str()).arg(l_item_mmap_size);
-    int l_fd = open(cm_mmap_filepath_items.c_str(), O_RDWR); // open storage file in R/W mode
+    for(unsigned int l_seg_id = 0; l_seg_id < cm_item_mmap_next_seg_id; l_seg_id++)
+        openSegment(l_seg_id);
+
+    M1_FUNC_EXIT
+}
+
+/**
+ * @brief M1Store::Storage::openSegment
+ * @param p_seg_id
+ */
+void M1Store::Storage::openSegment(unsigned int p_seg_id){
+    M1_FUNC_ENTRY(g_cat_store_mmap, QString("Opening Items mmap() segment: %1").arg(p_seg_id))
+
+    QString l_filename = QString(M1Store::LMDB_ITEM_MMAP_FILE_TEMPLATE).arg(p_seg_id, 4, 16, QChar('0'));
+    fs::path l_mmap_items_segment_filepath = fs::path(M1Store::STORE_DATA_PATH) / fs::path(l_filename.toStdString());
+    qCDebug(g_cat_store_mmap) << QString("opening item segment [%1] mmap() file [%2] size = %3")
+                                .arg(p_seg_id)
+                                .arg(l_mmap_items_segment_filepath.c_str())
+                                .arg(cm_item_mmap_seg_size);
+    int l_fd = open(l_mmap_items_segment_filepath.c_str(), O_RDWR); // open storage file in R/W mode
     if (l_fd == -1) {
-        qDebug() << QString("mmap() file [%1] does not exist. Creating it").arg(cm_mmap_filepath_items.c_str());
+        qDebug() << QString("mmap() segment file [%1] does not exist. Creating it").arg(l_mmap_items_segment_filepath.c_str());
         // failure to open --> assumes file does not exist --> creating it
-        EK( (l_fd = open(cm_mmap_filepath_items.c_str(), O_RDWR | O_CREAT, 0664)) < 0)
+        EK( (l_fd = open(l_mmap_items_segment_filepath.c_str(), O_RDWR | O_CREAT, 0664)) < 0)
     }
 
     // fill the file to the mmap() length (as per
     // https://www.linuxquestions.org/questions/programming-9/mmap-tutorial-c-c-511265/ third post, by Hko)
-    EK( lseek(l_fd, l_item_mmap_size-1, SEEK_SET) < 0 )
+    EK( lseek(l_fd, cm_item_mmap_seg_size-1, SEEK_SET) < 0 )
     EK( write(l_fd, "", 1) != 1 )
-    // the above is now placed here instead of within the if block above in case of enlargement requirement
 
     // set up the memory map for items
-    cm_item_mmap_base = (char*)mmap(
+    cm_item_mmap_base[p_seg_id] = (char*)mmap(
         NULL,                               // placed anywhere in RAM by kernel
-        l_item_mmap_size,                   // size
+        cm_item_mmap_seg_size,              // size
         PROT_READ | PROT_WRITE,             // R/W allowed
         MAP_SHARED,                         // not private --> written to disk
         l_fd,                               // file descriptor
         0                                   // no offset within the file. Map starts at file origin
-    );
+        );
     // file descriptor can be closed at this point as per
     // https://pubs.opengroup.org/onlinepubs/007904875/functions/mmap.html
     // 'The mmap() function shall add an extra reference ...'
@@ -310,18 +293,23 @@ void M1Store::Storage::openItemsMmap(){
 
     if(cm_item_mmap_base == MAP_FAILED){
         // mmap() error
-        qCDebug(g_cat_store) << QString("mmap() error (items): [%1]-%2").arg(errno).arg(strerror(errno));
+        qCDebug(g_cat_store_mmap) << QString("mmap() error (items): [%1]-%2").arg(errno).arg(strerror(errno));
         qFatal("Aborting / mmap() items");
     }
     M1_FUNC_EXIT
 }
+
+/**
+ * @brief M1Store::Storage::closeItemsMmap
+ */
 void M1Store::Storage::closeItemsMmap(){
-    M1_FUNC_ENTRY(g_cat_store, QString("Closing Items mmap() area"))
-    unsigned long long l_item_mmap_size = cm_item_next_upper_excluded * sizeof(M1Store::Item_lv0);
-    // just to be sure
-    msync(cm_item_mmap_base, l_item_mmap_size, MS_SYNC);
-    // actual mmap closing
-    qCDebug(g_cat_store) << QString("items munmap: %1").arg(munmap(cm_item_mmap_base, l_item_mmap_size));
+    M1_FUNC_ENTRY(g_cat_store_mmap, QString("Closing Items mmap() area"))
+    for(unsigned int l_seg_id = 0; l_seg_id < cm_item_mmap_next_seg_id; l_seg_id++){
+        // just to be sure
+        msync(cm_item_mmap_base[l_seg_id], cm_item_mmap_seg_size, MS_SYNC);
+        // actual mmap closing
+        qCDebug(g_cat_store_mmap) << QString("items segment [%1] munmap: %2").arg(l_seg_id).arg(munmap(cm_item_mmap_base, cm_item_mmap_seg_size));
+    }
     M1_FUNC_EXIT
 }
 
@@ -331,10 +319,11 @@ void M1Store::Storage::closeItemsMmap(){
  */
 void M1Store::Storage::mmapSync(){
     M1_FUNC_ENTRY(g_cat_store, QString("Syncing mmap"))
-    unsigned long long l_item_mmap_size = cm_item_next_upper_excluded * sizeof(M1Store::Item_lv0);
-    unsigned long l_special_mmap_size = 65536 * sizeof(M1Store::SpecialItem);
 
-    msync(cm_item_mmap_base, l_item_mmap_size, MS_SYNC);
+    for(unsigned int l_seg_id = 0; l_seg_id < cm_item_mmap_next_seg_id; l_seg_id++)
+        msync(cm_item_mmap_base[l_seg_id], cm_item_mmap_seg_size, MS_SYNC);
+
+    unsigned long l_special_mmap_size = (1 << SPECIAL_ITEMS_COUNT_P2) * sizeof(M1Store::SpecialItem);
     msync(cm_special_mmap_base, l_special_mmap_size, MS_SYNC);
     M1_FUNC_EXIT
 }
@@ -348,9 +337,12 @@ M1Store::Item_lv1* M1Store::Storage::getItemPointer_lv1(ItemID p_item_id){
     M1_FUNC_ENTRY(g_cat_store, QString("getItemPointer_lv0 from ItemID: 0x%1").arg(p_item_id, 16, 16, QChar('0')))
     Q_ASSERT_X(p_item_id < cm_next_item, "M1Store::Storage::getItemPointer_lv0()", "p_item_id out of bounds");
 
-    // shift left by 7 bits = mult by 128
+    // shift right by 23 = divide by the size of a segment in Items = 1Gb / 128 = 2^(30 - 7)
+    unsigned int l_segment_number = p_item_id >> ITEMS_MMAP_INCREMENT_COUNT_P2;
+    ItemID l_item_id_displacement = p_item_id & ITEMS_MMAP_SEG_DISPLACEMENT_MASK;
     M1_FUNC_EXIT
-    return (Item_lv1*)(cm_item_mmap_base + (p_item_id << 7));
+    // shift left by 7 bits = mult by 128 (Item size)
+    return (Item_lv1*)(cm_item_mmap_base[l_segment_number] + (l_item_id_displacement << ITEM_SIZE_P2));
 }
 
 /**
@@ -367,29 +359,29 @@ M1Store::SpecialItem* M1Store::Storage::getSpecialItemPointer(const SpecialItemI
 }
 
 /**
- * @brief allocate new Item_lv0 in the mmap() area and give it a new ItemID.
+ * @brief allocate new Item_lv0 (and _lv1) in the mmap() area and give it a new ItemID.
  *
- * Also initialize members. This function "replaces" the Item_lv0() constructor which is never used except for testing
+ * Also initialize members. This function "replaces" the Item_lv0/_lv1() constructors which are never used except for testing
  *
  * @param p_flags flag value for initialization
  * @param p_type ItemType value for initialization
- * @return pointer to the new Item_lv0
+ * @return pointer to the new Item_lv1
  */
 M1Store::Item_lv1* M1Store::Storage::getNewItemPointer_lv1(const FlagField p_flags, const ItemType& p_type){
     M1_FUNC_ENTRY(g_cat_store, QString("initialize new item: flags 0b%1 type %2").arg(p_flags, 64, 2, QChar('0')).arg(p_type.dbgString()))
     // get new item ID and increment the top ItemID counter
-    ItemID l_id = cm_next_item++;
-
-    // throw warning if low free items
-    if(lowSpaceMargin()) throw (new M1Env::M1Exception(
-            QString("Low free space. Only %1 free items left").arg(cm_item_next_upper_excluded-cm_next_item),
-            M1_WARNING_LOW_FREE_SPACE)
-    );
+    if(cm_next_item == cm_item_next_upper_excluded){
+        // create new segment if required
+        openSegment(cm_item_mmap_next_seg_id);
+        cm_item_mmap_next_seg_id += 1;
+        cm_item_next_upper_excluded += cm_items_per_mmap_segment;
+    }
+    ItemID l_new_id = cm_next_item++;
 
     // get the pointer inside the mmap() area
-    Item_lv1* l_ret = getItemPointer_lv1(l_id);
+    Item_lv1* l_ret = getItemPointer_lv1(l_new_id);
     // initialize members (depending on category determined from flags), including the new ItemID
-    l_ret->initializeMembers_lv1(l_id, p_flags, p_type);
+    l_ret->initializeMembers_lv1(l_new_id, p_flags, p_type);
 
     M1_FUNC_EXIT
     return l_ret;
@@ -432,36 +424,14 @@ bool M1Store::Storage::menmonic_exists(const char* p_mnemonic){
  * @param p_item_id the ItemID
  * @return the pointer
  */
-// TODO: Keep cm_dummy?
 M1Store::SpecialItem* M1Store::Storage::getSpecialItemPointer(const ItemID p_item_id){
     M1_FUNC_ENTRY(g_cat_store, QString("getSpecial from ItemID: 0x%1").arg(p_item_id, 16, 16, QChar('0')))
-    // SpecialItem* l_ret = nullptr;
     SpecialItem* l_ret = M1Store::SpecialItem::cm_dummy;
 
     if(auto l_search = cm_item_id_to_special.find(p_item_id); l_search != cm_item_id_to_special.end())
         l_ret = l_search->second;
 
-    /*
-    // goes through the whole table to find the corresponding SpecialItem, if it exists
-    qCDebug(g_cat_store) << QString("cm_next_special: %1").arg(cm_next_special);
-    for(SpecialItemID i = 0; i < cm_next_special; i++){
-        SpecialItem* l_special_item = getSpecialItemPointer(i);
-        qCDebug(g_cat_store) << QString("Special [0x%1] %3 --> 0x%2")
-                                    .arg(i, 4, 16, QChar('0'))
-                                    .arg(l_special_item->itemId(), 16, 16, QChar('0'))
-                                    .arg(l_special_item->mnemonic());
-        if(l_special_item->itemId() == p_item_id){
-            M1_FUNC_EXIT
-            return l_special_item;
-        }
-    }
-    */
-
-    // not found --> fatal error
-    // qFatal("Aborting / searching in the special items table for an item that is not there");
-
     M1_FUNC_EXIT
-    // return M1Store::SpecialItem::cm_dummy;
     return l_ret;
 }
 
@@ -546,8 +516,6 @@ void M1Store::Storage::getNewSpecialWithReciprocal(
                                 .arg(p_mnemonic_2))
 
     // forces the flag SI_HAS_RECIPROCAL for both
-    // M1Store::SpecialItem* l_s1 = getNewSpecialNoItem(p_flags | SI_HAS_RECIPROCAL, p_mnemonic_1, p_icon_path_1, p_siid_var_1);
-    // M1Store::SpecialItem* l_s2 = getNewSpecialNoItem(p_flags_2 | SI_HAS_RECIPROCAL, p_mnemonic_2, p_icon_path_2, p_siid_var_2);
     M1Store::SpecialItem* l_s1 = getNewSpecialNoItem(p_flags | SI_HAS_RECIPROCAL, p_mnemonic_1, p_icon_path_1);
     M1Store::SpecialItem* l_s2 = getNewSpecialNoItem(p_flags_2 | SI_HAS_RECIPROCAL, p_mnemonic_2, p_icon_path_2);
 
@@ -586,207 +554,12 @@ void M1Store::Storage::version_0_to_1(){
     M1_FUNC_EXIT
 }
 
-/**
- * @brief version update 1 to 2
- *
- * Creates the root nodes for texts
- */
-/*
-void M1Store::Storage::version_1_to_2(){
-    M1_FUNC_ENTRY(g_cat_store, QString("Creating text-related types"))
-
-    // Word Occurence edge
-    getNewSpecialNoItem(SI_IS_TYPE, "WDOCC", M1Env::TEXT_WORD_ICON_PATH, &M1Env::TW_WORD_OCC_SIID);
-
-    // "Reverse" word to occurence edges
-    getNewSpecialNoItem(SI_IS_TYPE, "RWDOC", M1Env::TEXT_WORD_ICON_PATH, &M1Env::TW_REV_WORD_OCC_SIID);
-
-    // Hierarchical section to occurence - begin and end - with their reciprocal
-    getNewSpecialWithReciprocal(SI_IS_TYPE,
-                                "HS2OB", M1Env::TW_SECTION_2_OCC_BEGIN_ICON_PATH, &M1Env::TW_SECTION_2_OCC_BEGIN_SIID,
-                                "OC2HB", M1Env::TW_SECTION_2_OCC_BEGIN_ICON_PATH, &M1Env::TW_REV_SECTION_2_OCC_BEGIN_SIID,
-                                SI_IS_TYPE);
-    getNewSpecialWithReciprocal(SI_IS_TYPE,
-                                "HS2OE", M1Env::TW_SECTION_2_OCC_END_ICON_PATH, &M1Env::TW_SECTION_2_OCC_END_SIID,
-                                "OC2HE", M1Env::TW_SECTION_2_OCC_END_ICON_PATH, &M1Env::TW_REV_SECTION_2_OCC_END_SIID,
-                                SI_IS_TYPE);
-
-    M1Store::Item_lv2* l_type_root = M1Store::Item_lv2::getExisting("TYPE_");
-    M1Store::Item_lv2* l_text_type = M1Store::Item_lv2::getNew(
-        // category & attributes
-        M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
-        // type
-        M1Store::ItemType(getSpecialItemPointer("TYPE_")->specialId()),
-        // label
-        "Texts root and type",
-        // special item flags
-        M1Store::SI_IS_TYPE | M1Store::SI_REQUIRES_EDGE,
-        // special item mnemonic
-        "TEXT_",                    // special item mnemonic
-        M1Env::TEXT_ICON_PATH,      // icon (none in this case)
-        &M1Env::TEXT_SIID           // special ID pseudo constant
-    );
-    l_text_type->linkTo(l_type_root, "BLNGS", nullptr, true);
-    
-    M1Store::Item_lv2* l_word = M1Store::Item_lv2::getNew(
-        // category & attributes
-        M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
-        // type
-        M1Store::ItemType(getSpecialItemPointer("TYPE_")->specialId()),
-        // label
-        "Text words (type)",
-        // special item flags
-        M1Store::SI_IS_TYPE | M1Store::SI_REQUIRES_EDGE,
-        // special item mnemonic
-        "TWORD",                    // special item mnemonic
-        M1Env::TEXT_WORD_ICON_PATH, // icon (none in this case)
-        &M1Env::TEXT_WORD_SIID      // special ID pseudo constant
-    );
-    l_word->linkTo(l_type_root, "BLNGS", nullptr, true);
-
-    M1Store::Item_lv2* l_lemma = M1Store::Item_lv2::getNew(
-        // category & attributes
-        M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
-        // type
-        M1Store::ItemType(getSpecialItemPointer("TYPE_")->specialId()),
-        // label
-        "Text lemmas (type)",
-        // special item flags
-        M1Store::SI_IS_TYPE | M1Store::SI_REQUIRES_EDGE,
-        // special item mnemonic
-        "TXLEM",                    // special item mnemonic
-        M1Env::TEXT_LEMMA_ICON_PATH,// icon (none in this case)
-        &M1Env::TEXT_LEMMA_SIID     // special ID pseudo constant
-    );
-    l_lemma->linkTo(l_type_root, "BLNGS", nullptr, true);
-
-    M1Store::Item_lv2* l_text_section_type = M1Store::Item_lv2::getNew(
-        // category & attributes
-        M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
-        // type
-        M1Store::ItemType(getSpecialItemPointer("TYPE_")->specialId()),
-        // label
-        "Text section type",
-        // special item flags
-        M1Store::SI_IS_TYPE | M1Store::SI_REQUIRES_EDGE,
-        // special item mnemonic
-        "TXSEC",                        // special item mnemonic
-        M1Env::TEXT_SECTION_ICON_PATH,  // icon (none in this case)
-        &M1Env::TEXT_SECTION_SIID       // special ID pseudo constant
-    );
-    l_text_section_type->linkTo(l_type_root, "BLNGS", nullptr, true);
-
-    M1Store::Storage::mmapSync();
-    M1Store::Storage::incrementCurrentVersion();
-
-    M1_FUNC_EXIT
-}
-
-void M1Store::Storage::version_2_to_3(){
-    M1_FUNC_ENTRY(g_cat_store, QString("Creating Indic text types"))
-
-    // Word transliteration field simple edge type
-    getNewSpecialNoItem(SI_IS_TYPE, "TRSLT", nullptr, &M1Env::TEXT_WORD_TRANSLIT_SIID);
-    // word dictionary reference field simple edge type
-    getNewSpecialNoItem(SI_IS_TYPE, "DCTRF", nullptr, &M1Env::TEXT_WORD_DICT_REF_SIID);
-
-    // Word-for-Word translation field simple edge type
-    getNewSpecialNoItem(SI_IS_TYPE, "WFTRN", nullptr, &M1Env::TEXT_WFW_TRANSL_SIID);
-    // URL link field simple edge type
-    getNewSpecialNoItem(SI_IS_TYPE, "URLNK", M1Env::TEXT_URL_LINK_ICON_PATH, &M1Env::TEXT_URL_LINK_SIID);
-
-    getNewSpecialWithReciprocal(SI_IS_TYPE,
-                                "WROTE", M1Env::TEXT_WROTE_ICON_PATH, &M1Env::TEXT_WROTE_SIID,
-                                "WRTBY", M1Env::TEXT_WRITTEN_BY_ICON_PATH, &M1Env::TEXT_WRITTEN_BY_SIID,
-                                SI_IS_TYPE | M1Env::SI_INSERT_AT_TOP);
-
-    M1Store::Item_lv2* l_type_root = M1Store::Item_lv2::getExisting("TYPE_");
-    M1Store::Item_lv2* l_sloka_bhashya_type = M1Store::Item_lv2::getNew(
-        // category & attributes
-        M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
-        // type
-        M1Store::ItemType(getSpecialItemPointer("TYPE_")->specialId()),
-        // label
-        "Sloka Bhashya",
-        // special item flags
-        M1Store::SI_IS_TYPE | M1Store::SI_REQUIRES_EDGE,
-        // special item mnemonic
-        "SLBHS",                                // special item mnemonic
-        M1Env::TEXT_SLOKA_BHASHYA_ICON_PATH,    // icon (none in this case)
-        &M1Env::TEXT_SLOKA_BHASHYA_SIID         // special ID pseudo constant
-    );
-    l_sloka_bhashya_type->linkTo(l_type_root, "BLNGS", nullptr, true);
-    M1Store::Item_lv2* l_sloka_translation_type = M1Store::Item_lv2::getNew(
-        // category & attributes
-        M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
-        // type
-        M1Store::ItemType(getSpecialItemPointer("TYPE_")->specialId()),
-        // label
-        "Sloka Translation",
-        // special item flags
-        M1Store::SI_IS_TYPE | M1Store::SI_REQUIRES_EDGE,
-        // special item mnemonic
-        "SLTRN",                                // special item mnemonic
-        M1Env::TEXT_SLOKA_TRANSLATION_ICON_PATH,// icon (none in this case)
-        &M1Env::TEXT_SLOKA_TRANSLATION_SIID     // special ID pseudo constant
-    );
-    l_sloka_translation_type->linkTo(l_type_root, "BLNGS", nullptr, true);
-    M1Store::Item_lv2* l_sloka_skt_line = M1Store::Item_lv2::getNew(
-        // category & attributes
-        M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
-        // type
-        M1Store::ItemType(getSpecialItemPointer("TYPE_")->specialId()),
-        // label
-        "Sloka Line",
-        // special item flags
-        M1Store::SI_IS_TYPE | M1Store::SI_REQUIRES_EDGE,
-        // special item mnemonic
-        "SLKLN",                            // special item mnemonic
-        M1Env::TEXT_SLOKA_LINE_ICON_PATH,   // icon (none in this case)
-        &M1Env::TEXT_SLOKA_LINE_SIID        // special ID pseudo constant
-    );
-    l_sloka_skt_line->linkTo(l_type_root, "BLNGS", nullptr, true);
-    M1Store::Item_lv2* l_inria_dict_ref = M1Store::Item_lv2::getNew(
-        // category & attributes
-        M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
-        // type
-        M1Store::ItemType(getSpecialItemPointer("TYPE_")->specialId()),
-        // label
-        "INRIA Dictionary Reference",
-        // special item flags
-        M1Store::SI_IS_TYPE | M1Store::SI_REQUIRES_EDGE,
-        // special item mnemonic
-        "INRIA",                            // special item mnemonic
-        nullptr,                            // icon (none in this case)
-        &M1Env::TEXT_WORD_DREF_INRIA_SIID   // special ID pseudo constant
-    );
-    l_inria_dict_ref->linkTo(l_type_root, "BLNGS", nullptr, true);
-    M1Store::Item_lv2* l_transl_unit = M1Store::Item_lv2::getNew(
-        // category & attributes
-        M1Store::FULL_VERTEX | M1Store::IS_SPECIAL,
-        // type
-        M1Store::ItemType(getSpecialItemPointer("TYPE_")->specialId()),
-        // label
-        "WfW Translation Unit (type)",
-        // special item flags
-        M1Store::SI_IS_TYPE | M1Store::SI_REQUIRES_EDGE,
-        // special item mnemonic
-        "TRLUN",                            // special item mnemonic
-        M1Env::TEXT_WFW_UNIT_ICON_PATH,     // icon (none in this case)
-        &M1Env::TEXT_WFW_UNIT_SIID          // special ID pseudo constant
-    );
-    l_transl_unit->linkTo(l_type_root, "BLNGS", nullptr, true);
-
-    M1Store::Storage::mmapSync();
-    M1Store::Storage::incrementCurrentVersion();
-
-    M1_FUNC_EXIT
-}
-*/
-
 QVector<QIcon*> M1Store::Storage::cm_type_icon;
 QVector<QString> M1Store::Storage::cm_icon_path;
 
+/**
+ * @brief M1Store::Storage::loadIcons
+ */
 void M1Store::Storage::loadIcons(){
     M1_FUNC_ENTRY(g_cat_store, "setting up Special Item QIcon list")
 
@@ -800,8 +573,16 @@ void M1Store::Storage::loadIcons(){
     M1_FUNC_EXIT
 }
 
+/**
+ * @brief M1Store::Storage::appendDefaultIcon
+ */
 void M1Store::Storage::appendDefaultIcon(){cm_type_icon.append(new QIcon(M1Env::FOLDER_ICON_PATH));}
 
+/**
+ * @brief M1Store::Storage::getQIcon
+ * @param p_si_id
+ * @return
+ */
 QIcon* M1Store::Storage::getQIcon(SpecialItemID p_si_id){
     M1_FUNC_ENTRY(g_cat_store, QString("Get Icon for [%1]").arg(getSpecialItemPointer(p_si_id)->mnemonic()))
 
@@ -819,6 +600,10 @@ QIcon* M1Store::Storage::getQIcon(SpecialItemID p_si_id){
     return l_ret;
 }
 
+/**
+ * @brief M1Store::Storage::getSelectableEdgeTypes
+ * @return
+ */
 QList<M1Store::SpecialItem*>& M1Store::Storage::getSelectableEdgeTypes(){
     M1_FUNC_ENTRY(g_cat_store, QString("Get list of selectable edge types"))
     static QList<M1Store::SpecialItem*> l_ret_edges;
@@ -832,6 +617,10 @@ QList<M1Store::SpecialItem*>& M1Store::Storage::getSelectableEdgeTypes(){
     M1_FUNC_EXIT
     return l_ret_edges;
 }
+/**
+ * @brief M1Store::Storage::getSelectableVertexTypes
+ * @return
+ */
 QList<M1Store::SpecialItem*>& M1Store::Storage::getSelectableVertexTypes(){
     M1_FUNC_ENTRY(g_cat_store, QString("Get list of selectable vertex types"))
     static QList<M1Store::SpecialItem*> l_ret_vertices;
@@ -849,46 +638,6 @@ QList<M1Store::SpecialItem*>& M1Store::Storage::getSelectableVertexTypes(){
     M1_FUNC_EXIT
     return l_ret_vertices;
 }
-
-
-/*
-0x0000 AUTO_ 0xffffffffffffffff 0b0000000000000000000000000000000000000000000000000000000000001001
-0x0001 OWNS_ 0xffffffffffffffff 0b0000000000000000000000000000000000000000000000000000000000011001 --RECIPROCAL--> BLNGS
-0x0002 BLNGS 0xffffffffffffffff 0b0000000000000000000000000000000000000000000000000000000001011001 --RECIPROCAL--> OWNS_
-0x0003 _ISA_ 0xffffffffffffffff 0b0000000000000000000000000000000000000000000000000000000000111001 --RECIPROCAL--> _ITO_
-0x0004 _ITO_ 0xffffffffffffffff 0b0000000000000000000000000000000000000000000000000000000000111001 --RECIPROCAL--> _ISA_
-0x0005 ROOT_ 0x0000000000000000 0b0000000000000000000000000000000000000000000000000000000000000000 --ITEM--> VRTX [_____] Global graph root (ROOT_)
-0x0006 HOME_ 0x0000000000000002 0b0000000000000000000000000000000000000000000000000000000000000000 --ITEM--> VRTX [_____] Home (HOME_)
-0x0007 ME___ 0x0000000000000004 0b0000000000000000000000000000000000000000000000000000000000000000 --ITEM--> VRTX [PERSN] Me (ME___)
-0x0008 TYPE_ 0x0000000000000006 0b0000000000000000000000000000000000000000000000000000000000000011 --ITEM--> VRTX [TYPE_] Root of all types (TYPE_)
-0x0009 PERSN 0x0000000000000008 0b0000000000000000000000000000000000000000000000000000000000000011 --ITEM--> VRTX [TYPE_] Person (type) (PERSN)
-0x000a EMAIL 0x000000000000000c 0b0000000000000000000000000000000000000000000000000000000000000011 --ITEM--> VRTX [_____] Email Inbox (EMAIL)
-0x000b WHTSP 0x000000000000000e 0b0000000000000000000000000000000000000000000000000000000000000011 --ITEM--> VRTX [_____] Whatsapp Inbox (WHTSP)
-0x000c DSCRD 0x0000000000000010 0b0000000000000000000000000000000000000000000000000000000000000011 --ITEM--> VRTX [_____] Discord Inbox (DSCRD)
-0x000d WDOCC 0xffffffffffffffff 0b0000000000000000000000000000000000000000000000000000000000001001
-0x000e RWDOC 0xffffffffffffffff 0b0000000000000000000000000000000000000000000000000000000000001001
-0x000f HS2OB 0xffffffffffffffff 0b0000000000000000000000000000000000000000000000000000000000011001 --RECIPROCAL--> OC2HB
-0x0010 OC2HB 0xffffffffffffffff 0b0000000000000000000000000000000000000000000000000000000000011001 --RECIPROCAL--> HS2OB
-0x0011 HS2OE 0xffffffffffffffff 0b0000000000000000000000000000000000000000000000000000000000011001 --RECIPROCAL--> OC2HE
-0x0012 OC2HE 0xffffffffffffffff 0b0000000000000000000000000000000000000000000000000000000000011001 --RECIPROCAL--> HS2OE
-0x0013 TEXT_ 0x0000000000000032 0b0000000000000000000000000000000000000000000000000000000000000011 --ITEM--> VRTX [TYPE_] Texts root and type (TEXT_)
-0x0014 TWORD 0x0000000000000038 0b0000000000000000000000000000000000000000000000000000000000000011 --ITEM--> VRTX [TYPE_] Text words (type) (TWORD)
-0x0015 TXLEM 0x000000000000003e 0b0000000000000000000000000000000000000000000000000000000000000011 --ITEM--> VRTX [TYPE_] Text lemmas (type) (TXLEM)
-0x0016 TXSEC 0x0000000000000044 0b0000000000000000000000000000000000000000000000000000000000000011 --ITEM--> VRTX [TYPE_] Text section type (TXSEC)
-0x0017 TRSLT 0xffffffffffffffff 0b0000000000000000000000000000000000000000000000000000000000001001
-0x0018 DCTRF 0xffffffffffffffff 0b0000000000000000000000000000000000000000000000000000000000001001
-0x0019 WFTRN 0xffffffffffffffff 0b0000000000000000000000000000000000000000000000000000000000001001
-0x001a PRABH 0xffffffffffffffff 0b0000000000000000000000000000000000000000000000000000000000001001
-0x001b SIVAN 0xffffffffffffffff 0b0000000000000000000000000000000000000000000000000000000000001001
-0x001c GAMBI 0xffffffffffffffff 0b0000000000000000000000000000000000000000000000000000000000001001
-0x001d SLBHS 0x000000000000004a 0b0000000000000000000000000000000000000000000000000000000000000011 --ITEM--> VRTX [TYPE_] Sloka Bhashya (SLBHS)
-0x001e SLTRN 0x0000000000000050 0b0000000000000000000000000000000000000000000000000000000000000011 --ITEM--> VRTX [TYPE_] Sloka Translation (SLTRN)
-0x001f SLKLN 0x0000000000000056 0b0000000000000000000000000000000000000000000000000000000000000011 --ITEM--> VRTX [TYPE_] Sloka Line (SLKLN)
-0x0020 INRIA 0x000000000000005c 0b0000000000000000000000000000000000000000000000000000000000000011 --ITEM--> VRTX [TYPE_] INRIA Dictionary Reference (INRIA)
-0x0021 TRLUN 0x0000000000000062 0b0000000000000000000000000000000000000000000000000000000000000011 --ITEM--> VRTX [TYPE_] WfW Translation Unit (type) (TRLUN)
-*/
-
-// TODO: Ascending edges should not be represented when opening edges
 
 /**
  * @brief Shuts down LMDB environment and mmap() areas for items and specials
@@ -919,7 +668,6 @@ void M1Store::Storage::storeShutDown(){
     // initiate transaction
     MDB_txn* l_txn;
     E(mdb_txn_begin(cm_lmdb_env, NULL, MDB_RDONLY, &l_txn));
-    // E(mdb_dbi_open(l_txn, LMDB_STRING_DB, 0 , &cm_dbi_string));
 
     E(mdb_stat(l_txn, cm_dbi_util, &l_mst));
     qCDebug(g_cat_silence) << QString("--------------------- Util stats ---------------------------");
@@ -943,7 +691,7 @@ void M1Store::Storage::storeShutDown(){
     dbgDump();
 #endif
 
-    // close everything
+    // close LMDB env
     mdb_dbi_close(cm_lmdb_env, cm_dbi_util);
     mdb_dbi_close(cm_lmdb_env, cm_dbi_string);
     mdb_env_close(cm_lmdb_env);
@@ -953,12 +701,10 @@ void M1Store::Storage::storeShutDown(){
 
     // unmap areas
     closeItemsMmap();
-    unsigned long l_special_mmap_size = 0x10000 * sizeof(M1Store::SpecialItem);
+    unsigned long l_special_mmap_size = (1 << SPECIAL_ITEMS_COUNT_P2) * sizeof(M1Store::SpecialItem);
     qCDebug(g_cat_store) << QString("special items munmap: %1").arg(munmap(cm_special_mmap_base, l_special_mmap_size));
 
-    // qCDebug(g_cat_store) << QString("sizeof(M1Store::Item_lv0) : %1").arg(sizeof(M1Store::Item_lv0));
     qCDebug(g_cat_store) << QString("Storage environment closed");
-
     M1_FUNC_EXIT
 }
 
@@ -967,12 +713,10 @@ void M1Store::Storage::dbgUtilDump(){
     int l_rc;
     MDB_val l_key, l_data;
     MDB_cursor* l_curs;
-
-    // initiate transaction
     MDB_txn* l_txn;
 
-    // dump util table
     qCDebug(g_cat_silence) << QString("================ Util dump ==========");
+    // initiate transaction
     E(mdb_txn_begin(cm_lmdb_env, NULL, MDB_RDONLY, &l_txn));
 
     E(mdb_cursor_open(l_txn, cm_dbi_util, &l_curs));
@@ -1002,6 +746,9 @@ void M1Store::Storage::dbgUtilDump(){
     E(mdb_txn_commit(l_txn));
 }
 
+/**
+ * @brief M1Store::Storage::dbgSpecialDump
+ */
 void M1Store::Storage::dbgSpecialDump(){
     qCDebug(g_cat_silence) << QString("========= Special Items dump ========");
 
@@ -1009,9 +756,106 @@ void M1Store::Storage::dbgSpecialDump(){
         qCDebug(g_cat_silence) << getSpecialItemPointer(i)->dbgString();
 }
 
+void M1Store::Storage::dbgStringDump(){
+    // LMDB return code (for use with return code test macros)
+    int l_rc;
+    MDB_val l_key, l_data;
+    MDB_cursor* l_curs;
+    MDB_txn* l_txn;
+
+    qCDebug(g_cat_silence) << QString("================ String dump ========");
+
+    for(StringID i=0; i<cm_next_string; i++){
+        l_key.mv_size = sizeof(ItemID);
+        l_key.mv_data = &i;
+
+        // initiate transaction
+        E(mdb_txn_begin(cm_lmdb_env, NULL, MDB_RDONLY, &l_txn));
+
+        // retrieve string and put char* pointer into l_data.mv_data
+        l_rc = mdb_get(l_txn, cm_dbi_string, &l_key, &l_data);
+
+        if(l_rc == MDB_NOTFOUND)
+            l_key.mv_data = 0; // do nothing
+        else{
+            QString s((char *)(l_data.mv_data));
+            qCDebug(g_cat_silence) << QString("0x%1 --> %2%3 [%4]")
+                                          .arg(QString("%1").arg(i, 16, 16, QChar('0')).toUpper())
+                                          .arg(s.left(100), s.length() > 100 ? "..." : "")
+                                          .arg(l_data.mv_size).toUtf8().constData();
+            // the .toUtf8().constData() is to avoid qDebug() escaping the backslashes as per
+            //https://stackoverflow.com/questions/40366555/c-qt-qstring-replace-double-backslash-with-one
+        }
+
+        // commit transaction
+        E(mdb_txn_commit(l_txn));
+    }
+}
+
+/**
+ * @brief M1Store::Storage::dbgVerticesDump
+ */
+void M1Store::Storage::dbgVerticesDump(){
+    qCDebug(g_cat_silence) << QString("========= Vertices dump =============");
+
+    QFile l_file("vertices_dump.txt");
+    if (!l_file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+    QTextStream l_out(&l_file);
+
+
+    for(ItemID i = 0; i < cm_next_item; i++){
+        Item_lv2* l_item = Item_lv2::getExisting(i);
+        if(l_item->isFullVertex())
+            l_out << QString("%1\n").arg(l_item->dbgString().toUtf8().constData());
+    }
+}
+
+/**
+ * @brief M1Store::Storage::dbgItemsDump
+ */
+void M1Store::Storage::dbgItemsDump(){
+    qCDebug(g_cat_silence) << QString("========= Items dump ================");
+
+    QFile l_file("items_dump.txt");
+    if (!l_file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+    QTextStream l_out(&l_file);
+
+    for(ItemID i = 0; i < cm_next_item; i++){
+        Item_lv2* l_item = Item_lv2::getExisting(i);
+        l_out << QString("0x%1 ").arg(i, 16, 16, QChar('0')) + l_item->dbgShort() + "\n";
+    }
+}
+
+/**
+ * @brief M1Store::Storage::dbgDump
+ */
 void M1Store::Storage::dbgDump(){
     // various table dumps, executed only in debug build
 
+    // dump util table
+    dbgUtilDump();
+
+    // dump string table
+    dbgStringDump();
+
+    // dump Constants
+    M1Env::GraphInit::dbg_dump_pseudo_constants();
+
+    // dump special items table
+    dbgSpecialDump();
+
+    // dump items --------------------------------------------------------------
+    dbgItemsDump();
+
+    // dump vertices --------------------------------------------------------------
+    dbgVerticesDump();
+
+    // tree dump --------------------------------------------------------------
+    Item_lv2::dbgRecurGraphStart(getSpecialItemPointer("ROOT_")->itemId());
+
+    /*
     // LMDB return code (for use with return code test macros)
     int l_rc;
     MDB_val l_key, l_data;
@@ -1021,7 +865,6 @@ void M1Store::Storage::dbgDump(){
     MDB_txn* l_txn;
     E(mdb_txn_begin(cm_lmdb_env, NULL, MDB_RDONLY, &l_txn));
 
-    // dump util table
     qCDebug(g_cat_silence) << QString("================ Util dump ==========");
 
     E(mdb_cursor_open(l_txn, cm_dbi_util, &l_curs));
@@ -1049,8 +892,9 @@ void M1Store::Storage::dbgDump(){
         l_rc = mdb_cursor_get(l_curs, NULL, NULL, MDB_NEXT);
     }
     E(mdb_txn_commit(l_txn));
+    */
 
-    // dump string table
+    /*
     qCDebug(g_cat_silence) << QString("================ String dump ========");
 
     for(StringID i=0; i<cm_next_string; i++){
@@ -1080,25 +924,12 @@ void M1Store::Storage::dbgDump(){
         // commit transaction
         E(mdb_txn_commit(l_txn));
     }
-
-    // dump Constants
-    qCDebug(g_cat_silence) << QString("================ Constants dump ========");
-    /*
-    qCDebug(g_cat_silence) << QString("ROOT_SIID  = 0x%1").arg(M1Store::ROOT_SIID, 4, 16, QChar('0'));
-    qCDebug(g_cat_silence) << QString("HOME_SIID  = 0x%1").arg(M1Store::HOME_SIID, 4, 16, QChar('0'));
-    qCDebug(g_cat_silence) << QString("ISA_SIID   = 0x%1").arg(M1Store::ISA_SIID, 4, 16, QChar('0'));
-    qCDebug(g_cat_silence) << QString("ITO_SIID   = 0x%1").arg(M1Store::ITO_SIID, 4, 16, QChar('0'));
-    qCDebug(g_cat_silence) << QString("OWNS_SIID  = 0x%1").arg(M1Store::OWNS_SIID, 4, 16, QChar('0'));
-    qCDebug(g_cat_silence) << QString("BLNGS_SIID = 0x%1").arg(M1Store::BLNGS_SIID, 4, 16, QChar('0'));
-    qCDebug(g_cat_silence) << QString("TEXT_SIID  = 0x%1").arg(M1Store::TEXT_SIID, 4, 16, QChar('0'));
-    qCDebug(g_cat_silence) << QString("FORM_SIID  = 0x%1").arg(M1Store::WFORM_SIID, 4, 16, QChar('0'));
     */
-
-    // dump special items table
+    /*
     qCDebug(g_cat_silence) << QString("========= Special Items dump ========");
-
     for(SpecialItemID i = 0; i < cm_next_special; i++)
         qCDebug(g_cat_silence) << getSpecialItemPointer(i)->dbgString();
+    */
 
     // dump items --------------------------------------------------------------
     /*
@@ -1189,16 +1020,16 @@ void M1Store::Storage::loadUtilites(MDB_txn *p_txn){
         ((l_rc == MDB_NOTFOUND) ? QString("%1 --> KEY NOT FOUND").arg(l_key_val, 8, 16, QChar('0')) :
         QString("retrieved: 0x%1 --> %2 [%3]").arg(l_key_val, 8, 16, QChar('0')).arg(cm_next_special).arg(l_data.mv_size));
 
-    // loading curremt upper bound for cm_next_item
-    l_key_val = CURRENT_UPPER_COUNT;
+    // loading next segment number
+    l_key_val = ITEM_NEXT_MMAP_SEGMENT;
     l_rc = mdb_get(p_txn, cm_dbi_util, &l_key, &l_data);
     if(l_rc == MDB_NOTFOUND)
-        cm_item_next_upper_excluded = 0;
+        cm_item_mmap_next_seg_id = 0;
     else
-        cm_item_next_upper_excluded = *((ItemID *)(l_data.mv_data));
-    qCDebug(g_cat_store) << QString("CURRENT_UPPER_COUNT: ") +
+        cm_item_mmap_next_seg_id = *((ItemID *)(l_data.mv_data));
+    qCDebug(g_cat_store) << QString("ITEM_NEXT_MMAP_SEGMENT: ") +
         ((l_rc == MDB_NOTFOUND) ? QString("%1 --> KEY NOT FOUND").arg(l_key_val, 8, 16, QChar('0')) :
-        QString("retrieved: 0x%1 --> %2 [%3]").arg(l_key_val, 8, 16, QChar('0')).arg(cm_item_next_upper_excluded).arg(l_data.mv_size));
+        QString("retrieved: 0x%1 --> %2 [%3]").arg(l_key_val, 8, 16, QChar('0')).arg(cm_item_mmap_next_seg_id).arg(l_data.mv_size));
 
     // --------------------------------------------------- load icon paths --------------------------------------------
     for(M1Store::SpecialItemID l_siid = 0; l_siid < cm_next_special; l_siid++){
@@ -1281,11 +1112,11 @@ void M1Store::Storage::saveUtilities(MDB_txn *p_txn){
 
     l_data.mv_size = sizeof(ItemID);
 
-    // storing curremt upper bound for cm_next_item
-    l_key_val = CURRENT_UPPER_COUNT;
-    l_data.mv_data = &(cm_item_next_upper_excluded);
+    // storing next segment number
+    l_key_val = ITEM_NEXT_MMAP_SEGMENT;
+    l_data.mv_data = &(cm_item_mmap_next_seg_id);
     E(mdb_put(l_txn, cm_dbi_util, &l_key, &l_data, 0));
-    qCDebug(g_cat_store) << QString("CURRENT_UPPER_COUNT: 0x%1 --> %2").arg(l_key_val, 8, 16, QChar('0')).arg(cm_item_next_upper_excluded);
+    qCDebug(g_cat_store) << QString("ITEM_NEXT_MMAP_SEGMENT: 0x%1 --> %2").arg(l_key_val, 8, 16, QChar('0')).arg(cm_item_mmap_next_seg_id);
 
     // --------------------------------------------------- Save icon paths --------------------------------------------
     for(M1Store::SpecialItemID l_siid = 0; l_siid < cm_next_special; l_siid++){

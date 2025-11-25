@@ -248,13 +248,13 @@ M1Store::Item_lv2* M1Store::Item_lv2::setFieldInternal(const QString& p_content,
 M1Store::Item_lv2* M1Store::Item_lv2::setFieldVertex(const QString& p_content, const M1Store::SpecialItemID p_field_type_siid){
     return setFieldInternal(p_content, false, false, M1Store::Storage::getSpecialItemPointer(p_field_type_siid));
 }
-M1Store::Item_lv2* M1Store::Item_lv2::setFieldVertexForce(const QString& p_content, const M1Store::SpecialItemID p_field_type_siid){
+M1Store::Item_lv2* M1Store::Item_lv2::setFieldVertexForceNew(const QString& p_content, const M1Store::SpecialItemID p_field_type_siid){
     return setFieldInternal(p_content, true, false, M1Store::Storage::getSpecialItemPointer(p_field_type_siid));
 }
 M1Store::Item_lv2* M1Store::Item_lv2::setFieldEdge(const QString& p_content, const M1Store::SpecialItemID p_field_type_siid){
     return setFieldInternal(p_content, false, true, M1Store::Storage::getSpecialItemPointer(p_field_type_siid));
 }
-M1Store::Item_lv2* M1Store::Item_lv2::setFieldEdgeForce(const QString& p_content, const M1Store::SpecialItemID p_field_type_siid){
+M1Store::Item_lv2* M1Store::Item_lv2::setFieldEdgeForceNew(const QString& p_content, const M1Store::SpecialItemID p_field_type_siid){
     return setFieldInternal(p_content, true, true, M1Store::Storage::getSpecialItemPointer(p_field_type_siid));
 }
 

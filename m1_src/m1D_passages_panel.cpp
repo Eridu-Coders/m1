@@ -349,7 +349,7 @@ QString M1UI::PassageEditor::bake_highlight(M1Store::Item_lv2* p_highlight_verte
         for(int i = m_from_sel; i <= m_to_sel; i++) l_word_list.append(m_item_list.at(i)->highlight(l_highlight_chunk, p_category, p_color));
     this->unselect_all();
 
-    return M1Store::Storage::maxLength(l_word_list.join(" "), 36);
+    return M1Store::Storage::maxLengthChop(l_word_list.join(" "), 36);
 }
 
 // PassagesPanel ---------------------------------------------------------------------------------------------------------------------------------------

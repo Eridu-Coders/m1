@@ -347,6 +347,7 @@ extern M1Env::SpecialItemID NT_SP_SIID;
     class GraphInit{
         public:
             static void set_pseudo_constants();
+            static void dbg_dump_pseudo_constants();
             static void init_base();
             static void init_plato();
             static QList<M1Env::SpecialItemID> cm_gram_attr_list; 

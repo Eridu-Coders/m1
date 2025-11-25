@@ -19,7 +19,7 @@ class Item_lv2_iterator;
  */
 class Item_lv2 : public Item_lv1 {
     private:
-        static void dbgRecurGraph(const ItemID p_item_id, std::set<ItemID>& p_already_expanded, const QString& p_left);
+        static void dbgRecurGraph(const ItemID p_item_id, std::set<ItemID>& p_already_expanded, const QString& p_left, QTextStream& p_out);
 
         void installFullEdge(Item_lv2* p_new_edge, const SpecialItemID p_edge_type, Item_lv2* p_edge_above, const bool p_at_top = false);
         static void insertEdgeBelow(Item_lv2* p_new_edge, Item_lv2* p_edge_above);
@@ -120,9 +120,9 @@ class Item_lv2 : public Item_lv1 {
         */
 
         Item_lv2* setFieldVertex(const QString& p_content, const SpecialItemID p_field_type_siid);
-        Item_lv2* setFieldVertexForce(const QString& p_content, const SpecialItemID p_field_type_siid);
+        Item_lv2* setFieldVertexForceNew(const QString& p_content, const SpecialItemID p_field_type_siid);
         Item_lv2* setFieldEdge(const QString& p_content, const SpecialItemID p_field_type_siid);
-        Item_lv2* setFieldEdgeForce(const QString& p_content, const SpecialItemID p_field_type_siid);
+        Item_lv2* setFieldEdgeForceNew(const QString& p_content, const SpecialItemID p_field_type_siid);
 
         Item_lv2* getFieldEdge(const SpecialItem* p_field_type_si, const SpecialItem* p_field_type2_si=nullptr) const;
         Item_lv2* getFieldEdge(const SpecialItemID p_field_type_si_id, const SpecialItemID p_field_type2_si_id = G_VOID_SI_ID) const{

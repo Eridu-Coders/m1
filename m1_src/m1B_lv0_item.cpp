@@ -134,8 +134,8 @@ void M1Store::SpecialItem::setAttr(const ItemID p_item_id, const SpecialItemID p
  * @return the debug string
  */
 QString M1Store::ItemType::dbgString() const{
-    return QString("4s[0x%1 0x%2 0x%3 0x%4]-id[0x%7 %8]")
-    .arg(t.m_type_short[0], 4, 16, QLatin1Char('0'))
+    return QString("4s[0x%1 0x%2 0x%3 0x%4]-id[0x%5 %6]")
+        .arg(t.m_type_short[0], 4, 16, QLatin1Char('0'))
         .arg(t.m_type_short[1], 4, 16, QLatin1Char('0'))
         .arg(t.m_type_short[2], 4, 16, QLatin1Char('0'))
         .arg(t.m_type_short[3], 4, 16, QLatin1Char('0'))

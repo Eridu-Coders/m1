@@ -489,7 +489,7 @@ int loadGita(){
                 }
                 // add Sivanande translation, if any
                 if(l_wfw_sivananda.length() > 0){
-                    M1Store::Item_lv2* l_edge_field = l_unit->setFieldEdgeForce(
+                    M1Store::Item_lv2* l_edge_field = l_unit->setFieldEdgeForceNew(
                         l_wfw_sivananda,
                         M1Env::TEXT_WFW_TRANSL_SIID);
                     l_edge_field->setType(M1Env::TEXT_WFW_SIVANANDA_SIID);

@@ -404,6 +404,34 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::GraphInit::cm_gram_attr_list.append(M1Env::VOICE_SIID);
 }
 
+void M1Env::GraphInit::dbg_dump_pseudo_constants(){
+    qCDebug(g_cat_silence) << QString("================ Constants dump ========");
+
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::FOLDER_SIID <-- %2").arg(M1Store::Storage::getSpecialID("FOLDR"), 4, 16, QChar('0')).arg("FOLDR");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::AUTO_SIID <-- %2").arg(M1Store::Storage::getSpecialID("AUTO_"), 4, 16, QChar('0')).arg("AUTO_");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::OWNS_SIID <-- %2").arg(M1Store::Storage::getSpecialID("OWNS_"), 4, 16, QChar('0')).arg("OWNS_");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::ISA_SIID <-- %2").arg(M1Store::Storage::getSpecialID("_ISA_"), 4, 16, QChar('0')).arg("_ISA_");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WROTE_SIID <-- %2").arg(M1Store::Storage::getSpecialID("WROTE"), 4, 16, QChar('0')).arg("WROTE");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::OCCUR_SIID <-- %2").arg(M1Store::Storage::getSpecialID("OCCUR"), 4, 16, QChar('0')).arg("OCCUR");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::WFORM_SIID <-- %2").arg(M1Store::Storage::getSpecialID("WFORM"), 4, 16, QChar('0')).arg("WFORM");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::CAPTL_SIID <-- %2").arg(M1Store::Storage::getSpecialID("CAPTL"), 4, 16, QChar('0')).arg("CAPTL");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::PCTLF_SIID <-- %2").arg(M1Store::Storage::getSpecialID("PCTLF"), 4, 16, QChar('0')).arg("PCTLF");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::PCTRT_SIID <-- %2").arg(M1Store::Storage::getSpecialID("PCTRT"), 4, 16, QChar('0')).arg("PCTRT");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::MKPLF_SIID <-- %2").arg(M1Store::Storage::getSpecialID("MKPLF"), 4, 16, QChar('0')).arg("MKPLF");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::MKPRT_SIID <-- %2").arg(M1Store::Storage::getSpecialID("MKPRT"), 4, 16, QChar('0')).arg("MKPRT");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::STPOS_SIID <-- %2").arg(M1Store::Storage::getSpecialID("STPOS"), 4, 16, QChar('0')).arg("STPOS");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::HLCLR_SIID <-- %2").arg(M1Store::Storage::getSpecialID("HLCLR"), 4, 16, QChar('0')).arg("HLCLR");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_PRABUPADA_SIID <-- %2").arg(M1Store::Storage::getSpecialID("PRABH"), 4, 16, QChar('0')).arg("PRABH");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_SIVANANDA_SIID <-- %2").arg(M1Store::Storage::getSpecialID("SIVAN"), 4, 16, QChar('0')).arg("SIVAN");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_GAMBIRANANDA_SIID <-- %2").arg(M1Store::Storage::getSpecialID("GAMBI"), 4, 16, QChar('0')).arg("GAMBI");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WORD_TRANSLIT_SIID <-- %2").arg(M1Store::Storage::getSpecialID("TRSLT"), 4, 16, QChar('0')).arg("TRSLT");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WORD_DICT_REF_SIID <-- %2").arg(M1Store::Storage::getSpecialID("DCTRF"), 4, 16, QChar('0')).arg("DCTRF");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_TRANSL_SIID <-- %2").arg(M1Store::Storage::getSpecialID("WFTRN"), 4, 16, QChar('0')).arg("WFTRN");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_URL_LINK_SIID <-- %2").arg(M1Store::Storage::getSpecialID("URLNK"), 4, 16, QChar('0')).arg("URLNK");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TW_SECTION_2_OCC_BEGIN_SIID <-- %2").arg(M1Store::Storage::getSpecialID("HS2OB"), 4, 16, QChar('0')).arg("HS2OB");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TW_SECTION_2_OCC_END_SIID <-- %2").arg(M1Store::Storage::getSpecialID("HS2OE"), 4, 16, QChar('0')).arg("HS2OE");
+}
+
 void M1Env::GraphInit::init_base(){
     // Special Vertex ID (Vertex type) of folders (ordinary vertices with no special role)
     M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE | SI_IS_SELECTABLE, "FOLDR", M1Env::FOLDER_ICON_PATH);

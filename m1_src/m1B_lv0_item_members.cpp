@@ -166,6 +166,7 @@ void M1Store::Item_lv1::setFlag(const M1Store::FlagField p_flag, const bool p_fo
 
     M1Store::FlagField l_old_flags = flags();
     M1Store::FlagField l_flags = flags() | p_flag;
+    setFlags_lv1(l_flags);
     if( (((l_old_flags & ITEM_NATURE_MASK) ^ (l_flags & ITEM_NATURE_MASK)) > 0) || p_force_init ){
         // erase all other flags
         l_flags = l_flags & ITEM_NATURE_MASK;
@@ -192,6 +193,7 @@ void M1Store::Item_lv1::unSetFlag(const M1Store::FlagField p_flag, const bool p_
 
     M1Store::FlagField l_old_flags = flags();
     M1Store::FlagField l_flags = flags() & (~p_flag);
+    setFlags_lv1(l_flags);
     if( (((l_old_flags & ITEM_NATURE_MASK) ^ (l_flags & ITEM_NATURE_MASK)) > 0) || p_force_init ){
         // erase all other flags
         l_flags = l_flags & ITEM_NATURE_MASK;
@@ -258,7 +260,7 @@ M1Env::SpecialItemID M1Store::Item_lv0::specialItemId(){
  * @param p_type the ItemType to set
  */
 void M1Store::Item_lv0::setType_member_lv0(const ItemType& p_type){
-    M1_FUNC_ENTRY(g_cat_lv0_members, QString("Set m_type to").arg(p_type.dbgString()))
+    M1_FUNC_ENTRY(g_cat_lv0_members, QString("Set m_type to %1").arg(p_type.dbgString()))
     m_type = p_type;
     M1_FUNC_EXIT
 }

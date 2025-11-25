@@ -84,32 +84,6 @@ namespace M1Env{
 /**@}*/ //end of TextLen
 
 /**
- * \defgroup UtilKeys Keys for stored in the utilities LMDB tables
- * @ingroup GlobDec
- * @{
- */
-    // keys for value storage in the utilities table
-    // values up to 0x00010000 are reserved for icon paths
-    const unsigned int ITEM_NEXT_KEY        = 0x00010000; ///< LMDB key for next ItemID
-    const unsigned int ITEM_NEXT_STRING     = 0x00010001; ///< LMDB key for next string ID
-    const unsigned int ITEM_NEXT_SPECIAL    = 0x00010002; ///< LMDB key for next special ID
-    const unsigned int CURRENT_VERSION      = 0x00010003; ///< LMDB key for the current version of the graph
-    const unsigned int CURRENT_UPPER_COUNT  = 0x00010004; ///< LMDB key for the current upper count of cm_next_item
-/**@}*/ //end of UtilKeys
-
- /**
- * \defgroup MmapSpace Management of free space in the mmap() space
- * @ingroup GlobDec
- * @{
- */
-    /// number of Items to add to the mmap() area on each increment. Results in file size incrementsw of 1GB
-    const unsigned int ITEMS_MMAP_INCREMENT_COUNT = 8388608;    // = 2^23 (*128 --> 1GB)
-    const float ITEMS_SPACE_MARGIN_FACTOR = .1;                 // space left inferior to this margin --> space increase at startup
-
-    const unsigned short M1_WARNING_LOW_FREE_SPACE = 0x0001;    // warning that free items are above the margin above
-/**@}*/ //end of MmapSpace
-
- /**
  * \defgroup FlagsSpec Special Item Flags
  * @ingroup GlobDec
  * flag bits for special items (m_flags in M1Store::SpecialItem)
@@ -133,12 +107,12 @@ namespace M1Env{
  * M1Store class-level constants holding the names of various things
  * @{
  */
-    static const char* STORE_DATA_PATH           = "../Storage";     ///< root dir for data storage
-    static const char* STORE_LMDB_DIR            = "lmdb";           ///< ubdir for LMDB data
-    static const char* LMDB_UTIL_DB              = "util_db";        ///< name of the utilities table
-    static const char* LMDB_STRING_DB            = "string_db";      ///< name of the strings table
-    static const char* LMDB_ITEM_MMAP_FILE       = "local_store.m1"; ///< name of mmap() file for items
-    static const char* LMDB_SPECIAL_MMAP_FILE    = "specials.m1";    ///< name of mmap() file for special items
+    static const char* STORE_DATA_PATH              = "../Storage";        ///< root dir for data storage
+    static const char* STORE_LMDB_DIR               = "lmdb";              ///< subdir for LMDB data
+    static const char* LMDB_UTIL_DB                 = "util_db";           ///< name of the utilities table
+    static const char* LMDB_STRING_DB               = "string_db";         ///< name of the strings table
+    static const char* LMDB_ITEM_MMAP_FILE_TEMPLATE = "local_store%1.m1";  ///< name template for mmap() item segment files
+    static const char* LMDB_SPECIAL_MMAP_FILE       = "specials.m1";       ///< name of mmap() file for special items
 /**@}*/ //end of StoreConst
 
 /**
@@ -205,6 +179,7 @@ namespace M1Env{
  */
 
 Q_DECLARE_LOGGING_CATEGORY(g_cat_store)                 ///< for Storage class (static functions)
+Q_DECLARE_LOGGING_CATEGORY(g_cat_store_mmap)            ///< for Storage class (mmap() handling)
 Q_DECLARE_LOGGING_CATEGORY(g_cat_lv0_item_type)         ///< for ItemType
 Q_DECLARE_LOGGING_CATEGORY(g_cat_lv0_special_item)      ///< for SpecialItem
 Q_DECLARE_LOGGING_CATEGORY(g_cat_lv0_members)           ///< for lv0_Item
@@ -228,19 +203,22 @@ Q_DECLARE_LOGGING_CATEGORY(g_cat_main)                  ///< messages from main 
 
 /**@}*/ //end of DebugLog
 
-/** \defgroup LV0 Level 0 Item - Class M1Store::Item_lv0 and others
+/** \defgroup STORE Physical storage layer
  *
- *  Base storage level. Data as stored in the mmap() areas.
+ *  Handles LMDB and mmap() access
  */
 
-// ---------------------------------- Constructors and instantiation from mmap() data -------------------------------------------
+/** \defgroup LV0 Level 0 Item - Class M1Store::Item_lv0 and others
+ *
+ *  Base item instance level. Data as stored in the mmap() areas.
+ */
+
 /** \defgroup LV1 Level 1 Item - Class M1Store::Item_lv1
  *
  *  Data Store integrity maintenance level. This level takes care of the archive-logs which are replayed in case of a crash. Some higher level methodes
  *  are alson taken care of at that level. There are no private members in M1Store::Item_lv1. The data it handles is still the same as M1Store::Item_lv0
  */
 
-// ---------------------------------- Constructors and instantiation from mmap() data -------------------------------------------
 /** \defgroup LV2 Level 2 Item - Class M1Store::Item_lv2 + Iterastors
  *
  *  Graph manipulation API provided to the rest of the system. There are no private members in M1Store::Item_lv2.

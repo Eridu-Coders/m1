@@ -477,6 +477,7 @@ __EXTERN_DECL__
     class GraphInit{
         public:
             static void set_pseudo_constants();
+            static void dbg_dump_pseudo_constants();
             static void init_base();
             static void init_plato();
             static QList<M1Env::SpecialItemID> cm_gram_attr_list; 
@@ -494,6 +495,12 @@ __PSEUDO_DECLARE__
 
 void M1Env::GraphInit::set_pseudo_constants(){
     __PSEUDO_INIT__
+}
+
+void M1Env::GraphInit::dbg_dump_pseudo_constants(){
+    qCDebug(g_cat_silence) << QString("================ Constants dump ========");
+
+    __PSEUDO_DUMP__
 }
 
 void M1Env::GraphInit::init_base(){
@@ -599,12 +606,14 @@ if __name__ == '__main__':
 
     # Ancillaries
     l_initialization = ''
+    l_dump = ''
     l_declaration = ''
     l_extern_declaration = ''
     for l_mnemo, _, _, l_pseudo_constant, l_reciprocal, l_comment in g_special_vertices:
         l_extern_declaration += f'// [{l_mnemo}] {l_comment}\nextern M1Env::SpecialItemID {l_pseudo_constant};\n'
         l_declaration += f'// [{l_mnemo}] {l_comment}\nM1Env::SpecialItemID M1Env::{l_pseudo_constant} = G_NONEX_SI_ID;\n'
         l_initialization += f'    M1Env::{l_pseudo_constant} = M1Store::Storage::getSpecialID("{l_mnemo}");\n'
+        l_dump += f'    qCDebug(g_cat_silence) << QString("0x%1 M1Env::{l_pseudo_constant} <-- %2").arg(M1Store::Storage::getSpecialID("{l_mnemo}"), 4, 16, QChar(\'0\')).arg("{l_mnemo}");\n'
         add_mnemo(l_mnemo)
         if l_reciprocal:
             l_mnemo_r, l_flags_r, l_icon_path_r, l_pseudo_constant_r = l_reciprocal
@@ -628,7 +637,7 @@ if __name__ == '__main__':
     # print(l_declaration)
     # print(l_initialization)
 
-    with open('src/m1B_graph_init.h', 'w') as l_fout:
+    with open('m1_src/m1B_graph_init.h', 'w') as l_fout:
         l_fout.write(g_declaration_template.replace('__EXTERN_DECL__', l_extern_declaration))
 
     # main code
@@ -947,7 +956,7 @@ if __name__ == '__main__':
                              f'    qCDebug(g_cat_silence) << QString("Creating Republic occurrence {l_occ_key} node");\n' +
                              f'    l_cur_occ = l_republic->linkTo(l_form_array[{l_form_id}]->item_id(), "OCCUR", l_cur_occ, false);\n')
             l_plato_code +=  f'    l_cur_occ->linkTo(l_cur_occ, "AUTO_");\n'
-            l_plato_code +=  f'    l_cur_occ->setText("{l_occ_key[:15]}");\n'
+            l_plato_code +=  f'    l_cur_occ->setText_lv1("{l_occ_key[:15]}");\n'
             l_plato_code +=  f'    l_cur_occ->setType("{l_mnemo_ver}");\n'
             l_plato_code +=  f'    l_form_array[{l_form_id}]->linkTo(l_cur_occ, "OWNS_");\n'
             # setTarget
@@ -1017,9 +1026,10 @@ if __name__ == '__main__':
     for l_ssid in l_attr_class_ssid_list:
         l_initialization += f'    M1Env::GraphInit::cm_gram_attr_list.append(M1Env::{l_ssid});\n'
 
-    with open('src/m1B_graph_init.cpp', 'w') as l_fout:
+    with open('m1_src/m1B_graph_init.cpp', 'w') as l_fout:
         l_fout.write(g_implementation_template
                      .replace('__PSEUDO_DECLARE__', l_declaration.strip())
+                     .replace('__PSEUDO_DUMP__', l_dump.strip())
                      .replace('__PSEUDO_INIT__', l_initialization.strip())
                      .replace('__INIT_BASE__', l_base_code.strip())
                      .replace('__INIT_PLATO__', l_plato_code.strip()))
