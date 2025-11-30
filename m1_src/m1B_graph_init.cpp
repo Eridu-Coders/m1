@@ -204,175 +204,175 @@ M1Env::SpecialItemID M1Env::NT_SP_SIID = G_NONEX_SI_ID;
 QList<M1Env::SpecialItemID> M1Env::GraphInit::cm_gram_attr_list;
 
 void M1Env::GraphInit::set_pseudo_constants(){
-    M1Env::FOLDER_SIID = M1Store::Storage::getSpecialID("FOLDR");
-    M1Env::AUTO_SIID = M1Store::Storage::getSpecialID("AUTO_");
-    M1Env::OWNS_SIID = M1Store::Storage::getSpecialID("OWNS_");
-    M1Env::BLNGS_SIID = M1Store::Storage::getSpecialID("BLNGS");
-    M1Env::ISA_SIID = M1Store::Storage::getSpecialID("_ISA_");
-    M1Env::ITO_SIID = M1Store::Storage::getSpecialID("_ITO_");
-    M1Env::TEXT_WROTE_SIID = M1Store::Storage::getSpecialID("WROTE");
-    M1Env::TEXT_WRITTEN_BY_SIID = M1Store::Storage::getSpecialID("WRTBY");
-    M1Env::OCCUR_SIID = M1Store::Storage::getSpecialID("OCCUR");
-    M1Env::WFORM_SIID = M1Store::Storage::getSpecialID("WFORM");
-    M1Env::CAPTL_SIID = M1Store::Storage::getSpecialID("CAPTL");
-    M1Env::PCTLF_SIID = M1Store::Storage::getSpecialID("PCTLF");
-    M1Env::PCTRT_SIID = M1Store::Storage::getSpecialID("PCTRT");
-    M1Env::MKPLF_SIID = M1Store::Storage::getSpecialID("MKPLF");
-    M1Env::MKPRT_SIID = M1Store::Storage::getSpecialID("MKPRT");
-    M1Env::STPOS_SIID = M1Store::Storage::getSpecialID("STPOS");
-    M1Env::HLCLR_SIID = M1Store::Storage::getSpecialID("HLCLR");
-    M1Env::TEXT_WFW_PRABUPADA_SIID = M1Store::Storage::getSpecialID("PRABH");
-    M1Env::TEXT_WFW_SIVANANDA_SIID = M1Store::Storage::getSpecialID("SIVAN");
-    M1Env::TEXT_WFW_GAMBIRANANDA_SIID = M1Store::Storage::getSpecialID("GAMBI");
-    M1Env::TEXT_WORD_TRANSLIT_SIID = M1Store::Storage::getSpecialID("TRSLT");
-    M1Env::TEXT_WORD_DICT_REF_SIID = M1Store::Storage::getSpecialID("DCTRF");
-    M1Env::TEXT_WFW_TRANSL_SIID = M1Store::Storage::getSpecialID("WFTRN");
-    M1Env::TEXT_URL_LINK_SIID = M1Store::Storage::getSpecialID("URLNK");
-    M1Env::TW_SECTION_2_OCC_BEGIN_SIID = M1Store::Storage::getSpecialID("HS2OB");
-    M1Env::TW_REV_SECTION_2_OCC_BEGIN_SIID = M1Store::Storage::getSpecialID("OC2HB");
-    M1Env::TW_SECTION_2_OCC_END_SIID = M1Store::Storage::getSpecialID("HS2OE");
-    M1Env::TW_REV_SECTION_2_OCC_END_SIID = M1Store::Storage::getSpecialID("OC2HE");
-    M1Env::ROOT_SIID = M1Store::Storage::getSpecialID("ROOT_");
-    M1Env::TYPE_NODE_SIID = M1Store::Storage::getSpecialID("TYPE_");
-    M1Env::PERS_TYPE_SIID = M1Store::Storage::getSpecialID("PERSN");
-    M1Env::ORG_TYPE_SIID = M1Store::Storage::getSpecialID("ORGN_");
-    M1Env::HOME_SIID = M1Store::Storage::getSpecialID("HOME_");
-    M1Env::TEXT_SIID = M1Store::Storage::getSpecialID("TEXT_");
-    M1Env::BG_ROOT_SIID = M1Store::Storage::getSpecialID("BGRT_");
-    M1Env::REPUBLIC_ROOT_SIID = M1Store::Storage::getSpecialID("REPRT");
-    M1Env::MSG_TYPE_SIID = M1Store::Storage::getSpecialID("_MSG_");
-    M1Env::ME_SIID = M1Store::Storage::getSpecialID("ME___");
-    M1Env::EMAIL_TYPE_SIID = M1Store::Storage::getSpecialID("EMAIL");
-    M1Env::WHTSP_TYPE_SIID = M1Store::Storage::getSpecialID("WHTSP");
-    M1Env::DSCRD_TYPE_SIID = M1Store::Storage::getSpecialID("DSCRD");
-    M1Env::GCHAT_TYPE_SIID = M1Store::Storage::getSpecialID("GCHAT");
-    M1Env::SMS_TYPE_SIID = M1Store::Storage::getSpecialID("SMS__");
-    M1Env::GRAMMAR_ATTR_SIID = M1Store::Storage::getSpecialID("GRATT");
-    M1Env::LEMMA_SIID = M1Store::Storage::getSpecialID("LEMMA");
-    M1Env::NLENT_SIID = M1Store::Storage::getSpecialID("NLENT");
-    M1Env::NLPOS_SIID = M1Store::Storage::getSpecialID("NLPOS");
-    M1Env::NLTAG_SIID = M1Store::Storage::getSpecialID("NLTAG");
-    M1Env::STEPHANUS_SIID = M1Store::Storage::getSpecialID("STPSC");
-    M1Env::TXTVR_SIID = M1Store::Storage::getSpecialID("TXTVR");
-    M1Env::TXTNT_SIID = M1Store::Storage::getSpecialID("TXTNT");
-    M1Env::TEXT_CHUNK_SIID = M1Store::Storage::getSpecialID("TXTCK");
-    M1Env::TEXT_BOOK_SIID = M1Store::Storage::getSpecialID("TXTBK");
-    M1Env::TEXT_SENTENCE_SIID = M1Store::Storage::getSpecialID("TXSNT");
-    M1Env::TEXT_HIGHLIGHT_SIID = M1Store::Storage::getSpecialID("TXHLT");
-    M1Env::TEXT_HIGHLIGHT_CAT_SIID = M1Store::Storage::getSpecialID("TXHLC");
-    M1Env::TEXT_HIGHLIGHT_FLDR_SIID = M1Store::Storage::getSpecialID("TXHLF");
-    M1Env::TEXT_HIGHLIGHT_CAT_FLDR_SIID = M1Store::Storage::getSpecialID("TXHCF");
-    M1Env::TEXT_HIGHLIGHT_CHUNK_SIID = M1Store::Storage::getSpecialID("TXHCK");
-    M1Env::TEXT_SLOKA_FLDR_SIID = M1Store::Storage::getSpecialID("SKFLD");
-    M1Env::TEXT_HIGHLIGHT_QUOTE_SIID = M1Store::Storage::getSpecialID("TXHQT");
-    M1Env::SLOKA_SIID = M1Store::Storage::getSpecialID("TXSLK");
-    M1Env::TEXT_SLOKA_LINE_SIID = M1Store::Storage::getSpecialID("SLKLN");
-    M1Env::TEXT_WORD_DREF_INRIA_SIID = M1Store::Storage::getSpecialID("INRIA");
-    M1Env::TEXT_SLOKA_TRANSLATION_SIID = M1Store::Storage::getSpecialID("SLTRN");
-    M1Env::TEXT_SLOKA_BHASHYA_SIID = M1Store::Storage::getSpecialID("SLBHS");
-    M1Env::TEXT_WFW_UNIT_SIID = M1Store::Storage::getSpecialID("TRLUN");
-    M1Env::ABBR__SIID = M1Store::Storage::getSpecialID("ABBR_");
-    M1Env::ANMCY_SIID = M1Store::Storage::getSpecialID("ANMCY");
-    M1Env::ASPCT_SIID = M1Store::Storage::getSpecialID("ASPCT");
-    M1Env::CASE__SIID = M1Store::Storage::getSpecialID("CASE_");
-    M1Env::CTNJY_SIID = M1Store::Storage::getSpecialID("CTNJY");
-    M1Env::CLSVT_SIID = M1Store::Storage::getSpecialID("CLSVT");
-    M1Env::DEFIN_SIID = M1Store::Storage::getSpecialID("DEFIN");
-    M1Env::DEGRE_SIID = M1Store::Storage::getSpecialID("DEGRE");
-    M1Env::DEIXI_SIID = M1Store::Storage::getSpecialID("DEIXI");
-    M1Env::DRXSF_SIID = M1Store::Storage::getSpecialID("DRXSF");
-    M1Env::EVDNT_SIID = M1Store::Storage::getSpecialID("EVDNT");
-    M1Env::EPXTS_SIID = M1Store::Storage::getSpecialID("EPXTS");
-    M1Env::FOREI_SIID = M1Store::Storage::getSpecialID("FOREI");
-    M1Env::GENDE_SIID = M1Store::Storage::getSpecialID("GENDE");
-    M1Env::MOOD__SIID = M1Store::Storage::getSpecialID("MOOD_");
-    M1Env::NCNLS_SIID = M1Store::Storage::getSpecialID("NCNLS");
-    M1Env::NTMYP_SIID = M1Store::Storage::getSpecialID("NTMYP");
-    M1Env::NUMBE_SIID = M1Store::Storage::getSpecialID("NUMBE");
-    M1Env::PERSO_SIID = M1Store::Storage::getSpecialID("PERSO");
-    M1Env::PLRTY_SIID = M1Store::Storage::getSpecialID("PLRTY");
-    M1Env::POLIT_SIID = M1Store::Storage::getSpecialID("POLIT");
-    M1Env::POSS__SIID = M1Store::Storage::getSpecialID("POSS_");
-    M1Env::PTRNY_SIID = M1Store::Storage::getSpecialID("PTRNY");
-    M1Env::REFLE_SIID = M1Store::Storage::getSpecialID("REFLE");
-    M1Env::TENSE_SIID = M1Store::Storage::getSpecialID("TENSE");
-    M1Env::TYPO__SIID = M1Store::Storage::getSpecialID("TYPO_");
-    M1Env::VFRBR_SIID = M1Store::Storage::getSpecialID("VFRBR");
-    M1Env::VTRBY_SIID = M1Store::Storage::getSpecialID("VTRBY");
-    M1Env::VOICE_SIID = M1Store::Storage::getSpecialID("VOICE");
-    M1Env::NPADJ_SIID = M1Store::Storage::getSpecialID("NPADJ");
-    M1Env::NPADP_SIID = M1Store::Storage::getSpecialID("NPADP");
-    M1Env::NPADV_SIID = M1Store::Storage::getSpecialID("NPADV");
-    M1Env::NPAUX_SIID = M1Store::Storage::getSpecialID("NPAUX");
-    M1Env::NPCNJ_SIID = M1Store::Storage::getSpecialID("NPCNJ");
-    M1Env::NPDET_SIID = M1Store::Storage::getSpecialID("NPDET");
-    M1Env::NPINT_SIID = M1Store::Storage::getSpecialID("NPINT");
-    M1Env::NPNON_SIID = M1Store::Storage::getSpecialID("NPNON");
-    M1Env::NPNUM_SIID = M1Store::Storage::getSpecialID("NPNUM");
-    M1Env::NPPRT_SIID = M1Store::Storage::getSpecialID("NPPRT");
-    M1Env::NPPRN_SIID = M1Store::Storage::getSpecialID("NPPRN");
-    M1Env::NPPPN_SIID = M1Store::Storage::getSpecialID("NPPPN");
-    M1Env::NPPCT_SIID = M1Store::Storage::getSpecialID("NPPCT");
-    M1Env::NPSCJ_SIID = M1Store::Storage::getSpecialID("NPSCJ");
-    M1Env::NPSYM_SIID = M1Store::Storage::getSpecialID("NPSYM");
-    M1Env::NPVRB_SIID = M1Store::Storage::getSpecialID("NPVRB");
-    M1Env::NPXXX_SIID = M1Store::Storage::getSpecialID("NPXXX");
-    M1Env::NTGSE_SIID = M1Store::Storage::getSpecialID("NTGSE");
-    M1Env::NTGCM_SIID = M1Store::Storage::getSpecialID("NTGCM");
-    M1Env::NTLRB_SIID = M1Store::Storage::getSpecialID("NTLRB");
-    M1Env::NTRRB_SIID = M1Store::Storage::getSpecialID("NTRRB");
-    M1Env::NTOQM_SIID = M1Store::Storage::getSpecialID("NTOQM");
-    M1Env::NTCQM_SIID = M1Store::Storage::getSpecialID("NTCQM");
-    M1Env::NTCRM_SIID = M1Store::Storage::getSpecialID("NTCRM");
-    M1Env::NTGCL_SIID = M1Store::Storage::getSpecialID("NTGCL");
-    M1Env::NTDOL_SIID = M1Store::Storage::getSpecialID("NTDOL");
-    M1Env::NTSRP_SIID = M1Store::Storage::getSpecialID("NTSRP");
-    M1Env::NTAFX_SIID = M1Store::Storage::getSpecialID("NTAFX");
-    M1Env::NTGCC_SIID = M1Store::Storage::getSpecialID("NTGCC");
-    M1Env::NTGCD_SIID = M1Store::Storage::getSpecialID("NTGCD");
-    M1Env::NTGDT_SIID = M1Store::Storage::getSpecialID("NTGDT");
-    M1Env::NTGEX_SIID = M1Store::Storage::getSpecialID("NTGEX");
-    M1Env::NTGFW_SIID = M1Store::Storage::getSpecialID("NTGFW");
-    M1Env::NTHYP_SIID = M1Store::Storage::getSpecialID("NTHYP");
-    M1Env::NTGIN_SIID = M1Store::Storage::getSpecialID("NTGIN");
-    M1Env::NTGJJ_SIID = M1Store::Storage::getSpecialID("NTGJJ");
-    M1Env::NTJJR_SIID = M1Store::Storage::getSpecialID("NTJJR");
-    M1Env::NTJJS_SIID = M1Store::Storage::getSpecialID("NTJJS");
-    M1Env::NTGLS_SIID = M1Store::Storage::getSpecialID("NTGLS");
-    M1Env::NTGMD_SIID = M1Store::Storage::getSpecialID("NTGMD");
-    M1Env::NTNIL_SIID = M1Store::Storage::getSpecialID("NTNIL");
-    M1Env::NTGNN_SIID = M1Store::Storage::getSpecialID("NTGNN");
-    M1Env::NTNNP_SIID = M1Store::Storage::getSpecialID("NTNNP");
-    M1Env::NTNPP_SIID = M1Store::Storage::getSpecialID("NTNPP");
-    M1Env::NTNNS_SIID = M1Store::Storage::getSpecialID("NTNNS");
-    M1Env::NTPDT_SIID = M1Store::Storage::getSpecialID("NTPDT");
-    M1Env::NTPOS_SIID = M1Store::Storage::getSpecialID("NTPOS");
-    M1Env::NTPRP_SIID = M1Store::Storage::getSpecialID("NTPRP");
-    M1Env::NTPR$_SIID = M1Store::Storage::getSpecialID("NTPR$");
-    M1Env::NTGRB_SIID = M1Store::Storage::getSpecialID("NTGRB");
-    M1Env::NTRBR_SIID = M1Store::Storage::getSpecialID("NTRBR");
-    M1Env::NTRBS_SIID = M1Store::Storage::getSpecialID("NTRBS");
-    M1Env::NTGRP_SIID = M1Store::Storage::getSpecialID("NTGRP");
-    M1Env::NTGTO_SIID = M1Store::Storage::getSpecialID("NTGTO");
-    M1Env::NTGUH_SIID = M1Store::Storage::getSpecialID("NTGUH");
-    M1Env::NTGVB_SIID = M1Store::Storage::getSpecialID("NTGVB");
-    M1Env::NTVBD_SIID = M1Store::Storage::getSpecialID("NTVBD");
-    M1Env::NTVBG_SIID = M1Store::Storage::getSpecialID("NTVBG");
-    M1Env::NTVBN_SIID = M1Store::Storage::getSpecialID("NTVBN");
-    M1Env::NTVBP_SIID = M1Store::Storage::getSpecialID("NTVBP");
-    M1Env::NTVBZ_SIID = M1Store::Storage::getSpecialID("NTVBZ");
-    M1Env::NTWDT_SIID = M1Store::Storage::getSpecialID("NTWDT");
-    M1Env::NTGWP_SIID = M1Store::Storage::getSpecialID("NTGWP");
-    M1Env::NTWP$_SIID = M1Store::Storage::getSpecialID("NTWP$");
-    M1Env::NTWRB_SIID = M1Store::Storage::getSpecialID("NTWRB");
-    M1Env::NTGSP_SIID = M1Store::Storage::getSpecialID("NTGSP");
-    M1Env::NTADD_SIID = M1Store::Storage::getSpecialID("NTADD");
-    M1Env::NTNFP_SIID = M1Store::Storage::getSpecialID("NTNFP");
-    M1Env::NTGGW_SIID = M1Store::Storage::getSpecialID("NTGGW");
-    M1Env::NTGXX_SIID = M1Store::Storage::getSpecialID("NTGXX");
-    M1Env::NTBES_SIID = M1Store::Storage::getSpecialID("NTBES");
-    M1Env::NTHVS_SIID = M1Store::Storage::getSpecialID("NTHVS");
-    M1Env::NT_SP_SIID = M1Store::Storage::getSpecialID("NT_SP");
+    M1Env::FOLDER_SIID = M1Store::StorageStatic::getSpecialID("FOLDR");
+    M1Env::AUTO_SIID = M1Store::StorageStatic::getSpecialID("AUTO_");
+    M1Env::OWNS_SIID = M1Store::StorageStatic::getSpecialID("OWNS_");
+    M1Env::BLNGS_SIID = M1Store::StorageStatic::getSpecialID("BLNGS");
+    M1Env::ISA_SIID = M1Store::StorageStatic::getSpecialID("_ISA_");
+    M1Env::ITO_SIID = M1Store::StorageStatic::getSpecialID("_ITO_");
+    M1Env::TEXT_WROTE_SIID = M1Store::StorageStatic::getSpecialID("WROTE");
+    M1Env::TEXT_WRITTEN_BY_SIID = M1Store::StorageStatic::getSpecialID("WRTBY");
+    M1Env::OCCUR_SIID = M1Store::StorageStatic::getSpecialID("OCCUR");
+    M1Env::WFORM_SIID = M1Store::StorageStatic::getSpecialID("WFORM");
+    M1Env::CAPTL_SIID = M1Store::StorageStatic::getSpecialID("CAPTL");
+    M1Env::PCTLF_SIID = M1Store::StorageStatic::getSpecialID("PCTLF");
+    M1Env::PCTRT_SIID = M1Store::StorageStatic::getSpecialID("PCTRT");
+    M1Env::MKPLF_SIID = M1Store::StorageStatic::getSpecialID("MKPLF");
+    M1Env::MKPRT_SIID = M1Store::StorageStatic::getSpecialID("MKPRT");
+    M1Env::STPOS_SIID = M1Store::StorageStatic::getSpecialID("STPOS");
+    M1Env::HLCLR_SIID = M1Store::StorageStatic::getSpecialID("HLCLR");
+    M1Env::TEXT_WFW_PRABUPADA_SIID = M1Store::StorageStatic::getSpecialID("PRABH");
+    M1Env::TEXT_WFW_SIVANANDA_SIID = M1Store::StorageStatic::getSpecialID("SIVAN");
+    M1Env::TEXT_WFW_GAMBIRANANDA_SIID = M1Store::StorageStatic::getSpecialID("GAMBI");
+    M1Env::TEXT_WORD_TRANSLIT_SIID = M1Store::StorageStatic::getSpecialID("TRSLT");
+    M1Env::TEXT_WORD_DICT_REF_SIID = M1Store::StorageStatic::getSpecialID("DCTRF");
+    M1Env::TEXT_WFW_TRANSL_SIID = M1Store::StorageStatic::getSpecialID("WFTRN");
+    M1Env::TEXT_URL_LINK_SIID = M1Store::StorageStatic::getSpecialID("URLNK");
+    M1Env::TW_SECTION_2_OCC_BEGIN_SIID = M1Store::StorageStatic::getSpecialID("HS2OB");
+    M1Env::TW_REV_SECTION_2_OCC_BEGIN_SIID = M1Store::StorageStatic::getSpecialID("OC2HB");
+    M1Env::TW_SECTION_2_OCC_END_SIID = M1Store::StorageStatic::getSpecialID("HS2OE");
+    M1Env::TW_REV_SECTION_2_OCC_END_SIID = M1Store::StorageStatic::getSpecialID("OC2HE");
+    M1Env::ROOT_SIID = M1Store::StorageStatic::getSpecialID("ROOT_");
+    M1Env::TYPE_NODE_SIID = M1Store::StorageStatic::getSpecialID("TYPE_");
+    M1Env::PERS_TYPE_SIID = M1Store::StorageStatic::getSpecialID("PERSN");
+    M1Env::ORG_TYPE_SIID = M1Store::StorageStatic::getSpecialID("ORGN_");
+    M1Env::HOME_SIID = M1Store::StorageStatic::getSpecialID("HOME_");
+    M1Env::TEXT_SIID = M1Store::StorageStatic::getSpecialID("TEXT_");
+    M1Env::BG_ROOT_SIID = M1Store::StorageStatic::getSpecialID("BGRT_");
+    M1Env::REPUBLIC_ROOT_SIID = M1Store::StorageStatic::getSpecialID("REPRT");
+    M1Env::MSG_TYPE_SIID = M1Store::StorageStatic::getSpecialID("_MSG_");
+    M1Env::ME_SIID = M1Store::StorageStatic::getSpecialID("ME___");
+    M1Env::EMAIL_TYPE_SIID = M1Store::StorageStatic::getSpecialID("EMAIL");
+    M1Env::WHTSP_TYPE_SIID = M1Store::StorageStatic::getSpecialID("WHTSP");
+    M1Env::DSCRD_TYPE_SIID = M1Store::StorageStatic::getSpecialID("DSCRD");
+    M1Env::GCHAT_TYPE_SIID = M1Store::StorageStatic::getSpecialID("GCHAT");
+    M1Env::SMS_TYPE_SIID = M1Store::StorageStatic::getSpecialID("SMS__");
+    M1Env::GRAMMAR_ATTR_SIID = M1Store::StorageStatic::getSpecialID("GRATT");
+    M1Env::LEMMA_SIID = M1Store::StorageStatic::getSpecialID("LEMMA");
+    M1Env::NLENT_SIID = M1Store::StorageStatic::getSpecialID("NLENT");
+    M1Env::NLPOS_SIID = M1Store::StorageStatic::getSpecialID("NLPOS");
+    M1Env::NLTAG_SIID = M1Store::StorageStatic::getSpecialID("NLTAG");
+    M1Env::STEPHANUS_SIID = M1Store::StorageStatic::getSpecialID("STPSC");
+    M1Env::TXTVR_SIID = M1Store::StorageStatic::getSpecialID("TXTVR");
+    M1Env::TXTNT_SIID = M1Store::StorageStatic::getSpecialID("TXTNT");
+    M1Env::TEXT_CHUNK_SIID = M1Store::StorageStatic::getSpecialID("TXTCK");
+    M1Env::TEXT_BOOK_SIID = M1Store::StorageStatic::getSpecialID("TXTBK");
+    M1Env::TEXT_SENTENCE_SIID = M1Store::StorageStatic::getSpecialID("TXSNT");
+    M1Env::TEXT_HIGHLIGHT_SIID = M1Store::StorageStatic::getSpecialID("TXHLT");
+    M1Env::TEXT_HIGHLIGHT_CAT_SIID = M1Store::StorageStatic::getSpecialID("TXHLC");
+    M1Env::TEXT_HIGHLIGHT_FLDR_SIID = M1Store::StorageStatic::getSpecialID("TXHLF");
+    M1Env::TEXT_HIGHLIGHT_CAT_FLDR_SIID = M1Store::StorageStatic::getSpecialID("TXHCF");
+    M1Env::TEXT_HIGHLIGHT_CHUNK_SIID = M1Store::StorageStatic::getSpecialID("TXHCK");
+    M1Env::TEXT_SLOKA_FLDR_SIID = M1Store::StorageStatic::getSpecialID("SKFLD");
+    M1Env::TEXT_HIGHLIGHT_QUOTE_SIID = M1Store::StorageStatic::getSpecialID("TXHQT");
+    M1Env::SLOKA_SIID = M1Store::StorageStatic::getSpecialID("TXSLK");
+    M1Env::TEXT_SLOKA_LINE_SIID = M1Store::StorageStatic::getSpecialID("SLKLN");
+    M1Env::TEXT_WORD_DREF_INRIA_SIID = M1Store::StorageStatic::getSpecialID("INRIA");
+    M1Env::TEXT_SLOKA_TRANSLATION_SIID = M1Store::StorageStatic::getSpecialID("SLTRN");
+    M1Env::TEXT_SLOKA_BHASHYA_SIID = M1Store::StorageStatic::getSpecialID("SLBHS");
+    M1Env::TEXT_WFW_UNIT_SIID = M1Store::StorageStatic::getSpecialID("TRLUN");
+    M1Env::ABBR__SIID = M1Store::StorageStatic::getSpecialID("ABBR_");
+    M1Env::ANMCY_SIID = M1Store::StorageStatic::getSpecialID("ANMCY");
+    M1Env::ASPCT_SIID = M1Store::StorageStatic::getSpecialID("ASPCT");
+    M1Env::CASE__SIID = M1Store::StorageStatic::getSpecialID("CASE_");
+    M1Env::CTNJY_SIID = M1Store::StorageStatic::getSpecialID("CTNJY");
+    M1Env::CLSVT_SIID = M1Store::StorageStatic::getSpecialID("CLSVT");
+    M1Env::DEFIN_SIID = M1Store::StorageStatic::getSpecialID("DEFIN");
+    M1Env::DEGRE_SIID = M1Store::StorageStatic::getSpecialID("DEGRE");
+    M1Env::DEIXI_SIID = M1Store::StorageStatic::getSpecialID("DEIXI");
+    M1Env::DRXSF_SIID = M1Store::StorageStatic::getSpecialID("DRXSF");
+    M1Env::EVDNT_SIID = M1Store::StorageStatic::getSpecialID("EVDNT");
+    M1Env::EPXTS_SIID = M1Store::StorageStatic::getSpecialID("EPXTS");
+    M1Env::FOREI_SIID = M1Store::StorageStatic::getSpecialID("FOREI");
+    M1Env::GENDE_SIID = M1Store::StorageStatic::getSpecialID("GENDE");
+    M1Env::MOOD__SIID = M1Store::StorageStatic::getSpecialID("MOOD_");
+    M1Env::NCNLS_SIID = M1Store::StorageStatic::getSpecialID("NCNLS");
+    M1Env::NTMYP_SIID = M1Store::StorageStatic::getSpecialID("NTMYP");
+    M1Env::NUMBE_SIID = M1Store::StorageStatic::getSpecialID("NUMBE");
+    M1Env::PERSO_SIID = M1Store::StorageStatic::getSpecialID("PERSO");
+    M1Env::PLRTY_SIID = M1Store::StorageStatic::getSpecialID("PLRTY");
+    M1Env::POLIT_SIID = M1Store::StorageStatic::getSpecialID("POLIT");
+    M1Env::POSS__SIID = M1Store::StorageStatic::getSpecialID("POSS_");
+    M1Env::PTRNY_SIID = M1Store::StorageStatic::getSpecialID("PTRNY");
+    M1Env::REFLE_SIID = M1Store::StorageStatic::getSpecialID("REFLE");
+    M1Env::TENSE_SIID = M1Store::StorageStatic::getSpecialID("TENSE");
+    M1Env::TYPO__SIID = M1Store::StorageStatic::getSpecialID("TYPO_");
+    M1Env::VFRBR_SIID = M1Store::StorageStatic::getSpecialID("VFRBR");
+    M1Env::VTRBY_SIID = M1Store::StorageStatic::getSpecialID("VTRBY");
+    M1Env::VOICE_SIID = M1Store::StorageStatic::getSpecialID("VOICE");
+    M1Env::NPADJ_SIID = M1Store::StorageStatic::getSpecialID("NPADJ");
+    M1Env::NPADP_SIID = M1Store::StorageStatic::getSpecialID("NPADP");
+    M1Env::NPADV_SIID = M1Store::StorageStatic::getSpecialID("NPADV");
+    M1Env::NPAUX_SIID = M1Store::StorageStatic::getSpecialID("NPAUX");
+    M1Env::NPCNJ_SIID = M1Store::StorageStatic::getSpecialID("NPCNJ");
+    M1Env::NPDET_SIID = M1Store::StorageStatic::getSpecialID("NPDET");
+    M1Env::NPINT_SIID = M1Store::StorageStatic::getSpecialID("NPINT");
+    M1Env::NPNON_SIID = M1Store::StorageStatic::getSpecialID("NPNON");
+    M1Env::NPNUM_SIID = M1Store::StorageStatic::getSpecialID("NPNUM");
+    M1Env::NPPRT_SIID = M1Store::StorageStatic::getSpecialID("NPPRT");
+    M1Env::NPPRN_SIID = M1Store::StorageStatic::getSpecialID("NPPRN");
+    M1Env::NPPPN_SIID = M1Store::StorageStatic::getSpecialID("NPPPN");
+    M1Env::NPPCT_SIID = M1Store::StorageStatic::getSpecialID("NPPCT");
+    M1Env::NPSCJ_SIID = M1Store::StorageStatic::getSpecialID("NPSCJ");
+    M1Env::NPSYM_SIID = M1Store::StorageStatic::getSpecialID("NPSYM");
+    M1Env::NPVRB_SIID = M1Store::StorageStatic::getSpecialID("NPVRB");
+    M1Env::NPXXX_SIID = M1Store::StorageStatic::getSpecialID("NPXXX");
+    M1Env::NTGSE_SIID = M1Store::StorageStatic::getSpecialID("NTGSE");
+    M1Env::NTGCM_SIID = M1Store::StorageStatic::getSpecialID("NTGCM");
+    M1Env::NTLRB_SIID = M1Store::StorageStatic::getSpecialID("NTLRB");
+    M1Env::NTRRB_SIID = M1Store::StorageStatic::getSpecialID("NTRRB");
+    M1Env::NTOQM_SIID = M1Store::StorageStatic::getSpecialID("NTOQM");
+    M1Env::NTCQM_SIID = M1Store::StorageStatic::getSpecialID("NTCQM");
+    M1Env::NTCRM_SIID = M1Store::StorageStatic::getSpecialID("NTCRM");
+    M1Env::NTGCL_SIID = M1Store::StorageStatic::getSpecialID("NTGCL");
+    M1Env::NTDOL_SIID = M1Store::StorageStatic::getSpecialID("NTDOL");
+    M1Env::NTSRP_SIID = M1Store::StorageStatic::getSpecialID("NTSRP");
+    M1Env::NTAFX_SIID = M1Store::StorageStatic::getSpecialID("NTAFX");
+    M1Env::NTGCC_SIID = M1Store::StorageStatic::getSpecialID("NTGCC");
+    M1Env::NTGCD_SIID = M1Store::StorageStatic::getSpecialID("NTGCD");
+    M1Env::NTGDT_SIID = M1Store::StorageStatic::getSpecialID("NTGDT");
+    M1Env::NTGEX_SIID = M1Store::StorageStatic::getSpecialID("NTGEX");
+    M1Env::NTGFW_SIID = M1Store::StorageStatic::getSpecialID("NTGFW");
+    M1Env::NTHYP_SIID = M1Store::StorageStatic::getSpecialID("NTHYP");
+    M1Env::NTGIN_SIID = M1Store::StorageStatic::getSpecialID("NTGIN");
+    M1Env::NTGJJ_SIID = M1Store::StorageStatic::getSpecialID("NTGJJ");
+    M1Env::NTJJR_SIID = M1Store::StorageStatic::getSpecialID("NTJJR");
+    M1Env::NTJJS_SIID = M1Store::StorageStatic::getSpecialID("NTJJS");
+    M1Env::NTGLS_SIID = M1Store::StorageStatic::getSpecialID("NTGLS");
+    M1Env::NTGMD_SIID = M1Store::StorageStatic::getSpecialID("NTGMD");
+    M1Env::NTNIL_SIID = M1Store::StorageStatic::getSpecialID("NTNIL");
+    M1Env::NTGNN_SIID = M1Store::StorageStatic::getSpecialID("NTGNN");
+    M1Env::NTNNP_SIID = M1Store::StorageStatic::getSpecialID("NTNNP");
+    M1Env::NTNPP_SIID = M1Store::StorageStatic::getSpecialID("NTNPP");
+    M1Env::NTNNS_SIID = M1Store::StorageStatic::getSpecialID("NTNNS");
+    M1Env::NTPDT_SIID = M1Store::StorageStatic::getSpecialID("NTPDT");
+    M1Env::NTPOS_SIID = M1Store::StorageStatic::getSpecialID("NTPOS");
+    M1Env::NTPRP_SIID = M1Store::StorageStatic::getSpecialID("NTPRP");
+    M1Env::NTPR$_SIID = M1Store::StorageStatic::getSpecialID("NTPR$");
+    M1Env::NTGRB_SIID = M1Store::StorageStatic::getSpecialID("NTGRB");
+    M1Env::NTRBR_SIID = M1Store::StorageStatic::getSpecialID("NTRBR");
+    M1Env::NTRBS_SIID = M1Store::StorageStatic::getSpecialID("NTRBS");
+    M1Env::NTGRP_SIID = M1Store::StorageStatic::getSpecialID("NTGRP");
+    M1Env::NTGTO_SIID = M1Store::StorageStatic::getSpecialID("NTGTO");
+    M1Env::NTGUH_SIID = M1Store::StorageStatic::getSpecialID("NTGUH");
+    M1Env::NTGVB_SIID = M1Store::StorageStatic::getSpecialID("NTGVB");
+    M1Env::NTVBD_SIID = M1Store::StorageStatic::getSpecialID("NTVBD");
+    M1Env::NTVBG_SIID = M1Store::StorageStatic::getSpecialID("NTVBG");
+    M1Env::NTVBN_SIID = M1Store::StorageStatic::getSpecialID("NTVBN");
+    M1Env::NTVBP_SIID = M1Store::StorageStatic::getSpecialID("NTVBP");
+    M1Env::NTVBZ_SIID = M1Store::StorageStatic::getSpecialID("NTVBZ");
+    M1Env::NTWDT_SIID = M1Store::StorageStatic::getSpecialID("NTWDT");
+    M1Env::NTGWP_SIID = M1Store::StorageStatic::getSpecialID("NTGWP");
+    M1Env::NTWP$_SIID = M1Store::StorageStatic::getSpecialID("NTWP$");
+    M1Env::NTWRB_SIID = M1Store::StorageStatic::getSpecialID("NTWRB");
+    M1Env::NTGSP_SIID = M1Store::StorageStatic::getSpecialID("NTGSP");
+    M1Env::NTADD_SIID = M1Store::StorageStatic::getSpecialID("NTADD");
+    M1Env::NTNFP_SIID = M1Store::StorageStatic::getSpecialID("NTNFP");
+    M1Env::NTGGW_SIID = M1Store::StorageStatic::getSpecialID("NTGGW");
+    M1Env::NTGXX_SIID = M1Store::StorageStatic::getSpecialID("NTGXX");
+    M1Env::NTBES_SIID = M1Store::StorageStatic::getSpecialID("NTBES");
+    M1Env::NTHVS_SIID = M1Store::StorageStatic::getSpecialID("NTHVS");
+    M1Env::NT_SP_SIID = M1Store::StorageStatic::getSpecialID("NT_SP");
     M1Env::GraphInit::cm_gram_attr_list.append(M1Env::ABBR__SIID);
     M1Env::GraphInit::cm_gram_attr_list.append(M1Env::ANMCY_SIID);
     M1Env::GraphInit::cm_gram_attr_list.append(M1Env::ASPCT_SIID);
@@ -407,90 +407,90 @@ void M1Env::GraphInit::set_pseudo_constants(){
 void M1Env::GraphInit::dbg_dump_pseudo_constants(){
     qCDebug(g_cat_silence) << QString("================ Constants dump ========");
 
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::FOLDER_SIID <-- %2").arg(M1Store::Storage::getSpecialID("FOLDR"), 4, 16, QChar('0')).arg("FOLDR");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::AUTO_SIID <-- %2").arg(M1Store::Storage::getSpecialID("AUTO_"), 4, 16, QChar('0')).arg("AUTO_");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::OWNS_SIID <-- %2").arg(M1Store::Storage::getSpecialID("OWNS_"), 4, 16, QChar('0')).arg("OWNS_");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::ISA_SIID <-- %2").arg(M1Store::Storage::getSpecialID("_ISA_"), 4, 16, QChar('0')).arg("_ISA_");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WROTE_SIID <-- %2").arg(M1Store::Storage::getSpecialID("WROTE"), 4, 16, QChar('0')).arg("WROTE");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::OCCUR_SIID <-- %2").arg(M1Store::Storage::getSpecialID("OCCUR"), 4, 16, QChar('0')).arg("OCCUR");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::WFORM_SIID <-- %2").arg(M1Store::Storage::getSpecialID("WFORM"), 4, 16, QChar('0')).arg("WFORM");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::CAPTL_SIID <-- %2").arg(M1Store::Storage::getSpecialID("CAPTL"), 4, 16, QChar('0')).arg("CAPTL");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::PCTLF_SIID <-- %2").arg(M1Store::Storage::getSpecialID("PCTLF"), 4, 16, QChar('0')).arg("PCTLF");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::PCTRT_SIID <-- %2").arg(M1Store::Storage::getSpecialID("PCTRT"), 4, 16, QChar('0')).arg("PCTRT");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::MKPLF_SIID <-- %2").arg(M1Store::Storage::getSpecialID("MKPLF"), 4, 16, QChar('0')).arg("MKPLF");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::MKPRT_SIID <-- %2").arg(M1Store::Storage::getSpecialID("MKPRT"), 4, 16, QChar('0')).arg("MKPRT");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::STPOS_SIID <-- %2").arg(M1Store::Storage::getSpecialID("STPOS"), 4, 16, QChar('0')).arg("STPOS");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::HLCLR_SIID <-- %2").arg(M1Store::Storage::getSpecialID("HLCLR"), 4, 16, QChar('0')).arg("HLCLR");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_PRABUPADA_SIID <-- %2").arg(M1Store::Storage::getSpecialID("PRABH"), 4, 16, QChar('0')).arg("PRABH");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_SIVANANDA_SIID <-- %2").arg(M1Store::Storage::getSpecialID("SIVAN"), 4, 16, QChar('0')).arg("SIVAN");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_GAMBIRANANDA_SIID <-- %2").arg(M1Store::Storage::getSpecialID("GAMBI"), 4, 16, QChar('0')).arg("GAMBI");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WORD_TRANSLIT_SIID <-- %2").arg(M1Store::Storage::getSpecialID("TRSLT"), 4, 16, QChar('0')).arg("TRSLT");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WORD_DICT_REF_SIID <-- %2").arg(M1Store::Storage::getSpecialID("DCTRF"), 4, 16, QChar('0')).arg("DCTRF");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_TRANSL_SIID <-- %2").arg(M1Store::Storage::getSpecialID("WFTRN"), 4, 16, QChar('0')).arg("WFTRN");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_URL_LINK_SIID <-- %2").arg(M1Store::Storage::getSpecialID("URLNK"), 4, 16, QChar('0')).arg("URLNK");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TW_SECTION_2_OCC_BEGIN_SIID <-- %2").arg(M1Store::Storage::getSpecialID("HS2OB"), 4, 16, QChar('0')).arg("HS2OB");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TW_SECTION_2_OCC_END_SIID <-- %2").arg(M1Store::Storage::getSpecialID("HS2OE"), 4, 16, QChar('0')).arg("HS2OE");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::FOLDER_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("FOLDR"), 4, 16, QChar('0')).arg("FOLDR");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::AUTO_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("AUTO_"), 4, 16, QChar('0')).arg("AUTO_");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::OWNS_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("OWNS_"), 4, 16, QChar('0')).arg("OWNS_");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::ISA_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("_ISA_"), 4, 16, QChar('0')).arg("_ISA_");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WROTE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WROTE"), 4, 16, QChar('0')).arg("WROTE");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::OCCUR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("OCCUR"), 4, 16, QChar('0')).arg("OCCUR");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::WFORM_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WFORM"), 4, 16, QChar('0')).arg("WFORM");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::CAPTL_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("CAPTL"), 4, 16, QChar('0')).arg("CAPTL");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::PCTLF_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("PCTLF"), 4, 16, QChar('0')).arg("PCTLF");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::PCTRT_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("PCTRT"), 4, 16, QChar('0')).arg("PCTRT");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::MKPLF_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("MKPLF"), 4, 16, QChar('0')).arg("MKPLF");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::MKPRT_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("MKPRT"), 4, 16, QChar('0')).arg("MKPRT");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::STPOS_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("STPOS"), 4, 16, QChar('0')).arg("STPOS");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::HLCLR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("HLCLR"), 4, 16, QChar('0')).arg("HLCLR");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_PRABUPADA_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("PRABH"), 4, 16, QChar('0')).arg("PRABH");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_SIVANANDA_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("SIVAN"), 4, 16, QChar('0')).arg("SIVAN");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_GAMBIRANANDA_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("GAMBI"), 4, 16, QChar('0')).arg("GAMBI");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WORD_TRANSLIT_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TRSLT"), 4, 16, QChar('0')).arg("TRSLT");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WORD_DICT_REF_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("DCTRF"), 4, 16, QChar('0')).arg("DCTRF");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_TRANSL_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WFTRN"), 4, 16, QChar('0')).arg("WFTRN");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_URL_LINK_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("URLNK"), 4, 16, QChar('0')).arg("URLNK");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TW_SECTION_2_OCC_BEGIN_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("HS2OB"), 4, 16, QChar('0')).arg("HS2OB");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TW_SECTION_2_OCC_END_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("HS2OE"), 4, 16, QChar('0')).arg("HS2OE");
 }
 
 void M1Env::GraphInit::init_base(){
     // Special Vertex ID (Vertex type) of folders (ordinary vertices with no special role)
-    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE | SI_IS_SELECTABLE, "FOLDR", M1Env::FOLDER_ICON_PATH);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_IS_SELECTABLE, "FOLDR", M1Env::FOLDER_ICON_PATH);
     // Special Vertex ID (Edge type) of AUTO edges
-    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE, "AUTO_", M1Env::AUTO_ICON_PATH);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE, "AUTO_", M1Env::AUTO_ICON_PATH);
     // Special Vertex ID (Edge type) of ownership edges
-    M1Store::Storage::getNewSpecialWithReciprocal(SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SELECTABLE,
+    M1Store::StorageStatic::getNewSpecialWithReciprocal(SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SELECTABLE,
         "OWNS_", M1Env::OWNS_ICON_PATH,
         "BLNGS", M1Env::BLNGS_ICON_PATH,
         SI_IS_TYPE | SI_EDGE_TYPE | SI_INSERT_AT_TOP | SI_IS_SELECTABLE);
     // Special Vertex ID (Edge type) of type edges
-    M1Store::Storage::getNewSpecialWithReciprocal(SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SPECIAL_EDGE | SI_IS_SELECTABLE,
+    M1Store::StorageStatic::getNewSpecialWithReciprocal(SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SPECIAL_EDGE | SI_IS_SELECTABLE,
         "_ISA_", M1Env::ISA_ICON_PATH,
         "_ITO_", M1Env::ITO_ICON_PATH,
         SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SELECTABLE);
     // Special Vertex ID (Edge type) wrote / written by
-    M1Store::Storage::getNewSpecialWithReciprocal(SI_IS_TYPE | SI_EDGE_TYPE,
+    M1Store::StorageStatic::getNewSpecialWithReciprocal(SI_IS_TYPE | SI_EDGE_TYPE,
         "WROTE", M1Env::TEXT_WROTE_ICON_PATH,
         "WRTBY", M1Env::TEXT_WRITTEN_BY_ICON_PATH,
         SI_IS_TYPE | SI_EDGE_TYPE);
     // Special Vertex ID (Edge type) of occurrence edges
-    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SPECIAL_EDGE, "OCCUR", M1Env::OCCURRENCE_ICON_PATH);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SPECIAL_EDGE, "OCCUR", M1Env::OCCURRENCE_ICON_PATH);
     // Special Vertex ID (Vertex type) of word form vertices
-    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE | SI_IS_ICON_TYPE, "WFORM", M1Env::WFORM_ICON_PATH);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_IS_ICON_TYPE, "WFORM", M1Env::WFORM_ICON_PATH);
     // Special Vertex ID (Simple edge type) of Occurrence field capitalization flag
-    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE, "CAPTL", nullptr);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "CAPTL", nullptr);
     // Special Vertex ID (Simple edge type) of Occurrence field left punctuation
-    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE, "PCTLF", nullptr);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PCTLF", nullptr);
     // Special Vertex ID (Simple edge type) of Occurrence field right punctuation
-    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE, "PCTRT", nullptr);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PCTRT", nullptr);
     // Special Vertex ID (Simple edge type) of Occurrence field markup left
-    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE, "MKPLF", nullptr);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "MKPLF", nullptr);
     // Special Vertex ID (Simple edge type) of Occurrence field markup right
-    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE, "MKPRT", nullptr);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "MKPRT", nullptr);
     // Special Vertex ID (Simple edge type) of Occurrence field sentence position
-    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE, "STPOS", nullptr);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "STPOS", nullptr);
     // Color of text highlight category
-    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE, "HLCLR", nullptr);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "HLCLR", nullptr);
     // Special Vertex ID (Vertex type) of Gita translation source: Prabhupada
-    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE, "PRABH", nullptr);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PRABH", nullptr);
     // Special Vertex ID (Vertex type) of Gita translation source: Sivananda
-    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE, "SIVAN", nullptr);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "SIVAN", nullptr);
     // Special Vertex ID (Vertex type) of Gita translation source: Gambirananda
-    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE, "GAMBI", nullptr);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "GAMBI", nullptr);
     // Special Vertex ID (Simple Edge type) of Gita transliteration field
-    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE, "TRSLT", nullptr);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TRSLT", nullptr);
     // Special Vertex ID (Simple Edge type) of Gita dictionary ref. field
-    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE, "DCTRF", nullptr);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "DCTRF", nullptr);
     // Special Vertex ID (Simple Edge type) WfW unit Translation field
-    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE, "WFTRN", nullptr);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "WFTRN", nullptr);
     // Special Vertex ID (Vertex type) Url link
-    M1Store::Storage::getNewSpecialNoItem(SI_IS_TYPE, "URLNK", M1Env::TEXT_URL_LINK_ICON_PATH);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "URLNK", M1Env::TEXT_URL_LINK_ICON_PATH);
     // Special Vertex ID (Edge type) begin section + reciprocal
-    M1Store::Storage::getNewSpecialWithReciprocal(SI_IS_TYPE,
+    M1Store::StorageStatic::getNewSpecialWithReciprocal(SI_IS_TYPE,
         "HS2OB", M1Env::TW_SECTION_2_OCC_BEGIN_ICON_PATH,
         "OC2HB", M1Env::TW_SECTION_2_OCC_BEGIN_ICON_PATH,
         SI_IS_TYPE);
     // Special Vertex ID (Edge type) end section + reciprocal
-    M1Store::Storage::getNewSpecialWithReciprocal(SI_IS_TYPE,
+    M1Store::StorageStatic::getNewSpecialWithReciprocal(SI_IS_TYPE,
         "HS2OE", M1Env::TW_SECTION_2_OCC_END_ICON_PATH,
         "OC2HE", M1Env::TW_SECTION_2_OCC_END_ICON_PATH,
         SI_IS_TYPE);

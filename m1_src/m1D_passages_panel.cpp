@@ -1,5 +1,6 @@
 #include "m1A_constants.h"
 #include "m1B_graph_init.h"
+#include "m1B_lv2_iterators.h"
 #include "m1C_interp.h"
 #include "m1D_passages_panel.h"
 
@@ -349,7 +350,7 @@ QString M1UI::PassageEditor::bake_highlight(M1Store::Item_lv2* p_highlight_verte
         for(int i = m_from_sel; i <= m_to_sel; i++) l_word_list.append(m_item_list.at(i)->highlight(l_highlight_chunk, p_category, p_color));
     this->unselect_all();
 
-    return M1Store::Storage::maxLengthChop(l_word_list.join(" "), 36);
+    return M1Store::StorageStatic::maxLengthChop(l_word_list.join(" "), 36);
 }
 
 // PassagesPanel ---------------------------------------------------------------------------------------------------------------------------------------

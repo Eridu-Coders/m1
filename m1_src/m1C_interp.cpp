@@ -2,7 +2,7 @@
 #include "m1A_env.h"
 #include "m1B_graph_init.h"
 #include "m1B_store.h"
-#include "m1B_lv2_item.h"
+#include "m1B_lv2_iterators.h"
 #include "m1D_tree_display.h"
 #include "m1D_passages_panel.h"
 
@@ -246,10 +246,10 @@ QString M1MidPlane::Interp::displayText(){
 }
 
 QIcon* M1MidPlane::Interp::edgeIcon(){
-    return M1Store::Storage::getQIcon(m_myself->getIconSITypeID());
+    return M1Store::StorageStatic::getQIcon(m_myself->getIconSITypeID());
 }
 QIcon* M1MidPlane::Interp::vertexIcon(){
-    return M1Store::Storage::getQIcon(m_myself->getTarget_lv2()->getIconSITypeID());
+    return M1Store::StorageStatic::getQIcon(m_myself->getTarget_lv2()->getIconSITypeID());
 }
 
 void M1MidPlane::Interp::paintEvent(QPaintEvent* p_event){
@@ -718,9 +718,11 @@ M1MidPlane::BhashyaTranslation::BhashyaTranslation(M1Store::Item_lv2* p_myself, 
 //------------------------------------ ChunkInterp -----------------------------------------------------
 QString ck_html_fragment(M1Store::Item_lv2* p_si){
     QStringList l_raw;
-    for(M1Store::Item_lv2_iterator it = p_si->getIteratorTop(); !it.beyondEnd(); it.next()){
-        if(it.at()->isFullEdge() && !it.at()->isOfType(M1Env::BLNGS_SIID) )
-            l_raw.append(it.at()->getTarget_lv2()->text());
+    l_raw.append(p_si->text());
+    // for(M1Store::Item_lv2_iterator it = p_si->getIteratorTop(); !it.beyondEnd(); it.next()){
+    //    if(it.at()->isFullEdge() && !it.at()->isOfType(M1Env::BLNGS_SIID) )
+    for(M1Store::Item_lv2_iterator it = p_si->getIteratorTop(M1Env::OWNS_SIID, M1Env::TEXT_CHUNK_SIID); !it.beyondEnd(); it.next()){
+        l_raw.append(ck_html_fragment(it.at()->getTarget_lv2()));
     }
 
     QString l_html = QString("<span style=\"font-family: 'Noto Serif', 'Times New Roman', serif;\">") + l_raw.join(" ") + "</span>";

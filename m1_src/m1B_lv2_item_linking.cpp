@@ -1,5 +1,5 @@
 #include "m1A_env.h"
-#include "m1B_lv2_item.h"
+#include "m1B_lv2_iterators.h"
 #include "m1B_store.h"
 #include "m1B_graph_init.h"
 
@@ -17,6 +17,8 @@
  * If p_edge_above is provided, and both the new edge and p_edge_above have a reciprocal edge, then the reciprocal of the new edge
  * will be positionned below the reciprocal of p_edge_above, unless p_at_top is set, in which case, it will be positioned at the
  * top of the appropriate ring of the target element.
+ *
+ * \todo insert new edges at bottom
  * @{
  */
 
@@ -35,7 +37,7 @@
 M1Store::Item_lv2* M1Store::Item_lv2::linkTo(Item_lv2* p_target, const SpecialItemID p_type_edge, Item_lv2* p_edge_above, bool p_at_top){
     M1_FUNC_ENTRY(g_cat_lv2_members, QString("{%3} link to: {%1} [%2]")
                       .arg(p_target->dbgShort())
-                      .arg(M1Store::Storage::getSpecialItemPointer(p_type_edge)->mnemonic())
+                      .arg(M1Store::StorageStatic::getSpecialItemPointer(p_type_edge)->mnemonic())
                       .arg(this->dbgShort()))
     // cannot link simple items to anything
     Q_ASSERT_X(isFullVertex() || isFullEdge(), "Item_lv2::linkTo()", "cannot link simple vertices or edges to anything");
@@ -47,9 +49,9 @@ M1Store::Item_lv2* M1Store::Item_lv2::linkTo(Item_lv2* p_target, const SpecialIt
     l_new_edge->setOrigin_lv1(this->item_id());
 
     // creation of a reciprocal edge if necessary
-    if(M1Store::Storage::getSpecialItemPointer(p_type_edge)->flags() & SI_HAS_RECIPROCAL){
+    if(M1Store::StorageStatic::getSpecialItemPointer(p_type_edge)->flags() & SI_HAS_RECIPROCAL){
         // the reciprocal edge
-        SpecialItemID l_reciprocal_type_si_id = M1Store::Storage::getSpecialItemPointer(p_type_edge)->reciprocalSpecialId();
+        SpecialItemID l_reciprocal_type_si_id = M1Store::StorageStatic::getSpecialItemPointer(p_type_edge)->reciprocalSpecialId();
         M1Store::Item_lv2* l_new_edge_reciprocal =
             getNew(FULL_EDGE, M1Store::ItemType(l_reciprocal_type_si_id));
         l_new_edge_reciprocal->setOrigin_lv1(p_target->item_id());
@@ -69,7 +71,7 @@ M1Store::Item_lv2* M1Store::Item_lv2::linkTo(Item_lv2* p_target, const SpecialIt
         p_target->installFullEdge(l_new_edge_reciprocal,
                                   l_reciprocal_type_si_id,
                                   nullptr, // no edge above
-                                  M1Store::Storage::getSpecialItemPointer(l_reciprocal_type_si_id)->flags() & M1Env::SI_INSERT_AT_TOP);
+                                  M1Store::StorageStatic::getSpecialItemPointer(l_reciprocal_type_si_id)->flags() & M1Env::SI_INSERT_AT_TOP);
     }
     // insert the direct edge into one of the edge rings (special or ordinary) of this item
     this->installFullEdge(l_new_edge, p_type_edge, p_edge_above, p_at_top);
@@ -103,7 +105,7 @@ void M1Store::Item_lv2::installFullEdge(Item_lv2* p_new_edge, const SpecialItemI
 
     // determine in which ring the edge is to be inserted
     bool l_edge_is_special =
-        p_edge_type == G_VOID_SI_ID ? false : M1Store::Storage::getSpecialItemPointer(p_edge_type)->flags() & SI_IS_SPECIAL_EDGE;
+        p_edge_type == G_VOID_SI_ID ? false : M1Store::StorageStatic::getSpecialItemPointer(p_edge_type)->flags() & SI_IS_SPECIAL_EDGE;
 
     ItemID l_first_edge_id = l_edge_is_special ? this->firstEdgeSpecial_item_id() : this->firstEdge_item_id();
 
@@ -205,11 +207,12 @@ M1Store::Item_lv2* M1Store::Item_lv2::linkTo(Item_lv2* p_target, const char* p_m
                       .arg(p_target->dbgShort())
                       .arg(p_mnemonic_edge))
 
-    M1Store::Item_lv2* l_ret = linkTo(p_target, Storage::getSpecialItemPointer(p_mnemonic_edge)->specialId(), p_edge_above, p_at_top);
+    M1Store::Item_lv2* l_ret = linkTo(p_target, StorageStatic::getSpecialItemPointer(p_mnemonic_edge)->specialId(), p_edge_above, p_at_top);
 
     M1_FUNC_EXIT
         return l_ret;
 }
+
 /**
  * @brief link an item to another
  * @param p_target_id the target (as an ItemID)
@@ -226,12 +229,13 @@ M1Store::Item_lv2* M1Store::Item_lv2::linkTo(ItemID p_target_id, const SpecialIt
     M1Store::Item_lv2* l_target = getExisting(p_target_id);
     qCDebug(g_cat_lv2_members) << QString("link to: %1 [%2]")
                                       .arg(l_target->dbgShort())
-                                      .arg(Storage::getSpecialItemPointer(p_type)->mnemonic());
+                                      .arg(StorageStatic::getSpecialItemPointer(p_type)->mnemonic());
     M1Store::Item_lv2* l_ret = linkTo(l_target, p_type, p_edge_above, p_at_top);
 
     M1_FUNC_EXIT
         return l_ret;
 }
+
 /**
  * @brief link an item to another
  * @param p_target_id the target (as an ItemID)
@@ -251,6 +255,7 @@ M1Store::Item_lv2*  M1Store::Item_lv2::linkTo(ItemID p_target_id, const char* p_
     M1_FUNC_EXIT
         return l_ret;
 }
+
 /**
  * @brief Checking whether an edge belongs to one of the rings of this item
  * @param p_edge edge to test
@@ -278,14 +283,15 @@ bool M1Store::Item_lv2::edgeBelongs(Item_lv2* p_edge, bool p_edge_is_special){
     M1_FUNC_EXIT
         return l_ret;
 }
+
 /**
  * @brief Create a new vertex linked to this item
  *
- * @param p_edge_type
- * @param p_label
- * @param p_vertex_type
- * @param p_edge_above
- * @param p_at_top
+ * @param p_edge_type type of the edge leading to the new descendant
+ * @param p_label label of the new descendant
+ * @param p_vertex_type type of the new descendant vertex
+ * @param p_edge_above edge below which to install the edge leading to the new descendant
+ * @param p_at_top true --> edge leading to the new descendant inserted at top
  * @return the newly created vertex
  */
 M1Store::Item_lv2* M1Store::Item_lv2::create_descendant(
@@ -297,8 +303,8 @@ M1Store::Item_lv2* M1Store::Item_lv2::create_descendant(
     M1_FUNC_ENTRY(g_cat_lv2_members,
                   QString("new descendant: %1 --{%2}--> [%3] %4")
                       .arg(this->dbgShort())
-                      .arg(M1Store::Storage::getSpecialItemPointer(p_edge_type)->mnemonic())
-                      .arg(M1Store::Storage::getSpecialItemPointer(p_vertex_type)->mnemonic())
+                      .arg(M1Store::StorageStatic::getSpecialItemPointer(p_edge_type)->mnemonic())
+                      .arg(M1Store::StorageStatic::getSpecialItemPointer(p_vertex_type)->mnemonic())
                       .arg(p_label)
                   )
     // cannot give descendants to anything but full vertices or edge

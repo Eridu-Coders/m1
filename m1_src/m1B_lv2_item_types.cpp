@@ -11,6 +11,7 @@
  *
  *  @{
  */
+
 /**
  * @brief Type assignment with a special item pointer
  *
@@ -50,18 +51,20 @@ bool M1Store::Item_lv2::setType(const SpecialItem* p_type_si){
     M1_FUNC_EXIT
         return l_ret;
 }
+
 /**
  * @brief Type assignment with a special item ID
  * @param p_type_id the SpecialItemID for the type to be assigned
  * @return true/false depending on success/failure
  */
 bool M1Store::Item_lv2::setType(const SpecialItemID p_type_si_id){
-    M1_FUNC_ENTRY(g_cat_lv2_members, QString("Set type to: %1").arg(M1Store::Storage::getSpecialItemPointer(p_type_si_id)->mnemonic()))
+    M1_FUNC_ENTRY(g_cat_lv2_members, QString("Set type to: %1").arg(M1Store::StorageStatic::getSpecialItemPointer(p_type_si_id)->mnemonic()))
 
-    bool l_ret = setType(M1Store::Storage::getSpecialItemPointer(p_type_si_id));
+    bool l_ret = setType(M1Store::StorageStatic::getSpecialItemPointer(p_type_si_id));
     M1_FUNC_EXIT
         return l_ret;
 }
+
 /**
  * @brief Type assignment with a mnemonic
  * @param p_mnemonic the mnemonic of the type to be assigned
@@ -70,10 +73,11 @@ bool M1Store::Item_lv2::setType(const SpecialItemID p_type_si_id){
 bool M1Store::Item_lv2::setType(const char* p_mnemonic){
     M1_FUNC_ENTRY(g_cat_lv2_members, QString("Set type to: %1").arg(p_mnemonic))
 
-    bool l_ret = setType(M1Store::Storage::getSpecialItemPointer(p_mnemonic));
+    bool l_ret = setType(M1Store::StorageStatic::getSpecialItemPointer(p_mnemonic));
     M1_FUNC_EXIT
         return l_ret;
 }
+
 /**
  * @brief M1Store::Item_lv2::setType
  * @param p_type_lv2
@@ -86,6 +90,7 @@ bool M1Store::Item_lv2::setType(const Item_lv2* p_type_lv2){
     M1_FUNC_EXIT
         return l_ret;
 }
+
 /**
  * @brief M1Store::Item_lv2::isOfType
  * @param p_type_item_id
@@ -106,13 +111,13 @@ bool M1Store::Item_lv2::isOfType(const Item_lv2* p_type_lv2) const{
  */
 bool M1Store::Item_lv2::isOfType(const SpecialItemID p_type_si_id) const{
     M1_FUNC_ENTRY(g_cat_lv2_members,
-                  QString("Is of type (SpecialItemID): %1 ?").arg(M1Store::Storage::getSpecialItemPointer(p_type_si_id)->mnemonic()))
+                  QString("Is of type (SpecialItemID): %1 ?").arg(M1Store::StorageStatic::getSpecialItemPointer(p_type_si_id)->mnemonic()))
 
     // type test within own m_type (lv0)
     bool l_ret = this->isOfType_member(p_type_si_id);
     // if type not found and there are special edges (and this is not a simple edge/vertex either)
     if( !l_ret && !this->isSimpleEdge() && !this->isSimpleVertex() && this->firstEdgeSpecial_item_id() != G_VOID_ITEM_ID){
-        ItemID l_expected_target_id = Storage::getSpecialItemPointer(p_type_si_id)->itemId();
+        ItemID l_expected_target_id = StorageStatic::getSpecialItemPointer(p_type_si_id)->itemId();
         // if the type corresponds to an ItemID (otherwise, there cannot be ISA edges))
         if(l_expected_target_id != G_VOID_ITEM_ID){
             bool l_not_first = false;
@@ -156,7 +161,7 @@ bool M1Store::Item_lv2::isOfType(const SpecialItem* p_type_si) const{
 bool M1Store::Item_lv2::isOfType(const char* p_mnemonic) const{
     M1_FUNC_ENTRY(g_cat_lv2_members, QString("Is of type (char*): %1 ?").arg(p_mnemonic))
 
-    bool l_ret = this->isOfType(M1Store::Storage::getSpecialItemPointer(p_mnemonic)->specialId());
+    bool l_ret = this->isOfType(M1Store::StorageStatic::getSpecialItemPointer(p_mnemonic)->specialId());
     M1_FUNC_EXIT
         return l_ret;
 }

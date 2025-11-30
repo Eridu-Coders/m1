@@ -47,13 +47,13 @@ M1UI::MainWindow::MainWindow(QWidget *p_parent) : QMainWindow(p_parent){
     l_bar_layout->addWidget(l_vt_combo);
     l_bar_layout->addStretch(1);
 
-    for(const M1Store::SpecialItem* l_special : M1Store::Storage::getSelectableEdgeTypes()) {
+    for(const M1Store::SpecialItem* l_special : M1Store::StorageStatic::getSelectableEdgeTypes()) {
         qDebug() << l_special->mnemonic();
-        l_et_combo->addItem(*M1Store::Storage::getQIcon(l_special->specialId()), l_special->mnemonic());
+        l_et_combo->addItem(*M1Store::StorageStatic::getQIcon(l_special->specialId()), l_special->mnemonic());
     }
-    for(const M1Store::SpecialItem* l_special : M1Store::Storage::getSelectableVertexTypes()) {
+    for(const M1Store::SpecialItem* l_special : M1Store::StorageStatic::getSelectableVertexTypes()) {
         //qDebug() << l_special->mnemonic();
-        l_vt_combo->addItem(*M1Store::Storage::getQIcon(l_special->specialId()), l_special->mnemonic());
+        l_vt_combo->addItem(*M1Store::StorageStatic::getQIcon(l_special->specialId()), l_special->mnemonic());
     }
     QPushButton* l_home_btn = new QPushButton("Home", l_buttons_bar);
     l_bar_layout->addWidget(l_home_btn);

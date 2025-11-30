@@ -186,7 +186,8 @@ Q_DECLARE_LOGGING_CATEGORY(g_cat_lv0_members)           ///< for lv0_Item
 Q_DECLARE_LOGGING_CATEGORY(g_cat_lv1_members)           ///< for lv1_Item
 Q_DECLARE_LOGGING_CATEGORY(g_cat_lv2_members)           ///< for lv2_Item class members
 Q_DECLARE_LOGGING_CATEGORY(g_cat_lv2_constructors)      ///< for lv2_Item class constructors and instanciation from mmap()
-Q_DECLARE_LOGGING_CATEGORY(g_cat_lv2_iterators)         ///< for lv2_Item-derived iterators
+Q_DECLARE_LOGGING_CATEGORY(g_cat_lv2_iterators)         ///< for lv2_Item-derived iterators g_cat_lv2_type_iterators
+Q_DECLARE_LOGGING_CATEGORY(g_cat_lv2_type_iterators)    ///< for edge type iterators
 Q_DECLARE_LOGGING_CATEGORY(g_cat_silence)               ///< for debug strings generation (silencing all other debug categories)
 Q_DECLARE_LOGGING_CATEGORY(g_main_test)                 ///< messages from main fumction in a test build
 Q_DECLARE_LOGGING_CATEGORY(g_cat_lv0_test)              ///< for tests of the lv0_Item class
@@ -203,7 +204,7 @@ Q_DECLARE_LOGGING_CATEGORY(g_cat_main)                  ///< messages from main 
 
 /**@}*/ //end of DebugLog
 
-/** \defgroup STORE Physical storage layer
+/** \defgroup STORE Physical storage layer - class M1Store::StorageStatic
  *
  *  Handles LMDB and mmap() access
  */

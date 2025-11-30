@@ -97,7 +97,7 @@ using namespace M1Env;
      * Instances of this class live in the items mmap() area
      */
     class Item_lv0{
-        friend class Storage;
+        friend class StorageStatic;
         friend class Item_lv2;
     private:
         /** \defgroup ShareMb Shared Members - present in all 4 kinds of Items

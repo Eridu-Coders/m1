@@ -9,14 +9,14 @@
 #include "m1A_constants.h"
 
 // default inits for static members
-bool M1Env::M1EnvStatic::cm_block = false;
-QTextStream* M1Env::M1EnvStatic::cm_debug_stream = 0;
-QFile* M1Env::M1EnvStatic::cm_debug_file = 0;
-QString M1Env::M1EnvStatic::cm_normal_filter;
+bool M1Env::EnvStatic::cm_block = false;
+QTextStream* M1Env::EnvStatic::cm_debug_stream = 0;
+QFile* M1Env::EnvStatic::cm_debug_file = 0;
+QString M1Env::EnvStatic::cm_normal_filter;
 /// stack to contain the nested categories of corresponding entry()/exit() pairs
-std::stack<QString> M1Env::M1EnvStatic::cm_current_category;
-int M1Env::M1EnvStatic::cm_depth = 0;
-QStringList M1Env::M1EnvStatic::cm_list_excluded_catergory_for_screen;
+std::stack<QString> M1Env::EnvStatic::cm_current_category;
+int M1Env::EnvStatic::cm_depth = 0;
+QStringList M1Env::EnvStatic::cm_list_excluded_catergory_for_screen;
 
 /**
  * @brief M1Store::M1Env::myMessageHandler message handler callback for Qt debug infra
@@ -24,8 +24,8 @@ QStringList M1Env::M1EnvStatic::cm_list_excluded_catergory_for_screen;
  * @param p_context function name, file, line, etc
  * @param p_msg the error message
  */
-void M1Env::M1EnvStatic::myMessageHandler(QtMsgType p_type, const QMessageLogContext &p_context, const QString & p_msg){
-    if( M1Env::M1EnvStatic::cm_block ) return;
+void M1Env::EnvStatic::myMessageHandler(QtMsgType p_type, const QMessageLogContext &p_context, const QString & p_msg){
+    if( M1Env::EnvStatic::cm_block ) return;
 
     sendToLogChannels(p_type,
                       p_msg,
@@ -36,7 +36,7 @@ void M1Env::M1EnvStatic::myMessageHandler(QtMsgType p_type, const QMessageLogCon
 }
 
 /**
- * @brief M1Env::M1EnvStatic::sendToLogChannels
+ * @brief M1Env::EnvStatic::sendToLogChannels
  * @param p_type
  * @param p_msg
  * @param p_cat
@@ -44,7 +44,7 @@ void M1Env::M1EnvStatic::myMessageHandler(QtMsgType p_type, const QMessageLogCon
  * @param p_line
  * @param p_func_deco
  */
-void M1Env::M1EnvStatic::sendToLogChannels(QtMsgType p_type,
+void M1Env::EnvStatic::sendToLogChannels(QtMsgType p_type,
                                            const QString & p_msg,
                                            const QString & p_cat,
                                            const QString& p_file,
@@ -83,23 +83,23 @@ void M1Env::M1EnvStatic::sendToLogChannels(QtMsgType p_type,
     }
 }
 
-void M1Env::M1EnvStatic::addExcludeCatergoryForScreen(QString p_cat){
+void M1Env::EnvStatic::addExcludeCatergoryForScreen(QString p_cat){
     cm_list_excluded_catergory_for_screen.append(p_cat);
 }
 
-QString M1Env::M1EnvStatic::indentSpace(){
+QString M1Env::EnvStatic::indentSpace(){
     return QString("...").repeated(cm_depth) + QString("%1").arg(cm_depth, 2);
 }
 
 /**
- * @brief M1Env::M1EnvStatic::entry
+ * @brief M1Env::EnvStatic::entry
  * @param p_log_cat
  * @param p_msg
  * @param p_file
  * @param p_line
  * @param p_func
  */
-void M1Env::M1EnvStatic::entry(const QLoggingCategory& p_log_cat(),
+void M1Env::EnvStatic::entry(const QLoggingCategory& p_log_cat(),
                                const QString& p_msg,
                                const QString& p_file,
                                int p_line,
@@ -121,12 +121,12 @@ void M1Env::M1EnvStatic::entry(const QLoggingCategory& p_log_cat(),
 }
 
 /**
- * @brief M1Env::M1EnvStatic::exit
+ * @brief M1Env::EnvStatic::exit
  * @param p_file
  * @param p_line
  * @param p_func
  */
-void M1Env::M1EnvStatic::exit(
+void M1Env::EnvStatic::exit(
     const QString& p_file,
     int p_line,
     const QString& p_func_deco,
@@ -151,7 +151,7 @@ void M1Env::M1EnvStatic::exit(
 /**
  * @brief M1Store::M1Env::init init m1 env
  */
-void M1Env::M1EnvStatic::init(){
+void M1Env::EnvStatic::init(){
     // open stream for CSV debug messages
     cm_debug_file = new QFile(LOG_FILE_NAME);
     cm_debug_file->open(QIODevice::WriteOnly);
@@ -168,7 +168,7 @@ void M1Env::M1EnvStatic::init(){
 /**
  * @brief M1Store::M1Env::close close m1 env
  */
-void M1Env::M1EnvStatic::close(){
+void M1Env::EnvStatic::close(){
     // last debug message
     qDebug() << "Closing Logging system";
 
@@ -179,12 +179,12 @@ void M1Env::M1EnvStatic::close(){
     cm_block = true;
 }
 
-void M1Env::M1EnvStatic::setNormalFilter(const QString& p_filter){
+void M1Env::EnvStatic::setNormalFilter(const QString& p_filter){
     cm_normal_filter = p_filter;
     setSilentMode(false);
 }
 
-void M1Env::M1EnvStatic::setSilentMode(bool p_set){
+void M1Env::EnvStatic::setSilentMode(bool p_set){
     if(p_set)
         // set debug categories to just allow g_cat_silence (= "dump")
         QLoggingCategory::setFilterRules("*.debug=false\n"

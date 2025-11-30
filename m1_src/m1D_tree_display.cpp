@@ -5,7 +5,7 @@
 #include "m1D_tree_display.h"
 #include "m1A_env.h"
 #include "m1B_graph_init.h"
-#include "m1B_lv2_item.h"
+#include "m1B_lv2_iterators.h"
 
 Q_LOGGING_CATEGORY(g_cat_tree_display, "tree_display")
 
@@ -34,8 +34,8 @@ M1UI::TreeDisplay::TreeDisplay(QWidget *p_parent, MainWindow *p_main_window) : Q
 
     addInterp(M1Store::Item_lv2::getExisting(M1Env::HOME_SIID));
 
-    m_new_edge_type = M1Store::Storage::getSelectableEdgeTypes()[0];
-    m_new_vertex_type = M1Store::Storage::getSelectableVertexTypes()[0];
+    m_new_edge_type = M1Store::StorageStatic::getSelectableEdgeTypes()[0];
+    m_new_vertex_type = M1Store::StorageStatic::getSelectableVertexTypes()[0];
     qCDebug(g_cat_tree_display) << "Default Edge type : " << m_new_edge_type->mnemonic();
 
     // this->setAcceptDrops(true);
@@ -211,12 +211,12 @@ void M1UI::TreeDisplay::gotoVertex(M1Store::Item_lv2* p_new_vertex, M1MidPlane::
 }
 
 void M1UI::TreeDisplay::edgeTypeSelected(int p_index){
-    qCDebug(g_cat_tree_display) << "Edge type : " << M1Store::Storage::getSelectableEdgeTypes()[p_index]->mnemonic();
-    m_new_edge_type = M1Store::Storage::getSelectableEdgeTypes()[p_index];
+    qCDebug(g_cat_tree_display) << "Edge type : " << M1Store::StorageStatic::getSelectableEdgeTypes()[p_index]->mnemonic();
+    m_new_edge_type = M1Store::StorageStatic::getSelectableEdgeTypes()[p_index];
 }
 void M1UI::TreeDisplay::vertexTypeSelected(int p_index){
-    qCDebug(g_cat_tree_display) << "Vertex type : " << M1Store::Storage::getSelectableVertexTypes()[p_index]->mnemonic();
-    m_new_vertex_type = M1Store::Storage::getSelectableVertexTypes()[p_index];
+    qCDebug(g_cat_tree_display) << "Vertex type : " << M1Store::StorageStatic::getSelectableVertexTypes()[p_index]->mnemonic();
+    m_new_vertex_type = M1Store::StorageStatic::getSelectableVertexTypes()[p_index];
 }
 
 M1Store::SpecialItem* M1UI::TreeDisplay::newEdgeType(){

@@ -39,8 +39,8 @@ int main(int argc, char *argv[])
     po::store(po::parse_command_line(argc, argv, l_desc), l_program_options_vm);
     po::notify(l_program_options_vm);
 
-    M1Env::M1EnvStatic::init();
-    M1Env::M1EnvStatic::setNormalFilter("*.debug=true\n"
+    M1Env::EnvStatic::init();
+    M1Env::EnvStatic::setNormalFilter("*.debug=true\n"
                                         "store.*=false\n"
                                         "lv0.*=false\n"
                                         "lv1.*=false\n"
@@ -56,24 +56,25 @@ int main(int argc, char *argv[])
     }
 
     // screen logging excluded categories
-    M1Store::M1EnvStatic::addExcludeCatergoryForScreen("lv0.item_type");
-    M1Store::M1EnvStatic::addExcludeCatergoryForScreen("lv0.special_item");
-    M1Store::M1EnvStatic::addExcludeCatergoryForScreen("lv0.members_access");
-    M1Store::M1EnvStatic::addExcludeCatergoryForScreen("lv1.members_access");
-    M1Store::M1EnvStatic::addExcludeCatergoryForScreen("lv2.constructors");
-    M1Store::M1EnvStatic::addExcludeCatergoryForScreen("lv2.members_access");
-    M1Store::M1EnvStatic::addExcludeCatergoryForScreen("lv2.iterators");
-    M1Store::M1EnvStatic::addExcludeCatergoryForScreen("lv2.test");
-    M1Store::M1EnvStatic::addExcludeCatergoryForScreen("store.storage");
+    M1Store::EnvStatic::addExcludeCatergoryForScreen("lv0.item_type");
+    M1Store::EnvStatic::addExcludeCatergoryForScreen("lv0.special_item");
+    M1Store::EnvStatic::addExcludeCatergoryForScreen("lv0.members_access");
+    M1Store::EnvStatic::addExcludeCatergoryForScreen("lv1.members_access");
+    M1Store::EnvStatic::addExcludeCatergoryForScreen("lv2.constructors");
+    M1Store::EnvStatic::addExcludeCatergoryForScreen("lv2.members_access");
+    // M1Store::EnvStatic::addExcludeCatergoryForScreen("lv2.iterators");
+    M1Store::EnvStatic::addExcludeCatergoryForScreen("lv2.test");
+    M1Store::EnvStatic::addExcludeCatergoryForScreen("store.storage");
 
-    if(l_program_options_vm.count("reset")) M1Store::Storage::storeSetUp(true);
-    else M1Store::Storage::storeSetUp(false);
+    if(l_program_options_vm.count("reset")) M1Store::StorageStatic::storeSetUp(true);
+    else M1Store::StorageStatic::storeSetUp(false);
 
-    M1Env::M1EnvStatic::setNormalFilter("*.debug=true\n"
+    M1Env::EnvStatic::setNormalFilter("*.debug=true\n"
                                         "store.*=false\n"
                                         "lv0.*=false\n"
                                         "lv1.*=false\n"
                                         "lv2.*=false\n"
+                                        // "lv2.type_iterators=true\n"
                                         "interp.*=false\n"
                                         "interp.dev=true\n"
                                         // "interp.drag=true\n"
@@ -93,10 +94,10 @@ int main(int argc, char *argv[])
     w.show();
     int l_ret = a.exec();
 
-    M1Store::Storage::storeShutDown();
+    M1Store::StorageStatic::storeShutDown();
     qCDebug(g_cat_main) << "App ends";
     M1_FUNC_EXIT
-    M1Env::M1EnvStatic::close();
+    M1Env::EnvStatic::close();
 
     printf("Hurrah! No Core Dump ... Returning %d\n", l_ret);
     return l_ret;
@@ -106,12 +107,12 @@ int loadGita(){
     M1_FUNC_ENTRY(g_cat_main, QString("Loading Gita passage"))
 
     // perform the load only if not already done
-    if(M1Store::Storage::menmonic_exists("GITAL")){
+    if(M1Store::StorageStatic::menmonic_exists("GITAL")){
         M1_FUNC_EXIT
         return 0;
     }
     else
-        M1Store::Storage::getNewSpecialNoItem(M1Store::SI_IS_TYPE, "GITAL", nullptr);
+        M1Store::StorageStatic::getNewSpecialNoItem(M1Store::SI_IS_TYPE, "GITAL", nullptr);
 
     // lexicon root
     // M1Store::Item_lv2* l_words_root = M1Store::Item_lv2::getExisting(M1Env::FORM_SIID);
@@ -537,7 +538,7 @@ int loadGita(){
 void loadEnoch(){
     M1_FUNC_ENTRY(g_cat_main, QString("Loading Enoch passage"))
 
-    M1Env::M1EnvStatic::setSilentMode(true);
+    M1Env::EnvStatic::setSilentMode(true);
 
     //--------------------------------- words -----------------------------------------------------------
     // lexicon building
@@ -630,6 +631,6 @@ void loadEnoch(){
                                       .arg(l_punc_right).toUtf8().constData();
     }
 
-    M1Env::M1EnvStatic::setSilentMode(false);
+    M1Env::EnvStatic::setSilentMode(false);
     M1_FUNC_EXIT
 }

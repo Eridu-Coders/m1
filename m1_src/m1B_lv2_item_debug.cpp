@@ -85,9 +85,9 @@ void M1Store::Item_lv2::dbgRecurGraph(const ItemID p_item_id, std::set<ItemID>& 
 }
 
 /**
- * @brief debug dump
+ * @brief debug dump (full)
  *
- * This is a multi-line debug representation
+ * A multi-line debug representation of an Item_lv2
  *
  * @return the debug string
  */
@@ -139,14 +139,14 @@ QString M1Store::Item_lv2::dbgString(){
                    .arg(QString("m_first_edge_special : 0x%1 / %2").arg(firstEdgeSpecial_item_id(), 16, 16, QLatin1Char('0')).arg(firstEdgeSpecial_item_id()))
                    .arg(QString("m_string_id          : 0x%1 / %2").arg(string_id(), 16, 16, QLatin1Char('0')).arg(string_id()))
                    .arg(QString("text                 : [%1] %2")
-                            .arg(l_text.length()).arg(M1Store::Storage::maxLengthChop(l_text, 100))) + l_edges;
+                            .arg(l_text.length()).arg(M1Store::StorageStatic::maxLengthChop(l_text, 100))) + l_edges;
         break;
     case SIMPLE_VERTEX:
         l_ret +=
                QString("------------------------- SIMPLE VERTEX -------------------------------------------------\n") +
                QString("%1")
                     .arg(QString("text                 : [%1] %2")
-                        .arg(l_text.length()).arg(M1Store::Storage::maxLengthChop(l_text, 100)));
+                        .arg(l_text.length()).arg(M1Store::StorageStatic::maxLengthChop(l_text, 100)));
         break;
     case FULL_EDGE:
         l_ret +=
@@ -172,13 +172,17 @@ QString M1Store::Item_lv2::dbgString(){
                    .arg(QString("m_v_origin           : 0x%1 %2").arg(origin_item_id(), 16, 16, QLatin1Char('0')).arg(origin_item_id()))
                    .arg(QString("m_e_previous         : 0x%1 %2").arg(previous_item_id(), 16, 16, QLatin1Char('0')).arg(previous_item_id()))
                    .arg(QString("m_e_next             : 0x%1 %2").arg(next_item_id(), 16, 16, QLatin1Char('0')).arg(next_item_id()))
-                   .arg(QString("text                 : [%1] 2").arg(l_text.length()).arg(M1Store::Storage::maxLengthChop(l_text, 100)));
+                   .arg(QString("text                 : [%1] 2").arg(l_text.length()).arg(M1Store::StorageStatic::maxLengthChop(l_text, 100)));
         break;
     }
 
     return l_ret + "\n===== END =====";
 }
 
+/**
+ * @brief HTML equivalent of M1Store::Item_lv2::dbgString
+ * @return the HTML string
+ */
 QString M1Store::Item_lv2::dbgStringHtml(){
     QString l_ret = QString("<p style=\"margin: 0;font-weight: bold;\">------------------------ LV2 ------------------------</p>\n") +
                     QString("<table>\n%1%2%3</table>\n")
@@ -237,14 +241,14 @@ QString M1Store::Item_lv2::dbgStringHtml(){
                    .arg(QString("<tr><td>m_string_id</td><td>:</td><td>0x%1 / %2</td></tr>\n").arg(string_id(), 16, 16, QLatin1Char('0')).arg(string_id()))
                    .arg(QString("<p style=\"margin: 0;\">Text : [%1] %2</p>\n")
                             .arg(l_text.length())
-                            .arg(M1Store::Storage::maxLengthChop(l_text, 100))) + l_edges;
+                            .arg(M1Store::StorageStatic::maxLengthChop(l_text, 100))) + l_edges;
         break;
     case SIMPLE_VERTEX:
         l_ret +=
                QString("<p style=\"margin: 0;font-weight: bold;\">------------------- SIMPLE VERTEX -------------------</p>\n") +
                QString("<p style=\"margin: 0;\">Text : [%1] %2</p>")
                           .arg(l_text.length())
-                          .arg(M1Store::Storage::maxLengthChop(l_text, 100));
+                          .arg(M1Store::StorageStatic::maxLengthChop(l_text, 100));
         break;
     case FULL_EDGE:
         l_ret +=
@@ -271,7 +275,7 @@ QString M1Store::Item_lv2::dbgStringHtml(){
                    .arg(QString("<tr><td>m_v_origin</td><td>:</td><td>0x%1 %2</td></tr>\n").arg(origin_item_id(), 16, 16, QLatin1Char('0')).arg(origin_item_id()))
                    .arg(QString("<tr><td>m_e_previous</td><td>:</td><td>0x%1 %2</td></tr>\n").arg(previous_item_id(), 16, 16, QLatin1Char('0')).arg(previous_item_id()))
                    .arg(QString("<tr><td>m_e_next</td><td>:</td><td>0x%1 %2</td></tr>\n").arg(next_item_id(), 16, 16, QLatin1Char('0')).arg(next_item_id()))
-                   .arg(QString("<p style=\"margin: 0;\">Text: [%1] %2</p>").arg(l_text.length()).arg(M1Store::Storage::maxLengthChop(l_text, 100)));
+                   .arg(QString("<p style=\"margin: 0;\">Text: [%1] %2</p>").arg(l_text.length()).arg(M1Store::StorageStatic::maxLengthChop(l_text, 100)));
         break;
     }
 
@@ -282,9 +286,12 @@ QDebug operator<<(QDebug d, M1Store::Item_lv2 p){return d << p.dbgShort().toUtf8
 QDebug operator<<(QDebug d, M1Store::Item_lv2* p){return d << p->dbgShort().toUtf8().constData();}
 
 /**
- * @brief One liner debug representation
+ * @brief One-liner debug representation
+ *
+ * Will continue recursive descent for edges only down to p_depth
+ *
  * @param p_depth is used in the case of full edges which may need recursive descent
- * @return the one-liner
+ * @return the one-liner string
  */
 QString M1Store::Item_lv2::dbgShort(int p_depth){
     QString l_text = text();
@@ -295,7 +302,7 @@ QString M1Store::Item_lv2::dbgShort(int p_depth){
         return QString("VRTX [%1] %2%3")
             .arg(dbgTypeShort())
             .arg(l_text)
-            .arg((flags() & IS_SPECIAL) ? QString(" (%1)").arg(M1Store::Storage::getSpecialItemPointer(item_id())->mnemonic()) : "");
+            .arg((flags() & IS_SPECIAL) ? QString(" (%1)").arg(M1Store::StorageStatic::getSpecialItemPointer(item_id())->mnemonic()) : "");
     case FULL_EDGE:{
         // must accept to represent incomplete edges
         // Q_ASSERT_X(origin_item_id() != G_VOID_ITEM_ID && target_item_id() != G_VOID_ITEM_ID,
@@ -324,6 +331,10 @@ QString M1Store::Item_lv2::dbgShort(int p_depth){
 }
 
 // only for full edges
+/**
+ * @brief Edge-only one-liner giving only the type and target
+ * @return the one-liner string
+ */
 QString M1Store::Item_lv2::dbgHalf(){
     Q_ASSERT_X((flags() & ITEM_NATURE_MASK) == FULL_EDGE && target_item_id() != G_VOID_ITEM_ID,
                "ItemWrapperFullEdge::dbgHalf()", "target = G_VOID_ITEM_ID");

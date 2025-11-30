@@ -28,7 +28,7 @@ class Item_lv2 : public Item_lv1 {
         void defaultEdges();
         void loopNextPrevious();
         Item_lv2* findFieldEdge(const SpecialItem* p_field_type_si) const;
-        std::shared_ptr<Item_lv2_iterator_base> getIteratorGeneric(Item_lv2* p_start_edge, const SpecialItemID p_type) const;
+        std::shared_ptr<Item_lv2_iterator_base> getIteratorGeneric(Item_lv2* p_start_edge, const SpecialItemID p_edge_type, const SpecialItemID p_target_type) const;
         Item_lv2* setFieldInternal(const QString& p_content,
                                    const bool p_force_new,
                                    const bool p_edge,
@@ -127,17 +127,17 @@ class Item_lv2 : public Item_lv1 {
         Item_lv2* getFieldEdge(const SpecialItem* p_field_type_si, const SpecialItem* p_field_type2_si=nullptr) const;
         Item_lv2* getFieldEdge(const SpecialItemID p_field_type_si_id, const SpecialItemID p_field_type2_si_id = G_VOID_SI_ID) const{
             return this->getFieldEdge(
-                M1Store::Storage::getSpecialItemPointer(p_field_type_si_id),
-                p_field_type2_si_id == G_VOID_SI_ID ? nullptr : M1Store::Storage::getSpecialItemPointer(p_field_type2_si_id));
+                M1Store::StorageStatic::getSpecialItemPointer(p_field_type_si_id),
+                p_field_type2_si_id == G_VOID_SI_ID ? nullptr : M1Store::StorageStatic::getSpecialItemPointer(p_field_type2_si_id));
         }
         QString getField(const SpecialItem* p_field_type_si, const SpecialItem* p_field_type2_si=nullptr, const bool p_all=false) const;
         QString getField(const SpecialItemID p_field_type_si_id, const bool p_all=false) const{
-            return this->getField(M1Store::Storage::getSpecialItemPointer(p_field_type_si_id), nullptr, p_all);
+            return this->getField(M1Store::StorageStatic::getSpecialItemPointer(p_field_type_si_id), nullptr, p_all);
         }
         QString getField(const SpecialItemID p_field_type_si_id, const SpecialItemID p_field_type2_si_id, const bool p_all=false) const{
             return this->getField(
-                M1Store::Storage::getSpecialItemPointer(p_field_type_si_id),
-                M1Store::Storage::getSpecialItemPointer(p_field_type2_si_id), p_all);
+                M1Store::StorageStatic::getSpecialItemPointer(p_field_type_si_id),
+                M1Store::StorageStatic::getSpecialItemPointer(p_field_type2_si_id), p_all);
         }
 
         Item_lv2* linkTo(Item_lv2* p_target, const SpecialItemID p_type, Item_lv2* p_edge_above = nullptr, const bool p_at_top = false);
@@ -169,9 +169,9 @@ class Item_lv2 : public Item_lv1 {
         template <class T>
         Item_lv2* find_edge(T) const = delete; // C++11
 
-        Item_lv2_iterator getIteratorTop(const SpecialItemID p_type = G_VOID_SI_ID) const;
-        Item_lv2_iterator getIteratorAuto(const SpecialItemID p_type = G_VOID_SI_ID) const;
-        Item_lv2_iterator getIteratorSpecial(const SpecialItemID p_type = G_VOID_SI_ID) const;
+        Item_lv2_iterator getIteratorTop(const SpecialItemID p_edge_type = G_VOID_SI_ID, const SpecialItemID p_target_type = G_VOID_SI_ID) const;
+        Item_lv2_iterator getIteratorAuto(const SpecialItemID p_edge_type = G_VOID_SI_ID, const SpecialItemID p_target_type = G_VOID_SI_ID) const;
+        Item_lv2_iterator getIteratorSpecial(const SpecialItemID p_edge_type = G_VOID_SI_ID, const SpecialItemID p_target_type = G_VOID_SI_ID) const;
 
         // prevents other types from being implicitly converted
         template <class T>
@@ -185,78 +185,6 @@ class Item_lv2 : public Item_lv1 {
         QString dbgStringHtml();
         QString dbgShort(int p_depth = 0);
         QString dbgHalf();
-};
-
-/**
- * @brief Base class --> scans through ALL edges (no filter)
- * \ingroup LV2
- */
-class Item_lv2_iterator_base{
-        friend class Item_lv2;
-        friend class Item_lv2_iterator_edge_type;
-    private:
-        Item_lv2* m_current_edge = nullptr;
-        ItemID m_first_edge_item_id = G_VOID_ITEM_ID;
-        bool m_not_first = false;
-
-        Item_lv2_iterator_base();
-        Item_lv2_iterator_base(const Item_lv2_iterator_base& p_copiand);
-        Item_lv2_iterator_base(Item_lv2* p_start_edge);
-    public:
-        bool isNull();
-
-        virtual void next();
-        virtual bool beyondEnd() const;
-        virtual Item_lv2* at() const;
-
-        virtual QString dbgShort();
-};
-
-/**
- * @brief Edge type filter iterator --> scans only thoses edges that match the filter
- * \ingroup LV2
- */
-class Item_lv2_iterator_edge_type : public Item_lv2_iterator_base{
-        friend class Item_lv2;
-    private:
-        std::vector<Item_lv2*>::iterator m_selection;
-        int m_curren_position;
-
-        Item_lv2_iterator_edge_type();
-        Item_lv2_iterator_edge_type(const Item_lv2_iterator_edge_type& p_copiand);
-        Item_lv2_iterator_edge_type(Item_lv2* p_start_edge, const SpecialItemID p_type);
-    public:
-        void next();
-        bool beyondEnd() const;
-        Item_lv2* at() const;
-
-        QString dbgShort();
-};
-
-/**
- * @brief Wrapper class for Item_lv2_iterator_base and derived classes
- * \ingroup LV2
- *
- * This wrapper is needed because I want to be able to instantiate iterators as local variables (not pointers), so that
- * they are automatically deleted (freed) when leaving the block. If Item_lv2_iterator_base classes were directly instantiated
- * as pointers, using new, a separate delete instruction would be necessary to delete them at the end of the block.
- */
-class Item_lv2_iterator{
-        friend class Item_lv2;
-    private:
-        std::shared_ptr<Item_lv2_iterator_base> m_it;
-
-        Item_lv2_iterator(){}
-        Item_lv2_iterator(const Item_lv2_iterator& p_copiand);
-        Item_lv2_iterator(std::shared_ptr<Item_lv2_iterator_base> p_it){m_it = p_it;}
-    public:
-        ~Item_lv2_iterator();
-        Item_lv2_iterator& operator=(const Item_lv2_iterator& p_assignand);
-
-        bool isNull() const {return m_it->isNull();}
-        void next(){m_it->next();}
-        bool beyondEnd() const;
-        Item_lv2* at() const {return m_it->at();}
 };
 
 } // end namespace M1Store

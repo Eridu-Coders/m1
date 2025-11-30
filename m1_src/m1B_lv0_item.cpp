@@ -67,8 +67,8 @@ M1Store::SpecialItemID M1Store::ItemType::getSpecialType(const unsigned int p_in
 // ---------------------------------------------------------------------------------------------------------
 
 /**
- * @brief Use for debug purposes
- * @param p_mnemo
+ * @brief Used only for debug purposes
+ * @param p_mnemo the menmonic
  */
 M1Store::SpecialItem::SpecialItem(const char* p_mnemo){
     // make sure the memonic member is initialized to 0 (normally not necessary
@@ -152,10 +152,10 @@ QString M1Store::ItemType::dbgStringHr(bool p_is_item_id) const{
         return QString("<II %1>").arg(Item_lv2::getExisting(t.m_type_item)->text());
     else
         return QString("<4SI %1/%2/%3/%4>")
-            .arg(t.m_type_short[0] == M1Env::G_VOID_SI_ID ? "" : Storage::getSpecialItemPointer(t.m_type_short[0])->mnemonic())
-            .arg(t.m_type_short[1] == M1Env::G_VOID_SI_ID ? "" : Storage::getSpecialItemPointer(t.m_type_short[1])->mnemonic())
-            .arg(t.m_type_short[2] == M1Env::G_VOID_SI_ID ? "" : Storage::getSpecialItemPointer(t.m_type_short[2])->mnemonic())
-            .arg(t.m_type_short[3] == M1Env::G_VOID_SI_ID ? "" : Storage::getSpecialItemPointer(t.m_type_short[3])->mnemonic())
+            .arg(t.m_type_short[0] == M1Env::G_VOID_SI_ID ? "" : StorageStatic::getSpecialItemPointer(t.m_type_short[0])->mnemonic())
+            .arg(t.m_type_short[1] == M1Env::G_VOID_SI_ID ? "" : StorageStatic::getSpecialItemPointer(t.m_type_short[1])->mnemonic())
+            .arg(t.m_type_short[2] == M1Env::G_VOID_SI_ID ? "" : StorageStatic::getSpecialItemPointer(t.m_type_short[2])->mnemonic())
+            .arg(t.m_type_short[3] == M1Env::G_VOID_SI_ID ? "" : StorageStatic::getSpecialItemPointer(t.m_type_short[3])->mnemonic())
             .replace("<4SI >", "<4SI None>");
 }
 
@@ -164,7 +164,7 @@ QString M1Store::ItemType::dbgStringHr(bool p_is_item_id) const{
  * @return the debug string
  */
 QString M1Store::SpecialItem::dbgString() const {
-    QString l_item_dbg = QString(" %1").arg(M1Store::Storage::cm_icon_path[m_si_id], 25);
+    QString l_item_dbg = QString(" %1").arg(M1Store::StorageStatic::cm_icon_path[m_si_id], 25);
     if(M1Store::Item_lv2* l_item = M1Store::Item_lv2::getExisting(m_item_id)){
         l_item_dbg += " --ITEM--> " + l_item->dbgShort();
     }
@@ -176,7 +176,7 @@ QString M1Store::SpecialItem::dbgString() const {
         .arg(m_flags, 64, 2, QLatin1Char('0'))
         .arg(l_item_dbg)
         .arg(m_flags & SI_HAS_RECIPROCAL ?
-                 QString(" --RECIPROCAL--> ") + M1Store::Storage::getSpecialItemPointer(m_si_id_reciprocal)->mnemonic():
+                 QString(" --RECIPROCAL--> ") + M1Store::StorageStatic::getSpecialItemPointer(m_si_id_reciprocal)->mnemonic():
                  "");
 }
 
@@ -191,7 +191,7 @@ QString M1Store::Item_lv0::dbgString() const{
     QStringList l_list;
     for(int i = 0; i < 4; i++)
         if(getType_si_id(i) != G_VOID_SI_ID)
-            l_list.append(Storage::getSpecialItemPointer(getType_si_id(i))->mnemonic());
+            l_list.append(StorageStatic::getSpecialItemPointer(getType_si_id(i))->mnemonic());
 
     QString l_types = QString("[") + l_list.join(", ") + "]";
 
@@ -271,14 +271,14 @@ QString M1Store::Item_lv0::dbgTypeShort() const{
         QStringList m_type_list;
         for(int i = 0; i<4; i++)
             if(getType_si_id(i) != G_VOID_SI_ID)
-                m_type_list.append(Storage::getSpecialItemPointer(getType_si_id(i))->mnemonic());
+                m_type_list.append(StorageStatic::getSpecialItemPointer(getType_si_id(i))->mnemonic());
 
         return m_type_list.join("/");
     }
 }
 
 /**
- * @brief M1Store::Item_lv0::dbgShort
+ * @brief One-liner debug representation
  * @return short debug string
  */
 QString M1Store::Item_lv0::dbgShort() const{
@@ -287,7 +287,7 @@ QString M1Store::Item_lv0::dbgShort() const{
         return QString("VRTX [%1] %2%3")
             .arg(dbgTypeShort())
             .arg(text())
-            .arg((flags() & IS_SPECIAL) ? QString(" (%1)").arg(M1Store::Storage::getSpecialItemPointer(item_id())->mnemonic()) : "");
+            .arg((flags() & IS_SPECIAL) ? QString(" (%1)").arg(M1Store::StorageStatic::getSpecialItemPointer(item_id())->mnemonic()) : "");
     case SIMPLE_VERTEX:
         return QString("VFLD [%1]").arg(text());
     case FULL_EDGE:{

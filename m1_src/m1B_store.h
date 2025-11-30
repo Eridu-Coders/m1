@@ -42,7 +42,7 @@ namespace M1Store{
      * It is a purely static class grouping a number of storage-related features for convenience
      * \todo Keep cm_dummy?
      */
-    class Storage{
+    class StorageStatic{
         friend class Item_lv0;
         friend class SpecialItem;
     private:
@@ -64,20 +64,18 @@ namespace M1Store{
         static std::map<ItemID, SpecialItem*> cm_item_id_to_special;
 
         /**
-        * \defgroup MmapSpace Management of free space in the mmap() space
+        * \defgroup MmapSpace Management of free space in the mmap() areas (and LMDB)
         * @ingroup GlobDec
         * @{
         */
-        /// number of Items to add to the mmap() area on each increment. Results in file size incrementsw of 1GB
-
         static const unsigned short SPECIAL_SIZE_P2 = 5;                    ///< 32 = 2^4 = size of a special item
         static const unsigned short ITEM_SIZE_P2 = 7;                       ///< 128 = 2^7 = size of an item
         static const unsigned short ITEMS_MMAP_SEGMENT_SIZE_P2 = 30;        ///< 1Gb = 2^30 = 0x4000, 0000 = 0b0100 0000 0000 0000, 0000 0000 0000 0000
         static const unsigned short SPECIAL_ITEMS_COUNT_P2 = 16;            ///< 65 536 = 2^16 = max number of special items
 
-        /// 1Gb / 128 (2^7) = 2^23 = number of item per segment = 0x80, 0000 = 0b1000 0000, 0000 0000 0000 0000 = 8 388 608
+        /// 1Gb / 128 (2^7) = 2^23 = 2^(30 - 7) = number of item per segment = 0x80, 0000 = 0b1000 0000, 0000 0000 0000 0000 = 8 388 608
         static const unsigned short ITEMS_MMAP_INCREMENT_COUNT_P2 = ITEMS_MMAP_SEGMENT_SIZE_P2 - ITEM_SIZE_P2;
-        // 0x80 0000 - 1 = 0x5f ffff = mask to extract the segment displacement from an Item ID
+        /// 0x80 0000 - 1 = 0x5f ffff = mask to extract the segment displacement from an Item ID
         static const unsigned long ITEMS_MMAP_SEG_DISPLACEMENT_MASK = (1 << ITEMS_MMAP_INCREMENT_COUNT_P2) - 1;
         static const unsigned int ITEMS_SEGMENT_COUNT = 0x1000;             ///< 4096 --> total items space = 4 Tb = 34 359 738 368 items
 
@@ -95,9 +93,12 @@ namespace M1Store{
         static QVector<QString> cm_icon_path;
         static QVector<QIcon*> cm_type_icon;
 
+        static void initMmapConstants();
+        static void clearMmapFiles();
         static void openItemsMmap();
+        static void openSpecialsMmap();
         static void openSegment(unsigned int p_seg_id);
-        static void closeItemsMmap();
+        static void closeMmapAreas();
         /// increment the current version counter
         static void incrementCurrentVersion(){cm_current_version += 1;}
 

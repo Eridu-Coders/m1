@@ -208,7 +208,14 @@ void M1Store::Item_lv1::unSetFlag(const M1Store::FlagField p_flag, const bool p_
     M1_FUNC_EXIT
 }
 
-// number of bits == 1 in a flag field (for set/unset flags)
+/**
+ * @brief Utility function counting the number of set bits (=1) in a number
+ *
+ * used by st/unsetFlag to make sure that the parameter affects only one bit at a time
+ *
+ * @param p_flag the number to test
+ * @return the number of set bits (=1) in p_flag
+ */
 unsigned short M1Store::Item_lv0::count_1_bits(const M1Store::FlagField p_flag){
     unsigned int l_ret = 0;
     M1Store::FlagField n = p_flag;
@@ -220,7 +227,7 @@ unsigned short M1Store::Item_lv0::count_1_bits(const M1Store::FlagField p_flag){
     return l_ret;
 }
 /**
- * @brief get main flag field value
+ * @brief Get main flag field value
  * @return this value
  */
 M1Store::FlagField M1Store::Item_lv0::flags() const {
@@ -231,8 +238,8 @@ M1Store::FlagField M1Store::Item_lv0::flags() const {
 }
 
 /**
- * @brief M1Store::Item_lv0::storeSpecialItemID
- * @param p_si_id
+ * @brief Store a SpecialItemID in the flags field
+ * @param p_si_id the value to store
  */
 void M1Store::Item_lv1::storeSpecialItemID(const SpecialItemID p_si_id){
     FlagField l_id_as_flags = p_si_id;
@@ -240,8 +247,8 @@ void M1Store::Item_lv1::storeSpecialItemID(const SpecialItemID p_si_id){
     this->setFlags_lv1( (flags() & 0x0000FFFFFFFFFFFF) | l_id_as_flags);
 }
 /**
- * @brief M1Store::Item_lv0::specialItemId
- * @return
+ * @brief Retrieves a SpecialItemID from the flags field
+ * @return the value
  */
 M1Env::SpecialItemID M1Store::Item_lv0::specialItemId(){
     return (flags() & 0xFFFF000000000000) >> 48;
@@ -372,7 +379,7 @@ bool M1Store::Item_lv0::isOfType_member(const M1Store::SpecialItemID p_type) con
  * @return true/false
  */
 bool M1Store::Item_lv0::isOfType_member(const char* p_mnemonic) const{
-    SpecialItem* pi = Storage::getSpecialItemPointer(p_mnemonic);
+    SpecialItem* pi = StorageStatic::getSpecialItemPointer(p_mnemonic);
     M1_FUNC_ENTRY(g_cat_lv0_members, QString("Checking whether is of type (mnemonic) %1 ...").arg(p_mnemonic))
 
     bool l_ret = M1Store::Item_lv0::isOfType_member(pi->specialId());
@@ -512,7 +519,7 @@ void M1Store::Item_lv0::setTarget_lv0(const M1Store::ItemID p_target){
 
     p.e.f.m_v_target = p_target;
     // increase target's incoming edges counter
-    M1Store::Item_lv0* l_target_pointer = M1Store::Storage::getItemPointer_lv1(p_target);
+    M1Store::Item_lv0* l_target_pointer = M1Store::StorageStatic::getItemPointer_lv1(p_target);
     if((l_target_pointer->flags() & ITEM_NATURE_MASK) == M1Env::FULL_EDGE || (l_target_pointer->flags() & ITEM_NATURE_MASK) == M1Env::FULL_VERTEX)
         l_target_pointer->setIncomingEdges_lv0(l_target_pointer->incomingEdges() + 1);
 
@@ -611,7 +618,7 @@ M1Store::ItemID M1Store::Item_lv0::next_item_id() const {
  */
 void M1Store::Item_lv0::setReciprocal_lv0(const M1Store::ItemID p_reciprocal_item_id){
     M1_FUNC_ENTRY(g_cat_lv0_members, QString("setting reciprocal edge to 0x%1").arg(p_reciprocal_item_id, 16, 16, QLatin1Char('0')))
-    Q_ASSERT_X((m_flags & ITEM_NATURE_MASK) == 0,
+    Q_ASSERT_X((m_flags & ITEM_NATURE_MASK) == 0, // == full edge
                "Item::setReciprocal()",
                "accessing the reciprocal of an item that is not a full edge");
 
@@ -880,7 +887,7 @@ void M1Store::Item_lv0::setText_lv0(const QString& p_text){
         // full vertex =============================
         if( p.v.f.m_string_id != G_VOID_ITEM_ID){
             // in all cases free string id if there is one
-            M1Store::Storage::freeString(p.v.f.m_string_id);
+            M1Store::StorageStatic::freeString(p.v.f.m_string_id);
             p.v.f.m_string_id = G_VOID_ITEM_ID;
         }
 
@@ -903,7 +910,7 @@ void M1Store::Item_lv0::setText_lv0(const QString& p_text){
                 // unset ITEM_HAS_LOCAL_STRING
                 m_flags = m_flags & (~ITEM_HAS_LOCAL_STRING);
                 // stores the string in the LMDB string db
-                p.v.f.m_string_id = M1Store::Storage::storeString(p_text);
+                p.v.f.m_string_id = M1Store::StorageStatic::storeString(p_text);
             }
     }
     else
@@ -911,7 +918,7 @@ void M1Store::Item_lv0::setText_lv0(const QString& p_text){
             // simple edge =============================
             if( p.e.s.m_string_id != G_VOID_ITEM_ID){
                 // in all cases free string id if there is one
-                M1Store::Storage::freeString(p.e.s.m_string_id);
+                M1Store::StorageStatic::freeString(p.e.s.m_string_id);
                 p.e.s.m_string_id = G_VOID_ITEM_ID;
             }
 
@@ -927,7 +934,7 @@ void M1Store::Item_lv0::setText_lv0(const QString& p_text){
                 // unset ITEM_HAS_LOCAL_STRING
                 m_flags = m_flags & (~ITEM_HAS_LOCAL_STRING);
                 // stores the string in the LMDB string db
-                p.e.s.m_string_id = M1Store::Storage::storeString(p_text);
+                p.e.s.m_string_id = M1Store::StorageStatic::storeString(p_text);
             }
         }
         else{
@@ -953,7 +960,7 @@ void M1Store::Item_lv0::setText_lv0(const QString& p_text){
     M1_FUNC_EXIT
 }
 /**
- * @brief get item text
+ * @brief Get item text
  * @return text, as a char*
  *
  * Both full vertices and simple edges can have m_string_id. Otheres have only their local m_text
@@ -976,13 +983,13 @@ char* M1Store::Item_lv0::text() const {
         if((m_flags & ITEM_HAS_LOCAL_STRING) > 0) l_ret = (char *)p.e.s.m_text;
         else
             if(p.e.s.m_string_id == G_VOID_ITEM_ID) l_ret = l_empty_string;
-            else l_ret = M1Store::Storage::retrieveString(p.e.s.m_string_id);
+            else l_ret = M1Store::StorageStatic::retrieveString(p.e.s.m_string_id);
     else {
         // only possibility here: full vertex
         if((m_flags & ITEM_HAS_LOCAL_STRING) > 0) l_ret = (char *)p.v.f.m_text;
         else
             if(p.v.f.m_string_id == G_VOID_ITEM_ID) l_ret = l_empty_string;
-            else l_ret = M1Store::Storage::retrieveString(p.v.f.m_string_id);
+            else l_ret = M1Store::StorageStatic::retrieveString(p.v.f.m_string_id);
     }
     qCDebug(g_cat_lv0_members) << QString("--> [%1]").arg(l_ret);
 
