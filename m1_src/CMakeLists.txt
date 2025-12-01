@@ -55,6 +55,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         m1B_lv2_iterators.h
+        m1C_interp_new.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET m1_src APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
