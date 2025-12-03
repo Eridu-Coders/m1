@@ -319,7 +319,7 @@ def add_data(p_current_section, p_occ_key, p_occ_dict, p_form_key, p_form_data, 
     # Lemma recording
     if p_lemma_key:
         # if p_lemma_key in g_lemma_dict.keys() and g_lemma_dict[p_lemma_key] != p_lemma_data:
-        #     g_anno.setdefault('ZLEMM', []).append(f'{p_current_section} {p_lemma_key:20} {g_lemma_dict[p_lemma_key]}/{p_lemma_data}')
+        #     g_anno.setdefault('ZLEMM', []).append(g'{p_current_section} {p_lemma_key:20} {g_lemma_dict[p_lemma_key]}/{p_lemma_data}')
         g_lemma_dict[p_lemma_key] = p_lemma_data
 
 def pos_reduce(p_pos):
@@ -1305,7 +1305,7 @@ def process_cursor_list_gr(p_cursor_list):
             # ωδ 287-289
             l_gr = l_gr.replace('ωδ 287-289 ', '')
 
-            # print(f'------------------------------------{l_book} {l_section}------------------------------------')
+            # print(g'------------------------------------{l_book} {l_section}------------------------------------')
             l_republic_txt += l_gr + ' '
 
             # establish list of section start positions
@@ -1317,7 +1317,7 @@ def process_cursor_list_gr(p_cursor_list):
     g_republic_txt = l_republic_txt.strip()
 
     # for l_sec, l_sec_start in l_sections_start_list:
-    #     print(f'{l_sec} {g_republic_txt[l_sec_start:l_sec_start + 200]}')
+    #     print(g'{l_sec} {g_republic_txt[l_sec_start:l_sec_start + 200]}')
 
     print(g_republic_txt)
 
@@ -1403,12 +1403,12 @@ def process_cursor_list_gr(p_cursor_list):
 
             # l_context_from_txt = l_republic_txt[w.index_char_start:w.index_char_start+20]
             # l_word_from_txt = l_republic_txt[w.index_char_start:w.index_char_stop].lower().strip()
-            # print(f'{l_txt:15} {l_word_from_txt:15}', l_context_from_txt, w)
+            # print(g'{l_txt:15} {l_word_from_txt:15}', l_context_from_txt, w)
             # if l_txt != l_word_from_txt:
             #     raise Exception
 
-            # print(f'{l_prefix_section}{l_current_section:4} | {l_idx:6} | {l_txt:15} | {l_pos:5} | {l_lemma:15} |' +
-            #       f' {l_xpos:10} | {l_dep:10} | {l_father:15} | {len(l_txt):2} {l_length_problem:5} {repr(t.string)} {l_grammar}')
+            # print(g'{l_prefix_section}{l_current_section:4} | {l_idx:6} | {l_txt:15} | {l_pos:5} | {l_lemma:15} |' +
+            #       g' {l_xpos:10} | {l_dep:10} | {l_father:15} | {len(l_txt):2} {l_length_problem:5} {repr(t.string)} {l_grammar}')
             print(f'{l_prefix_section}{l_current_section:4} | {l_idx:6} | {l_txt:15} | {l_pos:5} | {l_lemma:15} |' +
                   f' {l_xpos:10} | {l_dep:10} | {l_father:15} | {len(l_txt):2}  {l_grammar}')
 
@@ -1459,7 +1459,7 @@ def process_cursor_list_gr(p_cursor_list):
         print(g_header_line_gr)
         print()
     # for t, l, p, m in zip(l_doc.tokens, l_doc.lemmata, l_doc.pos, l_doc.morphosyntactic_features, l_doc.):
-    #     print(f'{t:15} | {l:15} | {p:8} | {m}')
+    #     print(g'{t:15} | {l:15} | {p:8} | {m}')
 
 
 # ------------- main() -------------------------------------------------------------------------------------------------
@@ -1810,8 +1810,8 @@ if __name__ == '__main__':
         json.dump(g_notes_dict, f, indent=4, ensure_ascii=False)
 
     # g_tokens_no_punctuation
-    # with open('occ_no_punc.json', 'w') as f:
-    #     json.dump(g_tokens_no_punctuation, f, indent=4, ensure_ascii=False)
+    # with open('occ_no_punc.json', 'w') as g:
+    #     json.dump(g_tokens_no_punctuation, g, indent=4, ensure_ascii=False)
 
     with open('occ_restricted.json', 'w') as f:
         json.dump(g_occur_restricted, f, indent=4, ensure_ascii=False)

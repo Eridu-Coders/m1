@@ -19,10 +19,10 @@
 #include <QComboBox>
 
 // g_cat_interp_dev
-Q_LOGGING_CATEGORY(g_cat_interp_dev, "interp.dev")
-Q_LOGGING_CATEGORY(g_cat_interp_base, "interp.base")
+// Q_LOGGING_CATEGORY(g_cat_interp_dev, "interp.dev")
+// Q_LOGGING_CATEGORY(g_cat_interp_base, "interp.base")
 // g_cat_interp_drag
-Q_LOGGING_CATEGORY(g_cat_interp_drag, "interp.drag")
+// Q_LOGGING_CATEGORY(g_cat_interp_drag, "interp.drag")
 
-QIcon M1MidPlane::Interp::cm_open;
-QIcon M1MidPlane::Interp::cm_closed;
+// QIcon M1MidPlane::Interp::cm_open;
+// QIcon M1MidPlane::Interp::cm_closed;

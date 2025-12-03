@@ -92,7 +92,8 @@ M1Store::Item_lv2_iterator_base::Item_lv2_iterator_base(Item_lv2* p_start_edge){
  * @return true if m_current_edge is a full edge (and of course not nullptr)
  */
 bool M1Store::Item_lv2_iterator_base::validEdge(){
-    return (m_current_edge != nullptr) && m_current_edge->isFullEdge();
+    return (m_current_edge != nullptr);
+    // return (m_current_edge != nullptr) && m_current_edge->isFullEdge();
 }
 
 /**

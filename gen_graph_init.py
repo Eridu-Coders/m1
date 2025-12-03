@@ -177,7 +177,7 @@ g_attr_values = [
         ('Wol8', 'NCWL8', 'Wolof noun class 8/y (plural non-human)'),
         ('Wol9', 'NCWL9', 'Wolof noun class 9/s (singular)'),
         ('Wol10', 'NCW10', 'Wolof noun class 10/w (singular)'),
-        ('Wol11', 'NCW11', 'Wolof noun class 11/f (location)'),
+        ('Wol11', 'NCW11', 'Wolof noun class 11/g (location)'),
         ('Wol12', 'NCW12', 'Wolof noun class 12/n (manner)'),
     ]),
     ('NumType', 'numeral type', [
@@ -528,11 +528,11 @@ if __name__ == '__main__':
         print(l_mn_class, l_name_class)
 
         # ['Email Inbox', ['FULL_VERTEX',  'IS_SPECIAL'], ['TYPE_'], [('BLNGS',  '_MSG_')], 'EMAIL', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], None, 'EMAIL_TYPE_SIID'],
-        # l_vertex_label = (f'[{l_name_class}]-{l_label_class}'[:64]
+        # l_vertex_label = (g'[{l_name_class}]-{l_label_class}'[:64]
         #                           if l_name_class.lower() != l_label_class.lower()
         #                           else l_name_class[:64])
         l_vertex_label = l_label_class.capitalize()
-        l_ssid_attr = f'{l_mn_class}_SIID'
+        l_ssid_attr = g'{l_mn_class}_SIID'
         l_attr_class_ssid_list.append(l_ssid_attr)
         g_vertices.append([
             l_vertex_label,
@@ -546,10 +546,10 @@ if __name__ == '__main__':
 
         # [('Ex', 'CLSEX', 'exclusive'), ('In', 'CLSIN', 'inclusive')]
         for l_name_attr, l_mn_attr, l_label_attr in l_val_list:
-            l_attr_key = f'{l_name_class}-{l_name_attr}'
+            l_attr_key = g'{l_name_class}-{l_name_attr}'
             l_attr_2_mn[l_attr_key] = l_mn_attr
 
-            l_vertex_label = f'[{l_name_attr}]-{l_label_attr}'[:62] \
+            l_vertex_label = g'[{l_name_attr}]-{l_label_attr}'[:62] \
                 if l_name_attr.lower() != l_label_attr.lower() \
                 else l_name_attr[:62]
 
@@ -574,14 +574,14 @@ if __name__ == '__main__':
         l_pos_2_mn[l_pos] = l_mn
         # ['NLP Tag code (type)', ['FULL_VERTEX',  'IS_SPECIAL'], ['TYPE_'], [('BLNGS',  'HOME_')], 'NLTAG', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], 'ENTITY_ICON_PATH', 'NLTAG_SIID'],
         g_vertices.append([
-            f'[{l_pos}]-{l_label}',
+            g'[{l_pos}]-{l_label}',
             ['FULL_VERTEX', 'IS_SPECIAL'],
             ['TYPE_', 'NLPOS'],
             None,
             l_mn,
             ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],
             None,
-            f'{l_mn}_SIID'
+            g'{l_mn}_SIID'
         ])
 
     l_tag_2_mn = dict()
@@ -589,20 +589,20 @@ if __name__ == '__main__':
         l_tag_2_mn[l_tag] = l_mn
         # ['NLP Tag code (type)', ['FULL_VERTEX',  'IS_SPECIAL'], ['TYPE_'], [('BLNGS',  'HOME_')], 'NLTAG', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], 'ENTITY_ICON_PATH', 'NLTAG_SIID'],
         g_vertices.append([
-            f'[{l_tag}]-{l_label}',
+            g'[{l_tag}]-{l_label}',
             ['FULL_VERTEX', 'IS_SPECIAL'],
             ['TYPE_', 'NLTAG'],
             None,
             l_mn,
             ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],
             None,
-            f'{l_mn}_SIID'
+            g'{l_mn}_SIID'
         ])
 
     # |---------|---------|---------|---------|---------|---------|               |---------|---------|---------| |---------|---------|---------|      |---------|---------|---------|
     # l_label,                       l_vertex_flag_list,              l_type_list, l_edges               l_mnemo, l_si_flag_list,                      l_icon_path,              l_pseudo_constant
     for l_label, l_vertex_flag_list, l_type_list, l_edges, l_mnemo, l_si_flag_list, l_icon_path, l_pseudo_constant in g_vertices:
-        print(f'{l_label:80} {str(l_vertex_flag_list):30} {l_type_list} {str(l_edges):25} {l_mnemo} {str(l_si_flag_list):35} {str(l_icon_path):25} {l_pseudo_constant}')
+        print(g'{l_label:80} {str(l_vertex_flag_list):30} {l_type_list} {str(l_edges):25} {l_mnemo} {str(l_si_flag_list):35} {str(l_icon_path):25} {l_pseudo_constant}')
 
     # Ancillaries
     l_initialization = ''
@@ -610,28 +610,28 @@ if __name__ == '__main__':
     l_declaration = ''
     l_extern_declaration = ''
     for l_mnemo, _, _, l_pseudo_constant, l_reciprocal, l_comment in g_special_vertices:
-        l_extern_declaration += f'// [{l_mnemo}] {l_comment}\nextern M1Env::SpecialItemID {l_pseudo_constant};\n'
-        l_declaration += f'// [{l_mnemo}] {l_comment}\nM1Env::SpecialItemID M1Env::{l_pseudo_constant} = G_NONEX_SI_ID;\n'
-        l_initialization += f'    M1Env::{l_pseudo_constant} = M1Store::Storage::getSpecialID("{l_mnemo}");\n'
-        l_dump += f'    qCDebug(g_cat_silence) << QString("0x%1 M1Env::{l_pseudo_constant} <-- %2").arg(M1Store::Storage::getSpecialID("{l_mnemo}"), 4, 16, QChar(\'0\')).arg("{l_mnemo}");\n'
+        l_extern_declaration += g'// [{l_mnemo}] {l_comment}\nextern M1Env::SpecialItemID {l_pseudo_constant};\n'
+        l_declaration += g'// [{l_mnemo}] {l_comment}\nM1Env::SpecialItemID M1Env::{l_pseudo_constant} = G_NONEX_SI_ID;\n'
+        l_initialization += g'    M1Env::{l_pseudo_constant} = M1Store::Storage::getSpecialID("{l_mnemo}");\n'
+        l_dump += g'    qCDebug(g_cat_silence) << QString("0x%1 M1Env::{l_pseudo_constant} <-- %2").arg(M1Store::Storage::getSpecialID("{l_mnemo}"), 4, 16, QChar(\'0\')).arg("{l_mnemo}");\n'
         add_mnemo(l_mnemo)
         if l_reciprocal:
             l_mnemo_r, l_flags_r, l_icon_path_r, l_pseudo_constant_r = l_reciprocal
             add_mnemo(l_mnemo_r)
-            l_extern_declaration += (f'// [{l_mnemo_r}] {l_comment} (reciprocal of {l_mnemo} above))\n' +
-                                     f'extern M1Env::SpecialItemID {l_pseudo_constant_r};\n')
-            l_declaration += (f'// [{l_mnemo_r}] {l_comment} (reciprocal of {l_mnemo} above))\n' +
-                              f'M1Env::SpecialItemID M1Env::{l_pseudo_constant_r} = G_NONEX_SI_ID;\n')
-            l_initialization += f'    M1Env::{l_pseudo_constant_r} = M1Store::Storage::getSpecialID("{l_mnemo_r}");\n'
+            l_extern_declaration += (g'// [{l_mnemo_r}] {l_comment} (reciprocal of {l_mnemo} above))\n' +
+                                     g'extern M1Env::SpecialItemID {l_pseudo_constant_r};\n')
+            l_declaration += (g'// [{l_mnemo_r}] {l_comment} (reciprocal of {l_mnemo} above))\n' +
+                              g'M1Env::SpecialItemID M1Env::{l_pseudo_constant_r} = G_NONEX_SI_ID;\n')
+            l_initialization += g'    M1Env::{l_pseudo_constant_r} = M1Store::Storage::getSpecialID("{l_mnemo_r}");\n'
 
     l_extern_declaration += '\n'
     l_declaration += '\n'
     for l_label, _, _, _, l_mnemo, _, _, l_pseudo_constant in g_vertices:
         add_mnemo(l_mnemo)
         if l_pseudo_constant:
-            l_extern_declaration += f'// [{l_mnemo}] Special Vertex ID of "{l_label}"\nextern M1Env::SpecialItemID {l_pseudo_constant};\n'
-            l_declaration += f'M1Env::SpecialItemID M1Env::{l_pseudo_constant} = G_NONEX_SI_ID;\n'
-            l_initialization += f'    M1Env::{l_pseudo_constant} = M1Store::Storage::getSpecialID("{l_mnemo}");\n'
+            l_extern_declaration += g'// [{l_mnemo}] Special Vertex ID of "{l_label}"\nextern M1Env::SpecialItemID {l_pseudo_constant};\n'
+            l_declaration += g'M1Env::SpecialItemID M1Env::{l_pseudo_constant} = G_NONEX_SI_ID;\n'
+            l_initialization += g'    M1Env::{l_pseudo_constant} = M1Store::Storage::getSpecialID("{l_mnemo}");\n'
 
     # print(l_extern_declaration)
     # print(l_declaration)
@@ -645,53 +645,53 @@ if __name__ == '__main__':
     for l_mnemo, l_flags, l_icon_path, _, l_reciprocal, l_comment in g_special_vertices:
         if isinstance(l_flags, list):
             l_flags = ' | '.join(l_flags)
-        l_icon_path = f'M1Env::{l_icon_path}' if l_icon_path else 'nullptr'
+        l_icon_path = g'M1Env::{l_icon_path}' if l_icon_path else 'nullptr'
         if l_reciprocal:
             l_mnemo_r, l_flags_r, l_icon_path_r, l_pseudo_constant_r = l_reciprocal
             if isinstance(l_flags_r, list):
                 l_flags_r = ' | '.join(l_flags_r)
-            l_icon_path_r = f'M1Env::{l_icon_path_r}' if l_icon_path_r else 'nullptr'
-            l_base_code += (f'    // {l_comment}\n' +
-                            f'    M1Store::Storage::getNewSpecialWithReciprocal({l_flags},\n' +
-                            f'        "{l_mnemo}", {l_icon_path},\n' +
-                            f'        "{l_mnemo_r}", {l_icon_path_r},\n' +
-                            f'        {l_flags_r});\n')
+            l_icon_path_r = g'M1Env::{l_icon_path_r}' if l_icon_path_r else 'nullptr'
+            l_base_code += (g'    // {l_comment}\n' +
+                            g'    M1Store::Storage::getNewSpecialWithReciprocal({l_flags},\n' +
+                            g'        "{l_mnemo}", {l_icon_path},\n' +
+                            g'        "{l_mnemo_r}", {l_icon_path_r},\n' +
+                            g'        {l_flags_r});\n')
         else:
-            l_base_code += f'    // {l_comment}\n    M1Store::Storage::getNewSpecialNoItem({l_flags}, "{l_mnemo}", {l_icon_path});\n'
+            l_base_code += g'    // {l_comment}\n    M1Store::Storage::getNewSpecialNoItem({l_flags}, "{l_mnemo}", {l_icon_path});\n'
 
     l_base_code += '\n'
     l_mnemo_2_var = dict()
     for l_label, l_vertex_flag_list, l_type_list, l_edges, l_mnemo, l_si_flag_list, l_icon_path, l_pseudo_constant in g_vertices:
         l_var_name = 'l_' + l_mnemo.replace('_', '').lower()
-        l_vertex_flag_string = ' | '.join([f'M1Env::{l_flag}' for l_flag in l_vertex_flag_list])
-        l_debug_label = f'[{l_mnemo}]-{l_label}' if l_mnemo else f'{l_label}'
-        l_base_code += (f'    // creation of "{l_label}"\n' +
-                        f'    qCDebug(g_cat_silence) << QString("Creating <{l_debug_label}> item");\n' +
-                        f'    M1Store::Item_lv2* {l_var_name} = M1Store::Item_lv2::getNew(\n' +
-                        f'        // vertex flags\n' +
-                        f'        {l_vertex_flag_string},\n' +
-                        f'        // label\n' +
-                        f'        "{l_label}"')
+        l_vertex_flag_string = ' | '.join([g'M1Env::{l_flag}' for l_flag in l_vertex_flag_list])
+        l_debug_label = g'[{l_mnemo}]-{l_label}' if l_mnemo else g'{l_label}'
+        l_base_code += (g'    // creation of "{l_label}"\n' +
+                        g'    qCDebug(g_cat_silence) << QString("Creating <{l_debug_label}> item");\n' +
+                        g'    M1Store::Item_lv2* {l_var_name} = M1Store::Item_lv2::getNew(\n' +
+                        g'        // vertex flags\n' +
+                        g'        {l_vertex_flag_string},\n' +
+                        g'        // label\n' +
+                        g'        "{l_label}"')
         if not l_mnemo:
             l_base_code += ');\n'
         else:
             l_base_code += ',\n'
             l_mnemo_2_var[l_mnemo] = l_var_name
-            l_si_flag_string = '0' if l_si_flag_list == '0' else ' | '.join([f'M1Env::{l_flag}' for l_flag in l_si_flag_list])
-            l_icon_path = f'M1Env::{l_icon_path}' if l_icon_path else 'nullptr'
+            l_si_flag_string = '0' if l_si_flag_list == '0' else ' | '.join([g'M1Env::{l_flag}' for l_flag in l_si_flag_list])
+            l_icon_path = g'M1Env::{l_icon_path}' if l_icon_path else 'nullptr'
             l_base_code += (
-                    f'        // Special Item flag\n' +
-                    f'        {l_si_flag_string},\n' +
-                    f'        // mnemonic\n' +
-                    f'        "{l_mnemo}",\n' +
-                    f'        // icon path\n' +
-                    f'        {l_icon_path});\n')
+                    g'        // Special Item flag\n' +
+                    g'        {l_si_flag_string},\n' +
+                    g'        // mnemonic\n' +
+                    g'        "{l_mnemo}",\n' +
+                    g'        // icon path\n' +
+                    g'        {l_icon_path});\n')
 
         for l_type_mnemo in l_type_list:
-            l_base_code += f'    {l_var_name}->setType("{l_type_mnemo}");\n'
+            l_base_code += g'    {l_var_name}->setType("{l_type_mnemo}");\n'
         if l_edges:
             for l_edge_type, l_dest_mnemo in l_edges:
-                l_base_code += f'    {l_var_name}->linkTo({l_mnemo_2_var[l_dest_mnemo]}, "{l_edge_type}", nullptr, true);\n'
+                l_base_code += g'    {l_var_name}->linkTo({l_mnemo_2_var[l_dest_mnemo]}, "{l_edge_type}", nullptr, true);\n'
         l_base_code += '\n'
 
     # Plato ------------------------------------------------------------------------------------------------------------
@@ -708,212 +708,212 @@ if __name__ == '__main__':
     print('Greek :', len(l_republic['Versions']['Greek']))
 
     l_title = l_republic['Title']
-    l_plato_code += (f'    // creation of Republic text node\n' +
-                     f'    qCDebug(g_cat_silence) << QString("Creating Republic text node");\n' +
-                     f'    M1Store::Item_lv2* l_republic = M1Store::Item_lv2::getNew(\n' +
-                     f'        // vertex flags\n' +
-                     f'        M1Env::FULL_VERTEX,\n' +
-                     f'        // label\n' +
-                     f'        "{l_title} (Dialogue)");\n')
+    l_plato_code += (g'    // creation of Republic text node\n' +
+                     g'    qCDebug(g_cat_silence) << QString("Creating Republic text node");\n' +
+                     g'    M1Store::Item_lv2* l_republic = M1Store::Item_lv2::getNew(\n' +
+                     g'        // vertex flags\n' +
+                     g'        M1Env::FULL_VERTEX,\n' +
+                     g'        // label\n' +
+                     g'        "{l_title} (Dialogue)");\n')
     l_plato_code +=   '    l_republic->setType("TEXT_");\n\n'
     l_plato_code +=   '    l_republic->linkTo(M1Store::Item_lv2::getExisting("REPRT"), "BLNGS");\n\n'
-    l_plato_code += (f'    // creation of Plato Person node\n' +
-                     f'    qCDebug(g_cat_silence) << QString("Creating Plato node");\n' +
-                     f'    M1Store::Item_lv2* l_plato = M1Store::Item_lv2::getNew(\n' +
-                     f'        // vertex flags\n' +
-                     f'        M1Env::FULL_VERTEX,\n' +
-                     f'        // label\n' +
-                     f'        "Plato, son of Ariston of Collytus");\n')
+    l_plato_code += (g'    // creation of Plato Person node\n' +
+                     g'    qCDebug(g_cat_silence) << QString("Creating Plato node");\n' +
+                     g'    M1Store::Item_lv2* l_plato = M1Store::Item_lv2::getNew(\n' +
+                     g'        // vertex flags\n' +
+                     g'        M1Env::FULL_VERTEX,\n' +
+                     g'        // label\n' +
+                     g'        "Plato, son of Ariston of Collytus");\n')
     l_plato_code +=   '    l_plato->setType("PERSN");\n'
     l_plato_code +=   '    l_republic->linkTo(l_plato, "WRTBY");\n\n'
 
     # Notes
-    l_plato_code += (f'    // creation of Republic text notes node\n' +
-                     f'    qCDebug(g_cat_silence) << QString("Creating Republic text node");\n' +
-                     f'    M1Store::Item_lv2* l_republic_notes = M1Store::Item_lv2::getNew(\n' +
-                     f'        // vertex flags\n' +
-                     f'        M1Env::FULL_VERTEX,\n' +
-                     f'        // label\n' +
-                     f'        "Notes");\n')
+    l_plato_code += (g'    // creation of Republic text notes node\n' +
+                     g'    qCDebug(g_cat_silence) << QString("Creating Republic text node");\n' +
+                     g'    M1Store::Item_lv2* l_republic_notes = M1Store::Item_lv2::getNew(\n' +
+                     g'        // vertex flags\n' +
+                     g'        M1Env::FULL_VERTEX,\n' +
+                     g'        // label\n' +
+                     g'        "Notes");\n')
     l_plato_code +=   '    l_republic_notes->setType("FOLDR");\n'
     # l_plato_code +=   '    l_republic_notes->linkTo(l_republic, "BLNGS");\n\n'
     l_plato_code += '    l_republic->linkTo(l_republic_notes, "OWNS_");\n\n'
 
-    l_plato_code += f'    M1Store::Item_lv2* l_note_array[{len(l_republic["Notes"])}];\n'
+    l_plato_code += g'    M1Store::Item_lv2* l_note_array[{len(l_republic["Notes"])}];\n'
     l_note_id = 0
     for l_note_key in l_republic["Notes"]:
         l_note_txt = l_republic["Notes"][l_note_key][0]
-        l_plato_code += (f'    // creation of note <{l_note_key}>\n' +
-                         f'    qCDebug(g_cat_silence) << QString("Creating note <{l_note_key}>");\n' +
-                         f'    l_note_array[{l_note_id}] = M1Store::Item_lv2::getNew(\n' +
-                         f'        // vertex flags\n' +
-                         f'        M1Env::FULL_VERTEX,\n' +
-                         f'        // label\n' +
-                         f'        "{l_note_txt}");\n')
-        l_plato_code +=  f'    l_note_array[{l_note_id}]->setType("TXTNT");\n'
-        l_plato_code +=  f'    l_note_array[{l_note_id}]->linkTo(l_republic_notes, "BLNGS");\n\n'
+        l_plato_code += (g'    // creation of note <{l_note_key}>\n' +
+                         g'    qCDebug(g_cat_silence) << QString("Creating note <{l_note_key}>");\n' +
+                         g'    l_note_array[{l_note_id}] = M1Store::Item_lv2::getNew(\n' +
+                         g'        // vertex flags\n' +
+                         g'        M1Env::FULL_VERTEX,\n' +
+                         g'        // label\n' +
+                         g'        "{l_note_txt}");\n')
+        l_plato_code +=  g'    l_note_array[{l_note_id}]->setType("TXTNT");\n'
+        l_plato_code +=  g'    l_note_array[{l_note_id}]->linkTo(l_republic_notes, "BLNGS");\n\n'
         l_note_id += 1
 
     # Lemmas
-    l_plato_code += f'    M1Store::Item_lv2* l_lemma_array[{len(l_republic["Lemmas"])}];\n'
+    l_plato_code += g'    M1Store::Item_lv2* l_lemma_array[{len(l_republic["Lemmas"])}];\n'
     l_lemma_id = 0
     l_lemma_key_2_id = dict()
     for l_lemma_key in sorted(l_republic["Lemmas"].keys(), reverse=True):
         l_lemma_key_2_id[l_lemma_key] = l_lemma_id
         l_lemma_txt = l_republic["Lemmas"][l_lemma_key]['Text']
         l_lemma_pos = l_republic["Lemmas"][l_lemma_key]['Pos']
-        l_plato_code += (f'    // creation of lemma <{l_lemma_key}>\n' +
-                         f'    qCDebug(g_cat_silence) << QString("Creating lemma <{l_lemma_key}>");\n' +
-                         f'    l_lemma_array[{l_lemma_id}] = M1Store::Item_lv2::getNew(\n' +
-                         f'        // vertex flags\n' +
-                         f'        M1Env::FULL_VERTEX,\n' +
-                         f'        // label\n' +
-                         f'        "{l_lemma_txt}");\n')
-        l_plato_code +=  f'    l_lemma_array[{l_lemma_id}]->setType("LEMMA");\n'
-        l_plato_code +=  f'    l_lemma_array[{l_lemma_id}]->setType("{l_pos_2_mn[l_lemma_pos]}");\n\n'
+        l_plato_code += (g'    // creation of lemma <{l_lemma_key}>\n' +
+                         g'    qCDebug(g_cat_silence) << QString("Creating lemma <{l_lemma_key}>");\n' +
+                         g'    l_lemma_array[{l_lemma_id}] = M1Store::Item_lv2::getNew(\n' +
+                         g'        // vertex flags\n' +
+                         g'        M1Env::FULL_VERTEX,\n' +
+                         g'        // label\n' +
+                         g'        "{l_lemma_txt}");\n')
+        l_plato_code +=  g'    l_lemma_array[{l_lemma_id}]->setType("LEMMA");\n'
+        l_plato_code +=  g'    l_lemma_array[{l_lemma_id}]->setType("{l_pos_2_mn[l_lemma_pos]}");\n\n'
         l_lemma_id += 1
 
     # forms
-    l_plato_code += f'    M1Store::Item_lv2* l_form_array[{len(l_republic["Forms"].keys())}];\n'
+    l_plato_code += g'    M1Store::Item_lv2* l_form_array[{len(l_republic["Forms"].keys())}];\n'
     l_form_id = 0
     l_form_key_2_id = dict()
     for l_form_key in l_republic["Forms"].keys():
         l_form_key_2_id[l_form_key] = l_form_id
         l_form_txt = l_republic["Forms"][l_form_key]['Text']
         l_form_tag = l_republic["Forms"][l_form_key]['Tag']
-        l_plato_code += (f'    // creation of form <{l_form_key}>\n' +
-                         f'    qCDebug(g_cat_silence) << QString("Creating form <{l_form_key}>");\n' +
-                         f'    l_form_array[{l_form_id}] = M1Store::Item_lv2::getNew(\n' +
-                         f'        // vertex flags\n' +
-                         f'        M1Env::FULL_VERTEX,\n' +
-                         f'        // label\n' +
-                         f'        "{l_form_txt}");\n')
-        l_plato_code +=  f'    l_form_array[{l_form_id}]->setType("WFORM");\n'
+        l_plato_code += (g'    // creation of form <{l_form_key}>\n' +
+                         g'    qCDebug(g_cat_silence) << QString("Creating form <{l_form_key}>");\n' +
+                         g'    l_form_array[{l_form_id}] = M1Store::Item_lv2::getNew(\n' +
+                         g'        // vertex flags\n' +
+                         g'        M1Env::FULL_VERTEX,\n' +
+                         g'        // label\n' +
+                         g'        "{l_form_txt}");\n')
+        l_plato_code +=  g'    l_form_array[{l_form_id}]->setType("WFORM");\n'
         l_tag_mn = l_tag_2_mn[l_form_tag] if l_form_tag in l_tag_2_mn.keys() else l_pos_2_mn[l_form_tag]
-        l_plato_code +=  f'    l_form_array[{l_form_id}]->setType("{l_tag_mn}");\n'
+        l_plato_code +=  g'    l_form_array[{l_form_id}]->setType("{l_tag_mn}");\n'
         for l_lemma_key in l_republic["Forms"][l_form_key]['LemmaKey']:
             l_lemma_id = l_lemma_key_2_id[l_lemma_key]
-            l_plato_code +=  f'    l_form_array[{l_form_id}]->linkTo(l_lemma_array[{l_lemma_id}], "BLNGS");\n'
+            l_plato_code +=  g'    l_form_array[{l_form_id}]->linkTo(l_lemma_array[{l_lemma_id}], "BLNGS");\n'
 
         l_form_id += 1
         l_plato_code += "\n"
 
     # books
-    l_plato_code += (f'    // creation of Republic books node\n' +
-                     f'    qCDebug(g_cat_silence) << QString("Creating Republic books node");\n' +
-                     f'    M1Store::Item_lv2* l_republic_books = M1Store::Item_lv2::getNew(\n' +
-                     f'        // vertex flags\n' +
-                     f'        M1Env::FULL_VERTEX,\n' +
-                     f'        // label\n' +
-                     f'        "Books");\n')
+    l_plato_code += (g'    // creation of Republic books node\n' +
+                     g'    qCDebug(g_cat_silence) << QString("Creating Republic books node");\n' +
+                     g'    M1Store::Item_lv2* l_republic_books = M1Store::Item_lv2::getNew(\n' +
+                     g'        // vertex flags\n' +
+                     g'        M1Env::FULL_VERTEX,\n' +
+                     g'        // label\n' +
+                     g'        "Books");\n')
     l_plato_code +=   '    l_republic_books->setType("FOLDR");\n'
     l_plato_code +=   '    l_republic->linkTo(l_republic_books, "OWNS_");\n\n'
     l_plato_code +=   '    M1Store::Item_lv2* l_book[10];\n'
     for l_book_num in range(10, 0, -1):
-        l_plato_code += (f'    // creation of Republic book {l_book_num} node\n' +
-                         f'    qCDebug(g_cat_silence) << QString("Creating Republic book {l_book_num} node");\n' +
-                         f'    l_book[{l_book_num - 1}] = M1Store::Item_lv2::getNew(\n' +
-                         f'        // vertex flags\n' +
-                         f'        M1Env::FULL_VERTEX,\n' +
-                         f'        // label\n' +
-                         f'        "Book {l_book_num}");\n')
-        l_plato_code +=  f'    l_book[{l_book_num - 1}]->setType("TXTBK");\n'
-        l_plato_code +=  f'    l_republic_books->linkTo(l_book[{l_book_num - 1}], "OWNS_");\n\n'
+        l_plato_code += (g'    // creation of Republic book {l_book_num} node\n' +
+                         g'    qCDebug(g_cat_silence) << QString("Creating Republic book {l_book_num} node");\n' +
+                         g'    l_book[{l_book_num - 1}] = M1Store::Item_lv2::getNew(\n' +
+                         g'        // vertex flags\n' +
+                         g'        M1Env::FULL_VERTEX,\n' +
+                         g'        // label\n' +
+                         g'        "Book {l_book_num}");\n')
+        l_plato_code +=  g'    l_book[{l_book_num - 1}]->setType("TXTBK");\n'
+        l_plato_code +=  g'    l_republic_books->linkTo(l_book[{l_book_num - 1}], "OWNS_");\n\n'
 
     # Sections
-    l_plato_code += (f'    // creation of Republic sections node\n' +
-                     f'    qCDebug(g_cat_silence) << QString("Creating Republic sections node");\n' +
-                     f'    M1Store::Item_lv2* l_republic_sections = M1Store::Item_lv2::getNew(\n' +
-                     f'        // vertex flags\n' +
-                     f'        M1Env::FULL_VERTEX,\n' +
-                     f'        // label\n' +
-                     f'        "Stephanus Section");\n')
+    l_plato_code += (g'    // creation of Republic sections node\n' +
+                     g'    qCDebug(g_cat_silence) << QString("Creating Republic sections node");\n' +
+                     g'    M1Store::Item_lv2* l_republic_sections = M1Store::Item_lv2::getNew(\n' +
+                     g'        // vertex flags\n' +
+                     g'        M1Env::FULL_VERTEX,\n' +
+                     g'        // label\n' +
+                     g'        "Stephanus Section");\n')
     l_plato_code +=   '    l_republic_sections->setType("FOLDR");\n'
     l_plato_code +=   '    l_republic->linkTo(l_republic_sections, "OWNS_");\n\n'
 
     # Highlights folder
-    l_plato_code += (f'    // creation of Republic highlights node\n' +
-                     f'    qCDebug(g_cat_silence) << QString("Creating Republic highlights folder");\n' +
-                     f'    M1Store::Item_lv2* l_republic_highlights = M1Store::Item_lv2::getNew(\n' +
-                     f'        // vertex flags\n' +
-                     f'        M1Env::FULL_VERTEX,\n' +
-                     f'        // label\n' +
-                     f'        "Highlights");\n')
+    l_plato_code += (g'    // creation of Republic highlights node\n' +
+                     g'    qCDebug(g_cat_silence) << QString("Creating Republic highlights folder");\n' +
+                     g'    M1Store::Item_lv2* l_republic_highlights = M1Store::Item_lv2::getNew(\n' +
+                     g'        // vertex flags\n' +
+                     g'        M1Env::FULL_VERTEX,\n' +
+                     g'        // label\n' +
+                     g'        "Highlights");\n')
     l_plato_code +=   '    l_republic_highlights->setType("FOLDR");\n'
     l_plato_code +=   '    l_republic_highlights->setType("TXHLF");\n'
     l_plato_code +=   '    l_republic->linkTo(l_republic_highlights, "OWNS_");\n\n'
 
     # Highlights categories folder
-    l_plato_code += (f'    // creation of Republic highlight categories node\n' +
-                     f'    qCDebug(g_cat_silence) << QString("Creating Republic highlight categories folder");\n' +
-                     f'    M1Store::Item_lv2* l_republic_highlight_cat = M1Store::Item_lv2::getNew(\n' +
-                     f'        // vertex flags\n' +
-                     f'        M1Env::FULL_VERTEX,\n' +
-                     f'        // label\n' +
-                     f'        "Highlight categories");\n')
+    l_plato_code += (g'    // creation of Republic highlight categories node\n' +
+                     g'    qCDebug(g_cat_silence) << QString("Creating Republic highlight categories folder");\n' +
+                     g'    M1Store::Item_lv2* l_republic_highlight_cat = M1Store::Item_lv2::getNew(\n' +
+                     g'        // vertex flags\n' +
+                     g'        M1Env::FULL_VERTEX,\n' +
+                     g'        // label\n' +
+                     g'        "Highlight categories");\n')
     l_plato_code +=   '    l_republic_highlight_cat->setType("FOLDR");\n'
     l_plato_code +=   '    l_republic_highlight_cat->setType("TXHCF");\n'
     l_plato_code +=   '    l_republic->linkTo(l_republic_highlight_cat, "OWNS_");\n\n'
 
     # example highlights categories HLCLR
-    l_plato_code += (f'    // creation of example highlights categories\n' +
-                     f'    qCDebug(g_cat_silence) << QString("Creating example Republic highlight categories");\n' +
-                     f'    M1Store::Item_lv2* l_republic_highlight_cat_1 = M1Store::Item_lv2::getNew(\n' +
-                     f'        // vertex flags\n' +
-                     f'        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,\n' +
-                     f'        // label\n' +
-                     f'        "Category 1",\n' +
-                     f'        // Special Item flag\n' +
-                     f'        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,\n' +
-                     f'        // mnemonic\n' +
-                     f'        "RCTG1",\n' +
-                     f'        // icon path\n' +
-                     f'        nullptr);\n')
+    l_plato_code += (g'    // creation of example highlights categories\n' +
+                     g'    qCDebug(g_cat_silence) << QString("Creating example Republic highlight categories");\n' +
+                     g'    M1Store::Item_lv2* l_republic_highlight_cat_1 = M1Store::Item_lv2::getNew(\n' +
+                     g'        // vertex flags\n' +
+                     g'        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,\n' +
+                     g'        // label\n' +
+                     g'        "Category 1",\n' +
+                     g'        // Special Item flag\n' +
+                     g'        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,\n' +
+                     g'        // mnemonic\n' +
+                     g'        "RCTG1",\n' +
+                     g'        // icon path\n' +
+                     g'        nullptr);\n')
     l_plato_code +=   '    l_republic_highlight_cat_1->setType("TYPE_");\n'
     l_plato_code +=   '    l_republic_highlight_cat_1->setType("TXHLC");\n'
-    l_plato_code +=  f'    l_republic_highlight_cat_1->setFieldVertex("#f78a38", M1Env::HLCLR_SIID);\n' # light orange
+    l_plato_code +=  g'    l_republic_highlight_cat_1->setFieldVertex("#f78a38", M1Env::HLCLR_SIID);\n' # light orange
     l_plato_code +=   '    l_republic_highlight_cat->linkTo(l_republic_highlight_cat_1, "OWNS_");\n\n'
 
-    l_plato_code += (f'    M1Store::Item_lv2* l_republic_highlight_cat_2 = M1Store::Item_lv2::getNew(\n' +
-                     f'        // vertex flags\n' +
-                     f'        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,\n' +
-                     f'        // label\n' +
-                     f'        "Category 2",\n' +
-                     f'        // Special Item flag\n' +
-                     f'        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,\n' +
-                     f'        // mnemonic\n' +
-                     f'        "RCTG2",\n' +
-                     f'        // icon path\n' +
-                     f'        nullptr);\n')
+    l_plato_code += (g'    M1Store::Item_lv2* l_republic_highlight_cat_2 = M1Store::Item_lv2::getNew(\n' +
+                     g'        // vertex flags\n' +
+                     g'        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,\n' +
+                     g'        // label\n' +
+                     g'        "Category 2",\n' +
+                     g'        // Special Item flag\n' +
+                     g'        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,\n' +
+                     g'        // mnemonic\n' +
+                     g'        "RCTG2",\n' +
+                     g'        // icon path\n' +
+                     g'        nullptr);\n')
     l_plato_code +=   '    l_republic_highlight_cat_2->setType("TYPE_");\n'
     l_plato_code +=   '    l_republic_highlight_cat_2->setType("TXHLC");\n'
-    l_plato_code +=  f'    l_republic_highlight_cat_2->setFieldVertex("#3883f7", M1Env::HLCLR_SIID);\n'  # light blue
+    l_plato_code +=  g'    l_republic_highlight_cat_2->setFieldVertex("#3883f7", M1Env::HLCLR_SIID);\n'  # light blue
     l_plato_code +=   '    l_republic_highlight_cat->linkTo(l_republic_highlight_cat_2, "OWNS_");\n\n'
 
     l_section_list = l_republic["Sections"]
-    l_plato_code += f'    M1Store::Item_lv2* l_stephanus_array[{len(l_section_list)}];\n'
+    l_plato_code += g'    M1Store::Item_lv2* l_stephanus_array[{len(l_section_list)}];\n'
     l_stephanus_2_id = dict()
     l_stephanus_id = 0
     for l_stephanus in l_section_list:
         l_stephanus_2_id[l_stephanus] = l_stephanus_id
-        l_plato_code += (f'    // creation of section <{l_stephanus}>\n' +
-                         f'    qCDebug(g_cat_silence) << QString("Creating section <{l_stephanus}>");\n' +
-                         f'    l_stephanus_array[{l_stephanus_id}] = M1Store::Item_lv2::getNew(\n' +
-                         f'        // vertex flags\n' +
-                         f'        M1Env::FULL_VERTEX,\n' +
-                         f'        // label\n' +
-                         f'        "{l_stephanus}");\n')
-        l_plato_code +=  f'    l_stephanus_array[{l_stephanus_id}]->setType("STPSC");\n\n'
+        l_plato_code += (g'    // creation of section <{l_stephanus}>\n' +
+                         g'    qCDebug(g_cat_silence) << QString("Creating section <{l_stephanus}>");\n' +
+                         g'    l_stephanus_array[{l_stephanus_id}] = M1Store::Item_lv2::getNew(\n' +
+                         g'        // vertex flags\n' +
+                         g'        M1Env::FULL_VERTEX,\n' +
+                         g'        // label\n' +
+                         g'        "{l_stephanus}");\n')
+        l_plato_code +=  g'    l_stephanus_array[{l_stephanus_id}]->setType("STPSC");\n\n'
         l_stephanus_id += 1
 
     # Occurences
-    l_plato_code += (f'    // creation of Republic versions node\n' +
-                     f'    qCDebug(g_cat_silence) << QString("Creating Republic versions node");\n' +
-                     f'    M1Store::Item_lv2* l_republic_versions = M1Store::Item_lv2::getNew(\n' +
-                     f'        // vertex flags\n' +
-                     f'        M1Env::FULL_VERTEX,\n' +
-                     f'        // label\n' +
-                     f'        "Versions");\n')
+    l_plato_code += (g'    // creation of Republic versions node\n' +
+                     g'    qCDebug(g_cat_silence) << QString("Creating Republic versions node");\n' +
+                     g'    M1Store::Item_lv2* l_republic_versions = M1Store::Item_lv2::getNew(\n' +
+                     g'        // vertex flags\n' +
+                     g'        M1Env::FULL_VERTEX,\n' +
+                     g'        // label\n' +
+                     g'        "Versions");\n')
     l_plato_code +=   '    l_republic_versions->setType("FOLDR");\n'
     l_plato_code +=   '    l_republic->linkTo(l_republic_versions, "OWNS_");\n\n'
 
@@ -923,23 +923,23 @@ if __name__ == '__main__':
     l_plato_code +=   '    M1Store::Item_lv2* l_cur_sentence_occ = nullptr;\n'
     l_plato_code +=   '    M1Store::Item_lv2* l_cur_sentence = nullptr;\n'
     for l_version in l_republic['Versions'].keys():
-        l_mnemo_ver = f'RV{re.sub("[aeiou]", "", l_version).upper()}'[:5]
-        l_plato_code += (f'    // creation of Republic version {l_version} node\n' +
-                         f'    qCDebug(g_cat_silence) << QString("Creating Republic version {l_version} node");\n' +
-                         f'    M1Store::Item_lv2* l_version_{l_version.lower()} = M1Store::Item_lv2::getNew(\n' +
-                         f'        // vertex flags\n' +
-                         f'        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,\n' +
-                         f'        // label\n' +
-                         f'        "{l_version} v.",\n' +
-                         f'        // Special Item flags\n' +
-                         f'        SI_IS_TYPE  | M1Env::SI_REQUIRES_EDGE,\n' +
-                         f'        // mnemonic\n' +
-                         f'        "{l_mnemo_ver}",\n' +
-                         f'        // icon path\n' +
-                         f'        FOLDER_ICON_PATH);\n')
-        l_plato_code +=  f'    l_version_{l_version.lower()}->setType("TYPE_");\n'
-        l_plato_code +=  f'    l_version_{l_version.lower()}->setType("TXTVR");\n'
-        l_plato_code +=  f'    l_republic_versions->linkTo(l_version_{l_version.lower()}, "OWNS_");\n\n'
+        l_mnemo_ver = g'RV{re.sub("[aeiou]", "", l_version).upper()}'[:5]
+        l_plato_code += (g'    // creation of Republic version {l_version} node\n' +
+                         g'    qCDebug(g_cat_silence) << QString("Creating Republic version {l_version} node");\n' +
+                         g'    M1Store::Item_lv2* l_version_{l_version.lower()} = M1Store::Item_lv2::getNew(\n' +
+                         g'        // vertex flags\n' +
+                         g'        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,\n' +
+                         g'        // label\n' +
+                         g'        "{l_version} v.",\n' +
+                         g'        // Special Item flags\n' +
+                         g'        SI_IS_TYPE  | M1Env::SI_REQUIRES_EDGE,\n' +
+                         g'        // mnemonic\n' +
+                         g'        "{l_mnemo_ver}",\n' +
+                         g'        // icon path\n' +
+                         g'        FOLDER_ICON_PATH);\n')
+        l_plato_code +=  g'    l_version_{l_version.lower()}->setType("TYPE_");\n'
+        l_plato_code +=  g'    l_version_{l_version.lower()}->setType("TXTVR");\n'
+        l_plato_code +=  g'    l_republic_versions->linkTo(l_version_{l_version.lower()}, "OWNS_");\n\n'
 
         l_plato_code += '    l_cur_ver_occ = nullptr;\n'
         # l_plato_code += '    l_cur_book_sentence = nullptr;\n'
@@ -952,45 +952,45 @@ if __name__ == '__main__':
             l_occ = l_republic['Versions'][l_version][l_occ_key]
             l_form_key = l_occ['FormKey']
             l_form_id = l_form_key_2_id[l_form_key]
-            l_plato_code += (f'    // creation of Republic occurrence {l_occ_key} node\n' +
-                             f'    qCDebug(g_cat_silence) << QString("Creating Republic occurrence {l_occ_key} node");\n' +
-                             f'    l_cur_occ = l_republic->linkTo(l_form_array[{l_form_id}]->item_id(), "OCCUR", l_cur_occ, false);\n')
-            l_plato_code +=  f'    l_cur_occ->linkTo(l_cur_occ, "AUTO_");\n'
-            l_plato_code +=  f'    l_cur_occ->setText_lv1("{l_occ_key[:15]}");\n'
-            l_plato_code +=  f'    l_cur_occ->setType("{l_mnemo_ver}");\n'
-            l_plato_code +=  f'    l_form_array[{l_form_id}]->linkTo(l_cur_occ, "OWNS_");\n'
+            l_plato_code += (g'    // creation of Republic occurrence {l_occ_key} node\n' +
+                             g'    qCDebug(g_cat_silence) << QString("Creating Republic occurrence {l_occ_key} node");\n' +
+                             g'    l_cur_occ = l_republic->linkTo(l_form_array[{l_form_id}]->item_id(), "OCCUR", l_cur_occ, false);\n')
+            l_plato_code +=  g'    l_cur_occ->linkTo(l_cur_occ, "AUTO_");\n'
+            l_plato_code +=  g'    l_cur_occ->setText_lv1("{l_occ_key[:15]}");\n'
+            l_plato_code +=  g'    l_cur_occ->setType("{l_mnemo_ver}");\n'
+            l_plato_code +=  g'    l_form_array[{l_form_id}]->linkTo(l_cur_occ, "OWNS_");\n'
             # setTarget
-            # l_plato_code += f'    l_cur_occ->setTarget(l_form_array[{l_form_id}]->item_id());\n'
+            # l_plato_code += g'    l_cur_occ->setTarget(l_form_array[{l_form_id}]->item_id());\n'
             l_occ_text = l_occ['Text']
             if re.search('[A-Z]', l_occ_text):
-                l_plato_code +=  f'    l_cur_occ->setFieldEdge("true", M1Env::CAPTL_SIID);\n'
+                l_plato_code +=  g'    l_cur_occ->setFieldEdge("true", M1Env::CAPTL_SIID);\n'
             l_occ_pctl = l_occ['PunctLeft']
             if len(l_occ_pctl) > 0:
-                l_plato_code += f'    l_cur_occ->setFieldEdge("{l_occ_pctl}", M1Env::PCTLF_SIID);\n'
+                l_plato_code += g'    l_cur_occ->setFieldEdge("{l_occ_pctl}", M1Env::PCTLF_SIID);\n'
             l_occ_pctr = l_occ['PunctRight']
             if len(l_occ_pctr) > 0:
-                l_plato_code += f'    l_cur_occ->setFieldEdge("{l_occ_pctr}", M1Env::PCTRT_SIID);\n'
+                l_plato_code += g'    l_cur_occ->setFieldEdge("{l_occ_pctr}", M1Env::PCTRT_SIID);\n'
             l_occ_section = l_occ['NewSection']
             if len(l_occ_section) > 0:
-                l_plato_code += f'    l_stephanus_array[{l_stephanus_2_id[l_occ_section]}]->linkTo(l_cur_occ, "OWNS_");\n'
+                l_plato_code += g'    l_stephanus_array[{l_stephanus_2_id[l_occ_section]}]->linkTo(l_cur_occ, "OWNS_");\n'
 
             l_occ_pos = l_occ['Pos']
             if len(l_occ_pos) > 0:
                 l_mn_pos = l_pos_2_mn[l_occ_pos]
-                l_plato_code +=  f'    l_cur_occ->setType("{l_mn_pos}");\n'
+                l_plato_code +=  g'    l_cur_occ->setType("{l_mn_pos}");\n'
             l_occ_tag = l_occ['Tag']
             if len(l_occ_tag) > 0:
                 try:
                     l_mn_tag = l_tag_2_mn[l_occ_tag]
-                    l_plato_code +=  f'    l_cur_occ->setType("{l_mn_tag}");\n'
+                    l_plato_code +=  g'    l_cur_occ->setType("{l_mn_tag}");\n'
                 except KeyError:
                     pass
             l_occ_grammar = l_occ['Grammar']
             if l_occ_grammar:
                 print(l_occ_grammar)
                 for l_attr_name, l_attr_value in l_occ_grammar.items():
-                    l_attr_key = f'{l_attr_name}-{l_attr_value}'
-                    l_plato_code += f'    l_cur_occ->setType("{l_attr_2_mn[l_attr_key]}");\n'
+                    l_attr_key = g'{l_attr_name}-{l_attr_value}'
+                    l_plato_code += g'    l_cur_occ->setType("{l_attr_2_mn[l_attr_key]}");\n'
 
             # toto = dict()
             # print(toto.items())
@@ -999,24 +999,24 @@ if __name__ == '__main__':
                 l_cur_bknum = l_occ_bknum
             l_occ_spos = l_occ['SentencePos']
             if len(l_occ_spos) > 0:
-                l_plato_code += f'    l_cur_occ->setFieldEdge("{l_occ_spos}", M1Env::STPOS_SIID);\n'
+                l_plato_code += g'    l_cur_occ->setFieldEdge("{l_occ_spos}", M1Env::STPOS_SIID);\n'
             if l_occ_spos == 'SS':
-                l_sentence_name = f'{l_version} - Sentence {l_cur_sent + 1}'
+                l_sentence_name = g'{l_version} - Sentence {l_cur_sent + 1}'
                 l_cur_sent += 1
-                l_plato_code += (f'    // creation of Republic sentence <{l_sentence_name}> node\n' +
-                                 f'    qCDebug(g_cat_silence) << QString("Creating Republic sentence <{l_sentence_name}> node");\n' +
-                                 f'    l_cur_sentence = M1Store::Item_lv2::getNew(\n' +
-                                 f'        // vertex flags\n' +
-                                 f'        M1Env::FULL_VERTEX,\n' +
-                                 f'        // label\n' +
-                                 f'        "{l_sentence_name}");\n')
-                l_plato_code += f'    l_cur_sentence->setType("TXSNT");\n'
-                l_plato_code += f'    l_cur_sentence->setType("{l_mnemo_ver}");\n'
-                l_plato_code += f'    l_cur_book_sentence = l_book[{l_cur_bknum - 1}]->linkTo(l_cur_sentence, "OWNS_", l_cur_book_sentence, false);\n'
+                l_plato_code += (g'    // creation of Republic sentence <{l_sentence_name}> node\n' +
+                                 g'    qCDebug(g_cat_silence) << QString("Creating Republic sentence <{l_sentence_name}> node");\n' +
+                                 g'    l_cur_sentence = M1Store::Item_lv2::getNew(\n' +
+                                 g'        // vertex flags\n' +
+                                 g'        M1Env::FULL_VERTEX,\n' +
+                                 g'        // label\n' +
+                                 g'        "{l_sentence_name}");\n')
+                l_plato_code += g'    l_cur_sentence->setType("TXSNT");\n'
+                l_plato_code += g'    l_cur_sentence->setType("{l_mnemo_ver}");\n'
+                l_plato_code += g'    l_cur_book_sentence = l_book[{l_cur_bknum - 1}]->linkTo(l_cur_sentence, "OWNS_", l_cur_book_sentence, false);\n'
                 l_plato_code +=  '    l_cur_sentence_occ = nullptr;\n'
 
-            # l_plato_code += f'    l_cur_ver_occ = l_version_{l_version.lower()}->linkTo(l_cur_occ, "OWNS_", l_cur_ver_occ, false);\n'
-            l_plato_code += f'    l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);\n'
+            # l_plato_code += g'    l_cur_ver_occ = l_version_{l_version.lower()}->linkTo(l_cur_occ, "OWNS_", l_cur_ver_occ, false);\n'
+            l_plato_code += g'    l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);\n'
 
             l_plato_code += "\n"
 
@@ -1024,7 +1024,7 @@ if __name__ == '__main__':
     l_declaration += 'QList<M1Env::SpecialItemID> M1Env::GraphInit::cm_gram_attr_list;\n'
 
     for l_ssid in l_attr_class_ssid_list:
-        l_initialization += f'    M1Env::GraphInit::cm_gram_attr_list.append(M1Env::{l_ssid});\n'
+        l_initialization += g'    M1Env::GraphInit::cm_gram_attr_list.append(M1Env::{l_ssid});\n'
 
     with open('m1_src/m1B_graph_init.cpp', 'w') as l_fout:
         l_fout.write(g_implementation_template

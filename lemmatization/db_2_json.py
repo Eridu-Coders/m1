@@ -702,7 +702,7 @@ def process_cursor_list_en(p_cursor_list, p_txt_key, p_phase_ii=True):
 
     #     print('--------------------------- Dangling right possessive save ---------------------------')
     #     l_count_substitutions = 0
-    #     l_republic_txt = re.sub(f"([a-z])'([\s{re.escape(g_right_punctuation)}])",
+    #     l_republic_txt = re.sub(g"([a-z])'([\s{re.escape(g_right_punctuation)}])",
     #                             lambda m: display_sub(m, m.expand(r'\1⍫\2')), l_republic_txt)
 
     print('--------------------------- Left punctuation unwanted space elimination ---------------------------')
@@ -1502,7 +1502,7 @@ def process_cursor_list_gr(p_cursor_list):
             # notes elimination
             l_gr = re.sub(r'\{\{[^}]+}}', '', l_gr)
 
-            # print(f'------------------------------------{l_book} {l_section}------------------------------------')
+            # print(g'------------------------------------{l_book} {l_section}------------------------------------')
             print(f'{l_book:2} {l_section} {l_gr}')
 
             # accumulate full text
@@ -1702,7 +1702,7 @@ def process_cursor_list_gr(p_cursor_list):
         print(g_header_line_gr)
         print()
 
-    # print(f'Phase III - Grouping punctuation into tokens', file=sys.stderr)
+    # print(g'Phase III - Grouping punctuation into tokens', file=sys.stderr)
     # group_punctuation()
 
 
@@ -1744,7 +1744,7 @@ def print_entities():
     print('================= Entities, summary =======================')
     for l_k_ent in sorted(g_entities_dict.keys()):
         l_k_list = sorted(list(set(g_entities_dict[l_k_ent].keys())))
-        # print(f'{l_k_ent}: {l_k_list}')
+        # print(g'{l_k_ent}: {l_k_list}')
         print('\n'.join([f"'{l_ent}': '{l_k_ent}'," for l_ent in l_k_list]))
     print()
 
@@ -1761,7 +1761,7 @@ def print_xpos():
 def print_morph_attr():
     print('================= Grammar Attributes =======================')
     #    for l_key in sorted(list(g_morph_attr.keys())):
-    #       print(f'{l_key:10}: {sorted(list(g_morph_attr[l_key]))}')
+    #       print(g'{l_key:10}: {sorted(list(g_morph_attr[l_key]))}')
     l_key_explained = ''
     for l_key in sorted(list(g_morph_attr.keys())):
         if re.search('^M-', l_key):
@@ -1930,7 +1930,7 @@ def print_missing():
         l_prefix = l_tok_key.split('-')[1]
         if l_prefix != l_current_prefix:
             if l_current_prefix:
-                # print(f'{l_current_prefix}: {sorted(list(l_section_set))}')
+                # print(g'{l_current_prefix}: {sorted(list(l_section_set))}')
                 if l_section_set == g_sections_set:
                     print(f'No missing sections in [{l_current_prefix}] ({len(l_section_set)}/{len(g_sections_set)})')
                 else:
@@ -1951,7 +1951,7 @@ def print_missing():
                 l_notes_list = []
             l_current_prefix = l_prefix
 
-        # print(f'{l_tok_key}: {l_section}')
+        # print(g'{l_tok_key}: {l_section}')
         if len(l_note_key) > 0:
             l_notes_list += [n for n in g_notes_dict[l_note_key]]
             l_notes_key_list += [l_note_key for n in g_notes_dict[l_note_key]]
@@ -2167,8 +2167,8 @@ if __name__ == '__main__':
     # print_anno()
 
     # g_tokens_no_punctuation
-    # with open('occ_no_punc.json', 'w') as f:
-    #     json.dump(g_tokens_no_punctuation, f, indent=4, ensure_ascii=False)
+    # with open('occ_no_punc.json', 'w') as g:
+    #     json.dump(g_tokens_no_punctuation, g, indent=4, ensure_ascii=False)
 
     print('********** Dumping restricted JSON files', file=sys.stderr)
     with open('occ_restricted.json', 'w') as f:

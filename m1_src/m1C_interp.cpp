@@ -1227,7 +1227,7 @@ M1MidPlane::TextLemma::TextLemma(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb,
     M1_FUNC_EXIT
 }
 
-//------------------------------------ TextLemma -----------------------------------------------------
+//------------------------------------ TextWForm -----------------------------------------------------
 bool M1MidPlane::TextWForm::wantIt(M1Store::Item_lv2* p_myself){
     return p_myself->isFullEdge() && p_myself->getTarget_lv2()->isOfType(M1Env::WFORM_SIID);
 }
