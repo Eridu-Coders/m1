@@ -62,24 +62,27 @@ def record_grammar(p_gr_list):
             g_tense_values[l_tense] = g_tense_values.setdefault(l_tense, 0) + 1
             g_voice_values[l_voice] = g_voice_values.setdefault(l_voice, 0) + 1
 
-        if g_count_grammar > 10000:
-            for l_back in g_grammar_values.keys():
-                print(f'{l_back}:')
-                for l_key, l_value in sorted(list(g_grammar_values[l_back].items()), key=lambda l_item: l_item[1]):
-                    print(f'    {l_value:5} {l_key}')
-
-            print('\nCases:')
-            for l_key, l_value in sorted(list(g_case_values.items()), key=lambda l_item: l_item[1]):
-                print(f'    {l_value:5} {l_key}')
-
-            print('\nTenses:')
-            for l_key, l_value in sorted(list(g_tense_values.items()), key=lambda l_item: l_item[1]):
-                print(f'    {l_value:5} {l_key}')
-
-            print('\nVoices:')
-            for l_key, l_value in sorted(list(g_voice_values.items()), key=lambda l_item: l_item[1]):
-                print(f'    {l_value:5} {l_key}')
+        if g_count_grammar > 10000000:
+            dump_grammar_values()
             sys.exit(0)
+
+def dump_grammar_values():
+    for l_back in g_grammar_values.keys():
+        print(f'{l_back}:')
+        for l_key, l_value in sorted(list(g_grammar_values[l_back].items()), key=lambda l_item: l_item[1]):
+            print(f'    {l_value:5} {l_key}')
+
+    print('\nCases:')
+    for l_key, l_value in sorted(list(g_case_values.items()), key=lambda l_item: l_item[1]):
+        print(f'    {l_value:5} {l_key}')
+
+    print('\nTenses:')
+    for l_key, l_value in sorted(list(g_tense_values.items()), key=lambda l_item: l_item[1]):
+        print(f'    {l_value:5} {l_key}')
+
+    print('\nVoices:')
+    for l_key, l_value in sorted(list(g_voice_values.items()), key=lambda l_item: l_item[1]):
+        print(f'    {l_value:5} {l_key}')
 
 
 def inria_recur(p_inner, p_background, p_pos, p_depth=0):
@@ -203,7 +206,7 @@ def inria_sloka_words(p_chap_number, p_sloka_num, p_sloka_txt):
             f"&text={l_velthuis_text_url}" \
             '&t=VH&topic=&mode=g&corpmode=&corpdir=&sentno='
 
-    l_url = l_url.replace(' ', '+').replace('.a', '%27')
+    l_url = l_url.replace(' ', '+').replace('.a', '%27').replace('\u200c', '').replace('\u200d', '')
     print(f'l_deva_txt:      [{l_deva_txt}]')
     print(f'l_txt_devtrans:  [{l_txt_devtrans}]')
     print(f'l_velthuis_text: [{l_velthuis_text}]')
@@ -271,6 +274,19 @@ def inria_sloka_words(p_chap_number, p_sloka_num, p_sloka_txt):
     return l_word_list
 
 
+g_header = """<TEI xmlns="http://www.tei-c.org/ns/1.0">
+<teiHeader xml:lang="en">
+<titleStmt>
+<title>Bhagavad-gītā</title>
+</titleStmt>
+</teiHeader>
+<text xml:lang="en, sk">
+"""
+
+g_footer = """</text>
+</TEI>
+"""
+
 # ------------- main() -------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     with open('chap.json', 'r', encoding='utf-8') as l_f_in:
@@ -279,6 +295,7 @@ if __name__ == '__main__':
 
     l_indent_prefix = ''
     with open('bg.xml', 'w', encoding='utf-8') as l_bg_out:
+        l_bg_out.write(g_header)
         for l_chap in l_json_chapters:
             l_verse_count = int(l_chap['verses_count'])
             l_chap_number = int(l_chap['chapter_number'])
@@ -501,7 +518,7 @@ if __name__ == '__main__':
                         for d in m:
                             l_form_list.append(d['form'])
                             l_lemma_list, l_grammar_list = extract_im(d['morph'])
-                            l_color = l_grammar_list[0]
+                            l_color = l_grammar_list[0] if len(l_grammar_list) > 0 else ''
                             l_pos = 'XXX'
                             if l_color == 'carmin':
                                 l_pos = 'VERB'
@@ -601,3 +618,9 @@ if __name__ == '__main__':
             l_bg_out.write(f'{l_indent_prefix}<!-- End of chapter {l_chap_number} -->\n')
             l_indent_prefix = g_prefix_stack.pop()
             l_bg_out.write(f'{l_indent_prefix}</div1>\n')
+
+        # dump grammar values
+        dump_grammar_values()
+
+        # end of TEI file
+        l_bg_out.write(g_footer)
