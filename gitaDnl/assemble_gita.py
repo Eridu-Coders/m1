@@ -19,16 +19,28 @@ from indic_transliteration.sanscript import transliterate
 g_indent = '    '
 g_prefix_stack = []
 
-def simple_cleanup(s):
-    return re.sub(r'\s+', ' ', s).strip()
+#                   re.sub(r'॥(\d+\.\d+)॥(\S)', r'॥\1॥ \2',
+#                   re.sub(r'॥\s*(\d+\.\d+)\s*॥', r'॥\1॥',
 
-def cleanup_br(s):
-    l_ret = re.sub(r'\n', r'<br/>', s.strip())
-    l_ret = re.sub(r'\s+', ' ', l_ret)
-    return l_ret
+def sloka_numbers_normalize(s):
+    return re.sub(r'॥(\d+\.\d+)॥(\S)', r'॥\1॥ \2',
+                  re.sub(r'॥\s*(\d+\.\d+)\s*॥(\s*\.)', r'॥\1॥',
+                         re.sub(r'^(<p>\s*)?(\d+\.\d+)\s*', r'\1॥\2॥ ',
+                                re.sub(r'^(<p>\s*)?॥?\s*(\d+\.\d+)\s*-?\s*(\d+\.\d+)\s*॥?\s*', r'\1॥\2 - \3॥ ',s)
+                                )
+                         )
+                  )
+
+def universal_cleanup(s):
+    return re.sub(r'\s+', ' ',
+                         s.replace('।।', '॥')
+                  ).strip()
+
+def cleanup_add_br(s):
+    return universal_cleanup(re.sub(r'\n', r'<br/>', s))
 
 def author_key(s):
-    return re.sub(f'[{string.punctuation}]+', '', simple_cleanup(s).lower()).replace(' ', '_')
+    return re.sub(f'[{string.punctuation}]+', '', universal_cleanup(s).lower()).replace(' ', '_')
 
 g_count_grammar = 0
 g_grammar_values = dict()
@@ -277,7 +289,11 @@ def inria_sloka_words(p_chap_number, p_sloka_num, p_sloka_txt):
 g_header = """<TEI xmlns="http://www.tei-c.org/ns/1.0">
 <teiHeader xml:lang="en">
 <titleStmt>
-<title>Bhagavad-gītā</title>
+<title type="main">Bhagavad-gītā</title>
+<title type="alt">श्रीमद् भगवद्गीता</title>
+<title type="sub">Original Sanskrit text with word-for-word translation, morphological analysis (INRIA), 12 sloka-by-sloka translations and 22 sloka-by-sloka commentaries</title>
+<editor role="compiler">Nicolas A. L. Reimen (nicolas.reimen@gmail.com, WhatsApp: +91 9900192517)</editor>
+<author>अपौरुषेय + various translators and commentators</author>
 </titleStmt>
 </teiHeader>
 <text xml:lang="en, sk">
@@ -289,6 +305,17 @@ g_footer = """</text>
 
 g_iskcon_missing = []
 g_iskcon_total = 0
+
+g_author_normalize = {
+    'Sri Abhinavgupta': 'Sri Abhinavagupta',
+    'Sri Abhinav Gupta': 'Sri Abhinavagupta'
+}
+
+def author_normalize(p_author):
+    if p_author in g_author_normalize.keys():
+        return g_author_normalize[p_author]
+    else:
+        return p_author
 
 # ------------- main() -------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
@@ -335,11 +362,29 @@ if __name__ == '__main__':
                     l_headers = {
                         'User-Agent': 'ShradhaaBot 1.0'}
                     l_req = urllib.request.Request(l_url_gs, headers=l_headers)
-                    l_page_iskcon = urllib.request.urlopen(l_req)
+                    l_page_gs = urllib.request.urlopen(l_req)
                     # Decode the bytes into a string using UTF-8
-                    l_html_gs = l_page_iskcon.read().decode('utf8').strip()
+                    l_html_gs = l_page_gs.read().decode('utf8').strip()
                     with open(l_cache_file_gs, 'w', encoding='utf-8') as l_f_v_gs:
                         l_f_v_gs.write(l_html_gs)
+
+                l_match_sk = re.search(
+                    r'<div class="views-field views-field-body".*?<p align="center"><font size="3px">(.*?)</font>',
+                    l_html_gs, flags=re.MULTILINE | re.DOTALL)
+                if l_match_sk:
+                    l_sk_gs = re.sub(r'\s+', ' ',
+                                     re.sub(r'(<br\s*/>)+', '<br/>',
+                                            re.sub(r'>\s+<', '><',
+                                                   l_match_sk.group(1).replace('।।', '॥')
+                                                   )
+                                            )
+                                     ).strip()
+                    l_translit_gs = transliterate(
+                        re.sub(r'\s+', ' ',
+                               re.sub(r'॥[^॥]+॥', '', l_sk_gs).replace('।', '').replace('<br/>', '')
+                               ).strip(), sanscript.DEVANAGARI, sanscript.IAST)
+                    print(f'l_sk_gs:       {l_sk_gs}')
+                    print(f'l_translit_gs: {l_translit_gs}')
 
                 # data from the BG API
                 if os.path.exists(l_cache_file):
@@ -362,11 +407,11 @@ if __name__ == '__main__':
 
                 # top-level attributes
                 # sanskrit text
-                l_sk = simple_cleanup(l_json_verse['text'])
+                l_sk = universal_cleanup(l_json_verse['text'])
                 # IAST transliteration
-                l_translit = simple_cleanup(l_json_verse['transliteration'])
+                l_translit = universal_cleanup(l_json_verse['transliteration'])
                 # Word-for-Word translation (API version)
-                l_wfw_api_list = [s.strip().split('—') for s in simple_cleanup(l_json_verse['word_meanings']).split(';')]
+                l_wfw_api_list = [s.strip().split('—') for s in universal_cleanup(l_json_verse['word_meanings']).split(';')]
                 # translations
                 l_translations = l_json_verse['translations']
                 # commentaries
@@ -390,13 +435,13 @@ if __name__ == '__main__':
                         # print(f'[{k:10}] {l_txt}')
                         if type(l_json_local[k]) is dict and 'author' in l_json_local[k]:
                             d = l_json_local[k]
-                            l_author_local = simple_cleanup(d['author'])
+                            l_author_local = author_normalize(universal_cleanup(d['author']))
                             l_type_list_local = set(d.keys()).difference({'author'})
                             print(l_type_list_local, d)
                             for l_type in l_type_list_local:
                                 l, z = list(l_type)
                                 l_language_local = 'english' if l == 'e' else 'hindi' if l == 'h' else 'sanskrit' if l == 's' else 'unknown language'
-                                l_text = re.sub(r'\s+', ' ', d[l_type]).strip()
+                                l_text = universal_cleanup(d[l_type])
                                 l_author_key = author_key(l_author_local)
                                 if z == 't':
                                     l_local_translations[l_author_key] = [l_author_local, l_language_local, l_text]
@@ -409,40 +454,119 @@ if __name__ == '__main__':
                         print(f'(c) {n:35}: {l_local_commentaries[n]}')
                     print('=============================================', l_local_file)
 
+                # merging of commentaries and translations
+                for t in l_translations:
+                    l_text = universal_cleanup(t['description'])
+                    l_author = author_normalize(universal_cleanup(t['author_name']))
+                    l_language = universal_cleanup(t['language'])
+                    l_local_translations[author_key(l_author)] = [l_author, l_language, l_text]
+
+                for c in l_commentaries:
+                    l_text = cleanup_add_br(c['description'])
+                    l_author = author_normalize(universal_cleanup(c['author_name']))
+                    l_language = universal_cleanup(c['language'])
+                    l_local_commentaries[author_key(l_author)] = [l_author, l_language, l_text]
+
                 l_sk_from_trans = re.sub(r'\s+', ' ', devtrans.iast2dev(l_translit)).strip()
-                l_sk_test = re.sub(r'\s+', ' ', re.sub(r'\d+\.\d+$', '', l_sk.replace('।', ''))).strip()
                 l_sk_test_local = re.sub(r'\s+', ' ', re.sub(r'\|\|[^|]+\|\|$', '', l_sk_local).replace('|', '')).strip()
-                #                 l_sk_iskcon_comp = re.sub(r'\s+', ' ',
-                #                                           re.sub(r'॥[^॥]+॥', '', l_sk_iskcon).replace('।', '').replace('<br/>', '')
-                #                                           ).strip()
+                l_sk_test = re.sub(r'\s+', ' ',
+                                   re.sub(r'\d+\.\d+$', '',
+                                          l_sk.replace('।', '')
+                                          )
+                                   ).strip()
+                l_sk_gs_test = re.sub(r'\s+', ' ',
+                                      re.sub(r'॥[^॥]+॥', '', l_sk_gs).replace('।', '').replace('<br/>', '')
+                                      ).strip()
                 #                 l_trl_iskcon_comp = re.sub(r'\s+', ' ',
                 #                                            re.sub(r'<[^>]+>', ' ', l_trl_iskcon)
                 #                                            ).strip()
                 #                 l_sk_iskcon_from_trl = devtrans.iast2dev(l_trl_iskcon_comp).replace('-', '')
 
-                #                 if l_sk_test != l_sk_iskcon_comp and not l_iskcon_unavailable:
-                #                     print('!!!!!!!!!!!!!!!!!!!!!!!!!!! SK discrepancy !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-                #                     print(f'l_sk_test:            [{l_sk_test}]')
-                #                     print(f'l_sk_test_local:      [{l_sk_test_local}]')
-                #                     print(f'l_sk_from_trans:      {l_sk_from_trans}')
-                #                     print(f'l_translit:           {l_translit}')
-                #                     print(f'l_translit_local:     {l_translit}')
-                #                     print(f'IAST local:           {devtrans.dev2iast(l_sk_test_local)}')
-                #                     print(f'l_sk_iskcon:          {l_sk_iskcon}')
+                print(f"l_sk_test:            [{l_sk_test.replace(' ', '').strip()}]")
+                print(f"l_sk_gs_comp:         [{l_sk_gs_test.replace(' ', '').strip()}]")
+                print(f"l_sk_test_local:      [{l_sk_test_local.replace(' ', '').strip()}]")
+                if l_sk_test != l_sk_gs_test:
+                    print('!!!!!!!!!!!!!!!!!!!!!!!!!!! SK discrepancy !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+                    print(f'l_sk_from_trans:      {l_sk_from_trans}')
+                    print(f'l_translit:           {l_translit}')
+                    print(f'l_translit_local:     {l_translit}')
+                    print(f'IAST local:           {devtrans.dev2iast(l_sk_test_local)}')
+                    print(f'l_sk_gs:              {l_sk_gs}')
                 #                     print(f'l_trl_iskcon:         {l_trl_iskcon}')
                 #                     print(f'l_trl_iskcon_comp:    {l_trl_iskcon_comp}')
-                #                     print(f"l_sk_iskcon_comp:     [{l_sk_iskcon_comp.replace(' ', '')}]")
                 #                     print(f"l_sk_iskcon_from_trl: [{l_sk_iskcon_from_trl.replace(' ', '')}]")
                 #
-                #                     l_sk = l_sk_iskcon
-                #                     print(f'   --> New l_sk: {l_sk}')
-                #                     print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+                    l_sk = l_sk_gs
+                    print(f'   --> New l_sk: {l_sk}')
+                    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
                 #                     #sys.exit(0)
+
+                # Adding commentaries and translations from Gita Supersite to l_local_commentaries/l_local_translations
+                # <div class="views-field views-field-field-etadi"
+                l_html_gs_corrected = re.sub(r"([a-z]+)='([^']+)'", r'\1="\2"',
+                                             re.sub(r'\s*=\s*', '=', l_html_gs)
+                                             )
+                l_gs_count_item = 0
+                l_gs_count_com = 0
+                l_gs_count_tran = 0
+                for l_match_gs_tc in re.finditer(
+                        r'<div class="views-field views-field-field-([a-z]+).*?<font color="#2c44bd" size="4px"><b>([^<]+)</b></font></p>(.*?)</div>',
+                        l_html_gs_corrected, flags=re.MULTILINE | re.DOTALL):
+                    l_code_gs = l_match_gs_tc.group(1).strip()
+                    l_title_gs = l_match_gs_tc.group(2).strip()
+                    l_body_gs = re.sub(r'[ \t]+', ' ',
+                                       re.sub(r'<(/)?font[^<]*>', '',
+                                       re.sub(r'<p[^<]+>', '<p>',
+                                       re.sub(r'(<br\s*(/)?>)+', '',
+                                              re.sub(r'>\s+<', '><',
+                                                     l_match_gs_tc.group(3).replace('।।', '॥').replace('&nbsp;', ' ')
+                                                     )
+                                              )
+                                              )
+                                              ).replace('<b></b>', '')
+                                       ).strip()
+
+                    l_body_gs_disp = re.sub(r'\s*\n\s*', '\n', l_body_gs)
+                    print(f'---------------------------- {l_gs_count_item} --------------------------------')
+                    print(f'l_code_gs:  {l_code_gs}')
+                    print(f'l_title_gs: {l_title_gs}')
+                    print(f'l_body_gs:  {l_body_gs_disp}')
+                    l_body_gs = universal_cleanup(l_body_gs)
+
+                    l_language_gs = 'english' if 'english' in l_title_gs.lower() else 'sanskrit' if 'sanskrit' in l_title_gs.lower() else 'unknown'
+
+                    l_is_commentary = ('commentary' in l_title_gs.lower())
+                    if l_is_commentary:
+                        l_gs_count_com += 1
+                    else:
+                        l_gs_count_tran += 1
+
+                    l_match_author = re.search(r'(?:(?:B|b)y\s*)+(.*)$', l_title_gs)
+                    if l_match_author:
+                        l_author_gs = author_normalize(l_match_author.group(1).strip())
+                    else:
+                        print('No Author')
+                        sys.exit(0)
+
+                    if l_is_commentary and 'translation' in l_title_gs.lower():
+                        l_match_original_author = re.search(r"^English Translation [Oo]f ((?:Sri )?[A-Z][a-z]+)'s", l_title_gs)
+                        if l_match_original_author:
+                            l_original_author = l_match_original_author.group(1)
+                            l_original_author = 'Sri ' + l_original_author if 'sri' not in l_original_author.lower() else l_original_author
+                            l_author_gs = author_normalize(l_original_author) + f' (transl. {l_author_gs})'
+
+                    if l_is_commentary:
+                        l_local_commentaries[author_key(l_author_gs)] = [l_author_gs, l_language_gs, l_body_gs]
+                    else:
+                        l_local_translations[author_key(l_author_gs)] = [l_author_gs, l_language_gs, l_body_gs]
+
+                    l_gs_count_item += 1
+                print(f'Gita Supersite: {l_gs_count_com} commentaries and {l_gs_count_tran} translations')
 
                 # get grammatical analysis from INRIA
                 l_wfw_inria_list = inria_sloka_words(l_chap_number, l_verse_number, l_sk)
                 for l_wfw_inria in l_wfw_inria_list:
-                    print(l_wfw_inria)
+                    print('INRIA:', l_wfw_inria)
 
                 # start of output for this sloka
                 l_bg_out.write(f'{l_indent_prefix}<div2 type="sloka-block" n="{l_verse_number}" xml:id="{l_verse_id}">\n')
@@ -453,15 +577,21 @@ if __name__ == '__main__':
                 #     l_sk_out = re.sub('\s*।\s*', '<caesura>', re.sub('।।', '॥', l_sk.strip()))
                 # else:
                 l_sk_out = re.sub(r'\s+', ' ',
-                                  re.sub('\s*।\s*', '<caesura>',
-                                         re.sub('।।', '॥',
-                                                re.sub(r'<[^>]+>', ' ', l_sk)
+                                  re.sub(r'॥\s*(\d+\.\d+)\s*॥', lambda m: f' ॥ {devtrans.wx2dev(m.group(1))} ॥',
+                                         re.sub('\s*।\s*', '<caesura>',
+                                                re.sub(r'<[^>]+>', '',
+                                                       l_sk.replace('।।', '॥')
+                                                       )
                                                 )
                                          )
                                   ).strip()
 
+                print('Sanskrit        :', l_sk)
+                print('l_sk_out 1      :', l_sk.replace('।।', '॥'))
+                print('l_sk_out        :', l_sk_out)
+                print('Transliteration :', l_translit)
                 l_bg_out.write(f'{l_indent_prefix}<l>{l_sk_out}</l>\n')
-                l_bg_out.write(f'{l_indent_prefix}<seg type="transliteration">{l_translit}</seg>\n')
+                l_bg_out.write(f'{l_indent_prefix}<seg type="transliteration" standard="IAST">{l_translit_gs}</seg>\n')
 
                 #                 if not l_iskcon_unavailable:
                 #                     for l_wfw_api in l_wfw_iskcon_list:
@@ -536,8 +666,8 @@ if __name__ == '__main__':
                 #                         l_interp_list_join = ''.join(l_interp_list)
                 #                         t = re.sub(rf'\s+([.?:;!])', r'\1', t)
                 #                         l_bg_out.write(f'{l_indent_prefix}<seg type="wfw-unit">{devtrans.iast2dev(k)}\n'
-                #                                        f'{l_indent_prefix}    <interp type="transliteration" standard="ISO 15919">{k}</interp>\n'
-                #                                        #f'{l_indent_prefix}    <interp type="transliteration" standard="ISO 15919">{l_form}</interp>\n'
+                #                                        f'{l_indent_prefix}    <interp type="transliteration" standard="IAST">{k}</interp>\n'
+                #                                        #f'{l_indent_prefix}    <interp type="transliteration" standard="IAST">{l_form}</interp>\n'
                 #                                        f'{l_indent_prefix}    <interp type="translation" source="ISKCON">{t}</interp>\n'
                 #                                        f'{l_indent_prefix}    <interpGrp type="morphology" source="INRIA">\n' +
                 #                                        l_interp_list_join +
@@ -548,22 +678,14 @@ if __name__ == '__main__':
                 #                     l_indent_prefix = g_prefix_stack.pop()
                 #                     l_bg_out.write(f'{l_indent_prefix}</div3>\n')
 
-                print('    Sanskrit        :', l_sk)
-                print('    Transliteration :', l_translit)
-
                 print('    Translations    :', l_translations)
                 l_bg_out.write(f'{l_indent_prefix}<div3 type="translations-block" xml:id="{l_verse_id}_tran">\n')
                 g_prefix_stack.append(l_indent_prefix)
                 l_indent_prefix += g_indent
-                for t in l_translations:
-                    l_text = simple_cleanup(t['description'])
-                    l_author = simple_cleanup(t['author_name'])
-                    l_language = simple_cleanup(t['language'])
-                    l_local_translations[author_key(l_author)] = [l_author, l_language, l_text]
-                    # l_bg_out.write(f'{l_indent_prefix}<div4 type="translations" xml:lang="{l_language}">{l_text}<author>{l_author}</author></div4>\n')
 
                 for l_ak in l_local_translations:
                     l_author, l_language, l_text = l_local_translations[l_ak]
+                    l_text = sloka_numbers_normalize(l_text)
                     print(f'      Description (t): ', l_text)
                     print(f'      Author         : ', l_author)
                     print(f'      Language       : ', l_language)
@@ -577,15 +699,10 @@ if __name__ == '__main__':
                 l_bg_out.write(f'{l_indent_prefix}<div3 type="commentaries-block" xml:id="{l_verse_id}_com">\n')
                 g_prefix_stack.append(l_indent_prefix)
                 l_indent_prefix += g_indent
-                for c in l_commentaries:
-                    l_text = cleanup_br(c['description'])
-                    l_author = simple_cleanup(c['author_name'])
-                    l_language = simple_cleanup(c['language'])
-                    l_local_commentaries[author_key(l_author)] = [l_author, l_language, l_text]
-                    # l_bg_out.write(f'{l_indent_prefix}<div4 type="commentary" xml:lang="{l_language}">{l_text}<author>{l_author}</author></div4>\n')
 
                 for l_ak in l_local_commentaries:
                     l_author, l_language, l_text = l_local_commentaries[l_ak]
+                    l_text = sloka_numbers_normalize(l_text)
                     print(f'      Description (c): ', l_text)
                     print(f'      Author         : ', l_author)
                     print(f'      Language       : ', l_language)
