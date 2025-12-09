@@ -5,17 +5,10 @@ __author__ = 'fi11222'
 
 import json
 import re
-import string
-import subprocess
 import os
 import sys
-import devtrans
 import urllib.request
 import urllib.error
-import html
-
-from indic_transliteration import sanscript
-from indic_transliteration.sanscript import transliterate
 
 def universal_cleanup(s):
     return re.sub(r'\s+', ' ',
