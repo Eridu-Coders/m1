@@ -60,18 +60,16 @@ if __name__ == '__main__':
 
         # Data extraction
         for l_match in re.finditer(
-                r'<div class="Textnum">TEXTS? (\d+|\d+-\d+)</div>(.*?)<div class="Synonyms-Section">SYNONYMS</div>.*?<div class="Synonyms-SA">(.*?)</div>',
+                r'<div class="Textnum">TEXTS? (\d+|\d+-\d+)</div>.*?<div class="Synonyms(?:-SA)?">(.*?)</div>',
                 l_html_prabh_chap, flags=re.MULTILINE | re.DOTALL):
             l_sloka_group = l_match.group(1).strip()
             l_sloka_number_list = [int(l_sloka_group), int(l_sloka_group)] if '-' not in l_sloka_group else [int(s) for s in l_sloka_group.split('-')]
 
-            l_translit_group = re.sub('<div\s*style="\s*margin-top:\s*0\.125in">', '_*_SEP_*_', l_match.group(2).strip())
-            l_translit_group = universal_cleanup(re.sub(r'<[^>]+>', '', l_translit_group))
-            l_translit_list = [s.strip() for s in l_translit_group.split('_*_SEP_*_')]
-
-            l_wfw_html = universal_cleanup(re.sub(r'<[^>]+>', '', l_match.group(3).strip()))
-            l_wfw_prabh_list = [s.strip().split('—') for s in l_wfw_html.split(';')]
-            # print(f'{l_chap_number}.{str(l_sloka_number_list):11}: {l_translit_list} {l_wfw_prabh_list}')
+            l_wfw_html = l_match.group(2).strip()
+            print(l_wfw_html)
+            l_wfw_str = universal_cleanup(re.sub(r'<[^>]+>', '', l_match.group(2).strip()))
+            l_wfw_prabh_list = [s.strip().split('—') for s in l_wfw_str.split(';')]
+            print(f'{l_chap_number}.{str(l_sloka_number_list):11}: {l_wfw_str}')
             l_wfw = []
             for l in l_wfw_prabh_list:
                 if len(l) == 2:
@@ -125,7 +123,7 @@ if __name__ == '__main__':
                 #                         else:
                 #                             break
                 print(f'{l_chap_number}.{l_sloka_number:3}: {l_wfw}')
-                l_cache_file_pv = f'cache/iskcon_pv_{l_chap_number}.{l_sloka_number}.json'
+                l_cache_file_pv = f'cache/iskcon_pvn_{l_chap_number}.{l_sloka_number}.json'
                 with open(l_cache_file_pv, 'w', encoding='utf-8') as l_f_v_prabh:
                     json.dump(l_wfw, l_f_v_prabh, indent=4, ensure_ascii=False)
 
