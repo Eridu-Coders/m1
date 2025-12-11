@@ -795,7 +795,7 @@ if __name__ == '__main__':
 
         # list of missing ISKCON slokas (multiple slokas in one Vedabase block)
         print('\nMissing ISKCON slokas ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
-        for l_ref in  g_iskcon_missing:
+        for l_ref in g_iskcon_missing:
             print(l_ref)
 
         # end of TEI file
