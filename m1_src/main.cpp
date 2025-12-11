@@ -24,20 +24,28 @@ QRegularExpression g_re_space(R"(\s+)");
 
 void loadEnoch();
 int loadGita();
+int loadTei();
 
 int main(int argc, char *argv[])
 {
+    // printf("Xa");
     po::options_description l_desc("Allowed options");
+    // printf("Xb");
     l_desc.add_options()
         ("help,h", "produce help message")
         ("load-gita,g", "Load Bhagavad Gita test data")
         ("load-plato,p", "Load The Republic of Plato test data")
+        ("load-tei,t", "Loads a TEI file")
         ("reset,r", "Reset (empty) storage")
     ;
 
+    // printf("X");
     po::variables_map l_program_options_vm;
+    // printf("Y");
     po::store(po::parse_command_line(argc, argv, l_desc), l_program_options_vm);
+    // printf("Z");
     po::notify(l_program_options_vm);
+    // printf("T");
 
     M1Env::EnvStatic::init();
     M1Env::EnvStatic::setNormalFilter("*.debug=true\n"
@@ -88,6 +96,7 @@ int main(int argc, char *argv[])
     // loadEnoch();
     if(l_program_options_vm.count("load-gita")) loadGita();
     if(l_program_options_vm.count("load-plato")) M1Store::GraphInit::init_plato();
+    if(l_program_options_vm.count("load-tei")) loadTei();
 
     QApplication a(argc, argv);
     M1UI::MainWindow w;
@@ -101,6 +110,94 @@ int main(int argc, char *argv[])
 
     printf("Hurrah! No Core Dump ... Returning %d\n", l_ret);
     return l_ret;
+}
+
+QDataStream& operator<<(QDataStream &l_out, const QXmlStreamAttribute &a){
+    QString l_rep = QString("%1: %2").arg(a.qualifiedName()).arg(a.value());
+    qCDebug(g_cat_main).noquote() << l_rep;
+    l_out << l_rep.toUtf8().constData();
+    return l_out;
+}
+
+int loadTei(){
+    QXmlStreamReader l_xml;
+    QFile l_fin_tei("../gitaDnl/bg_final_ex.xml");
+    qCDebug(g_cat_main) << "Exists: " << l_fin_tei.exists();
+
+    // the xml stream parse
+    if (!l_fin_tei.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "Failed to open file for reading:" << l_fin_tei.errorString();
+        std::_Exit(0);
+    }
+    // QTextStream l_in_tei(&l_fin_tei);
+    // QString l_txt(l_in_gita.readAll());
+    QXmlStreamReader l_xml_reader(&l_fin_tei);
+    while (!l_xml_reader.atEnd()) {
+        QXmlStreamReader::TokenType l_tt = l_xml_reader.readNext();
+        QString l_tok_string = l_xml_reader.tokenString();
+        QStringView l_tok_name = l_xml_reader.name();
+        qCDebug(g_cat_main).noquote() << "Token Type: " << l_tt << l_tok_string << l_xml_reader.name();
+
+        int l_cur_chapter_number;
+        int l_cur_sloka_number;
+        if(l_tt == QXmlStreamReader::StartElement && l_tok_string == "StartElement" && l_tok_name == "title"){
+            QXmlStreamAttributes l_att_1 = l_xml_reader.attributes();
+            QString l_type = l_att_1.value("type").toString();
+
+            //qCDebug(g_cat_main).noquote() << "A";
+            // QXmlStreamAttributes& l_att_2 = l_att_1;
+            // QByteArray l_att_array(10000, '\0');
+            //qCDebug(g_cat_main).noquote() << "B";
+            // QDataStream l_att_stream(&l_att_array, QIODeviceBase::ReadWrite);
+            // QDataStream& l_att_str_ref = l_att_str;
+            //qCDebug(g_cat_main).noquote() << "C";
+            // l_att_stream << dynamic_cast<QList<QXmlStreamAttribute>&>(l_att_1);
+            // l_att_stream.device()->reset();
+            /*qCDebug(g_cat_main).noquote() << "D" <<
+                l_att_array.size() <<
+                QString("[%1]").arg(l_att_array.at(0)) <<
+                l_att_stream.status() <<
+                l_att_stream.atEnd() <<
+                (l_att_stream.device() == nullptr);*/
+            // QString s = QStringDecoder("utf8").decode(l_att_stream.device()->readAll());
+            // QString s = QStringDecoder("utf8").decode(l_att_array.data());
+            // qCDebug(g_cat_main).noquote() << "E";
+            // qCDebug(g_cat_main).noquote() << s.trimmed();
+            // qCDebug(g_cat_main).noquote() << l_att_1.value("type");
+
+            QXmlStreamReader::TokenType l_tt_title = l_xml_reader.readNext();
+            if(l_tt_title != QXmlStreamReader::Characters) qFatal() << "<title> not followed by Characters";
+            QString l_title_text = l_xml_reader.text().toString().trimmed();
+            qCDebug(g_cat_main).noquote() << QString("<title type=%1> [%2]").arg(l_type).arg(l_title_text);
+        }
+        if(l_tt == QXmlStreamReader::StartElement && l_tok_string == "StartElement" && l_tok_name == "div1"){
+            QString l_type = l_xml_reader.attributes().value("type").toString();
+            l_cur_chapter_number = l_xml_reader.attributes().value("n").toInt();
+            qCDebug(g_cat_main).noquote() << QString("<div1 type=%1> Chapter [%2]").arg(l_type).arg(l_cur_chapter_number);
+        }
+        if(l_tt == QXmlStreamReader::StartElement && l_tok_string == "StartElement" && l_tok_name == "div2"){
+            QString l_type = l_xml_reader.attributes().value("type").toString();
+            l_cur_sloka_number = l_xml_reader.attributes().value("n").toInt();
+            qCDebug(g_cat_main).noquote() << QString("<div1 type=%1> Slloka [%2]").arg(l_type).arg(l_cur_sloka_number);
+        }
+        if(l_tt == QXmlStreamReader::StartElement && l_tok_string == "StartElement" && l_tok_name == "l"){
+            QXmlStreamReader::TokenType l_tt_sk = l_xml_reader.readNext();
+            if(l_tt_sk != QXmlStreamReader::Characters) qFatal() << "<l> not followed by Characters";
+            QString l_sloka_text1 = l_xml_reader.text().toString().trimmed();
+            QXmlStreamReader::TokenType l_tt_caesura = l_xml_reader.readNext();
+            if(l_tt_caesura != QXmlStreamReader::StartElement && l_xml_reader.name() != "caesura") qFatal() << "No caesura in Sloka";
+            l_xml_reader.readNext(); // to pass the automatic EndElement after <caesura/>
+            QXmlStreamReader::TokenType l_tt_sk2 = l_xml_reader.readNext();
+            if(l_tt_sk2 != QXmlStreamReader::Characters) qFatal() << QString("No Characters after caesura: %1").arg(l_tt_sk2);
+            QString l_sloka_text2 = l_xml_reader.text().toString().trimmed();
+            qCDebug(g_cat_main).noquote() << QString("Sloka %1.%2: %3")
+                                                 .arg(l_cur_chapter_number)
+                                                 .arg(l_cur_sloka_number)
+                                                 .arg(QString("%1 । %2").arg(l_sloka_text1).arg(l_sloka_text2));
+        }
+    }
+
+    std::_Exit(0);
 }
 
 int loadGita(){

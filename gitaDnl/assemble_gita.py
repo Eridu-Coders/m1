@@ -333,7 +333,7 @@ if __name__ == '__main__':
             l_verse_count = int(l_chap['verses_count'])
             l_chap_number = int(l_chap['chapter_number'])
 
-            if l_chap_number == 19:
+            if l_chap_number == 3:
                 break
 
             # TEI chapter start (<div1>)
@@ -660,7 +660,7 @@ if __name__ == '__main__':
 
                 l_sk_out = re.sub(r'\s+', ' ',
                                   re.sub(r'॥\s*(\d+\.\d+)\s*॥', lambda m: f' ॥ {devtrans.wx2dev(m.group(1))} ॥',
-                                         re.sub('\s*।\s*', '<caesura>',
+                                         re.sub('\s*।\s*', '<caesura/>',
                                                 re.sub(r'<[^>]+>', '',
                                                        l_sk.replace('।।', '॥')
                                                        )
