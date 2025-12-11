@@ -727,8 +727,8 @@ if __name__ == '__main__':
                     t = re.sub(rf'\s+([.?:;!])', r'\1', t)
 
                     l_bg_out.write(f'{l_indent_prefix}<seg type="wfw-unit">{devtrans.iast2dev(k)}\n'
-                                   f'{l_indent_prefix}    <interp type="transliteration" standard="IAST">{k}</interp>\n'
-                                   f'{l_indent_prefix}    <interp type="transliteration" standard="IAST">{l_form}</interp>\n'
+                                   f'{l_indent_prefix}    <interp type="transliteration" source="ISKCON" standard="IAST">{k}</interp>\n'
+                                   f'{l_indent_prefix}    <interp type="transliteration" source="INRIA" standard="IAST">{l_form}</interp>\n'
                                    f'{l_indent_prefix}    <interp type="translation" source="ISKCON">{t}</interp>\n'
                                    f'{l_indent_prefix}    <interpGrp type="morphology" source="INRIA">\n' +
                                    l_interp_list_join +
