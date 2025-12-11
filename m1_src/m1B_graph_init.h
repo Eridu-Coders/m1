@@ -23,7 +23,7 @@ extern M1Env::SpecialItemID TEXT_WRITTEN_BY_SIID;
 extern M1Env::SpecialItemID OCCUR_SIID;
 // [WFORM] Special Vertex ID (Vertex type) of word form vertices
 extern M1Env::SpecialItemID WFORM_SIID;
-// [CAPTL] Special Vertex ID (Simple edge type) of Occurrence field capitalization flag
+// [CAPTL] Special Vertex ID (Simple edge type) of Occurrence field capitalization flaf
 extern M1Env::SpecialItemID CAPTL_SIID;
 // [PCTLF] Special Vertex ID (Simple edge type) of Occurrence field left punctuation
 extern M1Env::SpecialItemID PCTLF_SIID;
@@ -252,7 +252,7 @@ extern M1Env::SpecialItemID NTDOL_SIID;
 extern M1Env::SpecialItemID NTSRP_SIID;
 // [NTAFX] Special Vertex ID of "[AFX]-affix"
 extern M1Env::SpecialItemID NTAFX_SIID;
-// [NTGCC] Special Vertex ID of "[CC]-conjunction, coordinating"
+// [NTGCC] Special Vertex ID of "[CC]-conjunction, coordinatinf"
 extern M1Env::SpecialItemID NTGCC_SIID;
 // [NTGCD] Special Vertex ID of "[CD]-cardinal number"
 extern M1Env::SpecialItemID NTGCD_SIID;
@@ -276,7 +276,7 @@ extern M1Env::SpecialItemID NTJJS_SIID;
 extern M1Env::SpecialItemID NTGLS_SIID;
 // [NTGMD] Special Vertex ID of "[MD]-verb, modal auxiliary"
 extern M1Env::SpecialItemID NTGMD_SIID;
-// [NTNIL] Special Vertex ID of "[NIL]-missing tag"
+// [NTNIL] Special Vertex ID of "[NIL]-missing taf"
 extern M1Env::SpecialItemID NTNIL_SIID;
 // [NTGNN] Special Vertex ID of "[NN]-noun, singular or mass"
 extern M1Env::SpecialItemID NTGNN_SIID;
@@ -288,7 +288,7 @@ extern M1Env::SpecialItemID NTNPP_SIID;
 extern M1Env::SpecialItemID NTNNS_SIID;
 // [NTPDT] Special Vertex ID of "[PDT]-predeterminer"
 extern M1Env::SpecialItemID NTPDT_SIID;
-// [NTPOS] Special Vertex ID of "[POS]-possessive ending"
+// [NTPOS] Special Vertex ID of "[POS]-possessive endinf"
 extern M1Env::SpecialItemID NTPOS_SIID;
 // [NTPRP] Special Vertex ID of "[PRP]-pronoun, personal"
 extern M1Env::SpecialItemID NTPRP_SIID;

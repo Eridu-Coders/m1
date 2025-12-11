@@ -23,7 +23,7 @@ M1Env::SpecialItemID M1Env::TEXT_WRITTEN_BY_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::OCCUR_SIID = G_NONEX_SI_ID;
 // [WFORM] Special Vertex ID (Vertex type) of word form vertices
 M1Env::SpecialItemID M1Env::WFORM_SIID = G_NONEX_SI_ID;
-// [CAPTL] Special Vertex ID (Simple edge type) of Occurrence field capitalization flag
+// [CAPTL] Special Vertex ID (Simple edge type) of Occurrence field capitalization flaf
 M1Env::SpecialItemID M1Env::CAPTL_SIID = G_NONEX_SI_ID;
 // [PCTLF] Special Vertex ID (Simple edge type) of Occurrence field left punctuation
 M1Env::SpecialItemID M1Env::PCTLF_SIID = G_NONEX_SI_ID;
@@ -456,7 +456,7 @@ void M1Env::GraphInit::init_base(){
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SPECIAL_EDGE, "OCCUR", M1Env::OCCURRENCE_ICON_PATH);
     // Special Vertex ID (Vertex type) of word form vertices
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_IS_ICON_TYPE, "WFORM", M1Env::WFORM_ICON_PATH);
-    // Special Vertex ID (Simple edge type) of Occurrence field capitalization flag
+    // Special Vertex ID (Simple edge type) of Occurrence field capitalization flaf
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "CAPTL", nullptr);
     // Special Vertex ID (Simple edge type) of Occurrence field left punctuation
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PCTLF", nullptr);
@@ -1424,13 +1424,13 @@ void M1Env::GraphInit::init_base(){
     l_csacc->setType("TYPE_");
     l_csacc->setType("CASE_");
 
-    // creation of "[Erg]-ergative"
-    qCDebug(g_cat_silence) << QString("Creating <[CSERG]-[Erg]-ergative> item");
+    // creation of "[Erf]-ergative"
+    qCDebug(g_cat_silence) << QString("Creating <[CSERG]-[Erf]-ergative> item");
     M1Store::Item_lv2* l_cserg = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[Erg]-ergative",
+        "[Erf]-ergative",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -2220,13 +2220,13 @@ void M1Env::GraphInit::init_base(){
     l_dgabs->setType("TYPE_");
     l_dgabs->setType("DEGRE");
 
-    // creation of "[Aug]-augmentative"
-    qCDebug(g_cat_silence) << QString("Creating <[DGAUG]-[Aug]-augmentative> item");
+    // creation of "[Auf]-augmentative"
+    qCDebug(g_cat_silence) << QString("Creating <[DGAUG]-[Auf]-augmentative> item");
     M1Store::Item_lv2* l_dgaug = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[Aug]-augmentative",
+        "[Auf]-augmentative",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -3316,13 +3316,13 @@ void M1Env::GraphInit::init_base(){
     l_ncb15->setType("TYPE_");
     l_ncb15->setType("NCNLS");
 
-    // creation of "[Bantu16]-definite location, close to something"
-    qCDebug(g_cat_silence) << QString("Creating <[NCB16]-[Bantu16]-definite location, close to something> item");
+    // creation of "[Bantu16]-definite location, close to somethinf"
+    qCDebug(g_cat_silence) << QString("Creating <[NCB16]-[Bantu16]-definite location, close to somethinf> item");
     M1Store::Item_lv2* l_ncb16 = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[Bantu16]-definite location, close to something",
+        "[Bantu16]-definite location, close to somethinf",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -3348,13 +3348,13 @@ void M1Env::GraphInit::init_base(){
     l_ncb17->setType("TYPE_");
     l_ncb17->setType("NCNLS");
 
-    // creation of "[Bantu18]-definite location, inside something"
-    qCDebug(g_cat_silence) << QString("Creating <[NCB18]-[Bantu18]-definite location, inside something> item");
+    // creation of "[Bantu18]-definite location, inside somethinf"
+    qCDebug(g_cat_silence) << QString("Creating <[NCB18]-[Bantu18]-definite location, inside somethinf> item");
     M1Store::Item_lv2* l_ncb18 = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[Bantu18]-definite location, inside something",
+        "[Bantu18]-definite location, inside somethinf",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -3604,13 +3604,13 @@ void M1Env::GraphInit::init_base(){
     l_ncw10->setType("TYPE_");
     l_ncw10->setType("NCNLS");
 
-    // creation of "[Wol11]-Wolof noun class 11/f (location)"
-    qCDebug(g_cat_silence) << QString("Creating <[NCW11]-[Wol11]-Wolof noun class 11/f (location)> item");
+    // creation of "[Wol11]-Wolof noun class 11/g (location)"
+    qCDebug(g_cat_silence) << QString("Creating <[NCW11]-[Wol11]-Wolof noun class 11/g (location)> item");
     M1Store::Item_lv2* l_ncw11 = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[Wol11]-Wolof noun class 11/f (location)",
+        "[Wol11]-Wolof noun class 11/g (location)",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -4111,13 +4111,13 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_polit->setType("GRATT");
 
-    // creation of "[Elev]-referent elevating"
-    qCDebug(g_cat_silence) << QString("Creating <[PLELV]-[Elev]-referent elevating> item");
+    // creation of "[Elev]-referent elevatinf"
+    qCDebug(g_cat_silence) << QString("Creating <[PLELV]-[Elev]-referent elevatinf> item");
     M1Store::Item_lv2* l_plelv = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[Elev]-referent elevating",
+        "[Elev]-referent elevatinf",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -4143,13 +4143,13 @@ void M1Env::GraphInit::init_base(){
     l_plfrm->setType("TYPE_");
     l_plfrm->setType("POLIT");
 
-    // creation of "[Humb]-speaker humbling"
-    qCDebug(g_cat_silence) << QString("Creating <[PLHMB]-[Humb]-speaker humbling> item");
+    // creation of "[Humb]-speaker humblinf"
+    qCDebug(g_cat_silence) << QString("Creating <[PLHMB]-[Humb]-speaker humblinf> item");
     M1Store::Item_lv2* l_plhmb = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[Humb]-speaker humbling",
+        "[Humb]-speaker humblinf",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5415,13 +5415,13 @@ void M1Env::GraphInit::init_base(){
     l_ntafx->setType("TYPE_");
     l_ntafx->setType("NLTAG");
 
-    // creation of "[CC]-conjunction, coordinating"
-    qCDebug(g_cat_silence) << QString("Creating <[NTGCC]-[CC]-conjunction, coordinating> item");
+    // creation of "[CC]-conjunction, coordinatinf"
+    qCDebug(g_cat_silence) << QString("Creating <[NTGCC]-[CC]-conjunction, coordinatinf> item");
     M1Store::Item_lv2* l_ntgcc = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[CC]-conjunction, coordinating",
+        "[CC]-conjunction, coordinatinf",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5607,13 +5607,13 @@ void M1Env::GraphInit::init_base(){
     l_ntgmd->setType("TYPE_");
     l_ntgmd->setType("NLTAG");
 
-    // creation of "[NIL]-missing tag"
-    qCDebug(g_cat_silence) << QString("Creating <[NTNIL]-[NIL]-missing tag> item");
+    // creation of "[NIL]-missing taf"
+    qCDebug(g_cat_silence) << QString("Creating <[NTNIL]-[NIL]-missing taf> item");
     M1Store::Item_lv2* l_ntnil = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[NIL]-missing tag",
+        "[NIL]-missing taf",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5703,13 +5703,13 @@ void M1Env::GraphInit::init_base(){
     l_ntpdt->setType("TYPE_");
     l_ntpdt->setType("NLTAG");
 
-    // creation of "[POS]-possessive ending"
-    qCDebug(g_cat_silence) << QString("Creating <[NTPOS]-[POS]-possessive ending> item");
+    // creation of "[POS]-possessive endinf"
+    qCDebug(g_cat_silence) << QString("Creating <[NTPOS]-[POS]-possessive endinf> item");
     M1Store::Item_lv2* l_ntpos = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[POS]-possessive ending",
+        "[POS]-possessive endinf",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
