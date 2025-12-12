@@ -27,7 +27,7 @@ namespace M1Env{
 /**
  * @brief The M1Exception class
  */
-/*
+
 class M1Exception : public std::exception{
 private:
     QString m_message;
@@ -42,7 +42,7 @@ public:
 
     virtual char* what(){return m_tmp.data();}
 };
-*/
+
 
 /**
  * @brief The M1EnvStatic class
