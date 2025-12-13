@@ -16,8 +16,83 @@ import html
 from indic_transliteration import sanscript
 from indic_transliteration.sanscript import transliterate
 
+g_count_grammar = 0
+g_grammar_values = dict()
+g_case_values = dict()
+g_tense_values = dict()
+g_voice_values = dict()
+
+g_iskcon_missing = []
+g_iskcon_total = 0
+
 g_indent = '    '
 g_prefix_stack = []
+
+g_grammar_translation = {
+    'abl.': 'CSABL',
+    'acc.': 'CSACC',
+    'dat.': 'CSDAT',
+    'g.': 'CSGEN',
+    'i.': 'CSINS',
+    'loc.': 'CSLOC',
+    'nom.': 'CSNOM',
+    'voc.': 'CSVOC',
+    'f.': 'GNFEM',
+    'm.': 'GNMSC',
+    'n.': 'GNDNT',
+    'ben.': 'MDBEN',
+    'cond.': 'MDCND',
+    'des.': 'MDDES',
+    'imp.': 'MDIMP',
+    'inj.': 'MDJUS',
+    'int.': 'MDITS',
+    'opt.': 'MDOPT',
+    'subj.': 'MDSUB',
+    'du.': 'NMBDL',
+    'pl.': 'NMPLR',
+    'sg.': 'NMSNG',
+    'pfp.': 'VFPRT TNFUT VCPSS',
+    'pfu.': 'VFPRT TNFUT VCACT',
+    'pp.': 'VFPRT TNPST VCPSS',
+    'ppa.': 'VFPRT TNPST VCACT',
+    'ppf.': 'VFPRT TNPQP VCACT',
+    'ppr.': 'VFPRT TNPRS VCACT',
+    '1': 'PRSN1',
+    '2': 'PRSN2',
+    '3': 'PRSN3',
+    'adv.': 'NPADV',
+    'ind.': 'NPIND',
+    'prep.': 'NPPRT',
+    'iic.': 'IICOM',
+    'iiv.': 'IIVRB',
+    'aor.': 'TNPST',
+    'fut.': 'TNFUT',
+    'impft.': 'TNIMP',
+    'pft.': 'TNPQP',
+    'pr.': 'TNPRS',
+    '[1]': 'VRCN1',
+    '[10]': 'VRC10',
+    '[2]': 'VRCN2',
+    '[3]': 'VRCN3',
+    '[4]': 'VRCN4',
+    '[5]': 'VRCN5',
+    '[6]': 'VRCN6',
+    '[7]': 'VRCN7',
+    '[8]': 'VRCN8',
+    '[9]': 'VRCN9',
+    '[vn.]': 'VFVNN',
+    'abs.': 'VFGER',
+    'ca.': 'VFCAU',
+    'inf.': 'VFINF',
+    'ac.': 'VCACT',
+    'mo.': 'VCMID',
+    'ps.': 'VCPSS',
+    'act.': '??ACT',
+    'agt.': '??AGT',
+    'per.': '??PER',
+    'tasil': '??TSL',
+    '*': '*'
+}
 
 #                   re.sub(r'॥(\d+\.\d+)॥(\S)', r'॥\1॥ \2',
 #                   re.sub(r'॥\s*(\d+\.\d+)\s*॥', r'॥\1॥',
@@ -41,14 +116,6 @@ def cleanup_add_br(s):
 
 def author_key(s):
     return re.sub(f'[{string.punctuation}]+', '', universal_cleanup(s).lower()).replace(' ', '_')
-
-g_count_grammar = 0
-g_grammar_values = dict()
-g_case_values = dict()
-g_tense_values = dict()
-g_voice_values = dict()
-
-g_iskcon_missing = []
 
 def record_grammar(p_gr_list):
     global g_count_grammar
@@ -98,6 +165,16 @@ def dump_grammar_values():
     for l_key, l_value in sorted(list(g_voice_values.items()), key=lambda l_item: l_item[1]):
         print(f'    {l_value:5} {l_key}')
 
+g_grammar_abbr_dict = dict()
+
+def store_grammar_values(p_gv_list):
+    global g_grammar_abbr_dict
+
+    for l_gv in p_gv_list:
+        for l_grabr in l_gv.strip().split(' '):
+            g_grammar_abbr_dict.setdefault(l_grabr, set()).add(l_gv)
+
+    return p_gv_list
 
 def inria_recur(p_inner, p_background, p_pos, p_depth=0):
     # print(f"{'.' * p_pos}{p_inner[p_pos:]} (p_depth: {p_depth})")
@@ -137,7 +214,10 @@ def inria_recur(p_inner, p_background, p_pos, p_depth=0):
                 p_pos += len(l_match_grammar.group(0))
                 l_grammar = l_match_grammar.group(1).strip()
                 # print(f'{" " * (p_depth*4)}GR {l_grammar} ({g_count_grammar})')
-                l_grammar_l = [p_background] + [f'{s.strip()}' for s in l_grammar.split('|')]
+
+                l_grammar_values = store_grammar_values([f'{s.strip()}' for s in l_grammar.split('|')])
+                l_grammar_values = [' '.join([g_grammar_translation[v] for v in l_gv.split(' ')]) for l_gv in l_grammar_values]
+                l_grammar_l = [p_background] + l_grammar_values
 
                 record_grammar(l_grammar_l)
 
@@ -305,9 +385,6 @@ g_footer = """</text>
 </TEI>
 """
 
-g_iskcon_missing = []
-g_iskcon_total = 0
-
 g_author_normalize = {
     'Sri Abhinavgupta': 'Sri Abhinavagupta',
     'Sri Abhinav Gupta': 'Sri Abhinavagupta'
@@ -436,6 +513,7 @@ if __name__ == '__main__':
                     l_sk_local = l_json_local['slok']
                     l_translit_local = l_json_local['transliteration']
 
+                    l_source = "Kaggle/Bhagavad Gita API Database"
                     for k in l_json_local:
                         # l_txt = re.sub(r'\s+', ' ', str(l_json_local[k]))
                         # print(f'[{k:10}] {l_txt}')
@@ -450,9 +528,9 @@ if __name__ == '__main__':
                                 l_text = universal_cleanup(d[l_type])
                                 l_author_key = author_key(l_author_local)
                                 if z == 't':
-                                    l_local_translations[l_author_key] = [l_author_local, l_language_local, l_text]
+                                    l_local_translations[l_author_key] = [l_author_local, l_language_local, l_text, l_source]
                                 else:
-                                    l_local_commentaries[l_author_key] = [l_author_local, l_language_local, l_text]
+                                    l_local_commentaries[l_author_key] = [l_author_local, l_language_local, l_text, l_source]
                     print('=============================================', l_local_file)
                     for n in l_local_translations.keys():
                         print(f'(t) {n:35}: {l_local_translations[n]}')
@@ -461,17 +539,18 @@ if __name__ == '__main__':
                     print('=============================================', l_local_file)
 
                 # merging of commentaries and translations
+                l_source = "Ved Vyas Foundation"
                 for t in l_translations:
                     l_text = universal_cleanup(t['description'])
                     l_author = author_normalize(universal_cleanup(t['author_name']))
                     l_language = universal_cleanup(t['language'])
-                    l_local_translations[author_key(l_author)] = [l_author, l_language, l_text]
+                    l_local_translations[author_key(l_author)] = [l_author, l_language, l_text, l_source]
 
                 for c in l_commentaries:
                     l_text = cleanup_add_br(c['description'])
                     l_author = author_normalize(universal_cleanup(c['author_name']))
                     l_language = universal_cleanup(c['language'])
-                    l_local_commentaries[author_key(l_author)] = [l_author, l_language, l_text]
+                    l_local_commentaries[author_key(l_author)] = [l_author, l_language, l_text, l_source]
 
                 # Adding commentaries and translations from Gita Supersite to l_local_commentaries/l_local_translations
                 # <div class="views-field views-field-field-etadi"
@@ -481,6 +560,7 @@ if __name__ == '__main__':
                 l_gs_count_item = 0
                 l_gs_count_com = 0
                 l_gs_count_tran = 0
+                l_source = "Gita Supersite"
                 for l_match_gs_tc in re.finditer(
                         r'<div class="views-field views-field-field-([a-z]+).*?<font color="#2c44bd" size="4px"><b>([^<]+)</b></font></p>(.*?)</div>',
                         l_html_gs_corrected, flags=re.MULTILINE | re.DOTALL):
@@ -528,9 +608,9 @@ if __name__ == '__main__':
                             l_author_gs = author_normalize(l_original_author) + f' (transl. {l_author_gs})'
 
                     if l_is_commentary:
-                        l_local_commentaries[author_key(l_author_gs)] = [l_author_gs, l_language_gs, l_body_gs]
+                        l_local_commentaries[author_key(l_author_gs)] = [l_author_gs, l_language_gs, l_body_gs, l_source]
                     else:
-                        l_local_translations[author_key(l_author_gs)] = [l_author_gs, l_language_gs, l_body_gs]
+                        l_local_translations[author_key(l_author_gs)] = [l_author_gs, l_language_gs, l_body_gs, l_source]
 
                     l_gs_count_item += 1
                 print(f'Gita Supersite: {l_gs_count_com} commentaries and {l_gs_count_tran} translations')
@@ -748,12 +828,13 @@ if __name__ == '__main__':
                 l_indent_prefix += g_indent
 
                 for l_ak in l_local_translations:
-                    l_author, l_language, l_text = l_local_translations[l_ak]
+                    l_author, l_language, l_text, lsource = l_local_translations[l_ak]
                     l_text = sloka_numbers_normalize(l_text)
                     print(f'      Description (t): ', l_text)
                     print(f'      Author         : ', l_author)
                     print(f'      Language       : ', l_language)
-                    l_bg_out.write(f'{l_indent_prefix}<div4 type="translation" xml:lang="{l_language}"><author>{l_author}</author>{l_text}</div4>\n')
+                    print(f'      Source         : ', lsource)
+                    l_bg_out.write(f'{l_indent_prefix}<div4 type="translation" source="{lsource}" xml:lang="{l_language}"><author>{l_author}</author>{l_text}</div4>\n')
 
                 # end of translations block (<div3>)
                 l_bg_out.write(f'{l_indent_prefix}<!-- End of translations block for {l_verse_id} -->\n')
@@ -768,12 +849,13 @@ if __name__ == '__main__':
                 l_indent_prefix += g_indent
 
                 for l_ak in l_local_commentaries:
-                    l_author, l_language, l_text = l_local_commentaries[l_ak]
+                    l_author, l_language, l_text, lsource = l_local_commentaries[l_ak]
                     l_text = sloka_numbers_normalize(l_text)
                     print(f'      Description (c): ', l_text)
                     print(f'      Author         : ', l_author)
                     print(f'      Language       : ', l_language)
-                    l_bg_out.write(f'{l_indent_prefix}<div4 type="commentary" xml:lang="{l_language}"><author>{l_author}</author>{l_text}</div4>\n')
+                    print(f'      Source         : ', lsource)
+                    l_bg_out.write(f'{l_indent_prefix}<div4 type="commentary" source="{lsource}" xml:lang="{l_language}"><author>{l_author}</author>{l_text}</div4>\n')
 
                 # end of commentaries block (<div3>)
                 l_bg_out.write(f'{l_indent_prefix}<!-- End of commentaries block for {l_verse_id} -->\n')
@@ -797,6 +879,12 @@ if __name__ == '__main__':
         print('\nMissing ISKCON slokas ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
         for l_ref in g_iskcon_missing:
             print(l_ref)
+
+        print('\nGrammar Abbreviations ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+        l_ga_list = list(sorted(list(g_grammar_abbr_dict.keys())))
+        with open("INRIA_used_abbr.csv", "w") as l_fout:
+            for l_ga in l_ga_list:
+                l_fout.write(f'{l_ga:4}; {g_grammar_abbr_dict[l_ga]}\n')
 
         # end of TEI file
         l_bg_out.write(g_footer)

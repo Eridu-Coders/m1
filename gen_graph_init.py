@@ -128,10 +128,12 @@ g_attr_values = [
         ('Neut', 'GNDNT', 'neuter gender'),
     ]),
     ('Mood', 'mood', [
+        ('Ben', 'MDBEN', 'benedictive / precative'),
         ('Adm', 'MDADM', 'admirative'),
         ('Cnd', 'MDCND', 'conditional'),
         ('Des', 'MDDES', 'desiderative'),
         ('Imp', 'MDIMP', 'imperative'),
+        ('Its', 'MDITS', 'intensive'),
         ('Ind', 'MDIND', 'indicative or realis'),
         ('Int', 'MDINT', 'interrogative'),
         ('Irr', 'MDIRR', 'irrealis'),
@@ -240,6 +242,10 @@ g_attr_values = [
     ('Reflex', 'reflexive', [
         ('Yes', 'RFYES', 'it is reflexive'),
     ]),
+    ('II', 'In Initio', [
+        ('iic', 'IICOM', 'in initio compositi'),
+        ('iiv', 'IIVRB', 'in initio verbi'),
+    ]),
     ('Tense', 'tense', [
         ('Fut', 'TNFUT', 'future tense'),
         ('Imp', 'TNIMP', 'imperfect'),
@@ -258,7 +264,20 @@ g_attr_values = [
         ('Inf', 'VFINF', 'infinitive'),
         ('Part', 'VFPRT', 'participle, verbal adjective'),
         ('Sup', 'VFSUP', 'supine'),
+        ('Cau', 'VFCAU', 'causative'),
         ('Vnoun', 'VFVNN', 'verbal noun, masdar'),
+    ]),
+    ('VerbConj', 'verb conjugation', [
+        ('[1]', 'VRCN1', 'first conjugation'),
+        ('[2]', 'VRCN2', 'second conjugation'),
+        ('[3]', 'VRCN3', 'third conjugation'),
+        ('[4]', 'VRCN4', '4th conjugation'),
+        ('[5]', 'VRCN5', '5th conjugation'),
+        ('[6]', 'VRCN6', '6th conjugation'),
+        ('[7]', 'VRCN7', '7th conjugation'),
+        ('[8]', 'VRCN8', '8th conjugation'),
+        ('[9]', 'VRCN9', '9th conjugation'),
+        ('[10]', 'VRC10', '10th conjugation'),
     ]),
     ('VerbType', 'verb type', [
         ('Aux', 'VTAUX', 'auxiliary verb'),
@@ -266,6 +285,12 @@ g_attr_values = [
         ('Mod', 'VTMOD', 'modal verb'),
         ('Light', 'VTLGH', 'light (support) verb'),
         ('Quasi', 'VTRQS', 'quasi-verb'),
+    ]),
+    ('Undecided', 'undecided codes', [
+        ('act', '??ACT', ''),
+        ('agt', '??AGT', ''),
+        ('per', '??PER', ''),
+        ('tasil', '??TSL', ''),
     ]),
     ('Voice', 'voice', [
         ('Act', 'VCACT', 'active or actor-focus voice'),
@@ -288,6 +313,7 @@ g_nlp_pos_list = [
     ('NPAUX', 'AUX', 'auxiliary'),
     ('NPCNJ', 'CCONJ', 'coordinating conjunction'),
     ('NPDET', 'DET', 'determiner'),
+    ('NPIND', 'IND', 'indeclinable'),
     ('NPINT', 'INTJ', 'interjection'),
     ('NPNON', 'NOUN', 'noun'),
     ('NPNUM', 'NUM', 'numeral'),

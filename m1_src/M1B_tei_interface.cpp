@@ -1,137 +1,26 @@
-#include <QApplication>
-#include <QRegularExpression>
 #include <QXmlStreamReader>
 
-#include "m1D_main_window.h"
-#include "m1A_env.h"
 #include "M1B_tei_interface.h"
-#include "m1B_store.h"
-#include "m1B_graph_init.h"
-#include "m1B_lv2_item.h"
-#include "m1C_interp.h"
+#include "m1A_env.h"
+#include "m1A_constants.h"
 
-#include <boost/program_options.hpp>
-#include <iostream>
-
-namespace po = boost::program_options;
-
-Q_LOGGING_CATEGORY(g_cat_main, "m1_main")
-
-// cloc count
-// cloc --by-file-by-lang --exclude-content="M1Env::GraphInit::init_base()" --include-lang=C++,"C/C++ Header",Python --fullpath --not-match-d='^build.*|.*stringcase.*' *
-
-QRegularExpression g_re_punc(R"(^(\W*)(\w+)(\W*))");
-QRegularExpression g_re_space(R"(\s+)");
-
-void loadEnoch();
-int loadGita();
-bool loadTei(bool p_validate=false);
-
-int main(int argc, char *argv[])
-{
-    // printf("Xa");
-    po::options_description l_desc("Allowed options");
-    // printf("Xb");
-    l_desc.add_options()
-        ("help,h", "produce help message")
-        ("load-gita,g", "Load Bhagavad Gita test data")
-        ("load-plato,p", "Load The Republic of Plato test data")
-        ("load-tei,t", "Loads a TEI file")
-        ("reset,r", "Reset (empty) storage")
-    ;
-
-    // printf("X");
-    po::variables_map l_program_options_vm;
-    // printf("Y");
-    po::store(po::parse_command_line(argc, argv, l_desc), l_program_options_vm);
-    // printf("Z");
-    po::notify(l_program_options_vm);
-    // printf("T");
-
-    M1Env::EnvStatic::init();
-    M1Env::EnvStatic::setNormalFilter("*.debug=true\n"
-                                        "store.*=false\n"
-                                        "lv0.*=false\n"
-                                        "lv1.*=false\n"
-                                        "lv2.*=false\n"
-                                        // "lv2.g_cat_lv2_constructors=true\n"
-                                        "qt.*.debug=false");
-
-    M1_FUNC_ENTRY(g_cat_main, QString("App starts"))
-
-    if(l_program_options_vm.count("help")) {
-        std::cout << l_desc << "\n";
-        return 1;
+void M1Store::TEIInterface::init(){}
+void M1Store::TEIInterface::loadTei(const QString& p_file_path){
+    if(QFile::exists(p_file_path)){
+        loadTeiInternal(p_file_path);
+        // loadTeiInternal(p_file_path, true);
     }
-
-    // screen logging excluded categories
-    M1Store::EnvStatic::addExcludeCatergoryForScreen("lv0.item_type");
-    M1Store::EnvStatic::addExcludeCatergoryForScreen("lv0.special_item");
-    M1Store::EnvStatic::addExcludeCatergoryForScreen("lv0.members_access");
-    M1Store::EnvStatic::addExcludeCatergoryForScreen("lv1.members_access");
-    M1Store::EnvStatic::addExcludeCatergoryForScreen("lv2.constructors");
-    M1Store::EnvStatic::addExcludeCatergoryForScreen("lv2.members_access");
-    // M1Store::EnvStatic::addExcludeCatergoryForScreen("lv2.iterators");
-    M1Store::EnvStatic::addExcludeCatergoryForScreen("lv2.test");
-    M1Store::EnvStatic::addExcludeCatergoryForScreen("store.storage");
-
-    if(l_program_options_vm.count("reset")) M1Store::StorageStatic::storeSetUp(true);
-    else M1Store::StorageStatic::storeSetUp(false);
-
-    M1Env::EnvStatic::setNormalFilter("*.debug=true\n"
-                                        "store.*=false\n"
-                                        "lv0.*=false\n"
-                                        "lv1.*=false\n"
-                                        "lv2.*=false\n"
-                                        // "lv2.type_iterators=true\n"
-                                        "interp.*=false\n"
-                                        "interp.dev=true\n"
-                                        // "interp.drag=true\n"
-                                        "tree_display=false\n"
-                                        "passages_panel=false\n"
-                                        "main_window=false\n"
-                                        "qt.*.debug=false");
-
-    M1MidPlane::Interp::init();
-
-    M1Store::TEIInterface::init();
-    // loadEnoch();
-    // if(l_program_options_vm.count("load-gita")) loadGita();
-    if(l_program_options_vm.count("load-plato")) M1Store::GraphInit::init_plato();
-    if(l_program_options_vm.count("load-tei")) M1Store::TEIInterface::loadTei("../gitaDnl/bg_final_ex.xml");
-
-    // throw M1Env::M1Exception("", 0);
-    QApplication a(argc, argv);
-    M1UI::MainWindow w;
-    w.show();
-    int l_ret = a.exec();
-
-    M1Store::StorageStatic::storeShutDown();
-    qCDebug(g_cat_main) << "App ends";
-    M1_FUNC_EXIT
-    M1Env::EnvStatic::close();
-
-    printf("Hurrah! No Core Dump ... Returning %d\n", l_ret);
-    return l_ret;
-}
-
-QDataStream& operator<<(QDataStream &l_out, const QXmlStreamAttribute &a){
-    QString l_rep = QString("%1: %2").arg(a.qualifiedName()).arg(a.value());
-    qCDebug(g_cat_main).noquote() << l_rep;
-    l_out << l_rep.toUtf8().constData();
-    return l_out;
 }
 
 /**
- * @brief skipUntil
+ * @brief M1Store::TEIInterface::skipUntil
  * @param p_indent_count
  * @param p_indent
  * @param p_xml_reader
  * @param p_elem_close
  * @return
  */
-/*
-QString skipUntil(int p_indent_count, QString& p_indent, QXmlStreamReader& p_xml_reader, const QString& p_elem_close){
+QString M1Store::TEIInterface::skipUntil(int p_indent_count, QString& p_indent, QXmlStreamReader& p_xml_reader, const QString& p_elem_close){
     QString l_ret;
     qCDebug(g_cat_main).noquote() << p_indent << QString("Skip until <%1>").arg(p_elem_close);
     p_indent += QString(" ").repeated(p_indent_count);
@@ -156,16 +45,14 @@ QString skipUntil(int p_indent_count, QString& p_indent, QXmlStreamReader& p_xml
     }
     return l_ret;
 }
-*/
+
 /**
- * @brief loadTei
- * @param p_validate
- * @return
+ * @brief M1Store::TEIInterface::loadTeiInternal
+ * @param p_full_load
  */
-/*
-bool loadTei(bool p_validate){
+void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_full_load){
     QXmlStreamReader l_xml;
-    QFile l_fin_tei("../gitaDnl/bg_final_ex.xml");
+    QFile l_fin_tei(p_file_path);
     qCDebug(g_cat_main) << "Exists: " << l_fin_tei.exists();
 
     // the xml stream parse
@@ -228,10 +115,10 @@ bool loadTei(bool p_validate){
         // end of TEI header
         else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "teiHeader"){
             qCDebug(g_cat_main).noquote() << l_indent << QString("<teiHeader/> %1 (%2) [%3] author: %4")
-                                                             .arg(l_title)
-                                                             .arg(l_alt_title)
-                                                             .arg(l_sub_title)
-                                                             .arg(l_author_text);
+            .arg(l_title)
+                .arg(l_alt_title)
+                .arg(l_sub_title)
+                .arg(l_author_text);
         }
         // chapter start
         else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "div1"){
@@ -267,9 +154,9 @@ bool loadTei(bool p_validate){
             if(l_tt_sk2 != QXmlStreamReader::Characters) qFatal() << QString("No Characters after caesura: %1").arg(l_tt_sk2);
             QString l_sloka_text2 = l_xml_reader.text().toString().trimmed();
             qCDebug(g_cat_main).noquote() << l_indent << QString("Sloka %1.%2: %3")
-                                                 .arg(l_cur_chapter_number)
-                                                 .arg(l_cur_sloka_number)
-                                                 .arg(QString("%1 । %2").arg(l_sloka_text1).arg(l_sloka_text2));
+                                                             .arg(l_cur_chapter_number)
+                                                             .arg(l_cur_sloka_number)
+                                                             .arg(QString("%1 । %2").arg(l_sloka_text1).arg(l_sloka_text2));
         }
         // sloka transliteration
         else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "seg"){
@@ -348,22 +235,23 @@ bool loadTei(bool p_validate){
                             QString l_lemma = l_xml_reader.attributes().value("lemma").toString();
                             QString l_pos = l_xml_reader.attributes().value("pos").toString();
                             QString l_ref = l_xml_reader.attributes().value("lemmaRef").toString();
+                            QString l_grv = l_xml_reader.attributes().value("msd").toString();
 
                             QXmlStreamReader::TokenType l_tt_interp = l_xml_reader.readNext();
                             if(l_tt_interp != QXmlStreamReader::Characters) throw M1Env::M1Exception("<interp type=morphology> not followed by Characters", 0);
 
                             QString l_form_text = l_xml_reader.text().toString().trimmed();
-                            qCDebug(g_cat_main).noquote() << l_indent << QString("<interp type=\"%1\" lemma=\"%2\" pos=\"%3\" lemmaRef=\"%4\"> %5")
-                                                                             .arg(l_type).arg(l_lemma).arg(l_pos).arg(l_ref).arg(l_form_text);
+                            qCDebug(g_cat_main).noquote() << l_indent << QString("<interp type=\"%1\" lemma=\"%2\" pos=\"%3\" msg=\"%4\" lemmaRef=\"%5\"> %6")
+                                                                             .arg(l_type).arg(l_lemma).arg(l_pos).arg(l_grv).arg(l_ref).arg(l_form_text);
                         }
                     }
-                    // wfw morphology (<interpGrp>)
+                    // start wfw morphology (<interpGrp>)
                     else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "interpGrp"){
                         QString l_type = l_xml_reader.attributes().value("type").toString();
                         if(l_type == "morphology"){
                             l_found_wfw_morphology = true;
                             qCDebug(g_cat_main).noquote() << l_indent << QString("<interpGrp> start of INRIA morphology block for sloka %1.%2 word %3")
-                                                                 .arg(l_cur_chapter_number).arg(l_cur_sloka_number).arg(l_cur_word);
+                                                                             .arg(l_cur_chapter_number).arg(l_cur_sloka_number).arg(l_cur_word);
                             l_indent += QString(" ").repeated(l_indent_count);
                         }
                     }
@@ -489,26 +377,5 @@ bool loadTei(bool p_validate){
     if(! l_found_at_least_one_chapter) throw M1Env::M1Exception("No chapters", 0);
 
     std::_Exit(0);
-}
-*/
-//qCDebug(g_cat_main).noquote() << "A";
-// QXmlStreamAttributes& l_att_2 = l_att_1;
-// QByteArray l_att_array(10000, '\0');
-//qCDebug(g_cat_main).noquote() << "B";
-// QDataStream l_att_stream(&l_att_array, QIODeviceBase::ReadWrite);
-// QDataStream& l_att_str_ref = l_att_str;
-//qCDebug(g_cat_main).noquote() << "C";
-// l_att_stream << dynamic_cast<QList<QXmlStreamAttribute>&>(l_att_1);
-// l_att_stream.device()->reset();
-/*qCDebug(g_cat_main).noquote() << "D" <<
-                l_att_array.size() <<
-                QString("[%1]").arg(l_att_array.at(0)) <<
-                l_att_stream.status() <<
-                l_att_stream.atEnd() <<
-                (l_att_stream.device() == nullptr);*/
-// QString s = QStringDecoder("utf8").decode(l_att_stream.device()->readAll());
-// QString s = QStringDecoder("utf8").decode(l_att_array.data());
-// qCDebug(g_cat_main).noquote() << "E";
-// qCDebug(g_cat_main).noquote() << s.trimmed();
-// qCDebug(g_cat_main).noquote() << l_att_1.value("type");
 
+}
