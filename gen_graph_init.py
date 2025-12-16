@@ -124,8 +124,8 @@ g_attr_values = [
     ('Gender', 'gender', [
         ('Com', 'GNCOM', 'common gender'),
         ('Fem', 'GNFEM', 'feminine gender'),
-        ('Masc', 'GNMSC', 'masculine gender'),
-        ('Neut', 'GNDNT', 'neuter gender'),
+        ('Masc', 'GMASC', 'masculine gender'),
+        ('Neut', 'GNEUT', 'neuter gender'),
     ]),
     ('Mood', 'mood', [
         ('Ben', 'MDBEN', 'benedictive / precative'),
@@ -196,14 +196,14 @@ g_attr_values = [
     ('Number', 'number', [
         ('Coll', 'NMCLL', 'collective / mass / singulare tantum'),
         ('Count', 'NMCNT', 'count plural'),
-        ('Dual', 'NMBDL', 'dual number'),
+        ('Dual', 'NDUAL', 'dual number'),
         ('Grpa', 'NMGRP', 'greater paucal number'),
         ('Grpl', 'NMGRL', 'greater plural number'),
         ('Inv', 'NMINV', 'inverse number'),
         ('Pauc', 'NMBPC', 'paucal number'),
-        ('Plur', 'NMPLR', 'plural number'),
+        ('Plur', 'NPLUR', 'plural number'),
         ('Ptan', 'NMPTN', 'plurale tantum'),
-        ('Sing', 'NMSNG', 'singular number'),
+        ('Sing', 'NSING', 'singular number'),
         ('Tri', 'NMTRI', 'trial number'),
     ]),
     ('Person', 'person', [
@@ -268,16 +268,16 @@ g_attr_values = [
         ('Vnoun', 'VFVNN', 'verbal noun, masdar'),
     ]),
     ('VerbConj', 'verb conjugation', [
-        ('[1]', 'VRCN1', 'first conjugation'),
-        ('[2]', 'VRCN2', 'second conjugation'),
-        ('[3]', 'VRCN3', 'third conjugation'),
-        ('[4]', 'VRCN4', '4th conjugation'),
-        ('[5]', 'VRCN5', '5th conjugation'),
-        ('[6]', 'VRCN6', '6th conjugation'),
-        ('[7]', 'VRCN7', '7th conjugation'),
-        ('[8]', 'VRCN8', '8th conjugation'),
-        ('[9]', 'VRCN9', '9th conjugation'),
-        ('[10]', 'VRC10', '10th conjugation'),
+        ('[1]', 'VBCJ1', 'first conjugation'),
+        ('[2]', 'VBCJ2', 'second conjugation'),
+        ('[3]', 'VBCJ3', 'third conjugation'),
+        ('[4]', 'VBCJ4', '4th conjugation'),
+        ('[5]', 'VBCJ5', '5th conjugation'),
+        ('[6]', 'VBCJ6', '6th conjugation'),
+        ('[7]', 'VBCJ7', '7th conjugation'),
+        ('[8]', 'VBCJ8', '8th conjugation'),
+        ('[9]', 'VBCJ9', '9th conjugation'),
+        ('[10]', 'VCJ10', '10th conjugation'),
     ]),
     ('VerbType', 'verb type', [
         ('Aux', 'VTAUX', 'auxiliary verb'),
@@ -307,6 +307,8 @@ g_attr_values = [
 ]
 
 g_nlp_pos_list = [
+    ('NPIIC', 'IIC', 'in intio compositi'),
+    ('NPIIV', 'IIV', 'in intio verbi'),
     ('NPADJ', 'ADJ', 'adjective'),
     ('NPADP', 'ADP', 'adposition'),
     ('NPADV', 'ADV', 'adverb'),

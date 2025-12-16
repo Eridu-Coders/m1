@@ -55,6 +55,8 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_f
     QFile l_fin_tei(p_file_path);
     qCDebug(g_cat_main) << "Exists: " << l_fin_tei.exists();
 
+    if(!p_full_load) cm_forms.clear();
+
     // the xml stream parse
     if (!l_fin_tei.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qWarning() << "Failed to open file for reading:" << l_fin_tei.errorString();
@@ -185,6 +187,7 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_f
                 qCDebug(g_cat_main).noquote() << l_indent << QString("<div3> start of wfw block for sloka %1.%2").arg(l_cur_chapter_number).arg(l_cur_sloka_number);
                 int l_cur_word = 1;
                 l_indent += QString(" ").repeated(l_indent_count);
+
                 while (!l_xml_reader.atEnd()) {
                     QXmlStreamReader::TokenType l_tt = l_xml_reader.readNext();
                     QStringView l_tok_name = l_xml_reader.name();
@@ -201,10 +204,10 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_f
 
                             QXmlStreamReader::TokenType l_tt_wfw = l_xml_reader.readNext();
                             if(l_tt_wfw != QXmlStreamReader::Characters) throw M1Env::M1Exception("<seg type=transliteration> not followed by Characters", 0);
-                            QString l_wfw_text = l_xml_reader.text().toString().trimmed();
+                            QString l_wfw_form = l_xml_reader.text().toString().trimmed();
                             qCDebug(g_cat_main).noquote() << l_indent << QString("Word Word %1.%2.%3 <seg type=\"%4\"> %5")
                                                                              .arg(l_cur_chapter_number).arg(l_cur_sloka_number).arg(l_cur_word)
-                                                                             .arg(l_type).arg(l_wfw_text);
+                                                                             .arg(l_type).arg(l_wfw_form);
                         }
                     }
                     // <interp> --> wfw transliteration/wfw translation/one wfw morphology line inside interpGrp
@@ -241,6 +244,7 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_f
                             if(l_tt_interp != QXmlStreamReader::Characters) throw M1Env::M1Exception("<interp type=morphology> not followed by Characters", 0);
 
                             QString l_form_text = l_xml_reader.text().toString().trimmed();
+                            cm_forms[l_form_text] = Form(l_lemma, l_grv, l_pos);
                             qCDebug(g_cat_main).noquote() << l_indent << QString("<interp type=\"%1\" lemma=\"%2\" pos=\"%3\" msg=\"%4\" lemmaRef=\"%5\"> %6")
                                                                              .arg(l_type).arg(l_lemma).arg(l_pos).arg(l_grv).arg(l_ref).arg(l_form_text);
                         }
