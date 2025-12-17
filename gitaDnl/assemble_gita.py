@@ -227,58 +227,69 @@ def store_grammar_values(p_gv_list):
 
     return p_gv_list
 
+import random
+
 def group_near_identical(p_grammar_values_split):
     l_grammar_values_split = p_grammar_values_split
-    # print(f'{l_grammar_values_split} group_near_identical', file=sys.stderr)
+    print(f'{l_grammar_values_split} group_near_identical START', file=sys.stderr)
     l_attempts = 0
-    l_initial_len = len(l_grammar_values_split)
-    while len(l_grammar_values_split) >= 2 and l_attempts < 2 * l_initial_len:
-        # on mange la banane par les deux bouts
-        l_gv_l1 = l_grammar_values_split.pop()
-        l_gv_l2 = l_grammar_values_split.pop(0)
 
-        # if split values lists are of the same length
-        if len(l_gv_l1) == len(l_gv_l2):
-            l_not_found_any = True
-            # search if they are all the same except in on place
-            for l_i_diff in range(len(l_gv_l1)):
-                # (A) l_i_diff is the prospective index where the 2 lists differ while being identical at all other positions
-                l_all_others_same = True
-                # checks whether the list are indeed identical except at l_i_diff
-                for l_i_same in range(len(l_gv_l1)):
-                    if l_i_same != l_i_diff and l_gv_l1[l_i_same] != l_gv_l2[l_i_same]:
-                        l_all_others_same = False
-                        break
-                # if condition (A) above is met
-                if l_all_others_same:
-                    # create a new value of the form [a, b/c, d] from [a, b, d] and [a, c, d]
-                    l_new_value_split = []
-                    for l_i_same_or_diff in range(len(l_gv_l1)):
-                        if l_i_same_or_diff == l_i_diff:
-                            # different case
-                            # using sets to eliminate duplicates
-                            l_new_value_set_str = '/'.join(sorted(list(
-                                set(l_gv_l1[l_i_same_or_diff].split('/')).union(
-                                    set(l_gv_l2[l_i_same_or_diff].split('/'))))))
-                            l_new_value_split.append(l_new_value_set_str)
-                        else:
-                            # same case
-                            l_new_value_split.append(l_gv_l1[l_i_same_or_diff])
+    while True:
+        l_found_one = False
+        l_gv_len = len(l_grammar_values_split)
+        for l_comp_1 in range(l_gv_len):
+            if l_found_one:
+                break
 
-                    l_grammar_values_split.append(l_new_value_split)
-                    l_not_found_any = False
+            l_gv_l1 = l_grammar_values_split[l_comp_1]
+            for l_comp_2 in range(l_gv_len):
+                if l_found_one:
                     break
-            if l_not_found_any:
-                # same length but condition (A) above not met
-                l_grammar_values_split.append(l_gv_l2)
-                l_grammar_values_split.append(l_gv_l1)
-        else:
-            # different lengths
-            l_grammar_values_split.append(l_gv_l2)
-            l_grammar_values_split.append(l_gv_l1)
 
-        # print('   ', l_grammar_values_split, file=sys.stderr)
-        l_attempts += 1
+                if l_comp_2 != l_comp_1:
+                    l_gv_l2 = l_grammar_values_split[l_comp_2]
+
+                    # if split values lists are of the same length
+                    if len(l_gv_l1) == len(l_gv_l2):
+                        print(f'    {"-".join(l_gv_l1)} {"-".join(l_gv_l2)} --> ', file=sys.stderr, end='')
+                        # search if they are all the same except in on place
+                        for l_i_diff in range(len(l_gv_l1)):
+                            # (A) l_i_diff is the prospective index where the 2 lists differ while being identical at all other positions
+                            l_all_others_same = True
+                            # checks whether the list are indeed identical except at l_i_diff
+                            for l_i_same in range(len(l_gv_l1)):
+                                if l_i_same != l_i_diff and l_gv_l1[l_i_same] != l_gv_l2[l_i_same]:
+                                    l_all_others_same = False
+                                    break
+                            # if condition (A) above is met
+                            if l_all_others_same:
+                                # create a new value of the form [a, b/c, d] from [a, b, d] and [a, c, d]
+                                l_new_value_split = []
+                                for l_i_same_or_diff in range(len(l_gv_l1)):
+                                    if l_i_same_or_diff == l_i_diff:
+                                        # different case
+                                        # using sets to eliminate duplicates
+                                        l_new_value_set_str = '/'.join(sorted(list(
+                                            set(l_gv_l1[l_i_same_or_diff].split('/')).union(
+                                                set(l_gv_l2[l_i_same_or_diff].split('/'))))))
+                                        l_new_value_split.append(l_new_value_set_str)
+                                    else:
+                                        # same case
+                                        l_new_value_split.append(l_gv_l1[l_i_same_or_diff])
+
+                                l_found_one = True
+                                l_grammar_values_split.remove(l_gv_l1)
+                                l_grammar_values_split.remove(l_gv_l2)
+                                l_grammar_values_split.append(l_new_value_split)
+                                print(f'Success {["-".join(s) for s in l_grammar_values_split]} ({l_attempts})', file=sys.stderr)
+                                break
+
+                        print(f'failure {["-".join(s) for s in l_grammar_values_split]} ({l_attempts})', file=sys.stderr)
+                        l_attempts += 1
+
+        if not l_found_one:
+            print(f'{l_grammar_values_split} group_near_identical END', file=sys.stderr)
+            break
 
     return l_grammar_values_split
 
@@ -499,7 +510,7 @@ if __name__ == '__main__':
         l_verse_count = int(l_chap['verses_count'])
         l_chap_number = int(l_chap['chapter_number'])
 
-        if l_chap_number == 19:
+        if l_chap_number == 2:
             break
 
         # TEI chapter start (<div1>)
