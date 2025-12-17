@@ -12,6 +12,7 @@ import sys
 import devtrans
 import urllib.request
 import html
+import xml.etree.ElementTree as ET
 
 from indic_transliteration import sanscript
 from indic_transliteration.sanscript import transliterate
@@ -32,6 +33,8 @@ g_iskcon_total = 0
 
 g_indent = '    '
 g_prefix_stack = []
+
+g_cochonneries_list = []
 
 g_grammar_translation = {
     'abl.': 'CSABL',
@@ -111,6 +114,7 @@ g_color_2_pos = {
 'mauve': '__IND',
 'lawngreen': '__VOC',
 }
+
 g_header = """<TEI xmlns="http://www.tei-c.org/ns/1.0">
 <teiHeader xml:lang="en">
 <titleStmt>
@@ -132,6 +136,17 @@ g_author_normalize = {
     'Sri Abhinavgupta': 'Sri Abhinavagupta',
     'Sri Abhinav Gupta': 'Sri Abhinavagupta'
 }
+
+g_gs_cochonneries = [ #
+    ('twic</b>orn', 'twice born'),
+    ('som</b>ody', 'somebody'),
+    ('ric</b>all', 'rice-ball'),
+    ('ass</b>led', 'assembled'),
+    ('भूरिश्रवाः।<br><br></b>&nbsp;</font>', 'भूरिश्रवाः।</font>'),
+    ('परिगणयति &nbsp;<b>भवानित्यादिना।</b><br />', 'परिगणयति&nbsp;<b>भवानित्यादिना।</b></p>')
+]
+
+g_wfw_allowed_empty = ['1.47']
 
 def author_normalize(p_author):
     if p_author in g_author_normalize.keys():
@@ -510,7 +525,7 @@ if __name__ == '__main__':
         l_verse_count = int(l_chap['verses_count'])
         l_chap_number = int(l_chap['chapter_number'])
 
-        if l_chap_number == 2:
+        if l_chap_number == 3:
             break
 
         # TEI chapter start (<div1>)
@@ -668,12 +683,16 @@ if __name__ == '__main__':
                     l_html_gs_corrected, flags=re.MULTILINE | re.DOTALL):
                 l_code_gs = l_match_gs_tc.group(1).strip()
                 l_title_gs = l_match_gs_tc.group(2).strip()
+
+                l_body_gs = l_match_gs_tc.group(3)
+                for a, b in g_gs_cochonneries:
+                    l_body_gs = l_body_gs.replace(a, b)
                 l_body_gs = re.sub(r'[ \t]+', ' ',
-                                   re.sub(r'<(/)?font[^<]*>', '',
-                                   re.sub(r'<p[^<]+>', '<p>',
+                                   re.sub(r'<(/)?font[^>]*>', '',
+                                   re.sub(r'<p[^>]+>', '<p>',
                                    re.sub(r'(<br\s*(/)?>)+', '',
                                           re.sub(r'>\s+<', '><',
-                                                 l_match_gs_tc.group(3).replace('।।', '॥').replace('&nbsp;', ' ')
+                                                 l_body_gs.replace('।।', '॥').replace('&nbsp;', ' ')
                                                  )
                                           )
                                           )
@@ -862,7 +881,8 @@ if __name__ == '__main__':
 
             # Adding WfW block to TEI file
             # start of wfw block (<div3>)
-            l_bg_chapters_xml += f'{l_indent_prefix}<div3 type="wfw-block" xml:id="{l_verse_id}_wfw">\n'
+            l_empty_indicator = f'subtype="empty" ' if len(l_wfw_list) == 0 and f'{l_chap_number}.{l_verse_number}' in g_wfw_allowed_empty else ''
+            l_bg_chapters_xml += f'{l_indent_prefix}<div3 type="wfw-block" {l_empty_indicator}xml:id="{l_verse_id}_wfw">\n'
             g_prefix_stack.append(l_indent_prefix)
             l_indent_prefix += g_indent
 
@@ -929,28 +949,56 @@ if __name__ == '__main__':
             l_indent_prefix = g_prefix_stack.pop()
             l_bg_chapters_xml += f'{l_indent_prefix}</div3>\n'
 
-            print('    Translations    :', l_translations)
             # Adding Translations to TEI file
             # start of translations block (<div3>)
             l_bg_chapters_xml += f'{l_indent_prefix}<div3 type="translations-block" xml:id="{l_verse_id}_tran">\n'
             g_prefix_stack.append(l_indent_prefix)
             l_indent_prefix += g_indent
 
+            def com_tran_validate(p_row):
+                global g_cochonneries_list
+
+                l_author_ctv, l_language_ctv, l_text_ctv, l_source_ctv = p_row
+
+                # proper use of single and double danda and the spaces around them
+                l_text_ctv = sloka_numbers_normalize(l_text_ctv)
+                # XML validation
+                try:
+                    ET.fromstring(f'<TEI xmlns="http://www.tei-c.org/ns/1.0">{l_text_ctv}</TEI>')
+                except ET.ParseError as e:
+                    print(f'XML parse ERROR: {e.code} {e.msg} in [{l_text_ctv}]')
+                    g_cochonneries_list.append((e.code, e.msg, f'{l_chap_number}.{l_verse_number}', l_source_ctv, l_author_ctv, l_language_ctv, l_text_ctv))
+                    # sys.exit(0)
+                    l_text_ctv = re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', '', l_text_ctv)).strip()
+
+                print(f'      Source   : {l_source} --------------------------------------------------------------')
+                print(f'      Author   : {l_author}')
+                print(f'      Language : {l_language}')
+                print(f'      Text     : {l_text}')
+
+                return l_author_ctv, l_language_ctv, l_text_ctv, l_source_ctv
+
             for l_ak in l_local_translations:
-                l_author, l_language, l_text, lsource = l_local_translations[l_ak]
-                l_text = sloka_numbers_normalize(l_text)
-                print(f'      Description (t): ', l_text)
-                print(f'      Author         : ', l_author)
-                print(f'      Language       : ', l_language)
-                print(f'      Source         : ', lsource)
-                l_bg_chapters_xml += f'{l_indent_prefix}<div4 type="translation" source="{lsource}" xml:lang="{l_language}"><author>{l_author}</author>{l_text}</div4>\n'
+                l_author, l_language, l_text, l_source = com_tran_validate(l_local_translations[l_ak])
+                #                 l_text = sloka_numbers_normalize(l_text)
+                #                 print(f'      Description (t): ', l_text)
+                #                 print(f'      Author         : ', l_author)
+                #                 print(f'      Language       : ', l_language)
+                #                 print(f'      Source         : ', l_source)
+                #                 # XML validation
+                #                 try:
+                #                     ET.fromstring(f'<TEI xmlns="http://www.tei-c.org/ns/1.0">{l_text}</TEI>')
+                #                 except ET.ParseError as e:
+                #                     print(f'XML parse ERROR: {e.code} {e.msg} in [{l_text}]')
+                #                     sys.exit(0)
+
+                l_bg_chapters_xml += f'{l_indent_prefix}<div4 type="translation" source="{l_source}" xml:lang="{l_language}"><author>{l_author}</author>{l_text}</div4>\n'
 
             # end of translations block (<div3>)
             l_bg_chapters_xml += f'{l_indent_prefix}<!-- End of translations block for {l_verse_id} -->\n'
             l_indent_prefix = g_prefix_stack.pop()
             l_bg_chapters_xml += f'{l_indent_prefix}</div3>\n'
 
-            print('    Commentaries    :', l_commentaries)
             # Adding Commentaries to TEI file
             # start of commentaries block (<div3>)
             l_bg_chapters_xml += f'{l_indent_prefix}<div3 type="commentaries-block" xml:id="{l_verse_id}_com">\n'
@@ -958,13 +1006,21 @@ if __name__ == '__main__':
             l_indent_prefix += g_indent
 
             for l_ak in l_local_commentaries:
-                l_author, l_language, l_text, lsource = l_local_commentaries[l_ak]
-                l_text = sloka_numbers_normalize(l_text)
-                print(f'      Description (c): ', l_text)
-                print(f'      Author         : ', l_author)
-                print(f'      Language       : ', l_language)
-                print(f'      Source         : ', lsource)
-                l_bg_chapters_xml += f'{l_indent_prefix}<div4 type="commentary" source="{lsource}" xml:lang="{l_language}"><author>{l_author}</author>{l_text}</div4>\n'
+                # l_author, l_language, l_text, l_source = l_local_commentaries[l_ak]
+                l_author, l_language, l_text, l_source = com_tran_validate(l_local_commentaries[l_ak])
+                # l_text = sloka_numbers_normalize(l_text)
+                #                 print(f'      Description (c): ', l_text)
+                #                 print(f'      Author         : ', l_author)
+                #                 print(f'      Language       : ', l_language)
+                #                 print(f'      Source         : ', l_source)
+                #                 # XML validation
+                #                 try:
+                #                     ET.fromstring(f'<TEI xmlns="http://www.tei-c.org/ns/1.0">{l_text}</TEI>')
+                #                 except ET.ParseError as e:
+                #                     print(f'XML parse ERROR: {e.code} {e.msg} in [{l_text}]')
+                #                     sys.exit(0)
+
+                l_bg_chapters_xml += f'{l_indent_prefix}<div4 type="commentary" source="{l_source}" xml:lang="{l_language}"><author>{l_author}</author>{l_text}</div4>\n'
 
             # end of commentaries block (<div3>)
             l_bg_chapters_xml += f'{l_indent_prefix}<!-- End of commentaries block for {l_verse_id} -->\n'
@@ -1058,3 +1114,7 @@ if __name__ == '__main__':
     print('\nLexicon Lemmas ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
     for l_lemma in g_lexicon_lemmas.keys():
         print(f'{l_lemma:35} --> {g_lexicon_lemmas[l_lemma]}')
+
+    print('\nCochonneries ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+    for c in g_cochonneries_list:
+        print(c)

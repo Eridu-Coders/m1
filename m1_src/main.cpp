@@ -98,7 +98,17 @@ int main(int argc, char *argv[])
     // loadEnoch();
     // if(l_program_options_vm.count("load-gita")) loadGita();
     if(l_program_options_vm.count("load-plato")) M1Store::GraphInit::init_plato();
-    if(l_program_options_vm.count("load-tei")) M1Store::TEIInterface::loadTei("../gitaDnl/bg_final_ex.xml");
+    try{
+        if(l_program_options_vm.count("load-tei")){
+            M1Store::TEIInterface::loadTei("../gitaDnl/bg_final_ex.xml");
+            qCDebug(g_cat_main).noquote() << "End of TEI XML loading";
+            std::_Exit(0);
+        }
+    }
+    catch(const M1Env::M1Exception& e){
+        qCDebug(g_cat_main).noquote() << "TEI load error" << e.code() << e.message();
+        std::_Exit(0);
+    }
 
     // throw M1Env::M1Exception("", 0);
     QApplication a(argc, argv);
