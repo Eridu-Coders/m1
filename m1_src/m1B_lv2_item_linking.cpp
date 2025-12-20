@@ -87,12 +87,14 @@ M1Store::Item_lv2* M1Store::Item_lv2::linkTo(Item_lv2* p_target, const SpecialIt
  * If p_edge_above = nullptr, the edge is positioned below the auto edge (if there is one)
  * unless p_at_top is set or if there is no auto edge (like in the special edge ring)
  *
+ * \todo implement visible ISA edges
+ *
  * @param p_new_edge the newly created edge (as an Item_lv2*)
  * @param p_edge_type the edge type, as SpecialItemID
  * @param p_edge_above the existing edge below which the new one is to be inserted (or nullptr)
  * @param p_at_top if true, insert new edge at top of relevant ring, regardless of the presence of an auto edge
  */
-// TODO: implement visible ISA edges
+//
 void M1Store::Item_lv2::installFullEdge(Item_lv2* p_new_edge, const SpecialItemID p_edge_type, Item_lv2* p_edge_above, bool p_at_top){
     M1_FUNC_ENTRY(g_cat_lv2_members, QString("{%3} adding full edge [%1] at top? %2")
                       .arg(p_new_edge->dbgShort())

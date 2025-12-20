@@ -23,7 +23,11 @@ M1Env::SpecialItemID M1Env::TEXT_WRITTEN_BY_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::OCCUR_SIID = G_NONEX_SI_ID;
 // [WFORM] Special Vertex ID (Vertex type) of word form vertices
 M1Env::SpecialItemID M1Env::WFORM_SIID = G_NONEX_SI_ID;
-// [CAPTL] Special Vertex ID (Simple edge type) of Occurrence field capitalization flaf
+// [TXATL] Special Vertex ID (Simple edge type) alternate text title
+M1Env::SpecialItemID M1Env::TEXT_ALT_TITLE_SIID = G_NONEX_SI_ID;
+// [TXSBT] Special Vertex ID (Simple edge type) text subtitle
+M1Env::SpecialItemID M1Env::TEXT_SUB_TITLE_SIID = G_NONEX_SI_ID;
+// [CAPTL] Special Vertex ID (Simple edge type) of Occurrence field capitalization flag
 M1Env::SpecialItemID M1Env::CAPTL_SIID = G_NONEX_SI_ID;
 // [PCTLF] Special Vertex ID (Simple edge type) of Occurrence field left punctuation
 M1Env::SpecialItemID M1Env::PCTLF_SIID = G_NONEX_SI_ID;
@@ -123,17 +127,23 @@ M1Env::SpecialItemID M1Env::POLIT_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::POSS__SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::PTRNY_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::REFLE_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::II____SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TENSE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TYPO__SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::VFRBR_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::VCRBN_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::VTRBY_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::UNDCD_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::VOICE_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::NPIIC_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::NPIIV_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::NPADJ_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::NPADP_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::NPADV_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::NPAUX_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::NPCNJ_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::NPDET_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::NPIND_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::NPINT_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::NPNON_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::NPNUM_SIID = G_NONEX_SI_ID;
@@ -214,6 +224,8 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::TEXT_WRITTEN_BY_SIID = M1Store::StorageStatic::getSpecialID("WRTBY");
     M1Env::OCCUR_SIID = M1Store::StorageStatic::getSpecialID("OCCUR");
     M1Env::WFORM_SIID = M1Store::StorageStatic::getSpecialID("WFORM");
+    M1Env::TEXT_ALT_TITLE_SIID = M1Store::StorageStatic::getSpecialID("TXATL");
+    M1Env::TEXT_SUB_TITLE_SIID = M1Store::StorageStatic::getSpecialID("TXSBT");
     M1Env::CAPTL_SIID = M1Store::StorageStatic::getSpecialID("CAPTL");
     M1Env::PCTLF_SIID = M1Store::StorageStatic::getSpecialID("PCTLF");
     M1Env::PCTRT_SIID = M1Store::StorageStatic::getSpecialID("PCTRT");
@@ -295,17 +307,23 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::POSS__SIID = M1Store::StorageStatic::getSpecialID("POSS_");
     M1Env::PTRNY_SIID = M1Store::StorageStatic::getSpecialID("PTRNY");
     M1Env::REFLE_SIID = M1Store::StorageStatic::getSpecialID("REFLE");
+    M1Env::II____SIID = M1Store::StorageStatic::getSpecialID("II___");
     M1Env::TENSE_SIID = M1Store::StorageStatic::getSpecialID("TENSE");
     M1Env::TYPO__SIID = M1Store::StorageStatic::getSpecialID("TYPO_");
     M1Env::VFRBR_SIID = M1Store::StorageStatic::getSpecialID("VFRBR");
+    M1Env::VCRBN_SIID = M1Store::StorageStatic::getSpecialID("VCRBN");
     M1Env::VTRBY_SIID = M1Store::StorageStatic::getSpecialID("VTRBY");
+    M1Env::UNDCD_SIID = M1Store::StorageStatic::getSpecialID("UNDCD");
     M1Env::VOICE_SIID = M1Store::StorageStatic::getSpecialID("VOICE");
+    M1Env::NPIIC_SIID = M1Store::StorageStatic::getSpecialID("NPIIC");
+    M1Env::NPIIV_SIID = M1Store::StorageStatic::getSpecialID("NPIIV");
     M1Env::NPADJ_SIID = M1Store::StorageStatic::getSpecialID("NPADJ");
     M1Env::NPADP_SIID = M1Store::StorageStatic::getSpecialID("NPADP");
     M1Env::NPADV_SIID = M1Store::StorageStatic::getSpecialID("NPADV");
     M1Env::NPAUX_SIID = M1Store::StorageStatic::getSpecialID("NPAUX");
     M1Env::NPCNJ_SIID = M1Store::StorageStatic::getSpecialID("NPCNJ");
     M1Env::NPDET_SIID = M1Store::StorageStatic::getSpecialID("NPDET");
+    M1Env::NPIND_SIID = M1Store::StorageStatic::getSpecialID("NPIND");
     M1Env::NPINT_SIID = M1Store::StorageStatic::getSpecialID("NPINT");
     M1Env::NPNON_SIID = M1Store::StorageStatic::getSpecialID("NPNON");
     M1Env::NPNUM_SIID = M1Store::StorageStatic::getSpecialID("NPNUM");
@@ -397,10 +415,13 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::GraphInit::cm_gram_attr_list.append(M1Env::POSS__SIID);
     M1Env::GraphInit::cm_gram_attr_list.append(M1Env::PTRNY_SIID);
     M1Env::GraphInit::cm_gram_attr_list.append(M1Env::REFLE_SIID);
+    M1Env::GraphInit::cm_gram_attr_list.append(M1Env::II____SIID);
     M1Env::GraphInit::cm_gram_attr_list.append(M1Env::TENSE_SIID);
     M1Env::GraphInit::cm_gram_attr_list.append(M1Env::TYPO__SIID);
     M1Env::GraphInit::cm_gram_attr_list.append(M1Env::VFRBR_SIID);
+    M1Env::GraphInit::cm_gram_attr_list.append(M1Env::VCRBN_SIID);
     M1Env::GraphInit::cm_gram_attr_list.append(M1Env::VTRBY_SIID);
+    M1Env::GraphInit::cm_gram_attr_list.append(M1Env::UNDCD_SIID);
     M1Env::GraphInit::cm_gram_attr_list.append(M1Env::VOICE_SIID);
 }
 
@@ -414,6 +435,8 @@ void M1Env::GraphInit::dbg_dump_pseudo_constants(){
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WROTE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WROTE"), 4, 16, QChar('0')).arg("WROTE");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::OCCUR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("OCCUR"), 4, 16, QChar('0')).arg("OCCUR");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::WFORM_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WFORM"), 4, 16, QChar('0')).arg("WFORM");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_ALT_TITLE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TXATL"), 4, 16, QChar('0')).arg("TXATL");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_SUB_TITLE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TXSBT"), 4, 16, QChar('0')).arg("TXSBT");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::CAPTL_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("CAPTL"), 4, 16, QChar('0')).arg("CAPTL");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::PCTLF_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("PCTLF"), 4, 16, QChar('0')).arg("PCTLF");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::PCTRT_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("PCTRT"), 4, 16, QChar('0')).arg("PCTRT");
@@ -456,7 +479,11 @@ void M1Env::GraphInit::init_base(){
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SPECIAL_EDGE, "OCCUR", M1Env::OCCURRENCE_ICON_PATH);
     // Special Vertex ID (Vertex type) of word form vertices
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_IS_ICON_TYPE, "WFORM", M1Env::WFORM_ICON_PATH);
-    // Special Vertex ID (Simple edge type) of Occurrence field capitalization flaf
+    // Special Vertex ID (Simple edge type) alternate text title
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TXATL", nullptr);
+    // Special Vertex ID (Simple edge type) text subtitle
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TXSBT", nullptr);
+    // Special Vertex ID (Simple edge type) of Occurrence field capitalization flag
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "CAPTL", nullptr);
     // Special Vertex ID (Simple edge type) of Occurrence field left punctuation
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PCTLF", nullptr);
@@ -2791,8 +2818,8 @@ void M1Env::GraphInit::init_base(){
     l_gnfem->setType("GENDE");
 
     // creation of "[Masc]-masculine gender"
-    qCDebug(g_cat_silence) << QString("Creating <[GNMSC]-[Masc]-masculine gender> item");
-    M1Store::Item_lv2* l_gnmsc = M1Store::Item_lv2::getNew(
+    qCDebug(g_cat_silence) << QString("Creating <[GMASC]-[Masc]-masculine gender> item");
+    M1Store::Item_lv2* l_gmasc = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
@@ -2800,15 +2827,15 @@ void M1Env::GraphInit::init_base(){
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
-        "GNMSC",
+        "GMASC",
         // icon path
         M1Env::FOLDER_ICON_PATH);
-    l_gnmsc->setType("TYPE_");
-    l_gnmsc->setType("GENDE");
+    l_gmasc->setType("TYPE_");
+    l_gmasc->setType("GENDE");
 
     // creation of "[Neut]-neuter gender"
-    qCDebug(g_cat_silence) << QString("Creating <[GNDNT]-[Neut]-neuter gender> item");
-    M1Store::Item_lv2* l_gndnt = M1Store::Item_lv2::getNew(
+    qCDebug(g_cat_silence) << QString("Creating <[GNEUT]-[Neut]-neuter gender> item");
+    M1Store::Item_lv2* l_gneut = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
@@ -2816,11 +2843,11 @@ void M1Env::GraphInit::init_base(){
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
-        "GNDNT",
+        "GNEUT",
         // icon path
         M1Env::FOLDER_ICON_PATH);
-    l_gndnt->setType("TYPE_");
-    l_gndnt->setType("GENDE");
+    l_gneut->setType("TYPE_");
+    l_gneut->setType("GENDE");
 
     // creation of "Mood"
     qCDebug(g_cat_silence) << QString("Creating <[MOOD_]-Mood> item");
@@ -2836,6 +2863,22 @@ void M1Env::GraphInit::init_base(){
         // icon path
         M1Env::FOLDER_ICON_PATH);
     l_mood->setType("GRATT");
+
+    // creation of "[Ben]-benedictive / precative"
+    qCDebug(g_cat_silence) << QString("Creating <[MDBEN]-[Ben]-benedictive / precative> item");
+    M1Store::Item_lv2* l_mdben = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "[Ben]-benedictive / precative",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "MDBEN",
+        // icon path
+        M1Env::FOLDER_ICON_PATH);
+    l_mdben->setType("TYPE_");
+    l_mdben->setType("MOOD_");
 
     // creation of "[Adm]-admirative"
     qCDebug(g_cat_silence) << QString("Creating <[MDADM]-[Adm]-admirative> item");
@@ -2900,6 +2943,22 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_mdimp->setType("TYPE_");
     l_mdimp->setType("MOOD_");
+
+    // creation of "[Its]-intensive"
+    qCDebug(g_cat_silence) << QString("Creating <[MDITS]-[Its]-intensive> item");
+    M1Store::Item_lv2* l_mdits = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "[Its]-intensive",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "MDITS",
+        // icon path
+        M1Env::FOLDER_ICON_PATH);
+    l_mdits->setType("TYPE_");
+    l_mdits->setType("MOOD_");
 
     // creation of "[Ind]-indicative or realis"
     qCDebug(g_cat_silence) << QString("Creating <[MDIND]-[Ind]-indicative or realis> item");
@@ -3811,8 +3870,8 @@ void M1Env::GraphInit::init_base(){
     l_nmcnt->setType("NUMBE");
 
     // creation of "[Dual]-dual number"
-    qCDebug(g_cat_silence) << QString("Creating <[NMBDL]-[Dual]-dual number> item");
-    M1Store::Item_lv2* l_nmbdl = M1Store::Item_lv2::getNew(
+    qCDebug(g_cat_silence) << QString("Creating <[NDUAL]-[Dual]-dual number> item");
+    M1Store::Item_lv2* l_ndual = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
@@ -3820,11 +3879,11 @@ void M1Env::GraphInit::init_base(){
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
-        "NMBDL",
+        "NDUAL",
         // icon path
         M1Env::FOLDER_ICON_PATH);
-    l_nmbdl->setType("TYPE_");
-    l_nmbdl->setType("NUMBE");
+    l_ndual->setType("TYPE_");
+    l_ndual->setType("NUMBE");
 
     // creation of "[Grpa]-greater paucal number"
     qCDebug(g_cat_silence) << QString("Creating <[NMGRP]-[Grpa]-greater paucal number> item");
@@ -3891,8 +3950,8 @@ void M1Env::GraphInit::init_base(){
     l_nmbpc->setType("NUMBE");
 
     // creation of "[Plur]-plural number"
-    qCDebug(g_cat_silence) << QString("Creating <[NMPLR]-[Plur]-plural number> item");
-    M1Store::Item_lv2* l_nmplr = M1Store::Item_lv2::getNew(
+    qCDebug(g_cat_silence) << QString("Creating <[NPLUR]-[Plur]-plural number> item");
+    M1Store::Item_lv2* l_nplur = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
@@ -3900,11 +3959,11 @@ void M1Env::GraphInit::init_base(){
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
-        "NMPLR",
+        "NPLUR",
         // icon path
         M1Env::FOLDER_ICON_PATH);
-    l_nmplr->setType("TYPE_");
-    l_nmplr->setType("NUMBE");
+    l_nplur->setType("TYPE_");
+    l_nplur->setType("NUMBE");
 
     // creation of "[Ptan]-plurale tantum"
     qCDebug(g_cat_silence) << QString("Creating <[NMPTN]-[Ptan]-plurale tantum> item");
@@ -3923,8 +3982,8 @@ void M1Env::GraphInit::init_base(){
     l_nmptn->setType("NUMBE");
 
     // creation of "[Sing]-singular number"
-    qCDebug(g_cat_silence) << QString("Creating <[NMSNG]-[Sing]-singular number> item");
-    M1Store::Item_lv2* l_nmsng = M1Store::Item_lv2::getNew(
+    qCDebug(g_cat_silence) << QString("Creating <[NSING]-[Sing]-singular number> item");
+    M1Store::Item_lv2* l_nsing = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
@@ -3932,11 +3991,11 @@ void M1Env::GraphInit::init_base(){
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
-        "NMSNG",
+        "NSING",
         // icon path
         M1Env::FOLDER_ICON_PATH);
-    l_nmsng->setType("TYPE_");
-    l_nmsng->setType("NUMBE");
+    l_nsing->setType("TYPE_");
+    l_nsing->setType("NUMBE");
 
     // creation of "[Tri]-trial number"
     qCDebug(g_cat_silence) << QString("Creating <[NMTRI]-[Tri]-trial number> item");
@@ -4428,6 +4487,53 @@ void M1Env::GraphInit::init_base(){
     l_rfyes->setType("TYPE_");
     l_rfyes->setType("REFLE");
 
+    // creation of "In initio"
+    qCDebug(g_cat_silence) << QString("Creating <[II___]-In initio> item");
+    M1Store::Item_lv2* l_ii = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "In initio",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "II___",
+        // icon path
+        M1Env::FOLDER_ICON_PATH);
+    l_ii->setType("GRATT");
+
+    // creation of "[iic]-in initio compositi"
+    qCDebug(g_cat_silence) << QString("Creating <[IICOM]-[iic]-in initio compositi> item");
+    M1Store::Item_lv2* l_iicom = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "[iic]-in initio compositi",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "IICOM",
+        // icon path
+        M1Env::FOLDER_ICON_PATH);
+    l_iicom->setType("TYPE_");
+    l_iicom->setType("II___");
+
+    // creation of "[iiv]-in initio verbi"
+    qCDebug(g_cat_silence) << QString("Creating <[IIVRB]-[iiv]-in initio verbi> item");
+    M1Store::Item_lv2* l_iivrb = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "[iiv]-in initio verbi",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "IIVRB",
+        // icon path
+        M1Env::FOLDER_ICON_PATH);
+    l_iivrb->setType("TYPE_");
+    l_iivrb->setType("II___");
+
     // creation of "Tense"
     qCDebug(g_cat_silence) << QString("Creating <[TENSE]-Tense> item");
     M1Store::Item_lv2* l_tense = M1Store::Item_lv2::getNew(
@@ -4681,6 +4787,22 @@ void M1Env::GraphInit::init_base(){
     l_vfsup->setType("TYPE_");
     l_vfsup->setType("VFRBR");
 
+    // creation of "[Cau]-causative"
+    qCDebug(g_cat_silence) << QString("Creating <[VFCAU]-[Cau]-causative> item");
+    M1Store::Item_lv2* l_vfcau = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "[Cau]-causative",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "VFCAU",
+        // icon path
+        M1Env::FOLDER_ICON_PATH);
+    l_vfcau->setType("TYPE_");
+    l_vfcau->setType("VFRBR");
+
     // creation of "[Vnoun]-verbal noun, masdar"
     qCDebug(g_cat_silence) << QString("Creating <[VFVNN]-[Vnoun]-verbal noun, masdar> item");
     M1Store::Item_lv2* l_vfvnn = M1Store::Item_lv2::getNew(
@@ -4696,6 +4818,181 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vfvnn->setType("TYPE_");
     l_vfvnn->setType("VFRBR");
+
+    // creation of "Verb conjugation"
+    qCDebug(g_cat_silence) << QString("Creating <[VCRBN]-Verb conjugation> item");
+    M1Store::Item_lv2* l_vcrbn = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Verb conjugation",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "VCRBN",
+        // icon path
+        M1Env::FOLDER_ICON_PATH);
+    l_vcrbn->setType("GRATT");
+
+    // creation of "[[1]]-first conjugation"
+    qCDebug(g_cat_silence) << QString("Creating <[VBCJ1]-[[1]]-first conjugation> item");
+    M1Store::Item_lv2* l_vbcj1 = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "[[1]]-first conjugation",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "VBCJ1",
+        // icon path
+        M1Env::FOLDER_ICON_PATH);
+    l_vbcj1->setType("TYPE_");
+    l_vbcj1->setType("VCRBN");
+
+    // creation of "[[2]]-second conjugation"
+    qCDebug(g_cat_silence) << QString("Creating <[VBCJ2]-[[2]]-second conjugation> item");
+    M1Store::Item_lv2* l_vbcj2 = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "[[2]]-second conjugation",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "VBCJ2",
+        // icon path
+        M1Env::FOLDER_ICON_PATH);
+    l_vbcj2->setType("TYPE_");
+    l_vbcj2->setType("VCRBN");
+
+    // creation of "[[3]]-third conjugation"
+    qCDebug(g_cat_silence) << QString("Creating <[VBCJ3]-[[3]]-third conjugation> item");
+    M1Store::Item_lv2* l_vbcj3 = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "[[3]]-third conjugation",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "VBCJ3",
+        // icon path
+        M1Env::FOLDER_ICON_PATH);
+    l_vbcj3->setType("TYPE_");
+    l_vbcj3->setType("VCRBN");
+
+    // creation of "[[4]]-4th conjugation"
+    qCDebug(g_cat_silence) << QString("Creating <[VBCJ4]-[[4]]-4th conjugation> item");
+    M1Store::Item_lv2* l_vbcj4 = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "[[4]]-4th conjugation",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "VBCJ4",
+        // icon path
+        M1Env::FOLDER_ICON_PATH);
+    l_vbcj4->setType("TYPE_");
+    l_vbcj4->setType("VCRBN");
+
+    // creation of "[[5]]-5th conjugation"
+    qCDebug(g_cat_silence) << QString("Creating <[VBCJ5]-[[5]]-5th conjugation> item");
+    M1Store::Item_lv2* l_vbcj5 = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "[[5]]-5th conjugation",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "VBCJ5",
+        // icon path
+        M1Env::FOLDER_ICON_PATH);
+    l_vbcj5->setType("TYPE_");
+    l_vbcj5->setType("VCRBN");
+
+    // creation of "[[6]]-6th conjugation"
+    qCDebug(g_cat_silence) << QString("Creating <[VBCJ6]-[[6]]-6th conjugation> item");
+    M1Store::Item_lv2* l_vbcj6 = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "[[6]]-6th conjugation",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "VBCJ6",
+        // icon path
+        M1Env::FOLDER_ICON_PATH);
+    l_vbcj6->setType("TYPE_");
+    l_vbcj6->setType("VCRBN");
+
+    // creation of "[[7]]-7th conjugation"
+    qCDebug(g_cat_silence) << QString("Creating <[VBCJ7]-[[7]]-7th conjugation> item");
+    M1Store::Item_lv2* l_vbcj7 = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "[[7]]-7th conjugation",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "VBCJ7",
+        // icon path
+        M1Env::FOLDER_ICON_PATH);
+    l_vbcj7->setType("TYPE_");
+    l_vbcj7->setType("VCRBN");
+
+    // creation of "[[8]]-8th conjugation"
+    qCDebug(g_cat_silence) << QString("Creating <[VBCJ8]-[[8]]-8th conjugation> item");
+    M1Store::Item_lv2* l_vbcj8 = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "[[8]]-8th conjugation",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "VBCJ8",
+        // icon path
+        M1Env::FOLDER_ICON_PATH);
+    l_vbcj8->setType("TYPE_");
+    l_vbcj8->setType("VCRBN");
+
+    // creation of "[[9]]-9th conjugation"
+    qCDebug(g_cat_silence) << QString("Creating <[VBCJ9]-[[9]]-9th conjugation> item");
+    M1Store::Item_lv2* l_vbcj9 = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "[[9]]-9th conjugation",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "VBCJ9",
+        // icon path
+        M1Env::FOLDER_ICON_PATH);
+    l_vbcj9->setType("TYPE_");
+    l_vbcj9->setType("VCRBN");
+
+    // creation of "[[10]]-10th conjugation"
+    qCDebug(g_cat_silence) << QString("Creating <[VCJ10]-[[10]]-10th conjugation> item");
+    M1Store::Item_lv2* l_vcj10 = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "[[10]]-10th conjugation",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "VCJ10",
+        // icon path
+        M1Env::FOLDER_ICON_PATH);
+    l_vcj10->setType("TYPE_");
+    l_vcj10->setType("VCRBN");
 
     // creation of "Verb type"
     qCDebug(g_cat_silence) << QString("Creating <[VTRBY]-Verb type> item");
@@ -4791,6 +5088,85 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vtrqs->setType("TYPE_");
     l_vtrqs->setType("VTRBY");
+
+    // creation of "Undecided codes"
+    qCDebug(g_cat_silence) << QString("Creating <[UNDCD]-Undecided codes> item");
+    M1Store::Item_lv2* l_undcd = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Undecided codes",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "UNDCD",
+        // icon path
+        M1Env::FOLDER_ICON_PATH);
+    l_undcd->setType("GRATT");
+
+    // creation of "[act]-"
+    qCDebug(g_cat_silence) << QString("Creating <[__ACT]-[act]-> item");
+    M1Store::Item_lv2* l_act = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "[act]-",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "__ACT",
+        // icon path
+        M1Env::FOLDER_ICON_PATH);
+    l_act->setType("TYPE_");
+    l_act->setType("UNDCD");
+
+    // creation of "[agt]-"
+    qCDebug(g_cat_silence) << QString("Creating <[__AGT]-[agt]-> item");
+    M1Store::Item_lv2* l_agt = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "[agt]-",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "__AGT",
+        // icon path
+        M1Env::FOLDER_ICON_PATH);
+    l_agt->setType("TYPE_");
+    l_agt->setType("UNDCD");
+
+    // creation of "[per]-"
+    qCDebug(g_cat_silence) << QString("Creating <[__PER]-[per]-> item");
+    M1Store::Item_lv2* l_per = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "[per]-",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "__PER",
+        // icon path
+        M1Env::FOLDER_ICON_PATH);
+    l_per->setType("TYPE_");
+    l_per->setType("UNDCD");
+
+    // creation of "[tasil]-"
+    qCDebug(g_cat_silence) << QString("Creating <[__TSL]-[tasil]-> item");
+    M1Store::Item_lv2* l_tsl = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "[tasil]-",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "__TSL",
+        // icon path
+        M1Env::FOLDER_ICON_PATH);
+    l_tsl->setType("TYPE_");
+    l_tsl->setType("UNDCD");
 
     // creation of "Voice"
     qCDebug(g_cat_silence) << QString("Creating <[VOICE]-Voice> item");
@@ -4967,6 +5343,38 @@ void M1Env::GraphInit::init_base(){
     l_vcrcp->setType("TYPE_");
     l_vcrcp->setType("VOICE");
 
+    // creation of "[IIC]-in intio compositi"
+    qCDebug(g_cat_silence) << QString("Creating <[NPIIC]-[IIC]-in intio compositi> item");
+    M1Store::Item_lv2* l_npiic = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "[IIC]-in intio compositi",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "NPIIC",
+        // icon path
+        nullptr);
+    l_npiic->setType("TYPE_");
+    l_npiic->setType("NLPOS");
+
+    // creation of "[IIV]-in intio verbi"
+    qCDebug(g_cat_silence) << QString("Creating <[NPIIV]-[IIV]-in intio verbi> item");
+    M1Store::Item_lv2* l_npiiv = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "[IIV]-in intio verbi",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "NPIIV",
+        // icon path
+        nullptr);
+    l_npiiv->setType("TYPE_");
+    l_npiiv->setType("NLPOS");
+
     // creation of "[ADJ]-adjective"
     qCDebug(g_cat_silence) << QString("Creating <[NPADJ]-[ADJ]-adjective> item");
     M1Store::Item_lv2* l_npadj = M1Store::Item_lv2::getNew(
@@ -5062,6 +5470,22 @@ void M1Env::GraphInit::init_base(){
         nullptr);
     l_npdet->setType("TYPE_");
     l_npdet->setType("NLPOS");
+
+    // creation of "[IND]-indeclinable"
+    qCDebug(g_cat_silence) << QString("Creating <[NPIND]-[IND]-indeclinable> item");
+    M1Store::Item_lv2* l_npind = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "[IND]-indeclinable",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "NPIND",
+        // icon path
+        nullptr);
+    l_npind->setType("TYPE_");
+    l_npind->setType("NLPOS");
 
     // creation of "[INTJ]-interjection"
     qCDebug(g_cat_silence) << QString("Creating <[NPINT]-[INTJ]-interjection> item");
@@ -19603,8 +20027,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[671]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
     // creation of Republic sentence <Greek - Sentence 2> node
     qCDebug(g_cat_silence) << QString("Creating Republic sentence <Greek - Sentence 2> node");
@@ -19638,8 +20062,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[460]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054461 node
@@ -19661,8 +20085,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[524]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054463 node
@@ -19675,8 +20099,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCACT");
@@ -19691,8 +20115,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[388]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054466 node
@@ -19714,8 +20138,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[457]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054468 node
@@ -19737,8 +20161,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[490]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCACT");
@@ -19774,8 +20198,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[548]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054474 node
@@ -19787,7 +20211,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[656]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDSUB");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -19814,7 +20238,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054477 node
@@ -19827,7 +20251,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054478 node
@@ -19840,8 +20264,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSGEN");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054480 node
@@ -19853,8 +20277,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[428]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCMID");
@@ -19883,8 +20307,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[674]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054484 node
@@ -19906,8 +20330,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[688]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054486 node
@@ -19919,7 +20343,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[423]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -19935,8 +20359,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[533]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054488 node
@@ -19963,7 +20387,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[532]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIMP");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN2");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -20003,8 +20427,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[568]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
     // creation of Republic sentence <Greek - Sentence 4> node
     qCDebug(g_cat_silence) << QString("Creating Republic sentence <Greek - Sentence 4> node");
@@ -20061,8 +20485,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[561]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054498 node
@@ -20075,7 +20499,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -20111,8 +20535,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[690]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054503 node
@@ -20124,8 +20548,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[548]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054504 node
@@ -20137,7 +20561,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[617]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -20154,8 +20578,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("ASPRF");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCACT");
@@ -20170,8 +20594,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[568]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054507 node
@@ -20183,8 +20607,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[681]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054508 node
@@ -20196,8 +20620,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[569]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054509 node
@@ -20219,8 +20643,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[680]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054511 node
@@ -20242,8 +20666,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[388]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054513 node
@@ -20255,7 +20679,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[656]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDSUB");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -20284,8 +20708,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[696]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054516 node
@@ -20299,7 +20723,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("ASPRF");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -20316,8 +20740,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[620]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
     // creation of Republic sentence <Greek - Sentence 5> node
     qCDebug(g_cat_silence) << QString("Creating Republic sentence <Greek - Sentence 5> node");
@@ -20383,8 +20807,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054526 node
@@ -20396,7 +20820,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[573]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDOPT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -20425,8 +20849,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[567]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054529 node
@@ -20439,8 +20863,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -20453,8 +20877,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[539]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
     // creation of Republic sentence <Greek - Sentence 6> node
     qCDebug(g_cat_silence) << QString("Creating Republic sentence <Greek - Sentence 6> node");
@@ -20490,8 +20914,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[671]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
     // creation of Republic sentence <Greek - Sentence 7> node
     qCDebug(g_cat_silence) << QString("Creating Republic sentence <Greek - Sentence 7> node");
@@ -20515,8 +20939,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[563]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054536 node
@@ -20529,8 +20953,8 @@ void M1Env::GraphInit::init_plato(){
     l_stephanus_array[1]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSGEN");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054537 node
@@ -20542,8 +20966,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[655]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCMID");
@@ -20568,8 +20992,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[550]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054540 node
@@ -20581,8 +21005,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[388]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054541 node
@@ -20594,8 +21018,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[461]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054542 node
@@ -20617,8 +21041,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[428]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCMID");
@@ -20656,8 +21080,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[388]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054547 node
@@ -20679,8 +21103,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[564]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054549 node
@@ -20692,8 +21116,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[623]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSGEN");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054550 node
@@ -20706,8 +21130,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCACT");
@@ -20742,8 +21166,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[564]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054555 node
@@ -20755,8 +21179,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[477]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCACT");
@@ -20771,8 +21195,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[388]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054557 node
@@ -20794,8 +21218,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[388]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054559 node
@@ -20807,8 +21231,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[564]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054560 node
@@ -20820,8 +21244,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[477]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCACT");
@@ -20837,8 +21261,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCMID");
@@ -20853,7 +21277,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[689]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -20879,8 +21303,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[674]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054566 node
@@ -20912,8 +21336,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[509]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054569 node
@@ -20925,7 +21349,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[423]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -20941,8 +21365,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[533]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054571 node
@@ -21004,7 +21428,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("ASIMP");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -21021,8 +21445,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -21057,8 +21481,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[554]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSGEN");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054582 node
@@ -21081,7 +21505,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054584 node
@@ -21094,7 +21518,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054585 node
@@ -21116,8 +21540,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[404]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSGEN");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCACT");
@@ -21133,7 +21557,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054588 node
@@ -21165,7 +21589,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[576]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDSUB");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -21195,8 +21619,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[559]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSGEN");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054594 node
@@ -21219,7 +21643,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054596 node
@@ -21242,8 +21666,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(";", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSGEN");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCACT");
@@ -21303,8 +21727,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[539]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
     // creation of Republic sentence <Greek - Sentence 11> node
     qCDebug(g_cat_silence) << QString("Creating Republic sentence <Greek - Sentence 11> node");
@@ -21348,8 +21772,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[658]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054607 node
@@ -21361,7 +21785,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[579]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDSUB");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -21378,8 +21802,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054610 node
@@ -21391,8 +21815,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[682]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054611 node
@@ -21404,7 +21828,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[575]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -21478,7 +21902,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSDAT");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054619 node
@@ -21510,8 +21934,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[584]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054622 node
@@ -21524,7 +21948,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(";", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -21542,7 +21966,7 @@ void M1Env::GraphInit::init_plato(){
     l_stephanus_array[2]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNFUT");
     l_cur_occ->setType("VFFIN");
@@ -21570,8 +21994,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[550]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054626 node
@@ -21596,8 +22020,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[387]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054628 node
@@ -21633,8 +22057,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054632 node
@@ -21646,8 +22070,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[628]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCMID");
@@ -21683,7 +22107,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(";", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -21701,7 +22125,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("ASIMP");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -21739,8 +22163,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[553]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054640 node
@@ -21765,7 +22189,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("ASIMP");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -21782,7 +22206,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[665]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIMP");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN2");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -21821,7 +22245,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[532]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIMP");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN2");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -21837,8 +22261,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[539]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054649 node
@@ -21850,7 +22274,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[635]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -21877,8 +22301,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -21913,7 +22337,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[395]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN2");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -21939,7 +22363,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[527]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDSUB");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -21976,8 +22400,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[471]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCACT");
@@ -22012,8 +22436,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[550]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054664 node
@@ -22026,7 +22450,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("ASPRF");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -22042,8 +22466,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[497]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054666 node
@@ -22055,8 +22479,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[390]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054667 node
@@ -22069,8 +22493,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054669 node
@@ -22092,8 +22516,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[613]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCMID");
@@ -22118,7 +22542,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[664]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDOPT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -22135,8 +22559,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("ASPRF");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCACT");
@@ -22152,8 +22576,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -22188,8 +22612,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[658]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054678 node
@@ -22201,7 +22625,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[447]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIMP");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN2");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -22218,8 +22642,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -22232,8 +22656,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[671]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
     // creation of Republic sentence <Greek - Sentence 17> node
     qCDebug(g_cat_silence) << QString("Creating Republic sentence <Greek - Sentence 17> node");
@@ -22257,8 +22681,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[405]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCACT");
@@ -22273,7 +22697,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[403]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -22289,8 +22713,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[566]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054685 node
@@ -22313,8 +22737,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(";", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -22327,8 +22751,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[536]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
     // creation of Republic sentence <Greek - Sentence 18> node
     qCDebug(g_cat_silence) << QString("Creating Republic sentence <Greek - Sentence 18> node");
@@ -22362,8 +22786,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[482]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054691 node
@@ -22385,8 +22809,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[622]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSGEN");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054693 node
@@ -22399,7 +22823,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIMP");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN2");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -22417,7 +22841,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -22447,7 +22871,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("ASIMP");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -22473,7 +22897,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[403]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -22490,8 +22914,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -22505,8 +22929,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSNOM");
     l_cur_occ->setType("DGCMP");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
     // creation of Republic sentence <Greek - Sentence 20> node
     qCDebug(g_cat_silence) << QString("Creating Republic sentence <Greek - Sentence 20> node");
@@ -22530,8 +22954,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[672]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054705 node
@@ -22564,8 +22988,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(";", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -22580,8 +23004,8 @@ void M1Env::GraphInit::init_plato(){
     l_stephanus_array[3]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -22646,8 +23070,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[678]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054716 node
@@ -22669,8 +23093,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[550]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054718 node
@@ -22683,7 +23107,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(";", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDOPT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -22732,8 +23156,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[557]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054723 node
@@ -22746,7 +23170,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -22783,7 +23207,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSDAT");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054728 node
@@ -22796,7 +23220,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDSUB");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -22822,8 +23246,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[568]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054732 node
@@ -22855,8 +23279,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[672]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054735 node
@@ -22879,8 +23303,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054738 node
@@ -22902,8 +23326,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[672]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054740 node
@@ -22925,7 +23349,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[481]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDSUB");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -22952,8 +23376,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(";", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -22968,8 +23392,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("DGSUP");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -22983,7 +23407,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDOPT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -23042,8 +23466,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[550]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054753 node
@@ -23065,7 +23489,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[647]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -23178,7 +23602,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[458]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDOPT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -23194,8 +23618,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[559]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSGEN");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054767 node
@@ -23217,8 +23641,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[676]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSGEN");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCACT");
@@ -23243,8 +23667,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[559]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSGEN");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054771 node
@@ -23267,7 +23691,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSDAT");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054773 node
@@ -23280,8 +23704,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(";", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSGEN");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCACT");
@@ -23299,7 +23723,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSNOM");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -23354,8 +23778,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[571]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054781 node
@@ -23367,8 +23791,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[675]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCACT");
@@ -23384,7 +23808,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSNOM");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054783 node
@@ -23398,7 +23822,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("ASIMP");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -23415,7 +23839,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSNOM");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054786 node
@@ -23448,7 +23872,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSGEN");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054789 node
@@ -23481,8 +23905,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCACT");
@@ -23517,8 +23941,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[571]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054796 node
@@ -23540,8 +23964,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[556]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054798 node
@@ -23553,8 +23977,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[478]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054799 node
@@ -23566,8 +23990,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[549]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054800 node
@@ -23589,8 +24013,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[455]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054802 node
@@ -23604,7 +24028,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSGEN");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054803 node
@@ -23638,7 +24062,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSGEN");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054807 node
@@ -23660,8 +24084,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[550]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054809 node
@@ -23673,7 +24097,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[560]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -23689,8 +24113,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[672]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054811 node
@@ -23703,8 +24127,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(";", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -23793,7 +24217,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[469]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -23809,8 +24233,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[550]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054821 node
@@ -23823,7 +24247,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054822 node
@@ -23895,7 +24319,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
     // creation of Republic sentence <Greek - Sentence 28> node
     qCDebug(g_cat_silence) << QString("Creating Republic sentence <Greek - Sentence 28> node");
@@ -23920,7 +24344,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054830 node
@@ -23933,7 +24357,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054831 node
@@ -23946,7 +24370,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSGEN");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054832 node
@@ -23969,7 +24393,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054834 node
@@ -23983,7 +24407,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -23998,7 +24422,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -24033,8 +24457,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[607]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054840 node
@@ -24057,7 +24481,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("ASPRF");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -24074,7 +24498,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSNOM");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054843 node
@@ -24106,8 +24530,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[607]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054846 node
@@ -24121,7 +24545,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSNOM");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054848 node
@@ -24144,7 +24568,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054850 node
@@ -24157,7 +24581,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054851 node
@@ -24170,7 +24594,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSNOM");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054852 node
@@ -24183,7 +24607,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054853 node
@@ -24197,7 +24621,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSGEN");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -24245,7 +24669,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSNOM");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054859 node
@@ -24277,8 +24701,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[571]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054862 node
@@ -24290,8 +24714,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[675]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCACT");
@@ -24308,7 +24732,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("ASPRF");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -24347,7 +24771,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[645]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -24363,8 +24787,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[568]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054869 node
@@ -24377,8 +24801,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(";,", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
     // creation of Republic sentence <Greek - Sentence 31> node
     qCDebug(g_cat_silence) << QString("Creating Republic sentence <Greek - Sentence 31> node");
@@ -24432,8 +24856,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[482]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054876 node
@@ -24445,7 +24869,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[423]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -24461,8 +24885,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[525]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054878 node
@@ -24474,8 +24898,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[590]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054879 node
@@ -24528,7 +24952,7 @@ void M1Env::GraphInit::init_plato(){
     l_stephanus_array[5]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNFUT");
     l_cur_occ->setType("VFFIN");
@@ -24557,7 +24981,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054886 node
@@ -24582,8 +25006,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[397]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054888 node
@@ -24595,8 +25019,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[550]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054889 node
@@ -24608,8 +25032,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[570]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSGEN");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054890 node
@@ -24622,8 +25046,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSGEN");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCACT");
@@ -24639,7 +25063,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054893 node
@@ -24671,8 +25095,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[657]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054896 node
@@ -24684,7 +25108,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[426]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -24700,8 +25124,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[600]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054898 node
@@ -24713,7 +25137,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[426]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -24739,8 +25163,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[605]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054901 node
@@ -24752,8 +25176,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[529]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054902 node
@@ -24796,7 +25220,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDSUB");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -24812,8 +25236,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[494]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054908 node
@@ -24825,7 +25249,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[472]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -24842,7 +25266,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054910 node
@@ -24865,7 +25289,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054912 node
@@ -24878,7 +25302,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSGEN");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054913 node
@@ -24891,7 +25315,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSGEN");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054914 node
@@ -24937,7 +25361,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[475]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN2");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -24953,8 +25377,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[673]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054920 node
@@ -24966,7 +25390,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[396]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -24995,8 +25419,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[568]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054923 node
@@ -25009,8 +25433,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -25046,7 +25470,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -25064,7 +25488,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("ASIMP");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -25081,7 +25505,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[602]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIMP");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN2");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -25119,8 +25543,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[685]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054933 node
@@ -25132,8 +25556,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[482]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054934 node
@@ -25145,7 +25569,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[574]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -25172,8 +25596,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSGEN");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -25187,7 +25611,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSGEN");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
     // creation of Republic sentence <Greek - Sentence 35> node
     qCDebug(g_cat_silence) << QString("Creating Republic sentence <Greek - Sentence 35> node");
@@ -25221,8 +25645,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[620]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -25245,8 +25669,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[547]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054943 node
@@ -25258,8 +25682,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[580]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054944 node
@@ -25271,7 +25695,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[670]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -25297,8 +25721,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[534]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054947 node
@@ -25320,8 +25744,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[550]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054949 node
@@ -25333,8 +25757,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[570]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSGEN");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054950 node
@@ -25346,8 +25770,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[551]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSGEN");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054951 node
@@ -25359,8 +25783,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[494]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054952 node
@@ -25382,8 +25806,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[606]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSGEN");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054954 node
@@ -25396,8 +25820,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSGEN");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054956 node
@@ -25419,8 +25843,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[600]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054958 node
@@ -25432,8 +25856,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[595]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCACT");
@@ -25448,8 +25872,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[643]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054960 node
@@ -25461,7 +25885,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[422]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -25487,8 +25911,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[625]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054963 node
@@ -25500,8 +25924,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[564]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054964 node
@@ -25523,8 +25947,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[603]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054966 node
@@ -25550,8 +25974,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[564]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054969 node
@@ -25574,8 +25998,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -25589,7 +26013,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSGEN");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
     // creation of Republic sentence <Greek - Sentence 36> node
     qCDebug(g_cat_silence) << QString("Creating Republic sentence <Greek - Sentence 36> node");
@@ -25634,8 +26058,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[624]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054976 node
@@ -25647,8 +26071,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[483]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054977 node
@@ -25660,7 +26084,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[394]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -25686,8 +26110,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[696]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054980 node
@@ -25709,7 +26133,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[645]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -25735,8 +26159,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[673]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054984 node
@@ -25749,7 +26173,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -25776,7 +26200,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054988 node
@@ -25789,7 +26213,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054989 node
@@ -25801,8 +26225,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[389]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSGEN");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054990 node
@@ -25815,7 +26239,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054991 node
@@ -25828,7 +26252,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -25855,7 +26279,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054995 node
@@ -25887,8 +26311,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[571]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054998 node
@@ -25900,8 +26324,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[391]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-054999 node
@@ -25915,7 +26339,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("ASPRF");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCMID");
@@ -25940,8 +26364,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[568]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055002 node
@@ -25953,8 +26377,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[388]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055003 node
@@ -25967,7 +26391,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCMID");
@@ -25983,7 +26407,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055005 node
@@ -25996,7 +26420,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055006 node
@@ -26009,7 +26433,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -26026,7 +26450,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055009 node
@@ -26058,8 +26482,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[642]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055012 node
@@ -26082,7 +26506,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055014 node
@@ -26095,7 +26519,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCMID");
@@ -26112,7 +26536,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -26125,8 +26549,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[539]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
     // creation of Republic sentence <Greek - Sentence 37> node
     qCDebug(g_cat_silence) << QString("Creating Republic sentence <Greek - Sentence 37> node");
@@ -26161,8 +26585,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(";", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -26198,7 +26622,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(";", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN2");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -26240,7 +26664,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("ASIMP");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -26301,7 +26725,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("ASIMP");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -26328,8 +26752,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055036 node
@@ -26353,8 +26777,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSVOC");
     l_cur_occ->setType("DGSUP");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -26368,7 +26792,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
     // creation of Republic sentence <Greek - Sentence 41> node
     qCDebug(g_cat_silence) << QString("Creating Republic sentence <Greek - Sentence 41> node");
@@ -26393,7 +26817,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055041 node
@@ -26406,7 +26830,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055042 node
@@ -26418,8 +26842,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[546]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055043 node
@@ -26431,7 +26855,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[578]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN2");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -26462,7 +26886,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055047 node
@@ -26494,8 +26918,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[539]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055050 node
@@ -26507,8 +26931,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[397]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055051 node
@@ -26521,7 +26945,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(";", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN2");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -26561,8 +26985,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055056 node
@@ -26576,7 +27000,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("ASIMP");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -26593,7 +27017,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSGEN");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055059 node
@@ -26616,7 +27040,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSGEN");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055061 node
@@ -26631,7 +27055,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("DGSUP");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -26645,8 +27069,8 @@ void M1Env::GraphInit::init_plato(){
     l_stephanus_array[7]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
     // creation of Republic sentence <Greek - Sentence 43> node
     qCDebug(g_cat_silence) << QString("Creating Republic sentence <Greek - Sentence 43> node");
@@ -26682,7 +27106,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055067 node
@@ -26705,7 +27129,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055069 node
@@ -26737,8 +27161,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[605]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055072 node
@@ -26750,8 +27174,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[451]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055073 node
@@ -26764,7 +27188,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(";", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNFUT");
     l_cur_occ->setType("VFFIN");
@@ -26806,7 +27230,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("ASIMP");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -26823,8 +27247,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[696]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
     // creation of Republic sentence <Greek - Sentence 45> node
     qCDebug(g_cat_silence) << QString("Creating Republic sentence <Greek - Sentence 45> node");
@@ -26872,7 +27296,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -26898,8 +27322,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[605]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055086 node
@@ -26911,8 +27335,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[550]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055087 node
@@ -26935,7 +27359,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSNOM");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055089 node
@@ -26948,7 +27372,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -27007,8 +27431,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[666]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055095 node
@@ -27030,8 +27454,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[525]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055097 node
@@ -27043,7 +27467,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[691]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN2");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -27069,8 +27493,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[568]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055100 node
@@ -27082,8 +27506,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[388]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055101 node
@@ -27109,7 +27533,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055103 node
@@ -27143,7 +27567,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -27201,7 +27625,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("ASIMP");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -27217,8 +27641,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[562]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055114 node
@@ -27240,8 +27664,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[591]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055116 node
@@ -27253,8 +27677,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[571]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055117 node
@@ -27276,8 +27700,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[592]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055119 node
@@ -27289,8 +27713,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[541]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055120 node
@@ -27302,8 +27726,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[548]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055121 node
@@ -27315,8 +27739,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[491]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055122 node
@@ -27328,8 +27752,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[649]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFPRT");
     l_cur_occ->setType("VCACT");
@@ -27345,7 +27769,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(";", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDOPT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -27386,7 +27810,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("ASIMP");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -27413,8 +27837,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055131 node
@@ -27436,8 +27860,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[444]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055133 node
@@ -27459,8 +27883,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[652]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPADJ");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055135 node
@@ -27473,7 +27897,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSGEN");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055136 node
@@ -27486,7 +27910,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("CSNOM");
     l_cur_occ->setType("GNFEM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence Z-GRK-055137 node
@@ -27498,7 +27922,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[669]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -27515,8 +27939,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("CSDAT");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -27614,8 +28038,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -27668,7 +28092,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[289]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070768 node
@@ -27703,7 +28127,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[327]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070771 node
@@ -27716,7 +28140,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -27742,7 +28166,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[289]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070774 node
@@ -27778,7 +28202,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070778 node
@@ -27850,8 +28274,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -27889,7 +28313,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[165]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070788 node
@@ -27912,7 +28336,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -27925,7 +28349,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[41]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070791 node
@@ -27938,7 +28362,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -28038,7 +28462,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -28068,7 +28492,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -28084,8 +28508,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -28147,7 +28571,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[97]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070810 node
@@ -28199,7 +28623,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -28240,7 +28664,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070819 node
@@ -28316,7 +28740,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[175]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -28344,7 +28768,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070829 node
@@ -28367,7 +28791,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[254]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -28395,7 +28819,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[70]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070833 node
@@ -28431,7 +28855,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[240]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070836 node
@@ -28480,7 +28904,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("?", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -28495,7 +28919,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
@@ -28604,7 +29028,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBD");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPST");
     l_cur_occ->setType("VFFIN");
@@ -28685,7 +29109,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[57]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070856 node
@@ -28746,7 +29170,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[265]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -28774,7 +29198,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[111]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070864 node
@@ -28809,7 +29233,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[41]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070867 node
@@ -28834,7 +29258,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -28897,7 +29321,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[144]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070874 node
@@ -28933,7 +29357,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[216]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070877 node
@@ -28994,7 +29418,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070883 node
@@ -29045,7 +29469,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[216]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070887 node
@@ -29081,7 +29505,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[240]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070890 node
@@ -29117,7 +29541,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[144]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070893 node
@@ -29154,7 +29578,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[144]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070896 node
@@ -29190,7 +29614,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[240]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070899 node
@@ -29227,7 +29651,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070903 node
@@ -29240,7 +29664,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -29256,8 +29680,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -29285,7 +29709,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070908 node
@@ -29310,7 +29734,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -29326,8 +29750,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -29357,8 +29781,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
@@ -29385,7 +29809,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -29463,7 +29887,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -29525,7 +29949,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[193]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070926 node
@@ -29561,7 +29985,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[222]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070929 node
@@ -29584,7 +30008,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[167]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -29600,7 +30024,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -29616,7 +30040,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070934 node
@@ -29664,7 +30088,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[193]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070938 node
@@ -29724,7 +30148,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[225]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -29752,7 +30176,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -29768,7 +30192,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("?", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -29904,7 +30328,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -29942,7 +30366,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[232]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPR$");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PSYES");
     l_cur_occ->setType("PTPRS");
@@ -29958,7 +30382,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070965 node
@@ -29983,7 +30407,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -30033,7 +30457,7 @@ void M1Env::GraphInit::init_plato(){
     l_stephanus_array[2]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070971 node
@@ -30057,7 +30481,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[9]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070973 node
@@ -30082,8 +30506,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -30134,8 +30558,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -30172,7 +30596,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -30199,7 +30623,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[82]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070985 node
@@ -30222,8 +30646,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[142]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPR$");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PSYES");
     l_cur_occ->setType("PTPRS");
@@ -30239,7 +30663,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("?", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -30254,7 +30678,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
@@ -30316,8 +30740,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -30355,7 +30779,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-070998 node
@@ -30368,8 +30792,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -30462,7 +30886,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -30499,7 +30923,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[298]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTIND");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -30548,8 +30972,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
@@ -30590,7 +31014,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -30642,8 +31066,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -30669,8 +31093,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -30685,7 +31109,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -30734,7 +31158,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[165]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071029 node
@@ -30758,8 +31182,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -30822,7 +31246,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -30875,8 +31299,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[142]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPR$");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PSYES");
     l_cur_occ->setType("PTPRS");
@@ -30907,8 +31331,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
@@ -30949,7 +31373,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -31011,8 +31435,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -31040,7 +31464,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(":", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071054 node
@@ -31054,7 +31478,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -31070,8 +31494,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -31097,7 +31521,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -31112,7 +31536,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[165]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071059 node
@@ -31136,7 +31560,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[298]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTIND");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -31162,7 +31586,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("?", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTIND");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -31241,8 +31665,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
@@ -31259,7 +31683,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
@@ -31310,8 +31734,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -31325,7 +31749,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[167]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -31341,7 +31765,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTIND");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -31356,7 +31780,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("true", M1Env::CAPTL_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTIND");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
     // creation of Republic sentence <Jowett - Sentence 15> node
@@ -31394,7 +31818,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -31422,7 +31846,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -31452,7 +31876,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("true", M1Env::CAPTL_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTIND");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
     // creation of Republic sentence <Jowett - Sentence 16> node
@@ -31491,7 +31915,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -31541,7 +31965,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -31566,7 +31990,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -31673,7 +32097,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -31751,7 +32175,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[186]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071111 node
@@ -31786,7 +32210,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[244]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071114 node
@@ -31810,7 +32234,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071117 node
@@ -31845,7 +32269,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[45]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071120 node
@@ -31858,7 +32282,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -31995,7 +32419,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -32036,7 +32460,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("true", M1Env::CAPTL_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTIND");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
     // creation of Republic sentence <Jowett - Sentence 18> node
@@ -32185,7 +32609,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[24]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTIND");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -32210,7 +32634,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -32261,7 +32685,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[202]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071157 node
@@ -32404,7 +32828,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[240]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071170 node
@@ -32451,7 +32875,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[45]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071174 node
@@ -32500,7 +32924,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[204]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071178 node
@@ -32524,7 +32948,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("?", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -32575,7 +32999,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
@@ -32627,7 +33051,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[165]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071190 node
@@ -32663,7 +33087,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[45]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071193 node
@@ -32687,7 +33111,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[149]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071195 node
@@ -32710,7 +33134,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[203]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071197 node
@@ -32734,7 +33158,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPPRT");
     l_cur_occ->setType("NTGRB");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PLNEG");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -32758,7 +33182,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -32794,7 +33218,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[45]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071207 node
@@ -32843,7 +33267,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -32946,7 +33370,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[149]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071221 node
@@ -32971,7 +33395,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071224 node
@@ -33073,7 +33497,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -33112,7 +33536,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[111]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071236 node
@@ -33136,7 +33560,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("?", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -33236,7 +33660,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071248 node
@@ -33272,7 +33696,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("?", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -33310,7 +33734,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -33348,7 +33772,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[228]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071257 node
@@ -33372,7 +33796,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[165]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071259 node
@@ -33442,7 +33866,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[161]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071265 node
@@ -33465,7 +33889,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[186]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071267 node
@@ -33502,7 +33926,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[331]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -33515,7 +33939,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[77]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071271 node
@@ -33539,7 +33963,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("?", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -33591,7 +34015,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[165]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071278 node
@@ -33604,7 +34028,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -33642,7 +34066,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[45]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071282 node
@@ -33666,7 +34090,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[167]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -33682,7 +34106,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -33733,7 +34157,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -33774,7 +34198,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -33826,7 +34250,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -33864,7 +34288,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("?", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -33880,7 +34304,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
@@ -33955,7 +34379,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[114]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071306 node
@@ -33991,7 +34415,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[61]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071309 node
@@ -34016,7 +34440,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setType("RFYES");
@@ -34032,7 +34456,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -34060,7 +34484,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[247]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071315 node
@@ -34085,7 +34509,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -34146,7 +34570,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071324 node
@@ -34181,7 +34605,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -34221,7 +34645,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -34252,7 +34676,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("true", M1Env::CAPTL_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
     // creation of Republic sentence <Jowett - Sentence 30> node
     qCDebug(g_cat_silence) << QString("Creating Republic sentence <Jowett - Sentence 30> node");
@@ -34289,7 +34713,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071336 node
@@ -34313,7 +34737,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071339 node
@@ -34327,7 +34751,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -34366,7 +34790,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -34408,7 +34832,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -34460,7 +34884,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[61]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071350 node
@@ -34485,7 +34909,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -34541,7 +34965,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -34619,7 +35043,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -34658,7 +35082,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[200]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPR$");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PSYES");
     l_cur_occ->setType("PTPRS");
@@ -34673,7 +35097,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[351]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071367 node
@@ -34698,7 +35122,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
@@ -34715,7 +35139,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
@@ -34781,7 +35205,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -34831,7 +35255,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[85]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071380 node
@@ -34855,7 +35279,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071383 node
@@ -34868,7 +35292,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071385 node
@@ -34943,7 +35367,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -34993,7 +35417,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[76]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071396 node
@@ -35028,7 +35452,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071400 node
@@ -35091,7 +35515,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
@@ -35168,7 +35592,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[115]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071411 node
@@ -35182,7 +35606,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -35232,8 +35656,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[157]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPR$");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PSYES");
     l_cur_occ->setType("PTPRS");
@@ -35248,7 +35672,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[304]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071417 node
@@ -35272,8 +35696,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[157]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPR$");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PSYES");
     l_cur_occ->setType("PTPRS");
@@ -35289,7 +35713,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(";", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071421 node
@@ -35313,7 +35737,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -35338,7 +35762,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -35378,7 +35802,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[304]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071428 node
@@ -35427,7 +35851,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[274]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071432 node
@@ -35441,7 +35865,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -35494,7 +35918,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071438 node
@@ -35518,7 +35942,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -35543,7 +35967,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -35569,7 +35993,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[304]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071444 node
@@ -35604,7 +36028,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[274]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071447 node
@@ -35618,7 +36042,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -35684,7 +36108,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -35723,7 +36147,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[356]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071456 node
@@ -35932,7 +36356,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("?", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -36007,7 +36431,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[165]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071480 node
@@ -36020,7 +36444,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -36049,7 +36473,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071484 node
@@ -36095,7 +36519,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[61]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071488 node
@@ -36147,8 +36571,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
@@ -36187,7 +36611,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[165]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071495 node
@@ -36200,7 +36624,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -36229,7 +36653,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071499 node
@@ -36301,7 +36725,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -36341,7 +36765,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -36356,7 +36780,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[228]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071509 node
@@ -36393,7 +36817,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("?", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -36432,8 +36856,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -36473,7 +36897,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[228]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071520 node
@@ -36486,7 +36910,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -36501,7 +36925,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -36537,7 +36961,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -36614,7 +37038,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -36730,7 +37154,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[366]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071540 node
@@ -36764,7 +37188,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[165]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071543 node
@@ -36777,7 +37201,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -36841,7 +37265,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("?", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -36892,8 +37316,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -36967,7 +37391,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[45]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071562 node
@@ -37002,7 +37426,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -37027,7 +37451,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -37065,7 +37489,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -37090,7 +37514,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("?", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -37145,7 +37569,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071577 node
@@ -37174,7 +37598,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -37214,7 +37638,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -37289,7 +37713,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[86]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence B-JWT-071590 node
@@ -37314,7 +37738,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
@@ -37353,7 +37777,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
@@ -37409,8 +37833,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
@@ -37460,7 +37884,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[47]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -37499,7 +37923,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079364 node
@@ -37535,7 +37959,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[47]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -37561,7 +37985,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[41]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079369 node
@@ -37574,8 +37998,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setType("RFYES");
@@ -37603,7 +38027,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -37664,7 +38088,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[297]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTIND");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -37677,7 +38101,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[337]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -37716,8 +38140,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -37755,7 +38179,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[165]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079384 node
@@ -37780,8 +38204,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -37846,8 +38270,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[142]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPR$");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PSYES");
     l_cur_occ->setType("PTPRS");
@@ -37862,7 +38286,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[174]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079393 node
@@ -37875,7 +38299,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -37903,7 +38327,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[97]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079396 node
@@ -37941,7 +38365,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("?", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -37994,7 +38418,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -38046,7 +38470,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[97]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079407 node
@@ -38059,7 +38483,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079409 node
@@ -38095,7 +38519,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[184]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079412 node
@@ -38108,7 +38532,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -38172,7 +38596,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(":", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -38198,7 +38622,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[194]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079422 node
@@ -38221,7 +38645,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[273]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079424 node
@@ -38245,7 +38669,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("?”", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -38261,7 +38685,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
@@ -38322,7 +38746,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -38336,7 +38760,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",”", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079437 node
@@ -38349,8 +38773,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -38457,7 +38881,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(":", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079450 node
@@ -38482,7 +38906,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[184]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079452 node
@@ -38506,7 +38930,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[333]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079454 node
@@ -38519,7 +38943,7 @@ void M1Env::GraphInit::init_plato(){
     l_stephanus_array[1]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -38547,7 +38971,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[41]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079457 node
@@ -38572,8 +38996,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setType("RFYES");
@@ -38601,7 +39025,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -38663,7 +39087,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
     l_cur_occ->setType("DGPOS");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079469 node
@@ -38700,7 +39124,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[327]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079472 node
@@ -38749,8 +39173,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -38788,7 +39212,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[310]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -38816,7 +39240,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[236]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079482 node
@@ -38851,8 +39275,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[158]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -38879,8 +39303,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -38908,7 +39332,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079490 node
@@ -38921,7 +39345,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -38936,8 +39360,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[142]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPR$");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PSYES");
     l_cur_occ->setType("PTPRS");
@@ -38953,7 +39377,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079494 node
@@ -38991,7 +39415,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079498 node
@@ -39055,7 +39479,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[97]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079503 node
@@ -39068,7 +39492,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("?”", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -39084,8 +39508,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
@@ -39112,7 +39536,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -39163,8 +39587,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -39220,7 +39644,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -39308,7 +39732,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[306]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079529 node
@@ -39368,7 +39792,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079535 node
@@ -39381,7 +39805,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079537 node
@@ -39405,7 +39829,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -39466,7 +39890,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079545 node
@@ -39479,7 +39903,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("?”", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -39547,8 +39971,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -39574,7 +39998,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -39601,7 +40025,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[225]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -39629,7 +40053,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -39728,7 +40152,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[232]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPR$");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PSYES");
     l_cur_occ->setType("PTPRS");
@@ -39743,7 +40167,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[305]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079573 node
@@ -39819,7 +40243,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -39856,7 +40280,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[356]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079582 node
@@ -39894,8 +40318,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -39947,8 +40371,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -40000,8 +40424,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -40049,8 +40473,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -40065,7 +40489,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -40103,8 +40527,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[142]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPR$");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PSYES");
     l_cur_occ->setType("PTPRS");
@@ -40132,7 +40556,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("?”", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -40148,7 +40572,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
@@ -40200,8 +40624,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -40294,7 +40718,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -40358,8 +40782,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -40424,7 +40848,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -40451,8 +40875,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -40477,7 +40901,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[331]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -40491,7 +40915,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079640 node
@@ -40540,8 +40964,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -40555,7 +40979,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[167]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -40571,7 +40995,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTIND");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -40584,7 +41008,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[207]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTIND");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -40597,7 +41021,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[132]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -40613,8 +41037,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -40630,8 +41054,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -40658,7 +41082,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -40743,8 +41167,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -40773,7 +41197,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTIND");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -40811,7 +41235,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -40826,7 +41250,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(":", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -40841,7 +41265,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -40857,8 +41281,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -40883,7 +41307,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[167]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -40910,7 +41334,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[298]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTIND");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -40936,7 +41360,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("?", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTIND");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -41014,8 +41438,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[142]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPR$");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PSYES");
     l_cur_occ->setType("PTPRS");
@@ -41031,7 +41455,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".”", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -41047,7 +41471,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
@@ -41099,8 +41523,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -41141,8 +41565,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -41156,7 +41580,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[167]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -41172,7 +41596,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".”", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTIND");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -41189,7 +41613,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -41217,8 +41641,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -41232,7 +41656,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[298]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTIND");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -41258,7 +41682,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -41286,7 +41710,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -41317,7 +41741,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("“", M1Env::PCTLF_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
     // creation of Republic sentence <Shorey - Sentence 16> node
@@ -41344,7 +41768,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -41397,7 +41821,7 @@ void M1Env::GraphInit::init_plato(){
     l_stephanus_array[3]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -41422,7 +41846,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -41480,7 +41904,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
@@ -41557,7 +41981,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -41606,7 +42030,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -41645,8 +42069,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -41682,7 +42106,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[245]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079746 node
@@ -41706,7 +42130,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079749 node
@@ -41729,7 +42153,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -41767,7 +42191,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -41783,7 +42207,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -41834,7 +42258,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -41880,7 +42304,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[356]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079767 node
@@ -41895,7 +42319,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -41911,7 +42335,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -41948,7 +42372,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[356]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079773 node
@@ -42067,7 +42491,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079788 node
@@ -42093,7 +42517,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -42237,8 +42661,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -42287,7 +42711,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -42346,7 +42770,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -42373,7 +42797,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -42419,7 +42843,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[356]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079819 node
@@ -42433,7 +42857,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -42501,7 +42925,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[165]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079830 node
@@ -42513,7 +42937,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[239]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -42539,7 +42963,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -42564,7 +42988,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -42591,7 +43015,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[149]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079837 node
@@ -42614,7 +43038,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[203]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079839 node
@@ -42637,7 +43061,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -42662,7 +43086,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -42702,7 +43126,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -42726,7 +43150,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[172]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -42753,7 +43177,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -42802,7 +43226,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[298]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTIND");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -42826,7 +43250,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[206]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079857 node
@@ -42851,7 +43275,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079860 node
@@ -42898,7 +43322,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[328]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079864 node
@@ -42972,7 +43396,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".”", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -42988,7 +43412,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -43039,7 +43463,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[328]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079879 node
@@ -43063,7 +43487,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -43091,7 +43515,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("?”", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -43122,7 +43546,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -43150,8 +43574,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -43190,7 +43614,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[115]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079895 node
@@ -43213,7 +43637,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[284]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079897 node
@@ -43331,7 +43755,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[228]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079910 node
@@ -43344,7 +43768,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -43396,7 +43820,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[328]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079915 node
@@ -43420,7 +43844,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[284]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079917 node
@@ -43477,7 +43901,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[352]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079923 node
@@ -43500,8 +43924,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[157]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPR$");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PSYES");
     l_cur_occ->setType("PTPRS");
@@ -43540,7 +43964,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[248]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079928 node
@@ -43565,7 +43989,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".”", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -43580,7 +44004,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("“", M1Env::PCTLF_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
     // creation of Republic sentence <Shorey - Sentence 27> node
@@ -43606,7 +44030,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -43661,7 +44085,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -43712,7 +44136,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[284]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079947 node
@@ -43725,7 +44149,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -43776,7 +44200,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -43802,7 +44226,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -43840,7 +44264,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -43876,7 +44300,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -43901,7 +44325,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -43918,7 +44342,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -43983,7 +44407,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -44013,7 +44437,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -44041,7 +44465,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -44107,7 +44531,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".”", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -44146,7 +44570,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("?”", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -44187,7 +44611,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -44225,7 +44649,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079994 node
@@ -44238,7 +44662,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079996 node
@@ -44250,7 +44674,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[0]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-079997 node
@@ -44289,7 +44713,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[61]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080000 node
@@ -44312,7 +44736,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[103]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080002 node
@@ -44335,7 +44759,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[352]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080004 node
@@ -44370,7 +44794,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -44419,7 +44843,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[327]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080011 node
@@ -44492,7 +44916,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -44519,7 +44943,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -44586,7 +45010,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
@@ -44636,7 +45060,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[294]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080028 node
@@ -44661,7 +45085,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080031 node
@@ -44685,7 +45109,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080034 node
@@ -44712,7 +45136,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080037 node
@@ -44809,7 +45233,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[61]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080045 node
@@ -44833,7 +45257,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[341]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080047 node
@@ -44859,7 +45283,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -44874,7 +45298,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBP");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -44931,7 +45355,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SS", M1Env::STPOS_SIID);
@@ -44972,8 +45396,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -45042,7 +45466,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[200]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPR$");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PSYES");
     l_cur_occ->setType("PTPRS");
@@ -45057,7 +45481,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[212]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080070 node
@@ -45082,7 +45506,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
@@ -45134,7 +45558,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[115]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080076 node
@@ -45148,7 +45572,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -45209,7 +45633,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[63]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080082 node
@@ -45233,7 +45657,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[292]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080084 node
@@ -45269,7 +45693,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[185]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080087 node
@@ -45304,7 +45728,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[332]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -45374,7 +45798,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[56]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080096 node
@@ -45388,7 +45812,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -45415,7 +45839,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[200]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPR$");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PSYES");
     l_cur_occ->setType("PTPRS");
@@ -45430,7 +45854,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[113]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080100 node
@@ -45478,7 +45902,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[200]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPR$");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PSYES");
     l_cur_occ->setType("PTPRS");
@@ -45493,7 +45917,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[333]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080105 node
@@ -45517,7 +45941,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[328]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080107 node
@@ -45603,7 +46027,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[57]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080114 node
@@ -45639,7 +46063,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[115]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080117 node
@@ -45653,7 +46077,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -45703,7 +46127,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[328]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080122 node
@@ -45727,7 +46151,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -45762,8 +46186,8 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[158]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -45778,7 +46202,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -45831,8 +46255,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -45847,7 +46271,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -45875,8 +46299,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -45891,7 +46315,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -45917,7 +46341,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[331]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -45930,7 +46354,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[356]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080141 node
@@ -45955,7 +46379,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -46040,7 +46464,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -46068,7 +46492,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080153 node
@@ -46092,7 +46516,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -46117,7 +46541,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -46182,7 +46606,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[328]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080162 node
@@ -46206,7 +46630,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[5]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -46246,7 +46670,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[328]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080167 node
@@ -46260,7 +46684,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -46313,7 +46737,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080173 node
@@ -46337,7 +46761,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -46374,7 +46798,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -46477,7 +46901,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -46507,7 +46931,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge("?”", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -46561,8 +46985,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -46642,7 +47066,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[200]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPR$");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PSYES");
     l_cur_occ->setType("PTPRS");
@@ -46658,7 +47082,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",”", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080209 node
@@ -46686,7 +47110,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -46712,7 +47136,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[284]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080215 node
@@ -46749,7 +47173,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080219 node
@@ -46813,8 +47237,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -46829,7 +47253,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -46857,7 +47281,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[115]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080227 node
@@ -46895,7 +47319,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080231 node
@@ -46942,7 +47366,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[61]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080235 node
@@ -46996,8 +47420,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
@@ -47038,7 +47462,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",”", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -47052,8 +47476,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -47142,7 +47566,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".”", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -47182,7 +47606,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080262 node
@@ -47207,7 +47631,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -47234,8 +47658,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSACC");
-    l_cur_occ->setType("GNDNT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GNEUT");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -47283,7 +47707,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[61]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080270 node
@@ -47307,7 +47731,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".”", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -47357,7 +47781,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(",”", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTNNS");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080280 node
@@ -47370,8 +47794,8 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("GNMSC");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("GMASC");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -47411,7 +47835,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[317]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGDT");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTDEM");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -47447,7 +47871,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -47511,7 +47935,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -47526,7 +47950,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[211]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PTIND");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -47574,7 +47998,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[115]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080299 node
@@ -47598,7 +48022,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".”", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
@@ -47709,7 +48133,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[284]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080312 node
@@ -47733,7 +48157,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[228]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080314 node
@@ -47845,7 +48269,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[184]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080325 node
@@ -47882,7 +48306,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[147]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080328 node
@@ -48011,7 +48435,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -48039,7 +48463,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPPRN");
     l_cur_occ->setType("NTPRP");
     l_cur_occ->setType("CSNOM");
-    l_cur_occ->setType("NMPLR");
+    l_cur_occ->setType("NPLUR");
     l_cur_occ->setType("PRSN1");
     l_cur_occ->setType("PTPRS");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
@@ -48103,7 +48527,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[228]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080351 node
@@ -48116,7 +48540,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setType("NPVRB");
     l_cur_occ->setType("NTVBZ");
     l_cur_occ->setType("MDIND");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setType("PRSN3");
     l_cur_occ->setType("TNPRS");
     l_cur_occ->setType("VFFIN");
@@ -48156,7 +48580,7 @@ void M1Env::GraphInit::init_plato(){
     l_form_array[328]->linkTo(l_cur_occ, "OWNS_");
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 
     // creation of Republic occurrence A-SHR-080355 node
@@ -48192,7 +48616,7 @@ void M1Env::GraphInit::init_plato(){
     l_cur_occ->setFieldEdge(".”", M1Env::PCTRT_SIID);
     l_cur_occ->setType("NPNON");
     l_cur_occ->setType("NTGNN");
-    l_cur_occ->setType("NMSNG");
+    l_cur_occ->setType("NSING");
     l_cur_occ->setFieldEdge("SE", M1Env::STPOS_SIID);
     l_cur_sentence_occ = l_cur_sentence->linkTo(l_cur_occ, "OWNS_", l_cur_sentence_occ, false);
 }

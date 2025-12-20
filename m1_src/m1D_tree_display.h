@@ -9,7 +9,7 @@
 #include <QGraphicsItem>
 
 #include "m1B_lv2_item.h"
-#include "m1C_interp.h"
+#include "m1C_interp_new.h"
 #include "m1D_main_window.h"
 
 namespace M1UI{
@@ -18,34 +18,39 @@ namespace M1UI{
         Q_OBJECT
     private:
         // void addTestWidgets();
-        void addInterp(M1Store::Item_lv2* p_root);
-        M1MidPlane::Interp* addInterpRecur(M1Store::Item_lv2* p_root,
+        void addRow(M1Store::Item_lv2* p_root);
+        M1UI::TreeRow* addRowRecur(M1Store::Item_lv2* p_root,
                                            int p_depth,
-                                           QVBoxLayout* p_vb,
                                            QVector<M1Store::ItemID>& p_edges_alrady_traversed);
 
         void variousTests();
 
         M1Store::Item_lv2* m_root;
         MainWindow *m_main_window;
+
         M1Store::SpecialItem* m_new_edge_type;
         M1Store::SpecialItem* m_new_vertex_type;
-        QList<M1MidPlane::Interp*> m_interp_list;
-        M1MidPlane::Interp* m_old_interp = nullptr;
         QWidget* m_scroll_area_widget = nullptr;
         QVBoxLayout* m_vb_layout = nullptr;
-        M1MidPlane::Interp* m_being_dragged = nullptr;
+
+        QList<M1UI::TreeRow*> m_tree_row_list;
+
+        M1UI::TreeRow* m_old_tree_row = nullptr;
+        M1UI::TreeRow* m_being_dragged = nullptr;
     public:
         explicit TreeDisplay(QWidget *p_parent, MainWindow *p_main_window);
 
         virtual void paintEvent(QPaintEvent *);
         M1Store::SpecialItem* newEdgeType();
         M1Store::SpecialItem* newVertexType();
-        void setBeingDragged(M1MidPlane::Interp* p_being_dragged){m_being_dragged = p_being_dragged;}
+        void setBeingDragged(M1UI::TreeRow* p_being_dragged){m_being_dragged = p_being_dragged;}
         void restoreAcceptDrop();
+
+        QVBoxLayout* tree_vb_layout(){return m_vb_layout;}
+        QWidget* scroll_area_widget(){return m_scroll_area_widget;}
         // virtual void mouseMoveEvent(QMouseEvent *p_event);
     public slots:
-        void gotoVertex(M1Store::Item_lv2* p_new_vertex, M1MidPlane::Interp* p_sender);
+        void gotoVertex(M1Store::Item_lv2* p_new_vertex, M1UI::TreeRow* p_sender);
         void htmlReceive(const QString& p_html);
         void edgeTypeSelected(int p_index);
         void vertexTypeSelected(int p_index);

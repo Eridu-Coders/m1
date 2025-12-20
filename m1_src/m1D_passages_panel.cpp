@@ -12,11 +12,17 @@
 // g_cat_passages_panel
 Q_LOGGING_CATEGORY(g_cat_passages_panel, "passages_panel")
 
-// TODO English passage lengths proportional to Greek length (calculate ratio of distance between 2 Stephanus markers)
-
 // BasePassageItem ---------------------------------------------------------------------------------------------------------------------------------------
 QFont M1UI::WordItem::BasePassageItem::cm_base_font = QFont("Noto Mono", 12);
 
+/**
+ * @brief M1UI::BasePassageItem::BasePassageItem
+ *
+ * \todo English passage lengths proportional to Greek length (calculate ratio of distance between 2 Stephanus markers)
+ *
+ * @param p_id
+ * @param p_parent
+ */
 M1UI::BasePassageItem::BasePassageItem(const int p_id, PassageEditor *p_parent): QGraphicsSimpleTextItem(p_parent){
     m_id = p_id;
     m_editor = p_parent;

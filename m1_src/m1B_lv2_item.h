@@ -44,6 +44,8 @@ class Item_lv2 : public Item_lv1 {
                                 const FlagField p_flags_special,
                                 const char* p_mnemonic,
                                 const char* p_icon_path);
+        static Item_lv2* getNew(const FlagField p_flags,
+                                const QString& p_label){return getNew(p_flags, p_label.toUtf8().constData());}
 
         static Item_lv2* getExisting(const char* p_mnemonic);
         static Item_lv2* getExisting(const ItemID p_item_id);

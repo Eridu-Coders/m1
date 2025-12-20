@@ -23,7 +23,11 @@ extern M1Env::SpecialItemID TEXT_WRITTEN_BY_SIID;
 extern M1Env::SpecialItemID OCCUR_SIID;
 // [WFORM] Special Vertex ID (Vertex type) of word form vertices
 extern M1Env::SpecialItemID WFORM_SIID;
-// [CAPTL] Special Vertex ID (Simple edge type) of Occurrence field capitalization flaf
+// [TXATL] Special Vertex ID (Simple edge type) alternate text title
+extern M1Env::SpecialItemID TEXT_ALT_TITLE_SIID;
+// [TXSBT] Special Vertex ID (Simple edge type) text subtitle
+extern M1Env::SpecialItemID TEXT_SUB_TITLE_SIID;
+// [CAPTL] Special Vertex ID (Simple edge type) of Occurrence field capitalization flag
 extern M1Env::SpecialItemID CAPTL_SIID;
 // [PCTLF] Special Vertex ID (Simple edge type) of Occurrence field left punctuation
 extern M1Env::SpecialItemID PCTLF_SIID;
@@ -186,16 +190,26 @@ extern M1Env::SpecialItemID POSS__SIID;
 extern M1Env::SpecialItemID PTRNY_SIID;
 // [REFLE] Special Vertex ID of "Reflexive"
 extern M1Env::SpecialItemID REFLE_SIID;
+// [II___] Special Vertex ID of "In initio"
+extern M1Env::SpecialItemID II____SIID;
 // [TENSE] Special Vertex ID of "Tense"
 extern M1Env::SpecialItemID TENSE_SIID;
 // [TYPO_] Special Vertex ID of "Is this a misspelled word?"
 extern M1Env::SpecialItemID TYPO__SIID;
 // [VFRBR] Special Vertex ID of "Form of verb or deverbative"
 extern M1Env::SpecialItemID VFRBR_SIID;
+// [VCRBN] Special Vertex ID of "Verb conjugation"
+extern M1Env::SpecialItemID VCRBN_SIID;
 // [VTRBY] Special Vertex ID of "Verb type"
 extern M1Env::SpecialItemID VTRBY_SIID;
+// [UNDCD] Special Vertex ID of "Undecided codes"
+extern M1Env::SpecialItemID UNDCD_SIID;
 // [VOICE] Special Vertex ID of "Voice"
 extern M1Env::SpecialItemID VOICE_SIID;
+// [NPIIC] Special Vertex ID of "[IIC]-in intio compositi"
+extern M1Env::SpecialItemID NPIIC_SIID;
+// [NPIIV] Special Vertex ID of "[IIV]-in intio verbi"
+extern M1Env::SpecialItemID NPIIV_SIID;
 // [NPADJ] Special Vertex ID of "[ADJ]-adjective"
 extern M1Env::SpecialItemID NPADJ_SIID;
 // [NPADP] Special Vertex ID of "[ADP]-adposition"
@@ -208,6 +222,8 @@ extern M1Env::SpecialItemID NPAUX_SIID;
 extern M1Env::SpecialItemID NPCNJ_SIID;
 // [NPDET] Special Vertex ID of "[DET]-determiner"
 extern M1Env::SpecialItemID NPDET_SIID;
+// [NPIND] Special Vertex ID of "[IND]-indeclinable"
+extern M1Env::SpecialItemID NPIND_SIID;
 // [NPINT] Special Vertex ID of "[INTJ]-interjection"
 extern M1Env::SpecialItemID NPINT_SIID;
 // [NPNON] Special Vertex ID of "[NOUN]-noun"

@@ -95,10 +95,10 @@ g_grammar_translation = {
     'ac.': 'VCACT',
     'mo.': 'VCMID',
     'ps.': 'VCPSS',
-    'act.': '??ACT',
-    'agt.': '??AGT',
-    'per.': '??PER',
-    'tasil': '??TSL',
+    'act.': '__ACT',
+    'agt.': '__AGT',
+    'per.': '__PER',
+    'tasil': '__TSL',
     '*': 'GNFEM/GNEUT/GMASC'
 }
 

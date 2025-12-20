@@ -252,6 +252,81 @@ QIcon* M1MidPlane::Interp::vertexIcon(){
     return M1Store::StorageStatic::getQIcon(m_myself->getTarget_lv2()->getIconSITypeID());
 }
 
+QString base_html_fragment(M1Store::Item_lv2* p_myself, const QString& p_class_name=QString()){
+    M1_FUNC_ENTRY(g_cat_tmp_spotlight, QString("base_html_fragment: %1").arg(p_myself->isFullEdge() ? p_myself->getTarget_lv2()->text() : p_myself->text()))
+
+    QStringList l_self_list;
+    l_self_list.append(QString("<tr><td>ID</td><td>:</td><td>%1</td></tr>\n").arg(p_myself->item_id()));
+    l_self_list.append(QString("<tr><td>Nature</td><td>:</td><td>%1</td></tr>\n").arg(p_myself->isFullEdge() ? "Full Edge" : (p_myself->isSimpleEdge() ? "Simple Edge" : "ERRORO") ));
+    l_self_list.append(QString("<tr><td>Type</td><td>:</td><td>%1</td></tr>\n").arg(p_myself->dbgTypeShort()));
+    QString l_self_html = QString("<table>%1</table>\n").arg(l_self_list.join("\n"));
+    qCDebug(g_cat_tmp_spotlight) << "l_self_html:" << l_self_html;
+
+    QString l_html;
+    if(p_myself->isFullEdge()){
+        // full edge (target = full vertex or field)
+        QString l_target_html = p_myself->getTarget_lv2()->isSimpleEdge() ?
+                                    QString("<p><spanstyle=\"font-weight: bold;\">Field Payload</span>: %1</p>\n").arg(p_myself->getTarget_lv2()->text()) :
+                                    QString("<p style=\"font-weight: bold;\">Target:</p>\n<p>%1</p>\n").arg(p_myself->getTarget_lv2()->dbgStringHtml());
+        qCDebug(g_cat_tmp_spotlight) << "l_target_html:" << l_target_html;
+        l_html =
+            QString("<p style=\"font-size: larger;\">%2</p>\n<p style=\"font-weight: bold;\">Edge:</p>\n%1\n")
+                .arg(l_self_html)
+                .arg(p_class_name.length() > 0 ? p_class_name : "Interp Base") +
+            l_target_html;
+    }else{
+        // Simple Edge
+        l_html = QString("<p style=\"font-weight: bold;\">Self:</p>\n%1").arg(l_self_html) +
+                 QString("<p><span style=\"font-weight: bold;\">Field Payload</span>: %1</p>\n").arg(p_myself->text());
+    }
+    M1_FUNC_EXIT
+        return QString("<div style=\"font-family: 'Noto mono', Courier New, monospace;\">%1</div>\n").arg(l_html);
+}
+QString M1MidPlane::Interp::getHtml(){
+    M1_FUNC_ENTRY(g_cat_tmp_spotlight, QString("Interp getHtml(): %1").arg(m_myself->dbgShort()))
+    QString l_ret_html = g_html_template.arg(base_html_fragment(m_myself, "FieldInterp"));
+    M1_FUNC_EXIT
+        return l_ret_html;
+}
+
+QWidget *M1MidPlane::Interp::get_edit_widget(){
+    qCDebug(g_cat_interp_base) << QString("text: %1").arg(m_myself->dbgShort());
+
+    QWidget* l_panel_widget = new QWidget();
+    QVBoxLayout* l_panel_layout = new QVBoxLayout();
+    l_panel_widget->setLayout(l_panel_layout);
+
+    QWidget* l_button_bar = new QWidget(l_panel_widget);
+    l_panel_layout->addWidget(l_button_bar);
+    QHBoxLayout* l_bar_layout = new QHBoxLayout();
+    l_button_bar->setLayout(l_bar_layout);
+
+    QPushButton* l_btn0 = new QPushButton("Save", l_button_bar);
+    l_bar_layout->addWidget(l_btn0);
+    l_bar_layout->addStretch(1);
+    QObject::connect(l_btn0, &QPushButton::clicked,
+                     this, &M1MidPlane::Interp::save_text_edit);
+
+    m_text_edit = new QTextEdit(l_panel_widget);
+    l_panel_layout->addWidget(m_text_edit);
+    if(m_myself->isSimpleEdge())
+        m_text_edit->setPlainText(m_myself->text());
+    else
+        m_text_edit->setPlainText(m_myself->getTarget_lv2()->text());
+
+    return l_panel_widget;
+}
+void M1MidPlane::Interp::save_text_edit(){
+    qCDebug(g_cat_interp_base) << "Saving text edit field: " << m_text_edit->toPlainText();
+    if(m_myself->isSimpleEdge())
+        m_myself->setText_lv1(m_text_edit->toPlainText());
+    else
+        m_myself->getTarget_lv2()->setText_lv1(m_text_edit->toPlainText());
+    m_td_parent->repaint();
+    this->emitSignals();
+    this->m_proxy->setFocus(Qt::OtherFocusReason);
+}
+
 void M1MidPlane::Interp::paintEvent(QPaintEvent* p_event){
     qCDebug(g_cat_interp_base) << m_myself->dbgShort() << " painting: " << p_event->rect();
     if(m_proxy != nullptr){
@@ -297,69 +372,6 @@ void M1MidPlane::Interp::mouseDoubleClickEvent(QMouseEvent *p_event){
     emit gotoVertex(m_myself->getTarget_lv2(), this);
 }
 
-QString base_html_fragment(M1Store::Item_lv2* p_myself, const QString& p_class_name=QString()){
-    M1_FUNC_ENTRY(g_cat_interp_base, QString("base_html_fragment: %1").arg(p_myself->getTarget_lv2()->text()))
-    QStringList l_edge_list;
-    l_edge_list.append(QString("<tr><td>ID</td><td>:</td><td>%1</td></tr>\n").arg(p_myself->item_id()));
-    l_edge_list.append(QString("<tr><td>Type</td><td>:</td><td>%1</td></tr>\n").arg(p_myself->dbgTypeShort()));
-    QString l_edge_html = QString("<table>%1</table>\n").arg(l_edge_list.join("\n"));
-    QString l_html;
-    if((p_myself->flags() & M1Env::ITEM_NATURE_MASK) == M1Env::FULL_EDGE){
-        QString l_target_html = p_myself->getTarget_lv2()->dbgStringHtml();
-        qCDebug(g_cat_tree_display) << l_target_html;
-        l_html =
-            QString("<p style=\"font-size: larger;\">%2</p>\n<p style=\"font-weight: bold;\">Edge:</p>\n%1\n")
-                     .arg(l_edge_html)
-                     .arg(p_class_name.length() > 0 ? p_class_name : "Interp Base") +
-                 QString("<p style=\"font-weight: bold;\">Target:</p>\n<p>%1</p>\n").arg(l_target_html);
-    }else{
-        // Simple Edge
-        QString l_payload_html = p_myself->text();
-        qCDebug(g_cat_tree_display) << l_payload_html;
-        l_html = QString("<p style=\"font-weight: bold;\">Edge:</p>\n%1").arg(l_edge_html) +
-            QString("<p style=\"font-weight: bold;\">Payload: %1</p>\n").arg(l_payload_html);
-    }
-    M1_FUNC_EXIT
-    return QString("<div style=\"font-family: 'Noto mono', Courier New, monospace;\">%1</div>\n").arg(l_html);
-}
-
-QString M1MidPlane::Interp::getHtml(){
-    return g_html_template.arg(base_html_fragment(m_myself));
-    // return QString("<html>\n<Head></Head>\n<body>\n%1</body>\n</html>\n").arg(base_html_fragment(m_myself));
-}
-
-QWidget *M1MidPlane::Interp::get_edit_widget(){
-    qCDebug(g_cat_interp_base) << QString("text: %1").arg(m_myself->dbgShort());
-
-    QWidget* l_panel_widget = new QWidget();
-    QVBoxLayout* l_panel_layout = new QVBoxLayout();
-    l_panel_widget->setLayout(l_panel_layout);
-
-    QWidget* l_button_bar = new QWidget(l_panel_widget);
-    l_panel_layout->addWidget(l_button_bar);
-    QHBoxLayout* l_bar_layout = new QHBoxLayout();
-    l_button_bar->setLayout(l_bar_layout);
-
-    QPushButton* l_btn0 = new QPushButton("Save", l_button_bar);
-    l_bar_layout->addWidget(l_btn0);
-    l_bar_layout->addStretch(1);
-    QObject::connect(l_btn0, &QPushButton::clicked,
-                     this, &M1MidPlane::Interp::save_text_edit);
-
-    m_text_edit = new QTextEdit(l_panel_widget);
-    l_panel_layout->addWidget(m_text_edit);
-    m_text_edit->setPlainText(m_myself->getTarget_lv2()->text());
-
-    return l_panel_widget;
-}
-void M1MidPlane::Interp::save_text_edit(){
-    qCDebug(g_cat_interp_base) << "Saving text edit field: " << m_text_edit->toPlainText();
-    m_myself->getTarget_lv2()->setText_lv1(m_text_edit->toPlainText());
-    m_td_parent->repaint();
-    this->emitSignals();
-    this->m_proxy->setFocus(Qt::OtherFocusReason);
-}
-
 void M1MidPlane::Interp::focusInEvent(QFocusEvent *p_event){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Interp::focusInEvent()"))
     qCDebug(g_cat_interp_drag) << "focus in: " << p_event->reason() << this->dbgString();
@@ -376,38 +388,6 @@ void M1MidPlane::Interp::focusOutEvent(QFocusEvent *p_event){
     m_proxy->setAutoFillBackground(false);
     m_proxy->repaint();
 }
-
-void M1MidPlane::Interp::initiateDrag(){
-    Drag *l_drag = new Drag(this, m_td_parent);
-
-    QString l_payload = QString("%1").arg(m_myself->getTarget_lv2()->item_id());
-    QMimeData *l_data = new QMimeData;
-    l_data->setText(l_payload);
-    qCDebug(g_cat_interp_drag) << QString("Drag INITIATION ") << m_proxy->acceptDrops() << l_payload << l_data->formats();
-
-    l_drag->setMimeData(l_data);
-    m_proxy->setAcceptDrops(false);
-    m_td_parent->setBeingDragged(this);
-    l_drag->exec();
-}
-M1MidPlane::Drag::~Drag(){
-    qCDebug(g_cat_interp_drag) << "DRAG end: " << this->mimeData()->text();
-    m_td_parent->restoreAcceptDrop();
-}
-void M1MidPlane::Interp::restore_acept_drops(){
-    qCDebug(g_cat_interp_drag) << "Accept drops again " << this->dbgString();
-    if(m_proxy != nullptr) m_proxy->setAcceptDrops(true);
-}
-void M1UI::TreeDisplay::restoreAcceptDrop(){
-    if(m_being_dragged != nullptr) m_being_dragged->restore_acept_drops();
-    m_being_dragged = nullptr;
-}
-
-void M1MidPlane::Interp::emitSignals(){
-    emit emitHtml(getHtml());
-    emit emitEdit(get_edit_widget());
-}
-
 void M1MidPlane::Interp::mousePressEvent(QMouseEvent *p_event){
     qCDebug(g_cat_interp_drag) << m_myself->dbgShort() << " mouse press: " << p_event->pos();
     if(m_oc_x < p_event->pos().x() && p_event->pos().x() < m_oc_x + m_target_height){
@@ -425,17 +405,11 @@ void M1MidPlane::Interp::mousePressEvent(QMouseEvent *p_event){
         m_hold_timer.start(HOLD_DELAY);
     }
 }
-void M1MidPlane::Interp::handleMouseHold(){
-    qCDebug(g_cat_interp_drag) << QString("after %1 ms --> initiate DRAG").arg(HOLD_DELAY) << dbgString();
-    m_hold_timer.stop();
-    // initiate Drag/Drop
-    this->initiateDrag();
-}
-
 void M1MidPlane::Interp::mouseReleaseEvent(QMouseEvent *p_event){
-    qCDebug(g_cat_interp_drag) << QString("mouse release") << this->dbgString();
+    M1_FUNC_ENTRY(g_cat_tmp_spotlight, QString("mouse release(): %1").arg(m_myself->dbgShort()))
     m_hold_timer.stop();
     this->emitSignals();
+    M1_FUNC_EXIT
 }
 /*
 void M1MidPlane::Interp::mouseMoveEvent(QMouseEvent *p_event){
@@ -448,7 +422,7 @@ void M1MidPlane::Interp::dragEnterEvent(QDragEnterEvent *p_event){
 }
 void M1MidPlane::Interp::dragMoveEvent(QDragMoveEvent *p_event){
     qCDebug(g_cat_interp_drag) << QString("Drag MOVE p_event") << p_event->mimeData()->text() << p_event->mimeData()->formats()
-                               << m_myself->getTarget_lv2()->text() << p_event->position().toPoint() << m_proxy->rect();
+    << m_myself->getTarget_lv2()->text() << p_event->position().toPoint() << m_proxy->rect();
 
     m_drag_top = false;
     m_drag_bottom = false;
@@ -506,6 +480,47 @@ void M1MidPlane::Interp::contextMenuEvent(QContextMenuEvent *p_event) {
             this,                    &M1MidPlane::Interp::create_descendant);
 
     l_context_menu.exec(p_event->globalPos());
+}
+
+
+void M1MidPlane::Interp::initiateDrag(){
+    Drag *l_drag = new Drag(this, m_td_parent);
+
+    QString l_payload = QString("%1").arg(m_myself->getTarget_lv2()->item_id());
+    QMimeData *l_data = new QMimeData;
+    l_data->setText(l_payload);
+    qCDebug(g_cat_interp_drag) << QString("Drag INITIATION ") << m_proxy->acceptDrops() << l_payload << l_data->formats();
+
+    l_drag->setMimeData(l_data);
+    m_proxy->setAcceptDrops(false);
+    m_td_parent->setBeingDragged(this);
+    l_drag->exec();
+}
+M1MidPlane::Drag::~Drag(){
+    qCDebug(g_cat_interp_drag) << "DRAG end: " << this->mimeData()->text();
+    m_td_parent->restoreAcceptDrop();
+}
+void M1MidPlane::Interp::restore_acept_drops(){
+    qCDebug(g_cat_interp_drag) << "Accept drops again " << this->dbgString();
+    if(m_proxy != nullptr) m_proxy->setAcceptDrops(true);
+}
+void M1UI::TreeDisplay::restoreAcceptDrop(){
+    if(m_being_dragged != nullptr) m_being_dragged->restore_acept_drops();
+    m_being_dragged = nullptr;
+}
+
+void M1MidPlane::Interp::emitSignals(){
+    M1_FUNC_ENTRY(g_cat_tmp_spotlight, QString("emit signals(): %1").arg(m_myself->dbgShort()))
+    emit emitHtml(getHtml());
+    emit emitEdit(get_edit_widget());
+    M1_FUNC_EXIT
+}
+
+void M1MidPlane::Interp::handleMouseHold(){
+    qCDebug(g_cat_interp_drag) << QString("after %1 ms --> initiate DRAG").arg(HOLD_DELAY) << dbgString();
+    m_hold_timer.stop();
+    // initiate Drag/Drop
+    this->initiateDrag();
 }
 
 void M1MidPlane::Interp::create_descendant(){
@@ -581,7 +596,11 @@ void M1MidPlane::FieldInterp::paintEvent(QPaintEvent* p_event){
     p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), this->displayText());
 }
 QString M1MidPlane::FieldInterp::getHtml(){
-    return g_html_template.arg(base_html_fragment(m_myself, "FieldInterp"));
+    M1_FUNC_ENTRY(g_cat_tmp_spotlight, QString("FieldInterp HTML: %1").arg(m_myself->dbgShort()))
+    QString l_ret_html = g_html_template.arg(base_html_fragment(m_myself, "FieldInterp"));
+    qCDebug(g_cat_tmp_spotlight) << "l_ret_html:" << l_ret_html;
+    M1_FUNC_EXIT
+    return l_ret_html;
 }
 
 // ------------------------------------ TranslUnit -----------------------------------------------------

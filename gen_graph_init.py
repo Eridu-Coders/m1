@@ -287,10 +287,10 @@ g_attr_values = [
         ('Quasi', 'VTRQS', 'quasi-verb'),
     ]),
     ('Undecided', 'undecided codes', [
-        ('act', '??ACT', ''),
-        ('agt', '??AGT', ''),
-        ('per', '??PER', ''),
-        ('tasil', '??TSL', ''),
+        ('act', '__ACT', ''),
+        ('agt', '__AGT', ''),
+        ('per', '__PER', ''),
+        ('tasil', '__TSL', ''),
     ]),
     ('Voice', 'voice', [
         ('Act', 'VCACT', 'active or actor-focus voice'),
@@ -406,15 +406,17 @@ g_special_vertices = [
     ('WRTBY', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'TEXT_WRITTEN_BY_ICON_PATH', 'TEXT_WRITTEN_BY_SIID'), 'Special Vertex ID (Edge type) wrote / written by'],
     # ---------------------------------------------------------------------
     ['OCCUR', ['SI_IS_TYPE', 'SI_EDGE_TYPE',
-               'SI_IS_SPECIAL_EDGE'],                      'OCCURRENCE_ICON_PATH',      'OCCUR_SIID', None,      'Special Vertex ID (Edge type) of occurrence edges'],
-    ['WFORM', 'SI_IS_TYPE | SI_IS_ICON_TYPE',              'WFORM_ICON_PATH',           'WFORM_SIID', None,      'Special Vertex ID (Vertex type) of word form vertices'],
-    ['CAPTL', 'SI_IS_TYPE',                                None,                        'CAPTL_SIID', None,      'Special Vertex ID (Simple edge type) of Occurrence field capitalization flaf'],
-    ['PCTLF', 'SI_IS_TYPE',                                None,                        'PCTLF_SIID', None,      'Special Vertex ID (Simple edge type) of Occurrence field left punctuation'],
-    ['PCTRT', 'SI_IS_TYPE',                                None,                        'PCTRT_SIID', None,      'Special Vertex ID (Simple edge type) of Occurrence field right punctuation'],
-    ['MKPLF', 'SI_IS_TYPE',                                None,                        'MKPLF_SIID', None,      'Special Vertex ID (Simple edge type) of Occurrence field markup left'],
-    ['MKPRT', 'SI_IS_TYPE',                                None,                        'MKPRT_SIID', None,      'Special Vertex ID (Simple edge type) of Occurrence field markup right'],
-    ['STPOS', 'SI_IS_TYPE',                                None,                        'STPOS_SIID', None,      'Special Vertex ID (Simple edge type) of Occurrence field sentence position'],
-    ['HLCLR', 'SI_IS_TYPE',                                None,                        'HLCLR_SIID', None,      'Color of text highlight category'],
+               'SI_IS_SPECIAL_EDGE'],                      'OCCURRENCE_ICON_PATH',      'OCCUR_SIID', None,          'Special Vertex ID (Edge type) of occurrence edges'],
+    ['WFORM', 'SI_IS_TYPE | SI_IS_ICON_TYPE',              'WFORM_ICON_PATH',           'WFORM_SIID', None,          'Special Vertex ID (Vertex type) of word form vertices'],
+    ['TXATL', 'SI_IS_TYPE',                                None,                        'TEXT_ALT_TITLE_SIID', None, 'Special Vertex ID (Simple edge type) alternate text title'],
+    ['TXSBT', 'SI_IS_TYPE',                                None,                        'TEXT_SUB_TITLE_SIID', None, 'Special Vertex ID (Simple edge type) text subtitle'],
+    ['CAPTL', 'SI_IS_TYPE',                                None,                        'CAPTL_SIID', None,          'Special Vertex ID (Simple edge type) of Occurrence field capitalization flag'],
+    ['PCTLF', 'SI_IS_TYPE',                                None,                        'PCTLF_SIID', None,          'Special Vertex ID (Simple edge type) of Occurrence field left punctuation'],
+    ['PCTRT', 'SI_IS_TYPE',                                None,                        'PCTRT_SIID', None,          'Special Vertex ID (Simple edge type) of Occurrence field right punctuation'],
+    ['MKPLF', 'SI_IS_TYPE',                                None,                        'MKPLF_SIID', None,          'Special Vertex ID (Simple edge type) of Occurrence field markup left'],
+    ['MKPRT', 'SI_IS_TYPE',                                None,                        'MKPRT_SIID', None,          'Special Vertex ID (Simple edge type) of Occurrence field markup right'],
+    ['STPOS', 'SI_IS_TYPE',                                None,                        'STPOS_SIID', None,          'Special Vertex ID (Simple edge type) of Occurrence field sentence position'],
+    ['HLCLR', 'SI_IS_TYPE',                                None,                        'HLCLR_SIID', None,          'Color of text highlight category'],
 ]
 
 g_vertices = [

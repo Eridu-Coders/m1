@@ -97,7 +97,7 @@ private:
     // M1Store::Item_lv2* m_myself;
     int m_depth;
     int m_target_height;
-    int m_target_beseline;
+    int m_target_baseline;
     int m_target_padding;
     int m_icon_size;
     int m_oc_x;
@@ -117,8 +117,8 @@ protected:
 
     void paintOC(QPainter& p);
     virtual QString getHtml();
-    virtual QString displayText();
-    virtual bool diplayOpenClose(){ return true; }
+    virtual QString inTreedisplayText();
+    virtual bool displayOpenClose(){ return true; }
     virtual QIcon* edgeIcon();
     virtual QIcon* vertexIcon();
 
@@ -184,7 +184,7 @@ public:
     virtual QString getHtml();
     AutoInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
     virtual void paintEvent(QPaintEvent* p_event);
-    virtual bool diplayOpenClose(){ return false; }
+    virtual bool displayOpenClose(){ return false; }
     virtual QString dbgString(){return "AutoInterp for: " + m_myself->dbgShort();}
 };
 
@@ -198,7 +198,7 @@ public:
     virtual QIcon* vertexIcon();
     virtual QString getHtml();
     FieldInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    virtual QString displayText();
+    virtual QString inTreedisplayText();
     virtual void paintEvent(QPaintEvent* p_event);
 };
 
@@ -210,7 +210,7 @@ public:
 
     virtual QString getHtml();
     TranslUnit(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    virtual QString displayText();
+    virtual QString inTreedisplayText();
     // virtual void paintEvent(QPaintEvent* p_event);
 };
 
@@ -260,7 +260,7 @@ public:
 
     BhashyaTranslation(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
     virtual QString getHtml();
-    virtual QString displayText();
+    virtual QString inTreedisplayText();
     // virtual void paintEvent(QPaintEvent* p_event);
 };
 
@@ -283,7 +283,7 @@ public:
     virtual QString getHtml();
 
     SectionBeginEnd(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    virtual QString displayText();
+    virtual QString inTreedisplayText();
     // virtual void paintEvent(QPaintEvent* p_event);
 };
 
@@ -295,7 +295,7 @@ public:
 
     virtual QString getHtml();
     TextOccurrence(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    virtual QString displayText();
+    virtual QString inTreedisplayText();
     // virtual void paintEvent(QPaintEvent* p_event);
 };
 
@@ -353,7 +353,7 @@ public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
 
     HighlightChunkInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    virtual QString displayText();
+    virtual QString inTreedisplayText();
     virtual QString getHtml();
 };
 
@@ -364,7 +364,7 @@ public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
 
     HighlightInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    virtual QString displayText();
+    virtual QString inTreedisplayText();
     virtual QString getHtml();
 };
 
@@ -375,7 +375,7 @@ public:
     static bool wantIt(M1Store::Item_lv2* p_myself);
 
     HighlightQuotationInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    virtual QString displayText();
+    virtual QString inTreedisplayText();
     virtual QString getHtml();
 };
 
