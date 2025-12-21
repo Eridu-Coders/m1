@@ -179,7 +179,7 @@ M1MidPlane::Interp::Interp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI:
     m_depth = p_depth;
     m_myself = p_myself;
     m_target_height = (m_proxy->fontMetrics().height() * 1300) / 1000;
-    m_target_beseline = (m_target_height * 800) / 1000;
+    m_target_baseline = (m_target_height * 800) / 1000;
     m_target_padding = (m_target_height - m_proxy->fontMetrics().height())/2;
     m_icon_size = m_proxy->fontMetrics().height();
     m_oc_x = m_target_padding + (p_depth + 1)*m_target_height;
@@ -229,6 +229,7 @@ void M1MidPlane::Interp::deleteProxy(){
 M1MidPlane::Interp::~Interp(){
     qCDebug(g_cat_interp_base) << Interp::dbgString() << "deleted";
 }
+
 void M1MidPlane::Interp::blockFocusEvents(){
     MyEventFilter *l_filter = new MyEventFilter(m_proxy);
     m_proxy->installEventFilter(l_filter);
@@ -241,7 +242,7 @@ void M1MidPlane::Interp::paintOC(QPainter& p){
         M1MidPlane::Interp::cm_closed.paint(&p, m_oc_x, m_target_padding, m_icon_size, m_icon_size);
 }
 
-QString M1MidPlane::Interp::displayText(){
+QString M1MidPlane::Interp::inTreedisplayText(){
     return m_myself->getTarget_lv2()->text();
 }
 
@@ -334,13 +335,13 @@ void M1MidPlane::Interp::paintEvent(QPaintEvent* p_event){
         // edge type icon
         this->edgeIcon()->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
         // open/close icon
-        if(diplayOpenClose()) paintOC(p);
+        if(displayOpenClose()) paintOC(p);
         // target type icon
         this->vertexIcon()->paint(&p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
 
         // text
         p.setPen(Qt::white);
-        p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), this->displayText());
+        p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_baseline), this->inTreedisplayText());
 
         // drag markers
         p.setPen(QPen(QBrush(Qt::darkRed), 2.0));
@@ -482,7 +483,6 @@ void M1MidPlane::Interp::contextMenuEvent(QContextMenuEvent *p_event) {
     l_context_menu.exec(p_event->globalPos());
 }
 
-
 void M1MidPlane::Interp::initiateDrag(){
     Drag *l_drag = new Drag(this, m_td_parent);
 
@@ -570,7 +570,7 @@ M1MidPlane::FieldInterp::FieldInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p
     M1_FUNC_ENTRY(g_cat_interp_base, QString("FieldInterp Constructor from: %1").arg(p_myself->dbgShort()))
     M1_FUNC_EXIT
 }
-QString M1MidPlane::FieldInterp::displayText(){
+QString M1MidPlane::FieldInterp::inTreedisplayText(){
     if(m_myself->isSimpleEdge())
         return QString("e[%1] ").arg(m_myself->dbgTypeShort()) + m_myself->text();
     else
@@ -593,7 +593,7 @@ void M1MidPlane::FieldInterp::paintEvent(QPaintEvent* p_event){
     // M1MidPlane::Interp::cm_closed.paint(&p, m_target_padding + m_target_height, m_target_padding, m_icon_size, m_icon_size);
     this->vertexIcon()->paint(&p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
     p.setPen(Qt::white);
-    p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_beseline), this->displayText());
+    p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_baseline), this->inTreedisplayText());
 }
 QString M1MidPlane::FieldInterp::getHtml(){
     M1_FUNC_ENTRY(g_cat_tmp_spotlight, QString("FieldInterp HTML: %1").arg(m_myself->dbgShort()))
@@ -656,7 +656,7 @@ M1MidPlane::TranslUnit::TranslUnit(M1Store::Item_lv2* p_myself, QVBoxLayout* p_v
     M1_FUNC_ENTRY(g_cat_interp_base, QString("TranslUnit Constructor from: %1").arg(p_myself->dbgShort()))
     M1_FUNC_EXIT
 }
-QString M1MidPlane::TranslUnit::displayText(){
+QString M1MidPlane::TranslUnit::inTreedisplayText(){
     return QString("%1 [%2]")
         .arg(m_myself->getTarget_lv2()->text())
         .arg(m_myself->getTarget_lv2()->getField(M1Store::TEXT_WFW_TRANSL_SIID, true));
@@ -676,7 +676,7 @@ M1MidPlane::SectionBeginEnd::SectionBeginEnd(M1Store::Item_lv2* p_myself, QVBoxL
     M1_FUNC_ENTRY(g_cat_interp_base, QString("SectionBeginEnd Constructor from: %1").arg(p_myself->dbgShort()))
     M1_FUNC_EXIT
 }
-QString M1MidPlane::SectionBeginEnd::displayText(){
+QString M1MidPlane::SectionBeginEnd::inTreedisplayText(){
     return QString("%1 [%2]")
         .arg(m_myself->getTarget_lv2()->getTarget_lv2()->text())
         .arg(m_myself->getTarget_lv2()->getTarget_lv2()->getField(M1Store::TEXT_WORD_TRANSLIT_SIID));
@@ -724,7 +724,7 @@ QString M1MidPlane::BhashyaTranslation::getHtml(){
                                "<hr/>\n" +
                                base_html_fragment(m_myself, "BhashyaTranslation"));
 }
-QString M1MidPlane::BhashyaTranslation::displayText(){
+QString M1MidPlane::BhashyaTranslation::inTreedisplayText(){
     QString l_text = m_myself->getTarget_lv2()->text();
     if(l_text.length() > 100) l_text = l_text.left(100) + "...";
     return l_text;
@@ -1150,7 +1150,7 @@ M1MidPlane::TextOccurrence::TextOccurrence(M1Store::Item_lv2* p_myself, QVBoxLay
     M1_FUNC_ENTRY(g_cat_interp_base, QString("TextOccurrence Constructor from: %1").arg(p_myself->dbgShort()))
     M1_FUNC_EXIT
 }
-QString M1MidPlane::TextOccurrence::displayText(){
+QString M1MidPlane::TextOccurrence::inTreedisplayText(){
     return M1MidPlane::SentenceInterp::occur_to_text(m_myself->getTarget_lv2());
 }
 QString M1MidPlane::TextOccurrence::getHtml(){
@@ -1281,7 +1281,7 @@ M1MidPlane::HighlightChunkInterp::HighlightChunkInterp(M1Store::Item_lv2* p_myse
     M1_FUNC_ENTRY(g_cat_interp_base, QString("HighlightChunkInterp Constructor from: %1").arg(p_myself->dbgShort()))
     M1_FUNC_EXIT
 }
-QString M1MidPlane::HighlightChunkInterp::displayText(){
+QString M1MidPlane::HighlightChunkInterp::inTreedisplayText(){
     QString l_ret(m_myself->getTarget_lv2()->text());
     l_ret += " : ";
     QStringList l_word_list;
@@ -1323,7 +1323,7 @@ M1MidPlane::HighlightInterp::HighlightInterp(M1Store::Item_lv2* p_myself,
     M1_FUNC_ENTRY(g_cat_interp_base, QString("HighlightInterp Constructor from: %1").arg(p_myself->dbgShort()))
     M1_FUNC_EXIT
 }
-QString M1MidPlane::HighlightInterp::displayText(){
+QString M1MidPlane::HighlightInterp::inTreedisplayText(){
     return m_myself->getTarget_lv2()->text();
 }
 QString M1MidPlane::HighlightInterp::getHtml(){
@@ -1364,7 +1364,7 @@ M1MidPlane::HighlightQuotationInterp::HighlightQuotationInterp(M1Store::Item_lv2
     M1_FUNC_ENTRY(g_cat_interp_base, QString("HighlightQuotationInterp Constructor from: %1").arg(p_myself->dbgShort()))
     M1_FUNC_EXIT
 }
-QString M1MidPlane::HighlightQuotationInterp::displayText(){
+QString M1MidPlane::HighlightQuotationInterp::inTreedisplayText(){
     return m_myself->getTarget_lv2()->text();
 }
 QString M1MidPlane::HighlightQuotationInterp::getHtml(){

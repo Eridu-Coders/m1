@@ -14,24 +14,6 @@
 #include <memory>
 using namespace std;
 
-class MyEventFilter : public QObject
-{
-    Q_OBJECT
-public:
-    explicit MyEventFilter(QObject *p_parent = nullptr) : QObject(p_parent) {}
-
-protected:
-    bool eventFilter(QObject *p_watched, QEvent *p_event) override
-    {
-        if (p_watched->isWidgetType() && (p_event->type() == QEvent::FocusIn || p_event->type() == QEvent::FocusOut)) {
-            qCDebug(g_cat_interp_drag) << "focus event: " << p_event << " intercepted";
-            return true;
-        }
-        return QObject::eventFilter(p_watched, p_event); // Pass unhandled events to the base class
-    }
-};
-
-
 namespace M1MidPlane{
     class Interp;
 }
@@ -70,6 +52,22 @@ public:
     InterpStaticConstructor();
 };
 */
+class FocusEventsBlocker : public QObject
+{
+    Q_OBJECT
+public:
+    explicit FocusEventsBlocker(QObject *p_parent = nullptr) : QObject(p_parent) {}
+
+protected:
+    bool eventFilter(QObject *p_watched, QEvent *p_event) override
+    {
+        if (p_watched->isWidgetType() && (p_event->type() == QEvent::FocusIn || p_event->type() == QEvent::FocusOut)) {
+            qCDebug(g_cat_interp_drag) << "focus event: " << p_event << " intercepted";
+            return true;
+        }
+        return QObject::eventFilter(p_watched, p_event); // Pass unhandled events to the base class
+    }
+};
 
 class TreeRow : public QWidget
 {
@@ -93,22 +91,14 @@ private:
     bool m_drag_bottom = false;
     bool m_block_emit = false;
 
+    const int HOLD_DELAY = 800;
+
     QTimer m_hold_timer;
 
-    QTextEdit* m_text_edit = nullptr;
-protected:
     M1Store::Item_lv2* m_edge;
     shared_ptr<M1MidPlane::Interp> m_target;
 
-    void paintOC(QPainter& p);
-    virtual QString getHtml();
-    virtual QString inTreedisplayText();
-    virtual bool displayOpenClose(){ return true; }
-    virtual QIcon* edgeIcon();
-    virtual QIcon* vertexIcon();
-    virtual QWidget *get_edit_widget();
-    void restore_acept_drops();
-
+    void paintOpenClose(QPainter& p);
     void initiateDrag();
     void emitSignals();
     // static InterpStaticConstructor cm_the_init;
@@ -120,6 +110,7 @@ public:
     ~TreeRow();
 
     void blockFocusEvents();
+    void performPostUpdate();
 
     virtual void paintEvent(QPaintEvent* p_event);
     virtual void resizeEvent(QResizeEvent *p_event);
@@ -137,6 +128,7 @@ public:
 
     virtual void setFocus(Qt::FocusReason p_reason);
 
+    void restore_acept_drops();
     // virtual void mouseMoveEvent(QMouseEvent *p_event);
 
     // void deleteProxy();
@@ -145,7 +137,6 @@ public:
 public slots:
     void create_descendant();
     void handleMouseHold();
-    void save_text_edit();
 signals:
     void gotoVertex(M1Store::Item_lv2* p_new_vertex, M1UI::TreeRow* p_sender);
     void emitHtml(const QString& p_html);
@@ -165,21 +156,41 @@ namespace M1MidPlane{
 
 class Interp : public QObject{
 private:
-    static void init();
-    static QMap<M1Env::ItemID, shared_ptr<Interp>> cm_interp_cache;
+    static QMap<M1Env::ItemID, shared_ptr<Interp>> cm_interp_map;
 
-    M1Store::Item_lv2* m_myself;
+    M1Store::ItemID m_edge_cache_iid = M1Store::G_VOID_ITEM_ID;
+    QString m_html_cache;
+    QTextEdit* m_text_edit = nullptr;
+    M1UI::TreeRow* m_tree_row = nullptr;
 protected:
-    Interp(M1Store::Item_lv2* p_myself);
+    M1Store::Item_lv2* m_myself;
+    static QString cm_html_template;
 
-    virtual QString getHtml();
-    virtual QString inTreedisplayText();
-    virtual bool displayOpenClose(){ return true; }
-    virtual QIcon* edgeIcon();
-    virtual QIcon* vertexIcon();
-    virtual QWidget *get_edit_widget();
+    Interp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "BaseInterp";}
+
+    QString base_html_fragment();
+    QString base_edge_html_fragment(const M1Store::Item_lv2* p_edge);
+
+    virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
 public:
+    static void init();
+    static void invalidateAllCaches();
     static shared_ptr<Interp> getInterp(M1Store::Item_lv2* p_myself);
+
+    QString getHtml(const M1Store::Item_lv2* p_edge);
+    void invalidateCache();
+    void setParent(M1UI::TreeRow* p_tree_row){m_tree_row = p_tree_row;}
+
+    virtual QWidget *get_edit_widget();
+    virtual bool displayOpenClose(){ return true; }
+    virtual QString inTreeDisplayText();
+    virtual QIcon* edgeIcon(const M1Store::Item_lv2* p_edge);
+    virtual QIcon* vertexIcon();
+    virtual M1Store::Item_lv2* targetForGotoVertex(){return m_myself;}
+    virtual void createDescendant(M1Store::SpecialItem* p_new_edge_type, M1Store::SpecialItem* p_new_vertex_type);
+public slots:
+    void save_text_edit();
 };
 
 class AutoInterp : public Interp
@@ -187,11 +198,10 @@ class AutoInterp : public Interp
     Q_OBJECT
 public:
     static AutoInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
-    // static AutoInterp* getOneIfMatch(M1Store::Item_lv2* p_myself, M1UI::TreeDisplay* p_parent, int p_depth);
 
-    virtual QString getHtml();
-    AutoInterp(M1Store::Item_lv2* p_myself, M1UI::TreeDisplay* p_parent, int p_depth);
     AutoInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "AutoInterp";}
+    virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
     virtual void paintEvent(QPaintEvent* p_event);
     virtual bool displayOpenClose(){ return false; }
     virtual QString dbgString();
@@ -202,14 +212,13 @@ class FieldInterp : public Interp
     Q_OBJECT
 public:
     static FieldInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
-    // static FieldInterp* getOneIfMatch(M1Store::Item_lv2* p_myself, M1UI::TreeDisplay* p_parent, int p_depth);
 
+    FieldInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "FieldInterp";}
     virtual QIcon* edgeIcon();
     virtual QIcon* vertexIcon();
-    virtual QString getHtml();
-    FieldInterp(M1Store::Item_lv2* p_myself, M1UI::TreeDisplay* p_parent, int p_depth);
-    FieldInterp(M1Store::Item_lv2* p_myself);
-    virtual QString inTreedisplayText();
+    virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
+    virtual QString inTreeDisplayText();
     virtual void paintEvent(QPaintEvent* p_event);
     virtual QString dbgString();
 };

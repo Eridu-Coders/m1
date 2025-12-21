@@ -192,7 +192,7 @@ void M1UI::TreeDisplay::gotoVertex(M1Store::Item_lv2* p_new_vertex, M1UI::TreeRo
     m_being_dragged = nullptr;
 
     // blocks focus events
-    MyEventFilter *l_filter = new MyEventFilter(this);
+    FocusEventsBlocker *l_filter = new FocusEventsBlocker(this);
     this->installEventFilter(l_filter);
     // blocks update / repaint events
     this->setUpdatesEnabled(false);

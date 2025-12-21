@@ -111,7 +111,7 @@ class Item_lv2 : public Item_lv1 {
         bool isOfType(const Item_lv2* p_type_lv2) const;
         bool isOfType(const char* p_mnemonic) const;
         // bool isOfType(const ItemID p_type_item_id) const;
-        SpecialItemID getIconSITypeID();
+        SpecialItemID getIconSITypeID() const;
 
         /*
         Item_lv2* setField(const QString& p_content,
