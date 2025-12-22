@@ -198,7 +198,7 @@ void M1UI::TreeDisplay::gotoVertex(M1Store::Item_lv2* p_new_vertex, M1UI::TreeRo
     this->setUpdatesEnabled(false);
     qCDebug(g_cat_tree_display) << "before m_interp_list delete" << m_vb_layout->count() << m_scroll_area_widget->children().count();
     if(m_old_tree_row != nullptr){
-        qCDebug(g_cat_tree_display) << "delete m_old_interp" << m_old_tree_row->dbgString();
+        qCDebug(g_cat_tree_display) << "delete m_old_interp" << m_old_tree_row->dbgOneLiner();
         delete m_old_tree_row;
         m_old_tree_row = nullptr;
     }
@@ -206,7 +206,7 @@ void M1UI::TreeDisplay::gotoVertex(M1Store::Item_lv2* p_new_vertex, M1UI::TreeRo
     for(M1UI::TreeRow *l_tree_row : std::as_const(m_tree_row_list)){
         // l_interp->deleteProxy();
         if(l_tree_row == p_sender){
-            qCDebug(g_cat_tree_display) << "skipping seletion of sender: " << p_sender->dbgString();
+            qCDebug(g_cat_tree_display) << "skipping seletion of sender: " << p_sender->dbgOneLiner();
             m_old_tree_row = l_tree_row;
         }
         else

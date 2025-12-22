@@ -1,7 +1,7 @@
 #include "m1A_constants.h"
 #include "m1B_graph_init.h"
 #include "m1B_lv2_iterators.h"
-#include "m1C_interp.h"
+#include "m1C_interp_new.h"
 #include "m1D_passages_panel.h"
 
 #include <QResizeEvent>

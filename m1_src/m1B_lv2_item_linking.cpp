@@ -274,7 +274,7 @@ bool M1Store::Item_lv2::edgeBelongs(Item_lv2* p_edge, bool p_edge_is_special){
                                       (this->firstEdge_item_id() != G_VOID_ITEM_ID);
     if( l_has_appropriate_ring ){
         for(Item_lv2_iterator it = (p_edge_is_special ? this->getIteratorSpecial() : this->getIteratorTop()); !it.beyondEnd(); it.next()){
-            qCDebug(g_cat_lv2_members) << QString("Current Edge: %1").arg(it.at()->dbgHalf());
+            qCDebug(g_cat_lv2_members) << QString("Current Edge: %1").arg(it.at()->dbgHalfRight());
             if(it.at()->item_id() == p_edge->item_id()){
                 l_ret = true;
                 break;

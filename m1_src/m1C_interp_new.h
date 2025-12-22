@@ -69,8 +69,7 @@ protected:
     }
 };
 
-class TreeRow : public QWidget
-{
+class TreeRow : public QWidget{
     Q_OBJECT
     // friend class InterpStaticConstructor;
 private:
@@ -126,14 +125,12 @@ public:
     virtual void dragLeaveEvent(QDragLeaveEvent *p_event);
     virtual void dropEvent(QDropEvent *p_event);
 
-    virtual void setFocus(Qt::FocusReason p_reason);
-
     void restore_acept_drops();
     // virtual void mouseMoveEvent(QMouseEvent *p_event);
 
     // void deleteProxy();
     // void invalidateProxy();
-    virtual QString dbgString();
+    QString dbgOneLiner();
 public slots:
     void create_descendant();
     void handleMouseHold();
@@ -155,6 +152,7 @@ public:
 namespace M1MidPlane{
 
 class Interp : public QObject{
+    Q_OBJECT
 private:
     static QMap<M1Env::ItemID, shared_ptr<Interp>> cm_interp_map;
 
@@ -163,9 +161,10 @@ private:
     QTextEdit* m_text_edit = nullptr;
     M1UI::TreeRow* m_tree_row = nullptr;
 protected:
-    M1Store::Item_lv2* m_myself;
+    M1Store::Item_lv2* m_myself  = nullptr;
     static QString cm_html_template;
 
+    Interp();
     Interp(M1Store::Item_lv2* p_myself);
     virtual QString className() {return "BaseInterp";}
 
@@ -174,10 +173,11 @@ protected:
 
     virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
 public:
-    static void init();
+    static void init(){cm_interp_map.clear();}
     static void invalidateAllCaches();
     static shared_ptr<Interp> getInterp(M1Store::Item_lv2* p_myself);
 
+    bool isEmpty(){return m_myself == nullptr;}
     QString getHtml(const M1Store::Item_lv2* p_edge);
     void invalidateCache();
     void setParent(M1UI::TreeRow* p_tree_row){m_tree_row = p_tree_row;}
@@ -189,38 +189,39 @@ public:
     virtual QIcon* vertexIcon();
     virtual M1Store::Item_lv2* targetForGotoVertex(){return m_myself;}
     virtual void createDescendant(M1Store::SpecialItem* p_new_edge_type, M1Store::SpecialItem* p_new_vertex_type);
+
+    virtual QString dbgOneLiner();
+    ~Interp();
+
+    static QString dbgMapContents();
 public slots:
     void save_text_edit();
 };
 
-class AutoInterp : public Interp
-{
+class AutoInterp : public Interp{
     Q_OBJECT
 public:
     static AutoInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
 
     AutoInterp(M1Store::Item_lv2* p_myself);
     virtual QString className() {return "AutoInterp";}
-    virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
-    virtual void paintEvent(QPaintEvent* p_event);
+    // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
+    // virtual void paintEvent(QPaintEvent* p_event);
     virtual bool displayOpenClose(){ return false; }
-    virtual QString dbgString();
 };
 
-class FieldInterp : public Interp
-{
+class FieldInterp : public Interp{
     Q_OBJECT
 public:
     static FieldInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
 
     FieldInterp(M1Store::Item_lv2* p_myself);
     virtual QString className() {return "FieldInterp";}
-    virtual QIcon* edgeIcon();
-    virtual QIcon* vertexIcon();
-    virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
+    // virtual QIcon* edgeIcon();
+    // virtual QIcon* vertexIcon();
+    // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
     virtual QString inTreeDisplayText();
-    virtual void paintEvent(QPaintEvent* p_event);
-    virtual QString dbgString();
+    // virtual void paintEvent(QPaintEvent* p_event);
 };
 
 } // namespace M1MidPlane

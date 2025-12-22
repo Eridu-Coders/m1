@@ -49,7 +49,7 @@ void M1Store::Item_lv2::dbgRecurGraph(const ItemID p_item_id, std::set<ItemID>& 
                 do{
                     Item_lv2* l_next_edge = l_edge->get_next_lv2();
                     // debug one liner of current edge ("S" = "special")
-                    p_out << p_left + "+--S" + (l_edge->isFullEdge() ? l_edge->dbgHalf() : l_edge->dbgShort(1)) + "\n";
+                    p_out << p_left + "+--S" + (l_edge->isFullEdge() ? l_edge->dbgHalfRight() : l_edge->dbgShort(1)) + "\n";
                     // recursive call to recurGraph on the target of the current edge  (may not be a full edge bc of fields)
                     if(l_edge->isFullEdge())
                         dbgRecurGraph(l_edge->target_item_id(), p_already_expanded,
@@ -66,7 +66,7 @@ void M1Store::Item_lv2::dbgRecurGraph(const ItemID p_item_id, std::set<ItemID>& 
                 // loop through all ordinary edges
                 do{
                     // debug one liner of current edge ("O" = "ordinary")
-                    p_out << p_left + "+--O" + (l_edge->isFullEdge() ? l_edge->dbgHalf() : l_edge->dbgShort(1)) + "\n";
+                    p_out << p_left + "+--O" + (l_edge->isFullEdge() ? l_edge->dbgHalfRight() : l_edge->dbgShort(1)) + "\n";
                     Item_lv2* l_next_edge = l_edge->get_next_lv2();
                     // recursive call to recurGraph on the target of the current edge (may not be a full edge bc of fields)
                     if(l_edge->isFullEdge())
@@ -330,17 +330,41 @@ QString M1Store::Item_lv2::dbgShort(int p_depth){
     }
 }
 
-// only for full edges
 /**
  * @brief Edge-only one-liner giving only the type and target
+ *
+ * Works also for simple edges (gives only the type)
+ *
  * @return the one-liner string
  */
-QString M1Store::Item_lv2::dbgHalf(){
-    Q_ASSERT_X((flags() & ITEM_NATURE_MASK) == FULL_EDGE && target_item_id() != G_VOID_ITEM_ID,
-               "ItemWrapperFullEdge::dbgHalf()", "target = G_VOID_ITEM_ID");
+QString M1Store::Item_lv2::dbgHalfRight(){
+    Q_ASSERT_X(this->isFullEdge() || this->isSimpleEdge(), "M1Store::Item_lv2::dbgHalfRight()",
+               "Cann only be applied to edges (simple or full)");
 
-    M1Store::Item_lv2* l_target = Item_lv2::getExisting(target_item_id());
+    QString l_ret;
+    if(this->isFullEdge())
+        l_ret = QString("-[%1]-->{%2}").arg(dbgTypeShort()).arg(this->getTarget_lv2()->dbgShort());
+    else l_ret = QString("Simple Edge Field [%1]").arg(this->dbgTypeShort());
 
-    return QString("-[%1]-->{%2}").arg(dbgTypeShort()).arg(l_target->dbgShort());
+    return l_ret;
+}
+
+/**
+ * @brief Edge-only one-liner giving only the origin and type
+ *
+ * Works also for simple edges (gives only the payload)
+ *
+ * @return the one-liner string
+ */
+QString M1Store::Item_lv2::dbgHalfLeft(){
+    Q_ASSERT_X(this->isFullEdge() || this->isSimpleEdge(), "M1Store::Item_lv2::dbgHalfRight()",
+               "Cann only be applied to edges (simple or full)");
+
+    QString l_ret;
+    if(this->isFullEdge())
+        l_ret = QString("{%1}--[%2]-->").arg(this->getOrigin_lv2()->dbgShort()).arg(dbgTypeShort());
+    else l_ret = QString("Simple Edge Field. Payload = %1").arg(this->text());
+
+    return l_ret;
 }
 /** @}*/ // end \defgroup DebugLv2

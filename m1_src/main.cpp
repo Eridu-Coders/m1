@@ -7,9 +7,10 @@
 #include "m1B_tei_interface.h"
 #include "m1B_store.h"
 #include "m1B_graph_init.h"
-#include "m1C_interp.h"
+#include "m1C_interp_new.h"
 
 #include <boost/program_options.hpp>
+#include <string>
 #include <iostream>
 
 namespace po = boost::program_options;
@@ -23,30 +24,43 @@ Q_LOGGING_CATEGORY(g_cat_tmp_spotlight, "tmp")
 QRegularExpression g_re_punc(R"(^(\W*)(\w+)(\W*))");
 QRegularExpression g_re_space(R"(\s+)");
 
+/*
 void loadEnoch();
 int loadGita();
 bool loadTei(bool p_validate=false);
+*/
 
 int main(int argc, char *argv[])
 {
-    // printf("Xa");
+    printf("Xa\n");
     po::options_description l_desc("Allowed options");
-    // printf("Xb");
+    printf("Xb\n");
+    std::vector<std::string> l_fuck;
     l_desc.add_options()
         ("help,h", "produce help message")
         ("load-gita,g", "Load Bhagavad Gita test data")
         ("load-plato,p", "Load The Republic of Plato test data")
         ("load-tei,t", "Loads a TEI file")
         ("reset,r", "Reset (empty) storage")
-    ;
-
-    // printf("X");
+        // ("qmljsdebugger", po::value<std::vector<std::string>>(&l_fuck), "Fuck")
+        ;
+    printf("X\n");
     po::variables_map l_program_options_vm;
-    // printf("Y");
-    po::store(po::parse_command_line(argc, argv, l_desc), l_program_options_vm);
-    // printf("Z");
-    po::notify(l_program_options_vm);
-    // printf("T");
+    printf("Xc\n");
+    try{
+        printf("Y\n");
+        po::store(po::parse_command_line(argc, argv, l_desc), l_program_options_vm);
+        printf("Z\n");
+        po::notify(l_program_options_vm);
+        printf("T\n");
+
+        if(l_program_options_vm.count("reset")) std::cout << "reset option detected" << std::endl;;
+        // if(l_program_options_vm.count("qmljsdebugger")) std::cout << l_fuck.at(0) << std::endl;
+        printf("U\n");
+    } catch ( po::error& e){
+        std::cout << e.what();
+        std::_Exit(0);
+    }
 
     M1Env::EnvStatic::init();
     M1Env::EnvStatic::setNormalFilter("*.debug=true\n"
@@ -84,8 +98,7 @@ int main(int argc, char *argv[])
                                         "lv1.*=false\n"
                                         "lv2.*=false\n"
                                         // "lv2.type_iterators=true\n"
-                                        "interp.*=false\n"
-                                        "interp.dev=true\n"
+                                        // "interp.*=false\n"
                                         // "interp.drag=true\n"
                                         "tree_display=false\n"
                                         "passages_panel=false\n"
@@ -93,6 +106,7 @@ int main(int argc, char *argv[])
                                         "qt.*.debug=false");
 
     M1MidPlane::Interp::init();
+    M1UI::TreeRow::init();
 
     M1Store::TEIInterface::init();
     // loadEnoch();
@@ -123,13 +137,6 @@ int main(int argc, char *argv[])
 
     printf("Hurrah! No Core Dump ... Returning %d\n", l_ret);
     return l_ret;
-}
-
-QDataStream& operator<<(QDataStream &l_out, const QXmlStreamAttribute &a){
-    QString l_rep = QString("%1: %2").arg(a.qualifiedName()).arg(a.value());
-    qCDebug(g_cat_main).noquote() << l_rep;
-    l_out << l_rep.toUtf8().constData();
-    return l_out;
 }
 
 /**
