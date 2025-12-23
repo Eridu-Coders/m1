@@ -455,16 +455,17 @@ void M1UI::TreeRow::create_descendant(){
  * @param p_myself
  * @return
  */
-shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_lv2* p_myself){
+std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_lv2* p_myself){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Getting appropriate Interp for: %1").arg(p_myself->dbgShort()))
 
-    shared_ptr<M1MidPlane::Interp> l_ret = nullptr;
+    std::shared_ptr<M1MidPlane::Interp> l_ret = nullptr;
     qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
     qCDebug(g_cat_interp_base).noquote() << M1MidPlane::Interp::dbgMapContents();
     qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
 
-    if(cm_interp_map.contains(p_myself->item_id())){
-        l_ret = M1MidPlane::Interp::cm_interp_map[p_myself->item_id()];
+    auto l_it = cm_interp_map.find(p_myself->item_id());
+    if(l_it != cm_interp_map.end()){
+        l_ret = l_it->second;
         qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
         qCDebug(g_cat_interp_base) << "after cache lookup : Exists";
     }
@@ -484,11 +485,11 @@ shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_lv2* 
         qCDebug(g_cat_interp_base) << QString("l_interp_raw: %1").arg(l_interp_raw->dbgOneLiner());
 
         qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
-        l_ret = shared_ptr<M1MidPlane::Interp>(l_interp_raw);
+        l_ret = std::shared_ptr<M1MidPlane::Interp>(l_interp_raw);
         qCDebug(g_cat_interp_base) << QString("l_ret one-liner: %1").arg(l_ret->dbgOneLiner());
         qCDebug(g_cat_interp_base) << "C";
         qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
-        M1MidPlane::Interp::cm_interp_map.insert(p_myself->item_id(), l_ret);
+        cm_interp_map[p_myself->item_id()] = l_ret;
         qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
         qCDebug(g_cat_interp_base) << "D";
     }
@@ -504,14 +505,14 @@ M1MidPlane::Interp::~Interp(){
     qCDebug(g_cat_interp_base).noquote() << "Interp deletion" << this->dbgOneLiner();
 }
 
-QMap<M1Env::ItemID, shared_ptr<M1MidPlane::Interp>> M1MidPlane::Interp::cm_interp_map;
+std::map<M1Env::ItemID, std::shared_ptr<M1MidPlane::Interp>> M1MidPlane::Interp::cm_interp_map;
 
 QString M1MidPlane::Interp::dbgMapContents(){
     QStringList l_ret;
     l_ret.append(QString("cm_interp_map [%1] contents:").arg(cm_interp_map.size()));
-    for(auto l_it = cm_interp_map.cbegin(); l_it != cm_interp_map.cend(); ++l_it){
-        qCDebug(g_cat_interp_base) << "Key:" << l_it.key() << "Value:" << (l_it.value() == nullptr ? "null" : "not null") << "Use Count:" << l_it.value().use_count();
-        l_ret.append(QString("%1: %2").arg(l_it.key(), 6).arg(l_it.value() != nullptr ? l_it.value()->dbgOneLiner() : "WARNING: nullptr"));
+    for(const auto& l_pair : cm_interp_map){
+        qCDebug(g_cat_interp_base) << "Key:" << l_pair.first << "Value:" << (l_pair.second == nullptr ? "null" : "not null") << "Use Count:" << l_pair.second.use_count();
+        l_ret.append(QString("%1: %2").arg(l_pair.first, 6).arg(l_pair.second != nullptr ? l_pair.second->dbgOneLiner() : "WARNING: nullptr"));
     }
     return l_ret.join("\n");
 }
@@ -578,7 +579,7 @@ M1MidPlane::Interp::Interp(M1Store::Item_lv2* p_myself){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Base Interp Constructor from: %1").arg(p_myself->dbgShort()))
 
     m_myself = p_myself;
-    M1MidPlane::Interp::cm_interp_map[p_myself->item_id()] = shared_ptr<Interp>(this);
+    // M1MidPlane::Interp::cm_interp_map[p_myself->item_id()] = std::shared_ptr<Interp>(this);
     // qCDebug(g_cat_interp_base) << QString("l_interp_raw: %1").arg(this->dbgOneLiner());
 
     M1_FUNC_EXIT
@@ -693,9 +694,8 @@ void M1MidPlane::Interp::invalidateCache(){
  * @brief M1MidPlane::Interp::invalidateAllCaches
  */
 void M1MidPlane::Interp::invalidateAllCaches(){
-    auto l_values = M1MidPlane::Interp::cm_interp_map.values();
-    for(auto l_interp_itr = l_values.cbegin(); l_interp_itr != l_values.cend(); ++l_interp_itr)
-        l_interp_itr->get()->invalidateCache();
+    for(const auto& l_interp_pair : cm_interp_map)
+        l_interp_pair.second->invalidateCache();
 }
 
 /**
