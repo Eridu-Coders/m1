@@ -32,10 +32,10 @@ bool loadTei(bool p_validate=false);
 
 int main(int argc, char *argv[])
 {
-    printf("Xa\n");
+    // printf("Xa\n");
     po::options_description l_desc("Allowed options");
-    printf("Xb\n");
-    std::vector<std::string> l_fuck;
+    // printf("Xb\n");
+    // std::vector<std::string> l_fuck;
     l_desc.add_options()
         ("help,h", "produce help message")
         ("load-gita,g", "Load Bhagavad Gita test data")
@@ -44,22 +44,22 @@ int main(int argc, char *argv[])
         ("reset,r", "Reset (empty) storage")
         // ("qmljsdebugger", po::value<std::vector<std::string>>(&l_fuck), "Fuck")
         ;
-    printf("X\n");
+    // printf("X\n");
     po::variables_map l_program_options_vm;
-    printf("Xc\n");
+    // printf("Xc\n");
     try{
-        printf("Y\n");
+        // printf("Y\n");
         po::store(po::parse_command_line(argc, argv, l_desc), l_program_options_vm);
-        printf("Z\n");
+        // printf("Z\n");
         po::notify(l_program_options_vm);
-        printf("T\n");
+        // printf("T\n");
 
         if(l_program_options_vm.count("reset")) std::cout << "reset option detected" << std::endl;;
         // if(l_program_options_vm.count("qmljsdebugger")) std::cout << l_fuck.at(0) << std::endl;
-        printf("U\n");
+        // printf("U\n");
     } catch ( po::error& e){
         std::cout << e.what();
-        std::_Exit(0);
+        return 1;
     }
 
     M1Env::EnvStatic::init();
@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
         }
         catch(const M1Env::M1Exception& e){
             qCDebug(g_cat_main).noquote() << "TEI load error" << e.code() << e.message();
-            std::_Exit(0);
+            return 1;
         }
     }
 

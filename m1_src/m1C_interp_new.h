@@ -12,7 +12,6 @@
 #include <QTextEdit>
 
 #include <memory>
-using namespace std;
 
 namespace M1MidPlane{
     class Interp;
@@ -95,7 +94,7 @@ private:
     QTimer m_hold_timer;
 
     M1Store::Item_lv2* m_edge;
-    shared_ptr<M1MidPlane::Interp> m_target;
+    std::shared_ptr<M1MidPlane::Interp> m_target;
 
     void paintOpenClose(QPainter& p);
     void initiateDrag();
@@ -154,7 +153,7 @@ namespace M1MidPlane{
 class Interp : public QObject{
     Q_OBJECT
 private:
-    static QMap<M1Env::ItemID, shared_ptr<Interp>> cm_interp_map;
+    static std::map<M1Env::ItemID, std::shared_ptr<Interp>> cm_interp_map;
 
     M1Store::ItemID m_edge_cache_iid = M1Store::G_VOID_ITEM_ID;
     QString m_html_cache;
@@ -175,7 +174,7 @@ protected:
 public:
     static void init(){cm_interp_map.clear();}
     static void invalidateAllCaches();
-    static shared_ptr<Interp> getInterp(M1Store::Item_lv2* p_myself);
+    static std::shared_ptr<Interp> getInterp(M1Store::Item_lv2* p_myself);
 
     bool isEmpty(){return m_myself == nullptr;}
     QString getHtml(const M1Store::Item_lv2* p_edge);
