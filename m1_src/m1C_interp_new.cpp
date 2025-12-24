@@ -55,7 +55,12 @@ M1UI::TreeRow::TreeRow(M1Store::Item_lv2* p_edge, M1UI::TreeDisplay* p_tree, int
                "M1MidPlane::TreeRow::TreeRow()",
                "A TreeRow can obnly be created out of an edge");
 
-    if(p_edge->isFullEdge()) m_target = M1MidPlane::Interp::getInterp(p_edge->getTarget_lv2()); // nearly all cases, including simple vertex field
+    if(p_edge->isFullEdge()){
+        // nearly all cases, including simple vertex field
+        // if(p_edge->isOfType(M1Env::AUTO_SIID)) m_target = std::shared_ptr<M1MidPlane::Interp>(new M1MidPlane::AutoInterp(p_edge->getTarget_lv2()));
+        // else m_target = M1MidPlane::Interp::getInterp(p_edge->getTarget_lv2());
+        m_target = M1MidPlane::Interp::getInterp(p_edge->getTarget_lv2());
+    }
     else m_target = M1MidPlane::Interp::getInterp(p_edge); // simple edge field case only
 
     m_target->setParent(this);
@@ -184,10 +189,18 @@ void M1UI::TreeRow::paintEvent(QPaintEvent* p_event){
     QPainter p(this);
     // edge type icon
     m_target->edgeIcon(m_edge)->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
-    // open/close icon if requested
-    if(m_target->displayOpenClose()) paintOpenClose(p);
     // target type icon
     m_target->vertexIcon()->paint(&p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
+
+    // AUTO edge
+    if(m_edge->isOfType(M1Env::AUTO_SIID)){
+        p.setPen(Qt::darkGray);
+        p.drawLine(QPoint(0,0), QPoint(this->width(),0));
+        p.drawLine(QPoint(0, m_target_height-1), QPoint(this->width(), m_target_height-1));
+    }
+    else
+        // open/close icon if requested
+        if(m_target->displayOpenClose()) paintOpenClose(p);
 
     // text
     p.setPen(Qt::white);
@@ -244,7 +257,6 @@ void M1UI::TreeRow::focusInEvent(QFocusEvent *p_event){
 
     this->setAutoFillBackground(true);
     this->repaint();
-    M1_FUNC_EXIT
 }
 
 /**
@@ -272,7 +284,6 @@ void M1UI::TreeRow::mousePressEvent(QMouseEvent *p_event){
             m_edge->setFlag(M1Env::EDGE_IS_OPEN);
         qCDebug(g_cat_interp_drag) << QString("GotoVertex after O/C BEFORE") << this->dbgOneLiner();
         emit gotoVertex(nullptr, this);
-        qCDebug(g_cat_interp_drag) << QString("GotoVertex after O/C AFTER") << this->dbgOneLiner();
     }
     else {
         // initiate Drag/Drop
@@ -476,8 +487,9 @@ std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_
         while(l_interp_raw == nullptr){
             qCDebug(g_cat_interp_base) << QString("A l_interp_raw: %1").arg(l_interp_raw == nullptr ? "null" : "instanciated");
 
-            if((l_interp_raw = AutoInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            else if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            //if((l_interp_raw = AutoInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            // else if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else l_interp_raw = new Interp(p_myself);
         }
         qCDebug(g_cat_interp_base) << QString("B l_interp_raw: %1").arg(l_interp_raw == nullptr ? "null" : "instanciated");
@@ -511,8 +523,11 @@ QString M1MidPlane::Interp::dbgMapContents(){
     QStringList l_ret;
     l_ret.append(QString("cm_interp_map [%1] contents:").arg(cm_interp_map.size()));
     for(const auto& l_pair : cm_interp_map){
-        qCDebug(g_cat_interp_base) << "Key:" << l_pair.first << "Value:" << (l_pair.second == nullptr ? "null" : "not null") << "Use Count:" << l_pair.second.use_count();
-        l_ret.append(QString("%1: %2").arg(l_pair.first, 6).arg(l_pair.second != nullptr ? l_pair.second->dbgOneLiner() : "WARNING: nullptr"));
+        // qCDebug(g_cat_interp_base) << "Key:" << l_pair.first << "Value:" << (l_pair.second == nullptr ? "null" : "not null") << "Use Count:" << l_pair.second.use_count();
+        l_ret.append(QString("%1: (use count: %2) %3")
+                         .arg(l_pair.first, 6)
+                         .arg(l_pair.second != nullptr ? QString("%1").arg(l_pair.second.use_count()) : "NA")
+                         .arg(l_pair.second != nullptr ? l_pair.second->dbgOneLiner() : "WARNING: nullptr"));
     }
     return l_ret.join("\n");
 }
@@ -725,10 +740,8 @@ QWidget *M1MidPlane::Interp::get_edit_widget(){
 
     m_text_edit = new QTextEdit(l_panel_widget);
     l_panel_layout->addWidget(m_text_edit);
-    if(m_myself->isSimpleEdge())
-        m_text_edit->setPlainText(m_myself->text());
-    else
-        m_text_edit->setPlainText(m_myself->getTarget_lv2()->text());
+
+    m_text_edit->setPlainText(m_myself->text());
 
     return l_panel_widget;
 }
@@ -764,6 +777,7 @@ void M1MidPlane::Interp::createDescendant(M1Store::SpecialItem* p_new_edge_type,
  * @param p_myself
  * @return
  */
+/*
 M1MidPlane::AutoInterp* M1MidPlane::AutoInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be an AutoInterp? %1").arg(p_myself->dbgShort()))
     M1MidPlane::AutoInterp* l_ret = nullptr;
@@ -773,12 +787,8 @@ M1MidPlane::AutoInterp* M1MidPlane::AutoInterp::getOneIfMatch(M1Store::Item_lv2*
     return l_ret;
 }
 
-/**
- * @brief M1MidPlane::AutoInterp::AutoInterp
- * @param p_myself
- */
 M1MidPlane::AutoInterp::AutoInterp(M1Store::Item_lv2* p_myself) : Interp(p_myself){}
-
+*/
 /** --------------------------------------------------------------- FieldInterp ---------------------------------
  * @brief M1MidPlane::FieldInterp::getOneIfMatch
  * @param p_myself
@@ -802,3 +812,13 @@ M1MidPlane::FieldInterp::FieldInterp(M1Store::Item_lv2* p_myself) : Interp(p_mys
 QString M1MidPlane::FieldInterp::inTreeDisplayText(){
     return QString("[%1] %2").arg(m_myself->dbgTypeShort()).arg(m_myself->text());
 }
+
+QIcon* M1MidPlane::FieldInterp::edgeIcon(const M1Store::Item_lv2* p_edge){
+    static QIcon ls_field_icon(M1Env::CROOKED_ICON_PATH);
+    return &ls_field_icon;
+}
+QIcon* M1MidPlane::FieldInterp::vertexIcon(){
+    static QIcon ls_field_icon(M1Env::FIELD_ICON_PATH);
+    return &ls_field_icon;
+}
+

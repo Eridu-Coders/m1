@@ -197,6 +197,7 @@ public slots:
     void save_text_edit();
 };
 
+/*
 class AutoInterp : public Interp{
     Q_OBJECT
 public:
@@ -208,6 +209,7 @@ public:
     // virtual void paintEvent(QPaintEvent* p_event);
     virtual bool displayOpenClose(){ return false; }
 };
+*/
 
 class FieldInterp : public Interp{
     Q_OBJECT
@@ -216,8 +218,8 @@ public:
 
     FieldInterp(M1Store::Item_lv2* p_myself);
     virtual QString className() {return "FieldInterp";}
-    // virtual QIcon* edgeIcon();
-    // virtual QIcon* vertexIcon();
+    virtual QIcon* edgeIcon(const M1Store::Item_lv2* p_edge);
+    virtual QIcon* vertexIcon();
     // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
     virtual QString inTreeDisplayText();
     // virtual void paintEvent(QPaintEvent* p_event);

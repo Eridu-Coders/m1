@@ -25,13 +25,8 @@ M1UI::TreeDisplay::TreeDisplay(QWidget *p_parent, MainWindow *p_main_window) : Q
     this->setBackgroundRole(QPalette::Window);
     this->setAutoFillBackground(true);
 
-    m_scroll_area_widget = new QWidget(this);
-    m_vb_layout = new QVBoxLayout();
-    m_scroll_area_widget->setLayout(m_vb_layout);
-    this->setWidget(m_scroll_area_widget);
-    m_vb_layout->setSpacing(0);
-    m_vb_layout->setContentsMargins(0, 0, 0, 0);
 
+    this->createScrollWidget();
     addRow(M1Store::Item_lv2::getExisting(M1Env::HOME_SIID));
 
     m_new_edge_type = M1Store::StorageStatic::getSelectableEdgeTypes()[0];
@@ -42,6 +37,15 @@ M1UI::TreeDisplay::TreeDisplay(QWidget *p_parent, MainWindow *p_main_window) : Q
     // this->setMouseTracking(true);
 
     M1_FUNC_EXIT
+}
+
+void M1UI::TreeDisplay::createScrollWidget(){
+    m_scroll_area_widget = new QWidget(this);
+    m_vb_layout = new QVBoxLayout(m_scroll_area_widget);
+    m_scroll_area_widget->setLayout(m_vb_layout);
+    this->setWidget(m_scroll_area_widget);
+    m_vb_layout->setSpacing(0);
+    m_vb_layout->setContentsMargins(0, 0, 0, 0);
 }
 
 /*
@@ -196,7 +200,33 @@ void M1UI::TreeDisplay::gotoVertex(M1Store::Item_lv2* p_new_vertex, M1UI::TreeRo
     this->installEventFilter(l_filter);
     // blocks update / repaint events
     this->setUpdatesEnabled(false);
-    qCDebug(g_cat_tree_display) << "before m_interp_list delete" << m_vb_layout->count() << m_scroll_area_widget->children().count();
+    qCDebug(g_cat_tree_display) << QString("before m_scroll_area_widget delete: L: %1 W: %2 M: %3")
+                                       .arg(m_vb_layout->count())
+                                       .arg(m_scroll_area_widget->children().count())
+                                       .arg(m_tree_row_list.count());
+
+    QWidget *l_widget_to_delete = this->takeWidget();
+    if (l_widget_to_delete) delete l_widget_to_delete;
+
+    // both have been deleted by the operation above so are set to nullptr for safety's sake
+    m_scroll_area_widget = nullptr;
+    m_vb_layout = nullptr;
+
+    // re-create the scroll area widget and its layout
+    this->createScrollWidget();
+
+    qCDebug(g_cat_tree_display) << QString("before m_tree_row_list clear: L: %1 W: %2 M: %3")
+                                       .arg(m_vb_layout->count())
+                                       .arg(m_scroll_area_widget->children().count())
+                                       .arg(m_tree_row_list.count());
+    m_tree_row_list.clear();
+    // remove stretch item at end
+    qCDebug(g_cat_tree_display) << QString("after m_tree_row_list clear: L: %1 W: %2 M: %3")
+                                       .arg(m_vb_layout->count())
+                                       .arg(m_scroll_area_widget->children().count())
+                                       .arg(m_tree_row_list.count());
+
+    /*
     if(m_old_tree_row != nullptr){
         qCDebug(g_cat_tree_display) << "delete m_old_interp" << m_old_tree_row->dbgOneLiner();
         delete m_old_tree_row;
@@ -211,29 +241,31 @@ void M1UI::TreeDisplay::gotoVertex(M1Store::Item_lv2* p_new_vertex, M1UI::TreeRo
         }
         else
             delete l_tree_row;
-    }
-
-    qCDebug(g_cat_tree_display) << "before clear" << m_vb_layout->count() << m_scroll_area_widget->children().count();
-    m_tree_row_list.clear();
-    // remove stretch item at end
     m_vb_layout->removeItem(m_vb_layout->itemAt(0));
-    qCDebug(g_cat_tree_display) << "after clear" << m_vb_layout->count() << m_scroll_area_widget->children().count();
 
     for(int i=0; i<m_vb_layout->count(); i++)
         qCDebug(g_cat_tree_display) << "Layout" << i << m_vb_layout->itemAt(i)->spacerItem() << m_vb_layout->itemAt(i)->widget();
     for(int i=0; i<this->widget()->children().count(); i++)
         qCDebug(g_cat_tree_display) << "m_scroll_area_widget" << i << m_scroll_area_widget->children().at(i);
+    }*/
 
+    // re-create list of rows ...
     if(p_new_vertex == nullptr)
+        // ... from the same root (if only for update purposes)
         addRow(m_root);
     else
+        // ... or from the new root given in parameter if not null
         addRow(p_new_vertex);
 
+    // restore normal operations
     this->setUpdatesEnabled(true);
     this->removeEventFilter(l_filter);
     delete l_filter;
 
-    qCDebug(g_cat_tree_display) << "after new filling" << m_vb_layout->count() << m_scroll_area_widget->children().count() << m_tree_row_list.count();
+    qCDebug(g_cat_tree_display) << QString("at end: L: %1 W: %2 M: %3")
+                                       .arg(m_vb_layout->count())
+                                       .arg(m_scroll_area_widget->children().count())
+                                       .arg(m_tree_row_list.count());
     M1_FUNC_EXIT
 }
 

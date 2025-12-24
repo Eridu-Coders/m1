@@ -24,6 +24,7 @@ namespace M1UI{
                                            QVector<M1Store::ItemID>& p_edges_alrady_traversed);
 
         void variousTests();
+        void createScrollWidget();
 
         M1Store::Item_lv2* m_root;
         MainWindow *m_main_window;
@@ -35,7 +36,7 @@ namespace M1UI{
 
         QList<M1UI::TreeRow*> m_tree_row_list;
 
-        M1UI::TreeRow* m_old_tree_row = nullptr;
+        // M1UI::TreeRow* m_old_tree_row = nullptr;
         M1UI::TreeRow* m_being_dragged = nullptr;
     public:
         explicit TreeDisplay(QWidget *p_parent, MainWindow *p_main_window);
