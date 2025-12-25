@@ -18,9 +18,170 @@
  * will be positionned below the reciprocal of p_edge_above, unless p_at_top is set, in which case, it will be positioned at the
  * top of the appropriate ring of the target element.
  *
- * \todo insert new edges at bottom
  * @{
  */
+
+/**
+ * @brief M1Store::Item_lv2::linkTo
+ * @param p_target
+ * @param p_edge_type
+ * @param p_where
+ * @param p_where_reciprocal
+ * @param p_edge_above
+ * @return
+ */
+M1Store::Item_lv2* M1Store::Item_lv2::linkTo(
+    Item_lv2* p_target,
+    const SpecialItemID p_edge_type,
+    const InsertionPoint p_where,
+    const InsertionPoint p_where_reciprocal,
+    Item_lv2* p_edge_above)
+{
+    M1_FUNC_ENTRY(g_cat_lv2_members, QString("{%3} link to: {%1} [%2]")
+                      .arg(p_target->dbgShort())
+                      .arg(M1Store::StorageStatic::getSpecialItemPointer(p_edge_type)->mnemonic())
+                      .arg(this->dbgShort()))
+    // cannot link simple items to anything
+    Q_ASSERT_X(this->isFullVertex() || this->isFullEdge(), "Item_lv2::linkTo()", "cannot link simple vertices or edges to anything");
+
+    // the new edge from this item to the target
+    M1Store::Item_lv2* l_new_edge =
+        getNew(FULL_EDGE, M1Store::ItemType(p_edge_type));
+    l_new_edge->setTarget_lv1(p_target->item_id());
+    l_new_edge->setOrigin_lv1(this->item_id());
+
+    // creation of a reciprocal edge if necessary
+    if(M1Store::StorageStatic::getSpecialItemPointer(p_edge_type)->flags() & SI_HAS_RECIPROCAL){
+        // the reciprocal edge
+        SpecialItemID l_reciprocal_type_si_id = M1Store::StorageStatic::getSpecialItemPointer(p_edge_type)->reciprocalSpecialId();
+        M1Store::Item_lv2* l_new_edge_reciprocal =
+            getNew(FULL_EDGE, M1Store::ItemType(l_reciprocal_type_si_id));
+        l_new_edge_reciprocal->setOrigin_lv1(p_target->item_id());
+        l_new_edge_reciprocal->setTarget_lv1(this->item_id());
+
+        // mutual reciprocal hook-up of the 2 edges
+        l_new_edge->setReciprocal_lv1(l_new_edge_reciprocal->item_id());
+        l_new_edge_reciprocal->setReciprocal_lv1(l_new_edge->item_id());
+
+        qCDebug(g_cat_lv2_members) << QString("Reciprocal edge created: %1 --> %2")
+                                          .arg(l_new_edge->dbgTypeShort())
+                                          .arg(l_new_edge_reciprocal->dbgTypeShort());
+
+        // it is IMPOSSIBLE to automatically determine a "reciprocal edge above" from p_where alone.
+        // Therefore p_where_reciprocal is used, but it can also be overridden if the special item flag
+        // SI_INSERT_AT_TOP of the reciprocal type is set
+        InsertionPoint l_where_reciprocal =
+            M1Store::StorageStatic::getSpecialItemPointer(l_reciprocal_type_si_id)->flags() & M1Env::SI_INSERT_AT_TOP ? InsertionPoint::at_top : p_where_reciprocal;
+
+        p_target->installFullEdge_2(
+            l_new_edge_reciprocal,
+            l_reciprocal_type_si_id,
+            l_where_reciprocal,
+            nullptr // no edge above
+        );
+    }
+    // insert the direct edge into one of the edge rings (special or ordinary) of this item
+    this->installFullEdge_2(l_new_edge, p_edge_type, p_where, p_edge_above);
+
+    qCDebug(g_cat_lv2_members) << QString("Returning new edge: %1").arg(l_new_edge->dbgShort());
+    M1_FUNC_EXIT
+        return l_new_edge;
+}
+
+/**
+ * @brief M1Store::Item_lv2::installFullEdge_2
+ * @param p_new_edge
+ * @param p_edge_type
+ * @param p_where
+ * @param p_edge_above
+ */
+void M1Store::Item_lv2::installFullEdge_2(Item_lv2* p_new_edge, const SpecialItemID p_edge_type, const InsertionPoint p_where, Item_lv2* p_edge_above){
+    M1_FUNC_ENTRY(g_cat_lv2_members, QString("{%3} adding full edge [%1] where? %2")
+                      .arg(p_new_edge->dbgShort())
+                      // .arg(p_where)
+                      .arg(this->dbgShort()))
+
+    // cannot link simple items to anything
+    Q_ASSERT_X(this->isFullVertex() || this->isFullEdge(),
+               "Item_lv2::installFullEdge()", "Cannot add an edge to a simple edge or vertex");
+
+    // determine in which ring the edge is to be inserted
+    bool l_edge_is_special =
+        (p_where == InsertionPoint::special_override) ||
+        (p_edge_type == G_VOID_SI_ID ? false : (M1Store::StorageStatic::getSpecialItemPointer(p_edge_type)->flags() & SI_IS_SPECIAL_EDGE) > 0);
+
+    ItemID l_first_edge_id = l_edge_is_special ? this->firstEdgeSpecial_item_id() : this->firstEdge_item_id();
+
+    // indicates whether the new edge is inserted at the top of the ring,
+    // and must therefore take the place of the first edge (of the relevant ring) --> see "at top" if-block below
+    bool l_at_top = false;
+
+    if(p_where == InsertionPoint::below_specified){
+        // to be installed below a specified edge
+        qCDebug(g_cat_lv2_members) << QString("[%1] Edge above was provided").arg(this->dbgShort());
+        Q_ASSERT_X(p_edge_above != nullptr,
+                   "Item_lv2::installFullEdge_2()", "No Edge Apove provided while p_where == InsertionPoint::below_specified");
+        Q_ASSERT_X(l_first_edge_id != G_VOID_ITEM_ID,
+                   "Item_lv2::installFullEdge()", "Cannot install an edge into an empty ring if edge above provided");
+        Q_ASSERT_X(M1Env::SKIP_HEAVY_CHECKING || this->edgeBelongs(p_edge_above, l_edge_is_special),
+                   "Item_lv2::installFullEdge()",
+                   "the given edge above does not belong to this ring");
+
+        l_at_top = false; // just to be sure
+
+        insertEdgeBelow(p_new_edge, p_edge_above);
+    }
+    else {
+        // no edge above provided
+        qCDebug(g_cat_lv2_members) << QString("No edge above provided, relying on p_where");
+
+        if(l_first_edge_id == G_VOID_ITEM_ID){
+            // case in which this item does not have any edge yet (in the relevant ring)
+            qCDebug(g_cat_lv2_members) << QString("inserting in empty edge ring");
+            // nothing to do here the "at top" if-block below will take care of linking the new edge to this
+            l_at_top = true;
+        }
+        else{
+            // determine DEFAULT edge above based on p_where
+            M1Store::Item_lv2* l_edge_above;
+
+            if(p_where == InsertionPoint::at_top || p_where == InsertionPoint::at_bottom || p_where == InsertionPoint::special_override){
+                l_edge_above = this->getExisting(l_first_edge_id)->get_previous_lv2();
+                // by default, if the edge will be placed in the special edge ring, the edge is inserted at top
+                l_at_top = (p_where == InsertionPoint::at_top || l_edge_is_special);
+            }
+            else if(p_where == InsertionPoint::below_auto){
+                Q_ASSERT_X(this->isFullVertex(), // must be a full VERTEX to have an AUTO edge
+                           "Item_lv2::installFullEdge_2()", "p_where == below_auto on a non-vertex");
+
+                l_edge_above = p_new_edge->getOrigin_lv2()->getAutoEdge_lv2();
+                l_at_top = false; // just to be sure
+            }
+            else throw M1Env::M1Exception("Wrong p_where value", 0);
+
+            qCDebug(g_cat_lv2_members) << QString("l_at_top before insetion: %1").arg(l_at_top);
+            insertEdgeBelow(p_new_edge, l_edge_above);
+        }
+    }
+
+    // "at top" if-block
+    if(l_at_top){
+        qCDebug(g_cat_lv2_members) << QString("Set the new edge as first edge");
+        // id of the new edge
+        ItemID l_new_edge_id = p_new_edge->item_id();
+
+        // the edge becomes the new first edge of the appropriate ring
+        if(l_edge_is_special)
+            // add to the special edge ring
+            this->setFirstEdgeSpecial_lv1(l_new_edge_id);
+        else
+            // add to the ordinary edge ring
+            this->setFirstEdge_lv1(l_new_edge_id);
+    }
+
+    qCDebug(g_cat_lv2_constructors) << QString("%1 Installed").arg(p_new_edge->dbgShort());
+    M1_FUNC_EXIT
+}
 
 /**
  * @brief link an item to another

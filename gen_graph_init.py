@@ -417,6 +417,16 @@ g_special_vertices = [
     ['MKPRT', 'SI_IS_TYPE',                                None,                        'MKPRT_SIID', None,          'Special Vertex ID (Simple edge type) of Occurrence field markup right'],
     ['STPOS', 'SI_IS_TYPE',                                None,                        'STPOS_SIID', None,          'Special Vertex ID (Simple edge type) of Occurrence field sentence position'],
     ['HLCLR', 'SI_IS_TYPE',                                None,                        'HLCLR_SIID', None,          'Color of text highlight category'],
+    ['TRSLT', 'SI_IS_TYPE',                                None,                        'TEXT_WORD_TRANSLIT_SIID', None, 'Special Vertex ID (Simple Edge type) of Gita transliteration field'],
+    ['DCTRF', 'SI_IS_TYPE',                                None,                        'TEXT_WORD_DICT_REF_SIID', None, 'Special Vertex ID (Simple Edge type) of Gita dictionary ref. field'],
+    ['WFTRN', 'SI_IS_TYPE',                                None,                        'TEXT_WFW_TRANSL_SIID', None, 'Special Vertex ID (Simple Edge type) WfW unit Translation field'],
+    ['URLNK', 'SI_IS_TYPE',                                'TEXT_URL_LINK_ICON_PATH',   'TEXT_URL_LINK_SIID', None,  'Special Vertex ID (Vertex type) Url link'],
+    # --------------------------- HS2OB / OC2HB ---------------------------
+    ['HS2OB', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_BEGIN_ICON_PATH', 'TW_SECTION_2_OCC_BEGIN_SIID',
+    ('OC2HB', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_BEGIN_ICON_PATH', 'TW_REV_SECTION_2_OCC_BEGIN_SIID'),  'Special Vertex ID (Edge type) begin section + reciprocal'],
+    # --------------------------- HS2OE / OC2HE ---------------------------
+    ['HS2OE', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_END_ICON_PATH', 'TW_SECTION_2_OCC_END_SIID',
+    ('OC2HE', 'SI_IS_TYPE',                                'TW_SECTION_2_OCC_END_ICON_PATH', 'TW_REV_SECTION_2_OCC_END_SIID'),'Special Vertex ID (Edge type) end section + reciprocal'],
 ]
 
 g_vertices = [
@@ -432,8 +442,9 @@ g_vertices = [
 ['Home',                         ['FULL_VERTEX',  'IS_SPECIAL'],  ['FOLDR'],  [('BLNGS',  'ROOT_')], 'HOME_', '0',                                 None,                     'HOME_SIID'],
 ['Texts Root (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TEXT_', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
                                                                                                                'SI_IS_SELECTABLE'],                'TEXT_ICON_PATH',         'TEXT_SIID'],
-['Baghavad Gita',                ['FULL_VERTEX',  'IS_SPECIAL'],  ['FOLDR'],  [('BLNGS',  'HOME_')], 'BGRT_', '0',                                 None,                     'BG_ROOT_SIID'],
-['The Republic (Plato)',         ['FULL_VERTEX',  'IS_SPECIAL'],  ['FOLDR'],  [('BLNGS',  'HOME_')], 'REPRT', '0',                                 None,                     'REPUBLIC_ROOT_SIID'],
+#['Baghavad Gita',                ['FULL_VERTEX',  'IS_SPECIAL'],  ['FOLDR'],  [('BLNGS',  'HOME_')], 'BGRT_', '0',                                 None,                     'BG_ROOT_SIID'],
+#['The Republic (Plato)',         ['FULL_VERTEX',  'IS_SPECIAL'],  ['FOLDR'],  [('BLNGS',  'HOME_')], 'REPRT', '0',                                 None,                     'REPUBLIC_ROOT_SIID'],
+['Texts Work Area',              ['FULL_VERTEX',  'IS_SPECIAL'],  ['FOLDR'],  [('BLNGS',  'HOME_')], 'TXWKK', '0',                                 None,                     'TEXT_WORK_SIID'],
 ['Inboxes / Message Root Type',  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], '_MSG_', ['SI_IS_TYPE'],                      None,                     'MSG_TYPE_SIID'],
 ['Me',                           ['FULL_VERTEX',  'IS_SPECIAL'],  ['PERSN'],  [('BLNGS',  'HOME_')], 'ME___', '0',                                 None,                     'ME_SIID'],
 ['Email Inbox',                  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  '_MSG_')], 'EMAIL', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'EMAIL_TYPE_SIID'],
@@ -441,27 +452,34 @@ g_vertices = [
 ['Discord Inbox',                ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  '_MSG_')], 'DSCRD', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'DSCRD_TYPE_SIID'],
 ['GChat Inbox',                  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  '_MSG_')], 'GCHAT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'GCHAT_TYPE_SIID'],
 ['SMS Inbox',                    ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  '_MSG_')], 'SMS__', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'SMS_TYPE_SIID'],
-['Grammar Attributes (type)',    ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'REPRT')], 'GRATT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'GRAMMAR_ATTR_SIID'],
-['Lemma (type)',                 ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'REPRT')], 'LEMMA', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
+['Grammar Attributes (type)',    ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'GRATT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'GRAMMAR_ATTR_SIID'],
+['Lemma (type)',                 ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'LEMMA', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
                                                                                                                'SI_IS_ICON_TYPE'],                 'LEMMA_ICON_PATH',        'LEMMA_SIID'],
-['NLP Entity (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'REPRT')], 'NLENT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'ENTITY_ICON_PATH',       'NLENT_SIID'],
-['NLP Pos code (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'REPRT')], 'NLPOS', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'POS_ICON_PATH',          'NLPOS_SIID'],
-['NLP Tag code (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'REPRT')], 'NLTAG', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'TAG_ICON_PATH',          'NLTAG_SIID'],
-['Stephanus Section (type)',     ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'REPRT')], 'STPSC', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'STEPHANUS_SIID'],
-['Text Version (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'REPRT')], 'TXTVR', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'TXTVR_SIID'],
-['Notes (type)',                 ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'REPRT')], 'TXTNT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'TXTNT_SIID'],
+['NLP Entity (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'NLENT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'ENTITY_ICON_PATH',       'NLENT_SIID'],
+['NLP Pos code (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'NLPOS', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'POS_ICON_PATH',          'NLPOS_SIID'],
+['NLP Tag code (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'NLTAG', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'TAG_ICON_PATH',          'NLTAG_SIID'],
+['Stephanus Section (type)',     ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'STPSC', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'STEPHANUS_SIID'],
+['Text Version (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'TXTVR', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'TXTVR_SIID'],
+['Notes (type)',                 ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'TXTNT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'TXTNT_SIID'],
 ['Text Chunk (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXTCK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
                                                                                                                'SI_IS_SELECTABLE'],                'TEXT_CHUNK_ICON_PATH',   'TEXT_CHUNK_SIID'],
-['Book (type)',                  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'REPRT')], 'TXTBK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'BOOK_ICON_PATH',         'TEXT_BOOK_SIID'],
+['Book (type)',                  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'TXTBK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'BOOK_ICON_PATH',         'TEXT_BOOK_SIID'],
+['Chapter (type)',               ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'TXTCH', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'CHAPTER_ICON_PATH',      'TEXT_CHAPTER_SIID'],
 ['Sentence (type)',              ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXSNT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'SENTENCE_ICON_PATH',     'TEXT_SENTENCE_SIID'],
-['Highlight (type)',             ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHLT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'HIGHLIGHTER_ICON_PATH',  'TEXT_HIGHLIGHT_SIID'],
-['Highlight category (type)',    ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'REPRT')], 'TXHLC', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'TEXT_HIGHLIGHT_CAT_SIID'],
+['Sloka (type)',                 ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'TXSLK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'SLOKA_ICON_PATH',        'SLOKA_SIID'],
+['Highlight (type)',             ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'TXHLT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'HIGHLIGHTER_ICON_PATH',  'TEXT_HIGHLIGHT_SIID'],
+['Highlight category (type)',    ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'TXHLC', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'TEXT_HIGHLIGHT_CAT_SIID'],
 ['Highlight Folder (type)',      ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHLF', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'TEXT_HIGHLIGHT_FLDR_SIID'],
 ['Highlight Categories Folder',  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHCF', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'TEXT_HIGHLIGHT_CAT_FLDR_SIID'],
 ['Highlight Chunk',              ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHCK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  "HL_CHUNK_ICON_PATH",     'TEXT_HIGHLIGHT_CHUNK_SIID'],
 ['Sloka folder',                 ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'SKFLD', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  "SLOKA_FOLDER_ICON_PATH", 'TEXT_SLOKA_FLDR_SIID'],
-['Highlight Quotation (type)',   ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHQT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE', 'SI_EDGE_TYPE',
-                                                                                                               'SI_IS_SELECTABLE'],                "HL_QUOTE_ICON_PATH",     'TEXT_HIGHLIGHT_QUOTE_SIID'],
+['Highlight Quotation (type)',   ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXHQT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
+                                                                                                               'SI_EDGE_TYPE', 'SI_IS_SELECTABLE'],"HL_QUOTE_ICON_PATH",     'TEXT_HIGHLIGHT_QUOTE_SIID'],
+['Sloka Lines (type)',           ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'SLKLN', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], 'TEXT_SLOKA_LINE_ICON_PATH', 'TEXT_SLOKA_LINE_SIID'],
+['INRIA Dictionary Reference',   ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'INRIA', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], 'FOLDER_ICON_PATH', 'TEXT_WORD_DREF_INRIA_SIID'],
+['Sloka Translation (type)',     ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'SLTRN', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], 'TEXT_SLOKA_TRANSLATION_ICON_PATH', 'TEXT_SLOKA_TRANSLATION_SIID'],
+['Sloka Bhashya (type)',         ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'SLBHS', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], 'TEXT_SLOKA_BHASHYA_ICON_PATH', 'TEXT_SLOKA_BHASHYA_SIID'],
+['WfW Translation Unit (type)',  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'TRLUN', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], 'TEXT_WFW_UNIT_ICON_PATH', 'TEXT_WFW_UNIT_SIID'],
 ]
 
 g_special_vertices_gita = [
@@ -544,8 +562,8 @@ void M1Env::GraphInit::init_plato(){
 # ------------- main() -------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     # gita
-    g_vertices += g_vertices_gita
-    g_special_vertices += g_special_vertices_gita
+    # g_vertices += g_vertices_gita
+    # g_special_vertices += g_special_vertices_gita
 
     l_attr_2_mn = dict()
     l_attr_class_ssid_list = []
@@ -1062,7 +1080,8 @@ if __name__ == '__main__':
                      .replace('__PSEUDO_DUMP__', l_dump.strip())
                      .replace('__PSEUDO_INIT__', l_initialization.strip())
                      .replace('__INIT_BASE__', l_base_code.strip())
-                     .replace('__INIT_PLATO__', l_plato_code.strip()))
+                     # .replace('__INIT_PLATO__', l_plato_code.strip())
+                     .replace('__INIT_PLATO__', ''))
 
     print('\n================ Duplicate Mnemonics =====================')
     for l_count, l_mn in sorted([(l_mnemo_dict[l_mn], l_mn) for l_mn in l_mnemo_dict.keys()]):

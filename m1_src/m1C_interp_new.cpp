@@ -124,7 +124,7 @@ QString M1UI::TreeRow::dbgOneLiner(){
  * @brief M1MidPlane::Interp::dbgOneLiner
  * @return
  */
-QString M1MidPlane::Interp::dbgOneLiner(){
+QString M1MidPlane::Interp::dbgOneLinerVirtual(){
     Q_ASSERT_X(m_myself != nullptr, "M1MidPlane::Interp::dbgOneLiner()", "m_myself is null");
 
     return QString("[Class: %1] %2").arg(this->className()).arg(m_myself->dbgShort());
@@ -490,6 +490,7 @@ std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_
             //if((l_interp_raw = AutoInterp::getOneIfMatch(p_myself)) != nullptr) break;
             // else if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break;
             if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = TextInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else l_interp_raw = new Interp(p_myself);
         }
         qCDebug(g_cat_interp_base) << QString("B l_interp_raw: %1").arg(l_interp_raw == nullptr ? "null" : "instanciated");
@@ -514,7 +515,8 @@ std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_
     return l_ret;
 }
 M1MidPlane::Interp::~Interp(){
-    qCDebug(g_cat_interp_base).noquote() << "Interp deletion" << this->dbgOneLiner();
+    // qCDebug(g_cat_interp_base).noquote() << "Interp deletion" << this->dbgOneLiner();
+    qCDebug(g_cat_interp_base).noquote() << "Interp deletion:" << m_dbgOneLinerCache;
 }
 
 std::map<M1Env::ItemID, std::shared_ptr<M1MidPlane::Interp>> M1MidPlane::Interp::cm_interp_map;
@@ -535,8 +537,14 @@ QString M1MidPlane::Interp::dbgMapContents(){
 QString M1MidPlane::Interp::cm_html_template =
     QString("<html><Head>\n") +
         "<style>\n" +
+        "body {font-size: 12pt; font-family: \"Latin Modern Math\", Times New Roman, Serif}\n" + // sepabove
+        "h1 {font-size: 20pt; text-align: center;}\n" +
+        "h2 {font-size: 16pt; font-weight: normal; text-align: center;}\n" +
+        "h3 {font-size: 12pt; font-weight: normal; text-align: center;}\n" +
+        "p.sepabove {border-top: 1px solid black; margin-top: 2em; padding-top: 1em;}\n" +
+        ".technical {font-size: 12pt; font-weight: normal; font-family: \"Noto Mono\", FreeMono, Monospace}\n}\n" +
         "table.wb {border: 1px solid black;border-collapse: collapse;}\n"
-        "td.wb, th.wb {border: 1px solid black;border-collapse: collapse; padding: 0.5em 0.5em 0.5em 0.5em}\n"
+        "td.wb, th.wb {border: 1px solid black; border-collapse: collapse; padding: 0.5em 0.5em 0.5em 0.5em}\n"
         "/* Tooltip container */\n" +
         ".tooltip {\n" +
         "  position: relative;\n" +
@@ -639,10 +647,10 @@ QString M1MidPlane::Interp::base_edge_html_fragment(const M1Store::Item_lv2* p_e
         p_edge->isFullEdge() ? "Full Edge" : (p_edge->isSimpleEdge() ? "Simple Edge" : "ERROROLOLO")
         ));
     l_self_list.append(QString("<tr><td>Type</td><td>:</td><td>%1</td></tr>\n").arg(p_edge->dbgTypeShort()));
-    QString l_self_html = QString("<table>%1</table>\n").arg(l_self_list.join("\n"));
+    QString l_self_html = QString("<table class=\"technical\">%1</table>\n").arg(l_self_list.join("\n"));
     qCDebug(g_cat_interp_base) << "l_self_html:" << l_self_html;
 
-    QString l_ret = QString("<p style=\"font-weight: bold;\">Edge:</p>\n%1").arg(l_self_html);
+    QString l_ret = QString("<p class=\"technical\" style=\"font-weight: bold;\">Edge:</p>\n%1").arg(l_self_html);
 
     M1_FUNC_EXIT
     return l_ret;
@@ -656,11 +664,11 @@ QString M1MidPlane::Interp::base_html_fragment(){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("base_html_fragment: %1").arg(this->dbgOneLiner()))
 
     QString l_html = m_myself->isSimpleEdge() ?
-        QString("<p><span style=\"font-weight: bold;\">Field Payload</span>: %1</p>\n").arg(m_myself->text()) :
-        QString("<p style=\"font-weight: bold;\">Target:</p>\n<p>%1</p>\n").arg(m_myself->dbgStringHtml());
+        QString("<p class=\"technical\"><span style=\"font-weight: bold;\">Field Payload</span>: %1</p>\n").arg(m_myself->text()) :
+        QString("<p class=\"technical\" style=\"font-weight: bold;\">Target:</p>\n<div class=\"technical\">%1</div>\n").arg(m_myself->dbgStringHtml());
 
     M1_FUNC_EXIT
-    return QString("<div style=\"font-family: 'Noto mono', Courier New, monospace;\">%1</div>\n").arg(l_html);
+    return QString("<div\">%1</div>\n").arg(l_html);
 }
 
 /**
@@ -670,13 +678,8 @@ QString M1MidPlane::Interp::base_html_fragment(){
  */
 QString M1MidPlane::Interp::getHtmlVirtual(const M1Store::Item_lv2* p_edge){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Interp getHtmlVirtual(): %1").arg(this->dbgOneLiner()))
-    QString l_ret_html = cm_html_template.arg(
-        QString("<p><span style=\"font-weight: bold;\">Class</span>: %1</p>\n").arg(className()) +
-        base_edge_html_fragment(p_edge) +
-        base_html_fragment()
-    );
     M1_FUNC_EXIT
-    return l_ret_html;
+    return "";
 }
 
 /**
@@ -690,7 +693,12 @@ QString M1MidPlane::Interp::getHtml(const M1Store::Item_lv2* p_edge){
     if(m_edge_cache_iid == p_edge->item_id())
         l_ret_html = m_html_cache;
     else{
-        l_ret_html = getHtmlVirtual(p_edge);
+        l_ret_html = cm_html_template.arg(
+            getHtmlVirtual(p_edge) +
+            QString("<p class=\"technical sepabove\"><span style=\"font-weight: bold;\">Class</span>: %1</p>\n").arg(className()) +
+            base_edge_html_fragment(p_edge) +
+            base_html_fragment()
+        );
         m_edge_cache_iid = p_edge->item_id();
         m_html_cache = l_ret_html;
     }
@@ -789,6 +797,7 @@ M1MidPlane::AutoInterp* M1MidPlane::AutoInterp::getOneIfMatch(M1Store::Item_lv2*
 
 M1MidPlane::AutoInterp::AutoInterp(M1Store::Item_lv2* p_myself) : Interp(p_myself){}
 */
+
 /** --------------------------------------------------------------- FieldInterp ---------------------------------
  * @brief M1MidPlane::FieldInterp::getOneIfMatch
  * @param p_myself
@@ -820,5 +829,57 @@ QIcon* M1MidPlane::FieldInterp::edgeIcon(const M1Store::Item_lv2* p_edge){
 QIcon* M1MidPlane::FieldInterp::vertexIcon(){
     static QIcon ls_field_icon(M1Env::FIELD_ICON_PATH);
     return &ls_field_icon;
+}
+
+/** --------------------------------------------------------------- TextInterp ---------------------------------
+ * @brief M1MidPlane::TextInterp::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
+M1MidPlane::TextInterp* M1MidPlane::TextInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be a TextInterp? %1").arg(p_myself->dbgShort()))
+    M1MidPlane::TextInterp* l_ret = nullptr;
+    if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::TEXT_SIID))
+        l_ret = new TextInterp(p_myself);
+    M1_FUNC_EXIT
+    return l_ret;
+}
+
+/**
+ * @brief M1MidPlane::TextInterp::TextInterp
+ * @param p_myself
+ */
+M1MidPlane::TextInterp::TextInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself) {}
+
+/**
+ * @brief M1MidPlane::TextInterp::inTreeDisplayText
+ * @return
+ */
+QString M1MidPlane::TextInterp::inTreeDisplayText(){
+    M1Store::Item_lv2* l_author_edge = m_myself->find_edge_edge_type(M1Env::TEXT_WRITTEN_BY_SIID);
+    return QString("%1%2").arg(l_author_edge != nullptr ? QString("[%1] ").arg(l_author_edge->getTarget_lv2()->text()) : "").arg(m_myself->text());
+}
+
+/**
+ * @brief M1MidPlane::TextInterp::getHtmlVirtual
+ * @param p_edge
+ * @return
+ */
+QString M1MidPlane::TextInterp::getHtmlVirtual(const M1Store::Item_lv2* p_edge){
+    QString l_html;
+    // title
+    l_html += QString("<h2>%1</h2>").arg(m_myself->text());
+
+    // author
+    M1Store::Item_lv2* l_author_edge = m_myself->find_edge_edge_type(M1Env::TEXT_WRITTEN_BY_SIID);
+    if(l_author_edge != nullptr) l_html += QString("<h3>by: %1</h2>").arg(l_author_edge->getTarget_lv2()->text());
+
+    // alternate and subtitle
+    QString l_alt_title = m_myself->getField(M1Env::TEXT_ALT_TITLE_SIID);
+    QString l_sub_title = m_myself->getField(M1Env::TEXT_SUB_TITLE_SIID);
+    if(l_alt_title.length() > 0) l_html += QString("<h2>Otherwise known as: %1</h2>").arg(l_alt_title);
+    if(l_sub_title.length() > 0) l_html += QString("<h3>%1</h3>").arg(l_sub_title);
+
+    return l_html;
 }
 

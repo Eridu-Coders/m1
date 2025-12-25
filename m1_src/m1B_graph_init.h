@@ -41,12 +41,6 @@ extern M1Env::SpecialItemID MKPRT_SIID;
 extern M1Env::SpecialItemID STPOS_SIID;
 // [HLCLR] Color of text highlight category
 extern M1Env::SpecialItemID HLCLR_SIID;
-// [PRABH] Special Vertex ID (Vertex type) of Gita translation source: Prabhupada
-extern M1Env::SpecialItemID TEXT_WFW_PRABUPADA_SIID;
-// [SIVAN] Special Vertex ID (Vertex type) of Gita translation source: Sivananda
-extern M1Env::SpecialItemID TEXT_WFW_SIVANANDA_SIID;
-// [GAMBI] Special Vertex ID (Vertex type) of Gita translation source: Gambirananda
-extern M1Env::SpecialItemID TEXT_WFW_GAMBIRANANDA_SIID;
 // [TRSLT] Special Vertex ID (Simple Edge type) of Gita transliteration field
 extern M1Env::SpecialItemID TEXT_WORD_TRANSLIT_SIID;
 // [DCTRF] Special Vertex ID (Simple Edge type) of Gita dictionary ref. field
@@ -76,10 +70,8 @@ extern M1Env::SpecialItemID ORG_TYPE_SIID;
 extern M1Env::SpecialItemID HOME_SIID;
 // [TEXT_] Special Vertex ID of "Texts Root (type)"
 extern M1Env::SpecialItemID TEXT_SIID;
-// [BGRT_] Special Vertex ID of "Baghavad Gita"
-extern M1Env::SpecialItemID BG_ROOT_SIID;
-// [REPRT] Special Vertex ID of "The Republic (Plato)"
-extern M1Env::SpecialItemID REPUBLIC_ROOT_SIID;
+// [TXWKK] Special Vertex ID of "Texts Work Area"
+extern M1Env::SpecialItemID TEXT_WORK_SIID;
 // [_MSG_] Special Vertex ID of "Inboxes / Message Root Type"
 extern M1Env::SpecialItemID MSG_TYPE_SIID;
 // [ME___] Special Vertex ID of "Me"
@@ -114,8 +106,12 @@ extern M1Env::SpecialItemID TXTNT_SIID;
 extern M1Env::SpecialItemID TEXT_CHUNK_SIID;
 // [TXTBK] Special Vertex ID of "Book (type)"
 extern M1Env::SpecialItemID TEXT_BOOK_SIID;
+// [TXTCH] Special Vertex ID of "Chapter (type)"
+extern M1Env::SpecialItemID TEXT_CHAPTER_SIID;
 // [TXSNT] Special Vertex ID of "Sentence (type)"
 extern M1Env::SpecialItemID TEXT_SENTENCE_SIID;
+// [TXSLK] Special Vertex ID of "Sloka (type)"
+extern M1Env::SpecialItemID SLOKA_SIID;
 // [TXHLT] Special Vertex ID of "Highlight (type)"
 extern M1Env::SpecialItemID TEXT_HIGHLIGHT_SIID;
 // [TXHLC] Special Vertex ID of "Highlight category (type)"
@@ -130,11 +126,9 @@ extern M1Env::SpecialItemID TEXT_HIGHLIGHT_CHUNK_SIID;
 extern M1Env::SpecialItemID TEXT_SLOKA_FLDR_SIID;
 // [TXHQT] Special Vertex ID of "Highlight Quotation (type)"
 extern M1Env::SpecialItemID TEXT_HIGHLIGHT_QUOTE_SIID;
-// [TXSLK] Special Vertex ID of "Sloka (type)"
-extern M1Env::SpecialItemID SLOKA_SIID;
 // [SLKLN] Special Vertex ID of "Sloka Lines (type)"
 extern M1Env::SpecialItemID TEXT_SLOKA_LINE_SIID;
-// [INRIA] Special Vertex ID of "INRIA Dictionary Reference (type)"
+// [INRIA] Special Vertex ID of "INRIA Dictionary Reference"
 extern M1Env::SpecialItemID TEXT_WORD_DREF_INRIA_SIID;
 // [SLTRN] Special Vertex ID of "Sloka Translation (type)"
 extern M1Env::SpecialItemID TEXT_SLOKA_TRANSLATION_SIID;

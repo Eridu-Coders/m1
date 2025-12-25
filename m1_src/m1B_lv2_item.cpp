@@ -351,7 +351,7 @@ QString M1Store::Item_lv2::getField(const SpecialItem* p_field_type_si, const Sp
  * @param p_type_target target type
  * @return the first edge meeting the criteria (or nullptr)
  */
-M1Store::Item_lv2* M1Store::Item_lv2::find_edge(const SpecialItemID p_type_edge, const SpecialItemID p_type_target, bool p_special) const{
+M1Store::Item_lv2* M1Store::Item_lv2::find_edge_generic(const SpecialItemID p_type_edge, const SpecialItemID p_type_target, bool p_special) const{
     M1_FUNC_ENTRY(g_cat_lv2_members,
                   QString("Finding edge of type [%1] and with target of type [%2]")
                       .arg(p_type_edge == M1Env::G_VOID_SI_ID ? "None" : M1Store::StorageStatic::getSpecialItemPointer(p_type_edge)->mnemonic() )
@@ -378,23 +378,47 @@ M1Store::Item_lv2* M1Store::Item_lv2::find_edge(const SpecialItemID p_type_edge,
  * @param p_type the edge type
  * @return the first edge meeting the criteria (or nullptr)
  */
-M1Store::Item_lv2* M1Store::Item_lv2::find_edge_edge(const M1Env::SpecialItemID p_type) const{
+M1Store::Item_lv2* M1Store::Item_lv2::find_edge_edge_type(const M1Env::SpecialItemID p_type) const{
     M1_FUNC_ENTRY(g_cat_lv2_members, QString("Finding edge of type [%1]").arg(M1Store::StorageStatic::getSpecialItemPointer(p_type)->mnemonic()))
-    M1Store::Item_lv2* l_ret = this->find_edge(p_type, M1Env::G_VOID_SI_ID);
+    M1Store::Item_lv2* l_ret = this->find_edge_generic(p_type, M1Env::G_VOID_SI_ID);
     M1_FUNC_EXIT
     return l_ret;
 }
 
 /**
- * @brief find and edge based only on its target type type
+ * @brief find an edge based only on its target type type
  * @param p_type the type
  * @return the first edge meeting the criteria (or nullptr)
  */
-M1Store::Item_lv2* M1Store::Item_lv2::find_edge_target(const M1Env::SpecialItemID p_type) const{
+M1Store::Item_lv2* M1Store::Item_lv2::find_edge_target_type(const M1Env::SpecialItemID p_type) const{
     M1_FUNC_ENTRY(g_cat_lv2_members, QString("Finding edge of any type with target of type [%1]").arg(M1Store::StorageStatic::getSpecialItemPointer(p_type)->mnemonic()))
-    M1Store::Item_lv2* l_ret = this->find_edge(M1Env::G_VOID_SI_ID, p_type);
+    M1Store::Item_lv2* l_ret = this->find_edge_generic(M1Env::G_VOID_SI_ID, p_type);
     M1_FUNC_EXIT
     return l_ret;
 }
+
+/**
+ * @brief find an edge of a given type with a certain target text
+ * @param p_type the edge type
+ * @param p_target_text the target text
+ * @return the first edge meeting the criteria (or nullptr)
+ */
+M1Store::Item_lv2* M1Store::Item_lv2::find_edge_target_string(const M1Env::SpecialItemID p_type_edge, const QString& p_target_text, bool p_special) const{
+    M1_FUNC_ENTRY(g_cat_lv2_members, QString("Finding edge of type [%1] with target string: [%2]")
+                                         .arg(M1Store::StorageStatic::getSpecialItemPointer(p_type_edge)->mnemonic()).arg(p_target_text))
+    M1Store::Item_lv2* l_ret = nullptr;
+    for(Item_lv2_iterator l_it = p_special ? this->getIteratorSpecial(p_type_edge) : this->getIteratorTop(p_type_edge); !l_it.beyondEnd(); l_it.next()){
+        qCDebug(g_cat_tmp_spotlight) << "Examining: " << l_it.at()->dbgShort();
+        if(l_it.at()->text() == p_target_text){
+            l_ret = l_it.at();
+            qCDebug(g_cat_tmp_spotlight) << "Found: " << l_it.at()->dbgShort();
+            break;
+        }
+    }
+    M1_FUNC_EXIT
+    return l_ret;
+
+}
+
 
 

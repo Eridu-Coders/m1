@@ -159,6 +159,8 @@ private:
     QString m_html_cache;
     QTextEdit* m_text_edit = nullptr;
     M1UI::TreeRow* m_tree_row = nullptr;
+
+    QString m_dbgOneLinerCache;
 protected:
     M1Store::Item_lv2* m_myself  = nullptr;
     static QString cm_html_template;
@@ -171,10 +173,12 @@ protected:
     QString base_edge_html_fragment(const M1Store::Item_lv2* p_edge);
 
     virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
+    virtual QString dbgOneLinerVirtual();
 public:
     static void init(){cm_interp_map.clear();}
     static void invalidateAllCaches();
     static std::shared_ptr<Interp> getInterp(M1Store::Item_lv2* p_myself);
+    static QString dbgMapContents();
 
     bool isEmpty(){return m_myself == nullptr;}
     QString getHtml(const M1Store::Item_lv2* p_edge);
@@ -189,10 +193,11 @@ public:
     virtual M1Store::Item_lv2* targetForGotoVertex(){return m_myself;}
     virtual void createDescendant(M1Store::SpecialItem* p_new_edge_type, M1Store::SpecialItem* p_new_vertex_type);
 
-    virtual QString dbgOneLiner();
+    QString dbgOneLiner(){
+        m_dbgOneLinerCache = dbgOneLinerVirtual();
+        return m_dbgOneLinerCache;
+    }
     ~Interp();
-
-    static QString dbgMapContents();
 public slots:
     void save_text_edit();
 };
@@ -220,8 +225,25 @@ public:
     virtual QString className() {return "FieldInterp";}
     virtual QIcon* edgeIcon(const M1Store::Item_lv2* p_edge);
     virtual QIcon* vertexIcon();
+    virtual bool displayOpenClose(){ return false; }
     // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
     virtual QString inTreeDisplayText();
+    // virtual void paintEvent(QPaintEvent* p_event);
+};
+
+class TextInterp : public Interp{
+    Q_OBJECT
+public:
+    static TextInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    TextInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "TextInterp";}
+    // virtual QIcon* edgeIcon(const M1Store::Item_lv2* p_edge);
+    // virtual QIcon* vertexIcon();
+    // virtual bool displayOpenClose(){ return false; }
+    // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
+    virtual QString inTreeDisplayText();
+    virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
     // virtual void paintEvent(QPaintEvent* p_event);
 };
 

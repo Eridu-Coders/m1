@@ -4,6 +4,8 @@
 #include "m1A_env.h"
 #include "m1A_constants.h"
 #include "m1B_graph_init.h"
+// #include "m1B_lv2_item.h"
+// #include "m1B_lv2_iterators.h"
 
 void M1Store::TEIInterface::init(){}
 void M1Store::TEIInterface::loadTei(const QString& p_file_path){
@@ -17,6 +19,7 @@ void M1Store::TEIInterface::loadTei(const QString& p_file_path){
  * @brief M1Store::TEIInterface::cm_text_root
  */
 M1Store::Item_lv2* M1Store::TEIInterface::cm_text_root;
+
 /**
  * @brief M1Store::TEIInterface::create_text
  * @param p_title
@@ -25,14 +28,27 @@ M1Store::Item_lv2* M1Store::TEIInterface::cm_text_root;
  * @param p_author_text
  */
 void M1Store::TEIInterface::create_text(const QString& p_title, const QString& p_alt_title, const QString& p_sub_title, const QString& p_author_text){
+    // title(s)
     cm_text_root = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX,
         // label
         p_title);
     cm_text_root->setType("TEXT_");
-    cm_text_root->setFieldEdge(p_alt_title, M1Env::TEXT_ALT_TITLE_SIID);
-    cm_text_root->setFieldEdge(p_sub_title, M1Env::TEXT_SUB_TITLE_SIID);
+    if(p_alt_title.length() > 0) cm_text_root->setFieldEdge(p_alt_title, M1Env::TEXT_ALT_TITLE_SIID);
+    if(p_sub_title.length() > 0) cm_text_root->setFieldEdge(p_sub_title, M1Env::TEXT_SUB_TITLE_SIID);
+
+    // Author
+    M1Store::Item_lv2* l_person_existing = M1Store::Item_lv2::getExisting(M1Env::PERS_TYPE_SIID)->find_edge_target_string(M1Env::ISA_SIID, p_author_text, true);
+    if(l_person_existing == nullptr){
+        l_person_existing = M1Store::Item_lv2::getNew(
+            // vertex flags
+            M1Env::FULL_VERTEX,
+            // label
+            p_author_text);
+        l_person_existing->setType(M1Store::PERS_TYPE_SIID);
+    }
+    cm_text_root->linkTo(l_person_existing, M1Env::TEXT_WRITTEN_BY_SIID);
 }
 
 /**
@@ -55,7 +71,7 @@ QString M1Store::TEIInterface::skipUntil(int p_indent_count, QString& p_indent, 
         if(l_tt == QXmlStreamReader::EndElement && l_tok_name == p_elem_close){
             p_indent.chop(p_indent_count);
             qCDebug(g_cat_main).noquote() << p_indent << QString("End of skip until <%1>").arg(p_elem_close);
-            break; // from the inner commentaries while
+            break; // from while (!p_xml_reader.atEnd())
         }
         else {
             if(l_tt == QXmlStreamReader::StartElement &&  l_tok_name != "br") l_ret += QString("<%1>").arg(l_tok_name);

@@ -11,6 +11,7 @@ namespace M1Store{
 class TEIInterface{
 private:
     static M1Store::Item_lv2* cm_text_root;
+    static M1Store::Item_lv2* cm_cur_chapter;
 
     static QString skipUntil(int p_indent_count, QString& p_indent, QXmlStreamReader& p_xml_reader, const QString& p_elem_close);
     static void loadTeiInternal(const QString& p_file_path, bool p_validate_only=false);

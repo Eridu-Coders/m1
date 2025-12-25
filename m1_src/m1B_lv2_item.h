@@ -11,6 +11,23 @@ class Item_lv2_iterator_base;
 class Item_lv2_iterator;
 
 /**
+ * @brief The InsertionPoint enum
+ *
+ * For Item_lv2::linkTo, to indicate where the new edge needs to be inserted within the Item's edge ring
+ *
+ * \todo convert obsolete Item_lv2::linkTo() calls to the new method with InsertionPoint parameter
+ * \todo test Magic Enum C++ (https://github.com/Neargye/magic_enum) to display enum labels in debug messages
+ * \todo remove getNext_lv2(xxx) and getPrevious_lv2(xxx) now replaced by iterators
+ */
+enum class InsertionPoint{
+    at_top = 1,
+    at_bottom,
+    below_auto,
+    below_specified,
+    special_override
+};
+
+/**
  * @brief Main access interface to the graph storage used by the rest of the system.
  *
  * The Item_lv2 class also handles the basic interactions between items, i.e. mainly their connections by means of edges (Which are also items in their own right).
@@ -33,6 +50,8 @@ class Item_lv2 : public Item_lv1 {
                                    const bool p_force_new,
                                    const bool p_edge,
                                    const SpecialItem* p_field_type_si);
+
+        void installFullEdge_2(Item_lv2* p_new_edge, const SpecialItemID p_edge_type, const InsertionPoint p_where, Item_lv2* p_edge_above);
     public:
         // ------------------------------- Static --------------------------------------------------------
         static Item_lv2* getNew(const FlagField p_flags,
@@ -53,7 +72,7 @@ class Item_lv2 : public Item_lv1 {
 
         // prevents other types from being implicitly converted
         template <class T>
-        static  Item_lv2* getExisting(T) = delete; // C++11
+        static  Item_lv2* getExisting(T) = delete; // C++11 weirdness
 
         static void dbgRecurGraphStart(const ItemID p_item_id);
 
@@ -91,7 +110,7 @@ class Item_lv2 : public Item_lv1 {
 
         // prevents other types from being implicitly converted
         template <class T>
-        Item_lv2* getNext_lv2(T) = delete; // C++11
+        Item_lv2* getNext_lv2(T) = delete; // C++11 weirdness
 
         Item_lv2* get_previous_lv2() const;
         Item_lv2* getPrevious_lv2(const SpecialItemID p_type) const;
@@ -99,7 +118,7 @@ class Item_lv2 : public Item_lv1 {
 
         // prevents other types from being implicitly converted
         template <class T>
-        Item_lv2* getPrevious_lv2(T) = delete; // C++11
+        Item_lv2* getPrevious_lv2(T) = delete; // C++11 weirdness
 
         bool setType(const SpecialItem* p_type_si);
         bool setType(const SpecialItemID p_type_si_id);
@@ -142,6 +161,8 @@ class Item_lv2 : public Item_lv1 {
                 M1Store::StorageStatic::getSpecialItemPointer(p_field_type2_si_id), p_all);
         }
 
+        Item_lv2* linkTo(Item_lv2* p_target, const SpecialItemID p_edge_type, const InsertionPoint p_where, const InsertionPoint p_where_reciprocal, Item_lv2* p_edge_above = nullptr);
+
         Item_lv2* linkTo(Item_lv2* p_target, const SpecialItemID p_type, Item_lv2* p_edge_above = nullptr, const bool p_at_top = false);
         Item_lv2* linkTo(Item_lv2* p_target, const char* p_mnemonic, Item_lv2* p_edge_above = nullptr, const bool p_at_top = false);
 
@@ -156,16 +177,17 @@ class Item_lv2 : public Item_lv1 {
 
         // prevents other types from being implicitly converted
         template <class T>
-        Item_lv2* linkTo(T, const SpecialItemID p_type, Item_lv2* p_edge_above = nullptr, const bool p_at_top = false) = delete; // C++11
+        Item_lv2* linkTo(T, const SpecialItemID p_type, Item_lv2* p_edge_above = nullptr, const bool p_at_top = false) = delete; // C++11 weirdness
         template <class U>
-        Item_lv2* linkTo(U, const char* p_mnemonic, Item_lv2* p_edge_above = nullptr, const bool p_at_top = false) = delete; // C++11
+        Item_lv2* linkTo(U, const char* p_mnemonic, Item_lv2* p_edge_above = nullptr, const bool p_at_top = false) = delete; // C++11 weirdness
         template <class V>
-        Item_lv2* linkTo(ItemID p_target_id, const V, Item_lv2* p_edge_above = nullptr, const bool p_at_top = false) = delete; // C++11
+        Item_lv2* linkTo(ItemID p_target_id, const V, Item_lv2* p_edge_above = nullptr, const bool p_at_top = false) = delete; // C++11 weirdness
 
-        Item_lv2* find_edge(const SpecialItemID p_type_edge, const SpecialItemID p_type_target, bool p_special = false) const;
+        Item_lv2* find_edge_generic(const SpecialItemID p_type_edge, const SpecialItemID p_type_target, bool p_special = false) const;
         // Item_lv2* find_edge(const char* p_mnemonic) const;
-        Item_lv2* find_edge_edge(const SpecialItemID p_type) const;
-        Item_lv2* find_edge_target(const SpecialItemID p_type) const;
+        Item_lv2* find_edge_edge_type(const SpecialItemID p_type) const;
+        Item_lv2* find_edge_target_type(const SpecialItemID p_type) const;
+        Item_lv2* find_edge_target_string(const SpecialItemID p_type_edge, const QString& p_targettext, bool p_special = false) const;
 
         // prevents other types from being implicitly converted
         template <class T>
