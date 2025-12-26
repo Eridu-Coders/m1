@@ -2,6 +2,11 @@
 #include "m1B_lv2_item.h"
 #include "m1B_store.h"
 
+#include <QRegularExpression>
+
+extern QRegularExpression g_re_space;
+QRegularExpression g_re_tags(R"(<[^>]+>)");
+
 // ---------------------------------- Debug data -------------------------------------------
 /** \defgroup DebugLv2 Level 2 Debug messages
  *  \ingroup DebugLog
@@ -200,7 +205,7 @@ QString M1Store::Item_lv2::dbgStringHtml(){
             // l_edges += "\nSpecial edges:";
             ItemID l_stop_id = l_current_edge->item_id();
             do {
-                l_edge_list.append(QString("<p style=\"margin: 0;\">%1</p>\n").arg(l_current_edge->dbgShort()));
+                l_edge_list.append(QString("<p style=\"margin: 0;\">%1</p>\n").arg(l_current_edge->dbgShort().replace(g_re_tags, "").replace(g_re_space, " ").trimmed()));
                 // l_edges += "\n" + l_current_edge->dbgShort();
                 Item_lv2* l_next_edge = l_current_edge->get_next_lv2();
                 l_current_edge = l_next_edge;
@@ -214,7 +219,7 @@ QString M1Store::Item_lv2::dbgStringHtml(){
             //l_edges += "\nOrdinary edges:";
             ItemID l_stop_id = l_current_edge->item_id();
             do {
-                l_edge_list.append(QString("<p style=\"margin: 0;\">%1</p>\n").arg(l_current_edge->dbgShort()));
+                l_edge_list.append(QString("<p style=\"margin: 0;\">%1</p>\n").arg(l_current_edge->dbgShort().replace(g_re_tags, "").replace(g_re_space, " ").trimmed()));
                 // l_edges += "\n" + l_current_edge->dbgShort();
                 Item_lv2* l_next_edge = l_current_edge->get_next_lv2();
                 l_current_edge = l_next_edge;
@@ -225,6 +230,9 @@ QString M1Store::Item_lv2::dbgStringHtml(){
     }
 
     QString l_text(text());
+    l_text = l_text.replace(g_re_tags, "").replace(g_re_space, " ").trimmed();
+    // g_re_space.
+
     switch(flags() & ITEM_NATURE_MASK){
     case FULL_VERTEX:
         // add the rest to the returned string

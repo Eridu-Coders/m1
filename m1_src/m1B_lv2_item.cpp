@@ -408,10 +408,10 @@ M1Store::Item_lv2* M1Store::Item_lv2::find_edge_target_string(const M1Env::Speci
                                          .arg(M1Store::StorageStatic::getSpecialItemPointer(p_type_edge)->mnemonic()).arg(p_target_text))
     M1Store::Item_lv2* l_ret = nullptr;
     for(Item_lv2_iterator l_it = p_special ? this->getIteratorSpecial(p_type_edge) : this->getIteratorTop(p_type_edge); !l_it.beyondEnd(); l_it.next()){
-        qCDebug(g_cat_tmp_spotlight) << "Examining: " << l_it.at()->dbgShort();
-        if(l_it.at()->text() == p_target_text){
+        qCDebug(g_cat_lv2_members) << "Examining: " << l_it.at()->getTarget_lv2()->text();
+        if(l_it.at()->getTarget_lv2()->text() == p_target_text){
             l_ret = l_it.at();
-            qCDebug(g_cat_tmp_spotlight) << "Found: " << l_it.at()->dbgShort();
+            qCDebug(g_cat_lv2_members) << "Found: " << l_it.at()->getTarget_lv2()->text();
             break;
         }
     }

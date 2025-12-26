@@ -146,6 +146,7 @@ namespace M1Env{
     static const char* TEXT_WFW_UNIT_ICON_PATH = "../m1_src/Icons/TranslUnit.svg";              ///<
     static const char* TEXT_SLOKA_BHASHYA_ICON_PATH = "../m1_src/Icons/Bhashya.svg";            ///<
     static const char* TEXT_SLOKA_TRANSLATION_ICON_PATH = "../m1_src/Icons/Translation.svg";    ///<
+    static const char* TEXT_SLOKA_TRANSLIT_ICON_PATH = "../m1_src/Icons/SlkTranslit.svg";       ///<
     static const char* TEXT_SLOKA_LINE_ICON_PATH = "../m1_src/Icons/SlkLn.svg";                 ///<
     static const char* TYPE_NODE_ICON_PATH = "../m1_src/Icons/Type.svg";                        ///<
     static const char* PERSON_ICON_PATH = "../m1_src/Icons/Person.svg";                         ///<
@@ -154,6 +155,7 @@ namespace M1Env{
     static const char* TEXT_WROTE_ICON_PATH = "../m1_src/Icons/Wrote.svg";                      ///<
     static const char* TEXT_WRITTEN_BY_ICON_PATH = "../m1_src/Icons/WrittenBy.svg";             ///<
     static const char* BOOK_ICON_PATH = "../m1_src/Icons/Book.svg";                             ///<
+    static const char* CHAPTER_ICON_PATH = "../m1_src/Icons/Chapter.svg";                       ///<
     static const char* SENTENCE_ICON_PATH = "../m1_src/Icons/Sentence.svg";                     ///<
     static const char* HIGHLIGHTER_ICON_PATH = "../m1_src/Icons/Highlighter.svg";               ///<
     static const char* HL_CHUNK_ICON_PATH = "../m1_src/Icons/Highlighter2.svg";                 ///<
@@ -200,7 +202,8 @@ Q_DECLARE_LOGGING_CATEGORY(g_cat_interp_base)           ///< Base class of the I
 Q_DECLARE_LOGGING_CATEGORY(g_cat_interp_drag)           ///< Drag/Drop in the Interp hierarchy
 Q_DECLARE_LOGGING_CATEGORY(g_cat_main_window)           ///< MainWindow widget class
 Q_DECLARE_LOGGING_CATEGORY(g_cat_main)                  ///< messages from main of complete (non-test) build (including XML loaders)
-Q_DECLARE_LOGGING_CATEGORY(g_cat_tmp_spotlight)         ///< messages from main of complete (non-test) build (including XML loaders)
+Q_DECLARE_LOGGING_CATEGORY(g_cat_tei)                   ///< messages from tei interface
+Q_DECLARE_LOGGING_CATEGORY(g_cat_tmp_spotlight)         ///< messages from feature under temporary scrutiny
 /**@}*/ //end of QtLogCat
 
 /**@}*/ //end of DebugLog

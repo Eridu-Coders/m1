@@ -57,6 +57,8 @@ std::map<M1Env::ItemID, M1Store::SpecialItem*> M1Store::StorageStatic::cm_item_i
  * @brief initialize LMDB environment (util + string) and mmap() areas for items and specials.
  *
  * Also does version updates and sets constants values depending on up to date version
+ *
+ * \todo make things safer on account of env being initially opened with MDB_NOSYNC | MDB_WRITEMAP
  */
 void M1Store::StorageStatic::storeSetUp(bool p_reset){
     M1_FUNC_ENTRY(g_cat_store, QString("Store set-up %1").arg(p_reset ? " (with reset)" : ""))
@@ -102,7 +104,7 @@ void M1Store::StorageStatic::storeSetUp(bool p_reset){
     E(mdb_env_set_mapsize(cm_lmdb_env, LMDB_MAX_SIZE));
 
     // open LMDB env and assign its directory (l_env_dir)
-    E(mdb_env_open(cm_lmdb_env, cm_lmdb_dir.c_str(), 0, 0664));
+    E(mdb_env_open(cm_lmdb_env, cm_lmdb_dir.c_str(), MDB_NOSYNC | MDB_WRITEMAP, 0664));
 
     MDB_txn* l_txn;
     E(mdb_txn_begin(cm_lmdb_env, NULL, 0, &l_txn));

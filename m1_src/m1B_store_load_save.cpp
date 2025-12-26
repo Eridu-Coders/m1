@@ -1,6 +1,7 @@
 #include <QtGlobal>
 #include <QDebug>
 #include <QIcon>
+#include <QElapsedTimer>
 
 #include <sys/mman.h>
 #include <fcntl.h>
@@ -242,6 +243,9 @@ M1Store::StringID M1Store::StorageStatic::storeString(QString p_string){
     l_data.mv_size = l_utf8_bytes.length() + 1; // +1 so that the null termination character also stored
     l_data.mv_data = l_utf8_bytes.data();
 
+    // QElapsedTimer l_timer;
+    // l_timer.start();
+
     // initiate transaction
     MDB_txn* l_txn;
     E(mdb_txn_begin(cm_lmdb_env, NULL, 0, &l_txn));
@@ -254,8 +258,10 @@ M1Store::StringID M1Store::StorageStatic::storeString(QString p_string){
     // commit transaction
     E(mdb_txn_commit(l_txn));
 
+    // printf("storeString took %ld ms\n", (long)l_timer.elapsed());
+
     M1_FUNC_EXIT
-        return l_ret_id;
+    return l_ret_id;
 }
 
 /**

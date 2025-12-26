@@ -1,4 +1,7 @@
 #include <QXmlStreamReader>
+#include <QElapsedTimer>
+
+#include <iostream>
 
 #include "m1B_tei_interface.h"
 #include "m1A_env.h"
@@ -6,6 +9,9 @@
 #include "m1B_graph_init.h"
 // #include "m1B_lv2_item.h"
 // #include "m1B_lv2_iterators.h"
+
+// g_cat_tei
+Q_LOGGING_CATEGORY(g_cat_tei, "tei_interface")
 
 void M1Store::TEIInterface::init(){}
 void M1Store::TEIInterface::loadTei(const QString& p_file_path){
@@ -19,6 +25,12 @@ void M1Store::TEIInterface::loadTei(const QString& p_file_path){
  * @brief M1Store::TEIInterface::cm_text_root
  */
 M1Store::Item_lv2* M1Store::TEIInterface::cm_text_root;
+M1Store::Item_lv2* M1Store::TEIInterface::cm_cur_chapter_vertex;
+M1Store::Item_lv2* M1Store::TEIInterface::cm_cur_sloka_vertex;
+
+int M1Store::TEIInterface::cm_cur_chapter_number;
+int M1Store::TEIInterface::cm_cur_sloka_number;
+QString M1Store::TEIInterface::cm_indent;
 
 /**
  * @brief M1Store::TEIInterface::create_text
@@ -39,16 +51,68 @@ void M1Store::TEIInterface::create_text(const QString& p_title, const QString& p
     if(p_sub_title.length() > 0) cm_text_root->setFieldEdge(p_sub_title, M1Env::TEXT_SUB_TITLE_SIID);
 
     // Author
-    M1Store::Item_lv2* l_person_existing = M1Store::Item_lv2::getExisting(M1Env::PERS_TYPE_SIID)->find_edge_target_string(M1Env::ISA_SIID, p_author_text, true);
-    if(l_person_existing == nullptr){
-        l_person_existing = M1Store::Item_lv2::getNew(
+    M1Store::Item_lv2* l_author = getPersonOrg(p_author_text, true);
+    cm_text_root->linkTo(l_author, M1Env::TEXT_WRITTEN_BY_SIID);
+}
+
+void M1Store::TEIInterface::addTranslationBhashya(const QString& p_text, const QString& p_source, const QString& p_author_text, bool p_is_translation){
+    // Text node
+    M1Store::Item_lv2* l_new_text = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX,
+        // label
+        p_text);
+    if(p_is_translation) l_new_text->setType(M1Env::TEXT_SLOKA_TRANSLATION_SIID);
+    else l_new_text->setType(M1Env::TEXT_SLOKA_BHASHYA_SIID);
+    cm_cur_sloka_vertex->linkTo(l_new_text, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+
+    // Author
+    M1Store::Item_lv2* l_author = getPersonOrg(p_author_text, true);
+    l_new_text->linkTo(l_author, M1Env::TEXT_WRITTEN_BY_SIID, InsertionPoint::at_top, InsertionPoint::at_bottom);
+
+    // Source
+    if(p_source.length() > 0){
+        M1Store::Item_lv2* l_source = getPersonOrg(p_source, false);
+        l_new_text->linkTo(l_source, M1Env::BLNGS_SIID, InsertionPoint::at_top, InsertionPoint::at_bottom);
+    }
+
+}
+
+M1Store::Item_lv2* M1Store::TEIInterface::getPersonOrg(const QString& p_name, bool p_is_person){
+    static std::map<QString, M1Store::Item_lv2*> s_cache_tei_ent;
+
+    M1Store::SpecialItemID l_entity_type_siid = p_is_person ? M1Env::PERS_TYPE_SIID : M1Env::ORG_TYPE_SIID;
+
+    M1Store::Item_lv2* l_entity_existing = s_cache_tei_ent[p_name];
+    /*
+    M1Store::SpecialItem* l_entity_type = M1Store::StorageStatic::getSpecialItemPointer(p_is_person ? M1Env::PERS_TYPE_SIID : M1Env::ORG_TYPE_SIID);
+    M1Store::Item_lv2* l_entity_root = M1Store::Item_lv2::getExisting(l_entity_type->itemId());
+    qCDebug(g_cat_tei) << "l_entity_type: " << l_entity_type->mnemonic();
+    qCDebug(g_cat_tei) << "l_entity_root: " << l_entity_root->dbgShort();
+
+    M1Store::Item_lv2* l_entity_existing = l_entity_root->find_edge_target_string(M1Env::ITO_SIID, p_name, false);
+
+    if(l_entity_existing == nullptr){
+        l_entity_existing = M1Store::Item_lv2::getNew(
             // vertex flags
             M1Env::FULL_VERTEX,
             // label
-            p_author_text);
-        l_person_existing->setType(M1Store::PERS_TYPE_SIID);
+            p_name);
+        l_entity_existing->setType(l_entity_type);
     }
-    cm_text_root->linkTo(l_person_existing, M1Env::TEXT_WRITTEN_BY_SIID);
+    else l_entity_existing = l_entity_existing->getTarget_lv2();
+    */
+    if(l_entity_existing == nullptr){
+        l_entity_existing = M1Store::Item_lv2::getNew(
+            // vertex flags
+            M1Env::FULL_VERTEX,
+            // label
+            p_name);
+        l_entity_existing->setType(l_entity_type_siid);
+        s_cache_tei_ent[p_name] = l_entity_existing;
+    }
+
+    return l_entity_existing;
 }
 
 /**
@@ -61,16 +125,16 @@ void M1Store::TEIInterface::create_text(const QString& p_title, const QString& p
  */
 QString M1Store::TEIInterface::skipUntil(int p_indent_count, QString& p_indent, QXmlStreamReader& p_xml_reader, const QString& p_elem_close){
     QString l_ret;
-    qCDebug(g_cat_main).noquote() << p_indent << QString("Skip until <%1>").arg(p_elem_close);
+    qCDebug(g_cat_tei).noquote() << p_indent << QString("Skip until <%1>").arg(p_elem_close);
     p_indent += QString(" ").repeated(p_indent_count);
     while (!p_xml_reader.atEnd()) {
         QXmlStreamReader::TokenType l_tt = p_xml_reader.readNext();
         QStringView l_tok_name = p_xml_reader.name();
-        qCDebug(g_cat_main).noquote() << p_indent << "Token Type: " << l_tt << p_xml_reader.name();
+        qCDebug(g_cat_tei).noquote() << p_indent << "Token Type: " << l_tt << p_xml_reader.name();
 
         if(l_tt == QXmlStreamReader::EndElement && l_tok_name == p_elem_close){
             p_indent.chop(p_indent_count);
-            qCDebug(g_cat_main).noquote() << p_indent << QString("End of skip until <%1>").arg(p_elem_close);
+            qCDebug(g_cat_tei).noquote() << p_indent << QString("End of skip until <%1>").arg(p_elem_close);
             break; // from while (!p_xml_reader.atEnd())
         }
         else {
@@ -92,7 +156,11 @@ QString M1Store::TEIInterface::skipUntil(int p_indent_count, QString& p_indent, 
 void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_validate_only){
     QXmlStreamReader l_xml;
     QFile l_fin_tei(p_file_path);
-    qCDebug(g_cat_main) << "Exists: " << l_fin_tei.exists();
+    qCDebug(g_cat_tei) << "Exists: " << l_fin_tei.exists();
+
+    // std::cout << "msg";
+    // std::cout << "msg" << QString("Loading File %1").arg(p_file_path).toUtf8().constData();
+    printf("%s\n", QString("Loading File %1").arg(p_file_path).toUtf8().constData());
 
     // the xml stream parse
     if (!l_fin_tei.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -104,9 +172,9 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
     QString l_sub_title;
     QString l_alt_title;
     QString l_author_text;
-    int l_cur_chapter_number = 0;
-    int l_cur_sloka_number = 0;
-    QString l_indent = "";
+    cm_cur_chapter_number = 0;
+    cm_cur_sloka_number = 0;
+    cm_indent = "";
     int l_indent_count = 4;
 
     bool l_found_title = false;
@@ -122,7 +190,7 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
     while (!l_xml_reader.atEnd()) {
         QXmlStreamReader::TokenType l_tt = l_xml_reader.readNext();
         QStringView l_tok_name = l_xml_reader.name();
-        qCDebug(g_cat_main).noquote() << l_indent << "Token Type: " << l_tt << l_xml_reader.name();
+        qCDebug(g_cat_tei).noquote() << cm_indent << "Token Type: " << l_tt << l_xml_reader.name();
 
         // text title(s)
         if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "title"){
@@ -132,7 +200,7 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
             QXmlStreamReader::TokenType l_tt_title = l_xml_reader.readNext();
             if(l_tt_title != QXmlStreamReader::Characters) throw M1Env::M1Exception("<title> not followed by Characters", 1000);
             QString l_title_text = l_xml_reader.text().toString().trimmed();
-            qCDebug(g_cat_main).noquote() << l_indent << QString("<title type=\"%1\"> [%2]").arg(l_type).arg(l_title_text);
+            qCDebug(g_cat_tei).noquote() << cm_indent << QString("<title type=\"%1\"> [%2]").arg(l_type).arg(l_title_text);
 
             if(l_type == "main") {
                 l_title = l_title_text;
@@ -141,7 +209,7 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
             else if(l_type == "sub") l_sub_title = l_title_text;
             else if(l_type == "alt") l_alt_title = l_title_text;
 
-            // qCDebug(g_cat_main).noquote() << l_title << l_sub_title << l_alt_title;
+            // qCDebug(g_cat_tei).noquote() << l_title << l_sub_title << l_alt_title;
         }
         // text author
         if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "author"){
@@ -149,11 +217,11 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
             QXmlStreamReader::TokenType l_tt_author = l_xml_reader.readNext();
             if(l_tt_author != QXmlStreamReader::Characters) throw M1Env::M1Exception("<author> not followed by Characters", 1001);
             l_author_text = l_xml_reader.text().toString().trimmed();
-            qCDebug(g_cat_main).noquote() << l_indent << QString("<author> %1").arg(l_author_text);
+            qCDebug(g_cat_tei).noquote() << cm_indent << QString("<author> %1").arg(l_author_text);
         }
         // end of TEI header
         else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "teiHeader"){
-            qCDebug(g_cat_main).noquote() << l_indent << QString("<teiHeader/> %1 (%2) [%3] author: %4")
+            qCDebug(g_cat_tmp_spotlight).noquote() << cm_indent << QString("<teiHeader/> %1 (%2) [%3] author: %4")
             .arg(l_title)
                 .arg(l_alt_title)
                 .arg(l_sub_title)
@@ -166,15 +234,23 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
             QString l_type = l_xml_reader.attributes().value("type").toString();
             if(l_type == "chapter"){
                 // chapter start
-                l_cur_chapter_number = l_xml_reader.attributes().value("n").toInt();
+                cm_cur_chapter_number = l_xml_reader.attributes().value("n").toInt();
                 l_found_at_least_one_chapter = true;
                 l_found_at_least_one_sloka = false;
-                qCDebug(g_cat_main).noquote() << l_indent << QString("<div1 type=%1> Chapter %2 start").arg(l_type).arg(l_cur_chapter_number);
+                qCDebug(g_cat_tmp_spotlight).noquote() << cm_indent << QString("<div1 type=%1> Chapter %2 start").arg(l_type).arg(cm_cur_chapter_number);
+
+                M1Store::TEIInterface::cm_cur_chapter_vertex = M1Store::Item_lv2::getNew(
+                    // vertex flags
+                    M1Env::FULL_VERTEX,
+                    // label
+                    QString("Chapter %1").arg(cm_cur_chapter_number));
+                cm_cur_chapter_vertex->setType(M1Env::TEXT_CHAPTER_SIID);
+                cm_text_root->linkTo(cm_cur_chapter_vertex, M1Store::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
             }
             else if(l_type == "lexicon"){
                 // lexicon start
-                qCDebug(g_cat_main).noquote() << l_indent << QString("<div1 type=%1> Lexicon start").arg(l_type).arg(l_cur_chapter_number);
-                l_indent += QString(" ").repeated(l_indent_count);
+                qCDebug(g_cat_tei).noquote() << cm_indent << QString("<div1 type=%1> Lexicon start").arg(l_type).arg(cm_cur_chapter_number);
+                cm_indent += QString(" ").repeated(l_indent_count);
 
                 bool l_found_one_entry = false;
 
@@ -198,12 +274,12 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                 while (!l_xml_reader.atEnd()) {
                     QXmlStreamReader::TokenType l_tt = l_xml_reader.readNext();
                     QStringView l_tok_name = l_xml_reader.name();
-                    qCDebug(g_cat_main).noquote() << l_indent << "Token Type: " << l_tt << l_xml_reader.name();
+                    qCDebug(g_cat_tei).noquote() << cm_indent << "Token Type: " << l_tt << l_xml_reader.name();
 
                     // start of entry
                     if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "entryFree"){
-                        qCDebug(g_cat_main).noquote() << l_indent << QString("<entryFree> start of one lexicon lemma entry").arg(l_type).arg(l_cur_chapter_number);
-                        l_indent += QString(" ").repeated(l_indent_count);
+                        qCDebug(g_cat_tei).noquote() << cm_indent << QString("<entryFree> start of one lexicon lemma entry").arg(l_type).arg(cm_cur_chapter_number);
+                        cm_indent += QString(" ").repeated(l_indent_count);
                         l_pos_text = "";
                         l_lemma_text = "";
                         l_url_dict_list = "";
@@ -216,11 +292,11 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                         // if(l_url_dict_list.length() == 0) throw M1Env::M1Exception("no dictionary reference", 1004);
                         if(l_form_list.length() == 0) throw M1Env::M1Exception("no inflected forms", 1005);
 
-                        l_indent.chop(l_indent_count);
-                        qCDebug(g_cat_main).noquote() << l_indent << "<entryFree/> End of lexicon entry";
-                        qCDebug(g_cat_main).noquote() << l_indent << QString("lemma: %1 POS: %2 Dictionary ref: %3").arg(l_lemma_text).arg(l_pos_text).arg(l_url_dict_list);
+                        cm_indent.chop(l_indent_count);
+                        qCDebug(g_cat_tei).noquote() << cm_indent << "<entryFree/> End of lexicon entry";
+                        qCDebug(g_cat_tei).noquote() << cm_indent << QString("lemma: %1 POS: %2 Dictionary ref: %3").arg(l_lemma_text).arg(l_pos_text).arg(l_url_dict_list);
                         for(Form f: l_form_list)
-                            qCDebug(g_cat_main).noquote() << l_indent << QString("    form: %1 Grammar: %2").arg(f.form()).arg(f.grammar());
+                            qCDebug(g_cat_tei).noquote() << cm_indent << QString("    form: %1 Grammar: %2").arg(f.form()).arg(f.grammar());
                         l_found_one_entry = true;
                     }
                     // POS
@@ -229,7 +305,7 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                         if(l_tt_sk != QXmlStreamReader::Characters) throw M1Env::M1Exception("<pos> not followed by Characters", 1006);
                         l_pos_text = l_xml_reader.text().toString().trimmed();
 
-                        qCDebug(g_cat_main).noquote() << l_indent << QString("<pos> value: %1").arg(l_pos_text);
+                        qCDebug(g_cat_tei).noquote() << cm_indent << QString("<pos> value: %1").arg(l_pos_text);
                     }
                     // form: lemma or inflected
                     else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "form"){
@@ -255,7 +331,7 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                             l_lemma_text = l_orth_text;
                             l_url_dict_list = l_url_dict_list_tmp;
 
-                            qCDebug(g_cat_main).noquote() << l_indent << QString("<form type=%1 url=%2> orth: %3").arg(l_type).arg(l_url_dict_list).arg(l_orth_text);
+                            qCDebug(g_cat_tei).noquote() << cm_indent << QString("<form type=%1 url=%2> orth: %3").arg(l_type).arg(l_url_dict_list).arg(l_orth_text);
                         }
                         else if(l_type == "inflected"){
                             // inflected
@@ -269,14 +345,14 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
 
                             l_form_list.append(Form(l_orth_text, l_gram_text));
 
-                            qCDebug(g_cat_main).noquote() << l_indent << QString("<form type=%1> gram: %2 orth: %3").arg(l_type).arg(l_gram_text).arg(l_orth_text);
+                            qCDebug(g_cat_tei).noquote() << cm_indent << QString("<form type=%1> gram: %2 orth: %3").arg(l_type).arg(l_gram_text).arg(l_orth_text);
                         }
                     }
                     // end of lexicon (</div1>)
                     else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "div1"){
-                        l_indent.chop(l_indent_count);
-                        l_indent.chop(l_indent_count);
-                        qCDebug(g_cat_main).noquote() << l_indent << "<div1/> End of lexicon";
+                        cm_indent.chop(l_indent_count);
+                        cm_indent.chop(l_indent_count);
+                        qCDebug(g_cat_tei).noquote() << cm_indent << "<div1/> End of lexicon";
                         if(! l_found_one_entry) throw M1Env::M1Exception("Lexicon has 0 entries", 1012);
                         break;
                     }
@@ -292,9 +368,19 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
             l_found_commentaries = false;
 
             QString l_type = l_xml_reader.attributes().value("type").toString();
-            l_cur_sloka_number = l_xml_reader.attributes().value("n").toInt();
+            cm_cur_sloka_number = l_xml_reader.attributes().value("n").toInt();
             l_found_at_least_one_sloka = true;
-            qCDebug(g_cat_main).noquote() << l_indent << QString("<div2 type=%1> Sloka %2.%3 start").arg(l_type).arg(l_cur_chapter_number).arg(l_cur_sloka_number);
+            qCDebug(g_cat_tmp_spotlight).noquote() << cm_indent << QString("<div2 type=%1> Sloka %2.%3 start").arg(l_type).arg(cm_cur_chapter_number).arg(cm_cur_sloka_number);
+            // std::cout << QString("Loading Sloka %1.%2").arg(cm_cur_chapter_number).arg(cm_cur_sloka_number).toUtf8().constData();
+            printf("%s\n", QString("Loading Sloka %1.%2").arg(cm_cur_chapter_number).arg(cm_cur_sloka_number).toUtf8().constData());
+
+            cm_cur_sloka_vertex = M1Store::Item_lv2::getNew(
+                // vertex flags
+                M1Env::FULL_VERTEX,
+                // label
+                QString("Sloka %1.%2").arg(cm_cur_chapter_number).arg(cm_cur_sloka_number));
+            cm_cur_sloka_vertex->setType(M1Env::SLOKA_SIID);
+            cm_cur_chapter_vertex->linkTo(cm_cur_sloka_vertex, M1Store::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
         }
         // sloka sk text
         else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "l"){
@@ -308,10 +394,18 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
             QXmlStreamReader::TokenType l_tt_sk2 = l_xml_reader.readNext();
             if(l_tt_sk2 != QXmlStreamReader::Characters) qFatal() << QString("No Characters after caesura: %1").arg(l_tt_sk2);
             QString l_sloka_text2 = l_xml_reader.text().toString().trimmed();
-            qCDebug(g_cat_main).noquote() << l_indent << QString("Sloka %1.%2: %3")
-                                                             .arg(l_cur_chapter_number)
-                                                             .arg(l_cur_sloka_number)
+            qCDebug(g_cat_tei).noquote() << cm_indent << QString("Sloka %1.%2: %3")
+                                                             .arg(cm_cur_chapter_number)
+                                                             .arg(cm_cur_sloka_number)
                                                              .arg(QString("%1 । %2").arg(l_sloka_text1).arg(l_sloka_text2));
+
+            M1Store::Item_lv2* l_sloka_line = M1Store::Item_lv2::getNew(
+                // vertex flags
+                M1Env::FULL_VERTEX,
+                // label
+                QString("%1 । %2").arg(l_sloka_text1).arg(l_sloka_text2));
+            l_sloka_line->setType(M1Env::TEXT_SLOKA_LINE_SIID);
+            cm_cur_sloka_vertex->linkTo(l_sloka_line, M1Store::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
         }
         // sloka transliteration
         else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "seg"){
@@ -322,7 +416,15 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                 QXmlStreamReader::TokenType l_tt_trl = l_xml_reader.readNext();
                 if(l_tt_trl != QXmlStreamReader::Characters) throw M1Env::M1Exception("<seg type=transliteration> not followed by Characters", 1015);
                 QString l_trl_text = l_xml_reader.text().toString().trimmed();
-                qCDebug(g_cat_main).noquote() << l_indent << QString("<seg type=\"%1\" standard=\"%2\"> %3").arg(l_type).arg(l_standard).arg(l_trl_text);
+                qCDebug(g_cat_tei).noquote() << cm_indent << QString("<seg type=\"%1\" standard=\"%2\"> %3").arg(l_type).arg(l_standard).arg(l_trl_text);
+
+                M1Store::Item_lv2* l_sloka_transl = M1Store::Item_lv2::getNew(
+                    // vertex flags
+                    M1Env::FULL_VERTEX,
+                    // label
+                    l_trl_text);
+                l_sloka_transl->setType(M1Env::TEXT_SLOKA_TRANSLIT_SIID);
+                cm_cur_sloka_vertex->linkTo(l_sloka_transl, M1Store::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
             }
         }
         // div3 start (wfw, translation or commentaries block)
@@ -342,14 +444,14 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                 bool l_found_wfw_transliteration = false;
                 bool l_found_wfw_morphology = false;
 
-                qCDebug(g_cat_main).noquote() << l_indent << QString("<div3> start of wfw block for sloka %1.%2").arg(l_cur_chapter_number).arg(l_cur_sloka_number);
+                qCDebug(g_cat_tei).noquote() << cm_indent << QString("<div3> start of wfw block for sloka %1.%2").arg(cm_cur_chapter_number).arg(cm_cur_sloka_number);
                 int l_cur_word = 1;
-                l_indent += QString(" ").repeated(l_indent_count);
+                cm_indent += QString(" ").repeated(l_indent_count);
 
                 while (!l_xml_reader.atEnd()) {
                     QXmlStreamReader::TokenType l_tt = l_xml_reader.readNext();
                     QStringView l_tok_name = l_xml_reader.name();
-                    qCDebug(g_cat_main).noquote() << l_indent << "Token Type: " << l_tt << l_xml_reader.name();
+                    qCDebug(g_cat_tei).noquote() << cm_indent << "Token Type: " << l_tt << l_xml_reader.name();
 
                     // wfw-unit <seg>
                     if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "seg"){
@@ -363,8 +465,8 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                             QXmlStreamReader::TokenType l_tt_wfw = l_xml_reader.readNext();
                             if(l_tt_wfw != QXmlStreamReader::Characters) throw M1Env::M1Exception("<seg type=transliteration> not followed by Characters", 1016);
                             QString l_wfw_form = l_xml_reader.text().toString().trimmed();
-                            qCDebug(g_cat_main).noquote() << l_indent << QString("Word Word %1.%2.%3 <seg type=\"%4\"> %5")
-                                                                             .arg(l_cur_chapter_number).arg(l_cur_sloka_number).arg(l_cur_word)
+                            qCDebug(g_cat_tei).noquote() << cm_indent << QString("Word Word %1.%2.%3 <seg type=\"%4\"> %5")
+                                                                             .arg(cm_cur_chapter_number).arg(cm_cur_sloka_number).arg(l_cur_word)
                                                                              .arg(l_type).arg(l_wfw_form);
                         }
                     }
@@ -379,7 +481,7 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                             QXmlStreamReader::TokenType l_tt_interp = l_xml_reader.readNext();
                             if(l_tt_interp == QXmlStreamReader::Characters){
                                 QString l_trl_text = l_xml_reader.text().toString().trimmed();
-                                qCDebug(g_cat_main).noquote() << l_indent << QString("<interp type=\"%1\" source=\"%2\" standard=\"%3\"> %4").arg(l_type).arg(l_source).arg(l_standard).arg(l_trl_text);
+                                qCDebug(g_cat_tei).noquote() << cm_indent << QString("<interp type=\"%1\" source=\"%2\" standard=\"%3\"> %4").arg(l_type).arg(l_source).arg(l_standard).arg(l_trl_text);
                             }
                         }
                         // wfw translation
@@ -389,7 +491,7 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                             QXmlStreamReader::TokenType l_tt_interp = l_xml_reader.readNext();
                             if(l_tt_interp != QXmlStreamReader::Characters) throw M1Env::M1Exception("<interp type=translation> not followed by Characters", 1017);
                             QString l_trl_text = l_xml_reader.text().toString().trimmed();
-                            qCDebug(g_cat_main).noquote() << l_indent << QString("<interp type=\"%1\" source=\"%2\"> %3").arg(l_type).arg(l_source).arg(l_trl_text);
+                            qCDebug(g_cat_tei).noquote() << cm_indent << QString("<interp type=\"%1\" source=\"%2\"> %3").arg(l_type).arg(l_source).arg(l_trl_text);
                         }
                         // one wfw morphology line inside interpGrp
                         else if(l_type == "morphology"){
@@ -402,7 +504,7 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                             if(l_tt_interp != QXmlStreamReader::Characters) throw M1Env::M1Exception("<interp type=morphology> not followed by Characters", 1018);
 
                             QString l_form_text = l_xml_reader.text().toString().trimmed();
-                            qCDebug(g_cat_main).noquote() << l_indent << QString("<interp type=\"%1\" lemma=\"%2\" pos=\"%3\" msg=\"%4\" lemmaRef=\"%5\"> %6")
+                            qCDebug(g_cat_tei).noquote() << cm_indent << QString("<interp type=\"%1\" lemma=\"%2\" pos=\"%3\" msg=\"%4\" lemmaRef=\"%5\"> %6")
                                                                              .arg(l_type).arg(l_lemma).arg(l_pos).arg(l_grv).arg(l_ref).arg(l_form_text);
                         }
                     }
@@ -411,35 +513,35 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                         QString l_type = l_xml_reader.attributes().value("type").toString();
                         if(l_type == "morphology"){
                             l_found_wfw_morphology = true;
-                            qCDebug(g_cat_main).noquote() << l_indent << QString("<interpGrp> start of INRIA morphology block for sloka %1.%2 word %3")
-                                                                             .arg(l_cur_chapter_number).arg(l_cur_sloka_number).arg(l_cur_word);
-                            l_indent += QString(" ").repeated(l_indent_count);
+                            qCDebug(g_cat_tei).noquote() << cm_indent << QString("<interpGrp> start of INRIA morphology block for sloka %1.%2 word %3")
+                                                                             .arg(cm_cur_chapter_number).arg(cm_cur_sloka_number).arg(l_cur_word);
+                            cm_indent += QString(" ").repeated(l_indent_count);
                         }
                     }
                     // end of wfw morphology (</interpGrp>)
                     else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "interpGrp"){
                         l_cur_word += 1;
-                        l_indent.chop(l_indent_count);
-                        qCDebug(g_cat_main).noquote() << l_indent << "<interpGrp/> End of INRIA morphology block";
+                        cm_indent.chop(l_indent_count);
+                        qCDebug(g_cat_tei).noquote() << cm_indent << "<interpGrp/> End of INRIA morphology block";
                     }
                     // end of wfw unit </seg>
                     else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "seg"){
                         if(! l_found_wfw_translation) throw M1Env::M1Exception(QString("Word %1.%2.%3 has no wfw translation")
-                                                         .arg(l_cur_chapter_number).arg(l_cur_sloka_number).arg(l_cur_word), 0);
+                                                         .arg(cm_cur_chapter_number).arg(cm_cur_sloka_number).arg(l_cur_word), 0);
                         if(! l_found_wfw_transliteration) throw M1Env::M1Exception(QString("Word %1.%2.%3 has no wfw transliteration")
-                                                         .arg(l_cur_chapter_number).arg(l_cur_sloka_number).arg(l_cur_word), 0);
+                                                         .arg(cm_cur_chapter_number).arg(cm_cur_sloka_number).arg(l_cur_word), 0);
                         if(! l_found_wfw_morphology) throw M1Env::M1Exception(QString("Word %1.%2.%3 has no wfw morphology group")
-                                                         .arg(l_cur_chapter_number).arg(l_cur_sloka_number).arg(l_cur_word), 0);
+                                                         .arg(cm_cur_chapter_number).arg(cm_cur_sloka_number).arg(l_cur_word), 0);
 
-                        qCDebug(g_cat_main).noquote() << l_indent << "<seg/> End of wfw group";
+                        qCDebug(g_cat_tei).noquote() << cm_indent << "<seg/> End of wfw group";
                     }
                     // end of wfw block <div3>
                     else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "div3"){
                         if(! l_found_one_wfw) throw M1Env::M1Exception(QString("SLoka %1.%2 has has no wfw units")
-                                                         .arg(l_cur_chapter_number).arg(l_cur_sloka_number), 0);
+                                                         .arg(cm_cur_chapter_number).arg(cm_cur_sloka_number), 0);
 
-                        l_indent.chop(l_indent_count);
-                        qCDebug(g_cat_main).noquote() << l_indent << "End of wfw block";
+                        cm_indent.chop(l_indent_count);
+                        qCDebug(g_cat_tei).noquote() << cm_indent << "End of wfw block";
                         break; // from the inner wfw while
                     }
                     l_cur_word += 1;
@@ -448,36 +550,38 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
             // translations block
             else if(l_type == "translations-block"){
                 l_found_translations = true;
-                qCDebug(g_cat_main).noquote() << l_indent << QString("<div3> start of translation block for sloka %1.%2").arg(l_cur_chapter_number).arg(l_cur_sloka_number);
-                l_indent += QString(" ").repeated(l_indent_count);
-                QString l_source;
+                qCDebug(g_cat_tei).noquote() << cm_indent << QString("<div3> start of translation block for sloka %1.%2").arg(cm_cur_chapter_number).arg(cm_cur_sloka_number);
+                cm_indent += QString(" ").repeated(l_indent_count);
+                QString l_source_txt;
                 QString l_author_text;
                 while (!l_xml_reader.atEnd()) {
                     QXmlStreamReader::TokenType l_tt = l_xml_reader.readNext();
                     QStringView l_tok_name = l_xml_reader.name();
-                    qCDebug(g_cat_main).noquote() << l_indent << "Token Type: " << l_tt << l_xml_reader.name();
+                    qCDebug(g_cat_tei).noquote() << cm_indent << "Token Type: " << l_tt << l_xml_reader.name();
 
                     if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "div4"){
                         QString l_type = l_xml_reader.attributes().value("type").toString();
                         if(l_type == "translation"){
-                            l_source = l_xml_reader.attributes().value("source").toString();
-                            qCDebug(g_cat_main).noquote() << l_indent << QString("<div4 type=\"%1\">").arg(l_type);
+                            l_source_txt = l_xml_reader.attributes().value("source").toString();
+                            qCDebug(g_cat_tei).noquote() << cm_indent << QString("<div4 type=\"%1\">").arg(l_type);
                         }
                     }
                     else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "author"){
                         QXmlStreamReader::TokenType l_tt_author = l_xml_reader.readNext();
                         if(l_tt_author != QXmlStreamReader::Characters) throw M1Env::M1Exception("<author type=translation> not followed by Characters", 1019);
                         l_author_text = l_xml_reader.text().toString().trimmed();
-                        qCDebug(g_cat_main).noquote() << l_indent << QString("<author> %1").arg(l_author_text);
+                        qCDebug(g_cat_tei).noquote() << cm_indent << QString("<author> %1").arg(l_author_text);
                     }
                     else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "author"){
-                        QString l_translation_text = skipUntil(l_indent_count, l_indent, l_xml_reader, "div4");
-                        qCDebug(g_cat_main).noquote() << l_indent << QString("translation (%1/%2) [%3]:")
-                                                                         .arg(l_source).arg(l_author_text).arg(l_translation_text.length()) << l_translation_text;
+                        QString l_translation_text = skipUntil(l_indent_count, cm_indent, l_xml_reader, "div4");
+                        qCDebug(g_cat_tei).noquote() << cm_indent << QString("translation (%1/%2) [%3]:")
+                                                                         .arg(l_source_txt).arg(l_author_text).arg(l_translation_text.length()) << l_translation_text;
+
+                        addTranslationBhashya(l_translation_text, l_source_txt, l_author_text, true);
                     }
                     else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "div3"){
-                        l_indent.chop(l_indent_count);
-                        qCDebug(g_cat_main).noquote() << l_indent << "End of translation block";
+                        cm_indent.chop(l_indent_count);
+                        qCDebug(g_cat_tei).noquote() << cm_indent << "End of translation block";
                         break; // from the inner translation while
                     }
                 } // end of translation while
@@ -485,38 +589,39 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
             // commentaries block
             else if(l_type == "commentaries-block"){
                 l_found_commentaries = true;
-                qCDebug(g_cat_main).noquote() << l_indent << QString("<div3> start of commentaries block for sloka %1.%2").arg(l_cur_chapter_number).arg(l_cur_sloka_number);
-                l_indent += QString(" ").repeated(l_indent_count);
-                QString l_source;
+                qCDebug(g_cat_tei).noquote() << cm_indent << QString("<div3> start of commentaries block for sloka %1.%2").arg(cm_cur_chapter_number).arg(cm_cur_sloka_number);
+                cm_indent += QString(" ").repeated(l_indent_count);
+                QString l_source_txt;
                 QString l_author_text;
                 while (!l_xml_reader.atEnd()) {
                     QXmlStreamReader::TokenType l_tt = l_xml_reader.readNext();
                     QStringView l_tok_name = l_xml_reader.name();
-                    qCDebug(g_cat_main).noquote() << l_indent << "Token Type: " << l_tt << l_xml_reader.name();
+                    qCDebug(g_cat_tei).noquote() << cm_indent << "Token Type: " << l_tt << l_xml_reader.name();
 
                     if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "div4"){
                         QString l_type = l_xml_reader.attributes().value("type").toString();
                         if(l_type == "commentary"){
-                            l_source = l_xml_reader.attributes().value("source").toString();
-                            qCDebug(g_cat_main).noquote() << l_indent << QString("<div4 type=\"%1\">").arg(l_type);
+                            l_source_txt = l_xml_reader.attributes().value("source").toString();
+                            qCDebug(g_cat_tei).noquote() << cm_indent << QString("<div4 type=\"%1\">").arg(l_type);
                         }
                     }
                     else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "author"){
                         QXmlStreamReader::TokenType l_tt_author = l_xml_reader.readNext();
                         if(l_tt_author != QXmlStreamReader::Characters) throw M1Env::M1Exception("<author type=commentary> not followed by Characters", 1020);
                         l_author_text = l_xml_reader.text().toString().trimmed();
-                        qCDebug(g_cat_main).noquote() << l_indent << QString("<author> %1").arg(l_author_text);
+                        qCDebug(g_cat_tei).noquote() << cm_indent << QString("<author> %1").arg(l_author_text);
                     }
                     else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "author"){
-                        QString l_commentary_text = skipUntil(l_indent_count, l_indent, l_xml_reader, "div4");
+                        QString l_commentary_text = skipUntil(l_indent_count, cm_indent, l_xml_reader, "div4");
                         if(l_xml_reader.hasError())
-                            qCDebug(g_cat_main).noquote() << "XML parsing ERROR" << l_xml_reader.error() << l_xml_reader.errorString();
-                        qCDebug(g_cat_main).noquote() << l_indent << QString("commentary (%1/%2) [%3]:")
-                                                                         .arg(l_source).arg(l_author_text).arg(l_commentary_text.length()) << l_commentary_text;
+                            qCDebug(g_cat_tei).noquote() << "XML parsing ERROR" << l_xml_reader.error() << l_xml_reader.errorString();
+                        qCDebug(g_cat_tei).noquote() << cm_indent << QString("commentary (%1/%2) [%3]:")
+                                                                         .arg(l_source_txt).arg(l_author_text).arg(l_commentary_text.length()) << l_commentary_text;
+                        addTranslationBhashya(l_commentary_text, l_source_txt, l_author_text, false);
                     }
                     else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "div3"){
-                        l_indent.chop(l_indent_count);
-                        qCDebug(g_cat_main).noquote() << l_indent << "End of commentaries block";
+                        cm_indent.chop(l_indent_count);
+                        qCDebug(g_cat_tei).noquote() << cm_indent << "End of commentaries block";
                         break; // from the inner commentaries while
                     }
                 } // end of commentaries while
@@ -525,18 +630,20 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
         }
         // chapter end
         else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "div1"){
-            if(! l_found_at_least_one_sloka) throw M1Env::M1Exception(QString("Chapter %1 has 0 Sloka").arg(l_cur_chapter_number), 0);
-            qCDebug(g_cat_main).noquote() << l_indent << QString("End of chapter %1").arg(l_cur_chapter_number);
+            if(! l_found_at_least_one_sloka) throw M1Env::M1Exception(QString("Chapter %1 has 0 Sloka").arg(cm_cur_chapter_number), 0);
+            qCDebug(g_cat_tei).noquote() << cm_indent << QString("End of chapter %1").arg(cm_cur_chapter_number);
         }
         // Sloka end
         else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "div2"){
-            if(! l_found_sk) throw M1Env::M1Exception(QString("Sloka %1.%2 has no sanskrit text").arg(l_cur_chapter_number).arg(l_cur_sloka_number), 0);
-            if(! l_found_trnsl) throw M1Env::M1Exception(QString("Sloka %1.%2 has no transliteration text").arg(l_cur_chapter_number).arg(l_cur_sloka_number), 0);
-            if(! l_found_wfw) throw M1Env::M1Exception(QString("Sloka %1.%2 has no wfw section").arg(l_cur_chapter_number).arg(l_cur_sloka_number), 0);
-            if(! l_found_translations) throw M1Env::M1Exception(QString("Sloka %1.%2 has no translations section").arg(l_cur_chapter_number).arg(l_cur_sloka_number), 0);
-            if(! l_found_commentaries) throw M1Env::M1Exception(QString("Sloka %1.%2 has no commentaries section").arg(l_cur_chapter_number).arg(l_cur_sloka_number), 0);
+            if(! l_found_sk) throw M1Env::M1Exception(QString("Sloka %1.%2 has no sanskrit text").arg(cm_cur_chapter_number).arg(cm_cur_sloka_number), 0);
+            if(! l_found_trnsl) throw M1Env::M1Exception(QString("Sloka %1.%2 has no transliteration text").arg(cm_cur_chapter_number).arg(cm_cur_sloka_number), 0);
+            if(! l_found_wfw) throw M1Env::M1Exception(QString("Sloka %1.%2 has no wfw section").arg(cm_cur_chapter_number).arg(cm_cur_sloka_number), 0);
+            if(! l_found_translations) throw M1Env::M1Exception(QString("Sloka %1.%2 has no translations section").arg(cm_cur_chapter_number).arg(cm_cur_sloka_number), 0);
+            if(! l_found_commentaries) throw M1Env::M1Exception(QString("Sloka %1.%2 has no commentaries section").arg(cm_cur_chapter_number).arg(cm_cur_sloka_number), 0);
 
-            qCDebug(g_cat_main).noquote() << l_indent << QString("End of Sloka %1.%2").arg(l_cur_chapter_number).arg(l_cur_sloka_number);
+            qCDebug(g_cat_tei).noquote() << cm_indent << QString("End of Sloka %1.%2").arg(cm_cur_chapter_number).arg(cm_cur_sloka_number);
+
+            // if(cm_cur_chapter_number == 1 && cm_cur_sloka_number == 10) break;
         }
     }
 

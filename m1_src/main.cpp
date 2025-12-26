@@ -54,7 +54,8 @@ int main(int argc, char *argv[])
         po::notify(l_program_options_vm);
         // printf("T\n");
 
-        if(l_program_options_vm.count("reset")) std::cout << "reset option detected" << std::endl;;
+        if(l_program_options_vm.count("reset")) std::cout << "reset option detected" << std::endl;
+        if(l_program_options_vm.count("load-tei")) std::cout << "load-tei option detected" << std::endl;
         // if(l_program_options_vm.count("qmljsdebugger")) std::cout << l_fuck.at(0) << std::endl;
         // printf("U\n");
     } catch ( po::error& e){
@@ -103,6 +104,7 @@ int main(int argc, char *argv[])
                                         "tree_display=false\n"
                                         "passages_panel=false\n"
                                         "main_window=false\n"
+                                        "tei_interface=false\n"
                                         "qt.*.debug=false");
 
     M1MidPlane::Interp::init();
@@ -114,6 +116,7 @@ int main(int argc, char *argv[])
     if(l_program_options_vm.count("load-plato")) M1Store::GraphInit::init_plato();
     if(l_program_options_vm.count("load-tei")){
         try{
+            std::cout << "Loading TEI file ..." << std::endl;
             M1Store::TEIInterface::loadTei("../gitaDnl/bg_final_ex.xml");
             qCDebug(g_cat_main).noquote() << "End of TEI XML loading";
             // std::_Exit(0);

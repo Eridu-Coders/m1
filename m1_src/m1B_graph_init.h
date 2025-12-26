@@ -60,18 +60,18 @@ extern M1Env::SpecialItemID TW_REV_SECTION_2_OCC_END_SIID;
 
 // [ROOT_] Special Vertex ID of "Global graph root"
 extern M1Env::SpecialItemID ROOT_SIID;
+// [HOME_] Special Vertex ID of "Home"
+extern M1Env::SpecialItemID HOME_SIID;
 // [TYPE_] Special Vertex ID of "Root of all types"
 extern M1Env::SpecialItemID TYPE_NODE_SIID;
+// [TXWKK] Special Vertex ID of "Texts Work Area"
+extern M1Env::SpecialItemID TEXT_WORK_SIID;
 // [PERSN] Special Vertex ID of "Person (type)"
 extern M1Env::SpecialItemID PERS_TYPE_SIID;
 // [ORGN_] Special Vertex ID of "Organization (type)"
 extern M1Env::SpecialItemID ORG_TYPE_SIID;
-// [HOME_] Special Vertex ID of "Home"
-extern M1Env::SpecialItemID HOME_SIID;
 // [TEXT_] Special Vertex ID of "Texts Root (type)"
 extern M1Env::SpecialItemID TEXT_SIID;
-// [TXWKK] Special Vertex ID of "Texts Work Area"
-extern M1Env::SpecialItemID TEXT_WORK_SIID;
 // [_MSG_] Special Vertex ID of "Inboxes / Message Root Type"
 extern M1Env::SpecialItemID MSG_TYPE_SIID;
 // [ME___] Special Vertex ID of "Me"
@@ -132,6 +132,8 @@ extern M1Env::SpecialItemID TEXT_SLOKA_LINE_SIID;
 extern M1Env::SpecialItemID TEXT_WORD_DREF_INRIA_SIID;
 // [SLTRN] Special Vertex ID of "Sloka Translation (type)"
 extern M1Env::SpecialItemID TEXT_SLOKA_TRANSLATION_SIID;
+// [SLTRL] Special Vertex ID of "Sloka Transliteration (type)"
+extern M1Env::SpecialItemID TEXT_SLOKA_TRANSLIT_SIID;
 // [SLBHS] Special Vertex ID of "Sloka Bhashya (type)"
 extern M1Env::SpecialItemID TEXT_SLOKA_BHASHYA_SIID;
 // [TRLUN] Special Vertex ID of "WfW Translation Unit (type)"
