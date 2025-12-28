@@ -116,10 +116,10 @@ if __name__ == '__main__':
                 #                     l_wfw = []
                 #                     while True:
                 #                         print(l_translit, l_wfw_prabh_list)
-                #                         l_sk, l_trad = l_wfw_prabh_list.pop(0)
-                #                         if l_sk == l_translit[:len(l_sk)]:
-                #                             l_translit = re.sub(f'^{l_sk}\s*', '', l_translit).strip()
-                #                             l_wfw.append((l_sk, l_trad))
+                #                         l_sk_api_online, l_trad = l_wfw_prabh_list.pop(0)
+                #                         if l_sk_api_online == l_translit[:len(l_sk_api_online)]:
+                #                             l_translit = re.sub(f'^{l_sk_api_online}\s*', '', l_translit).strip()
+                #                             l_wfw.append((l_sk_api_online, l_trad))
                 #                         else:
                 #                             break
                 print(f'{l_chap_number}.{l_sloka_number:3}: {l_wfw}')

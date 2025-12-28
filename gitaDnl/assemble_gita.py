@@ -5,6 +5,7 @@ __author__ = 'fi11222'
 
 import json
 import re
+import regex
 import string
 import subprocess
 import os
@@ -137,8 +138,9 @@ g_author_normalize = {
     'Sri Abhinav Gupta': 'Sri Abhinavagupta'
 }
 
-g_gs_cochonneries = [ #
+g_gs_cochonneries = [
     ('twic</b>orn', 'twice born'),
+    ('अर्जुन O Arjuna निर्द्वन्द्वः', 'अर्जुन O Arjuna, निर्द्वन्द्वः'),
     ('som</b>ody', 'somebody'),
     ('ric</b>all', 'rice-ball'),
     ('ass</b>led', 'assembled'),
@@ -407,14 +409,17 @@ def extract_im(p_im, p_depth=0):
         elif 'entry' in p_im.keys():
             # https://sanskrit.inria.fr/MW/204.html#H_mukha
             # {'id': 'MW', 'num': 212, 'anchor': 'H_yudh#1', 'entry': 'yudh_1'}
-            return [(p_im['entry'], f"https://sanskrit.inria.fr/{p_im['id']}/{p_im['num']}.html#{p_im['anchor']}")], ''
+            if 'id' in p_im.keys():
+                return [(p_im['entry'], f"https://sanskrit.inria.fr/{p_im['id']}/{p_im['num']}.html#{p_im['anchor']}")], ''
+            else:
+                return [(p_im['entry'], '')], ''
         elif 'lone-form' in p_im.keys():
             return [(p_im['lone-form'], '')], ''
         else:
             return [], ''
 
 
-def inria_sloka_words(p_chap_number, p_sloka_num, p_sloka_txt):
+def inria_sloka_words(p_chap_number, p_sloka_num, p_sloka_txt, p_is_fragment=False):
     print(f'------------------------------------------- INRIA -----------------------------------------------------------')
     l_deva_txt = re.sub(r'\s+', ' ',  # normalize spaces
                         re.sub(r'\d+\.\d+$', '',  # removes sloka number at end (if in ascii digits)
@@ -443,13 +448,14 @@ def inria_sloka_words(p_chap_number, p_sloka_num, p_sloka_txt):
             '&t=VH&topic=&mode=g&corpmode=&corpdir=&sentno='
 
     l_url = l_url.replace(' ', '+').replace('.a', '%27').replace('\u200c', '').replace('\u200d', '')
-    print(f'l_deva_txt:      [{l_deva_txt}]')
-    print(f'l_txt_devtrans:  [{l_txt_devtrans}]')
-    print(f'l_velthuis_text: [{l_velthuis_text}]')
+    l_inria_cache_path = f'cache/inria_{re.sub(r"[^a-z]", "_", l_velthuis_text)}.html' if p_is_fragment else f'cache/inria_{p_chap_number}_{p_sloka_num}.html'
+    print(f'l_deva_txt:         [{l_deva_txt}]')
+    print(f'l_txt_devtrans:     [{l_txt_devtrans}]')
+    print(f'l_velthuis_text:    [{l_velthuis_text}]')
+    print(f'l_inria_cache_path: [{l_inria_cache_path}]')
     l_url_disp = l_url.replace('&t', '\n&t')
     print(f'l_url:\n{l_url_disp}')
 
-    l_inria_cache_path = f'cache/inria_{p_chap_number}_{p_sloka_num}.html'
     if os.path.exists(l_inria_cache_path):
         print(f'Loading inria for v. {p_sloka_num} from cache')
         with open(l_inria_cache_path, 'r', encoding='utf-8') as l_f_inria:
@@ -481,9 +487,9 @@ def inria_sloka_words(p_chap_number, p_sloka_num, p_sloka_txt):
 
         l_position = l_match.start()
         l_sk_form = ''
-        m = re.search(r'this, event\)">([^<]+)</td>', l_match_txt)
-        if m:
-            l_sk_form = html.unescape(m.group(1)).strip()
+        l_match_sk_form = re.search(r'this, event\)">([^<]+)</td>', l_match_txt)
+        if l_match_sk_form:
+            l_sk_form = html.unescape(l_match_sk_form.group(1)).strip()
 
         # inner structure of showBox
         l_match_inner = re.search(r'onclick="showBox\(\'([^\']*?)\', \'#[^\']*\', this, event\)', l_match_txt)
@@ -539,6 +545,7 @@ if __name__ == '__main__':
         for l_verse_number in range(1, l_verse_count + 1):
             l_verse_id = f'BG_{l_chap_number}.{l_verse_number}'
 
+            # ######################################### GITA SUPERSITE #################################################
             # data from Gita Supersite
             l_cache_file_gs = f'cache/gs_{l_chap_number}_{l_verse_number}.html'
 
@@ -565,6 +572,9 @@ if __name__ == '__main__':
                 with open(l_cache_file_gs, 'w', encoding='utf-8') as l_f_v_gs:
                     l_f_v_gs.write(l_html_gs)
 
+            l_wfw_gs_string = ''
+            l_wfw_gs_list1 = ''
+            l_wfw_gs_list2 = ''
             l_sk_gs = ''
             l_translit_gs = ''
             l_match_sk = re.search(
@@ -585,6 +595,8 @@ if __name__ == '__main__':
                 print(f'l_sk_gs:       {l_sk_gs}')
                 print(f'l_translit_gs: {l_translit_gs}')
 
+            # ######################################### BG API (online) ################################################
+            # l_source = "Ved Vyas Foundation" (see below)
             # data from the BG API
             l_cache_file = f'cache/v_{l_chap_number}_{l_verse_number}.json'
             if os.path.exists(l_cache_file):
@@ -607,16 +619,20 @@ if __name__ == '__main__':
 
             # top-level attributes
             # sanskrit text
-            l_sk = universal_cleanup(l_json_verse['text'])
+            l_sk_api_online = universal_cleanup(l_json_verse['text'])
             # IAST transliteration
             l_translit = universal_cleanup(l_json_verse['transliteration'])
-            # Word-for-Word translation (API version)
-            l_wfw_api_list = [s.strip().split('—') for s in universal_cleanup(l_json_verse['word_meanings']).split(';')]
+            # Word-for-Word translation (API version) babhūva—became ha
+            l_wfw_api_string = (re.sub(r';$', '', universal_cleanup(l_json_verse['word_meanings']))
+                                .replace('pariśhuṣhyati—is drying up vepathuḥ', 'pariśhuṣhyati—is drying up; vepathuḥ')
+                                .replace('babhūva—became ha', 'babhūva—became; ha—certainly'))
+            l_wfw_api_list = [s.strip().split('—') for s in l_wfw_api_string.split(';')]
             # translations
             l_translations = l_json_verse['translations']
             # commentaries
             l_commentaries = l_json_verse['commentaries']
 
+            # ######################################### BG API local data ##############################################
             # Data from the local DB
             # bhagavadgita_chapter_1_slok_1.json
             l_local_file = f'kagl/slok/bhagavadgita_chapter_{l_chap_number}_slok_{l_verse_number}.json'
@@ -627,7 +643,7 @@ if __name__ == '__main__':
                 print('=============================================', l_local_file)
                 l_json_local = json.load(l_f_local_json)
 
-                l_sk_local = l_json_local['slok']
+                l_sk_api_local = l_json_local['slok']
                 l_translit_local = l_json_local['transliteration']
 
                 l_source = "Kaggle/Bhagavad Gita API Database"
@@ -655,6 +671,7 @@ if __name__ == '__main__':
                     print(f'(c) {n:35}: {l_local_commentaries[n]}')
                 print('=============================================', l_local_file)
 
+            # ########################### merge BG API online into local  ##############################################
             # merging of commentaries and translations
             l_source = "Ved Vyas Foundation"
             for t in l_translations:
@@ -669,6 +686,7 @@ if __name__ == '__main__':
                 l_language = universal_cleanup(c['language'])
                 l_local_commentaries[author_key(l_author)] = [l_author, l_language, l_text, l_source]
 
+            # ########################### merge Gita Supersite into local  #############################################
             # Adding commentaries and translations from Gita Supersite to l_local_commentaries/l_local_translations
             # <div class="views-field views-field-field-etadi"
             l_html_gs_corrected = re.sub(r"([a-z]+)='([^']+)'", r'\1="\2"',
@@ -677,6 +695,7 @@ if __name__ == '__main__':
             l_gs_count_item = 0
             l_gs_count_com = 0
             l_gs_count_tran = 0
+            l_gs_wfw_list = []
             l_source = "Gita Supersite"
             for l_match_gs_tc in re.finditer(
                     r'<div class="views-field views-field-field-([a-z]+).*?<font color="#2c44bd" size="4px"><b>([^<]+)</b></font></p>(.*?)</div>',
@@ -729,15 +748,35 @@ if __name__ == '__main__':
                         l_author_gs = author_normalize(l_original_author) + f' (transl. {l_author_gs})'
 
                 if l_is_commentary:
-                    l_local_commentaries[author_key(l_author_gs)] = [l_author_gs, l_language_gs, l_body_gs, l_source]
+                    if l_author_gs == 'Swami Sivananda':
+                        l_match_wfw = re.search(rf'{l_chap_number}\.{l_verse_number}\s*([^<]+)(<br/>|\.No Commentary\.|\.\s*Commentary|\.<b>Commentary:</b>)', l_body_gs)
+                        if l_match_wfw:
+                            l_wfw_gs_string = l_match_wfw.group(1)
+                            l_wfw_gs_list1 = l_wfw_gs_string.split('?')
+                            l_wfw_gs_list2 = l_wfw_gs_string.split(',')
+                            l_wfw_gs_list_selected = l_wfw_gs_list1 if len(l_wfw_gs_list1) > len(l_wfw_gs_list2) else l_wfw_gs_list2
+                            l_wfw_gs_list_selected = [l_elm.strip() for l_elm in l_wfw_gs_list_selected]
+                            # \p{Devanagari}+
+                            for l_elm in l_wfw_gs_list_selected:
+                                l_match_deva = regex.match(r'([\s\p{Devanagari}]+)', l_elm)
+                                if l_match_deva:
+                                    l_deva_content = l_match_deva.group(1)
+                                    print(f'l_deva_content: {l_deva_content}')
+                                    l_gs_wfw_list.append((l_deva_content, l_elm[len(l_deva_content):].strip()))
+                        else:
+                            l_wfw_gs_string = l_body_gs
+                    else:
+                        l_local_commentaries[author_key(l_author_gs)] = [l_author_gs, l_language_gs, l_body_gs, l_source]
                 else:
                     l_local_translations[author_key(l_author_gs)] = [l_author_gs, l_language_gs, l_body_gs, l_source]
 
                 l_gs_count_item += 1
             print(f'Gita Supersite: {l_gs_count_com} commentaries and {l_gs_count_tran} translations')
 
+            # ######################################### ISKCON #########################################################
             # get ISKCON data
             l_wfw_iskcon_list = []
+            l_wfw_iskcon_string = ''
             l_sk_iskcon = ''
             l_trl_iskcon = ''
             l_cache_file_iskcon = f'cache/iskcon_v_{l_chap_number}_{l_verse_number}.html'
@@ -761,12 +800,12 @@ if __name__ == '__main__':
 
                 l_match_wfw_iskcon = re.search(r'<div class="av-synonyms">.*?<div class="em-mb-4 em-leading-8 em-text-base text-justify">(.*?)</div>', l_html_iskcon)
                 if l_match_wfw_iskcon:
-                    l_wfw_iskcon = re.sub(r'\s+', ' ',
-                                         re.sub(r'<[^>]+>', ' ',
+                    l_wfw_iskcon_string = re.sub(r'\s+', ' ',
+                                                 re.sub(r'<[^>]+>', ' ',
                                                 l_match_wfw_iskcon.group(1)
                                                 )
-                                         ).strip()
-                    l_wfw_iskcon_list = [(a.strip(), b.strip()) for a, b in [s.split('—') for s in l_wfw_iskcon.split(';')]]
+                                                 ).strip()
+                    l_wfw_iskcon_list = [(a.strip(), b.strip()) for a, b in [s.split('—') for s in l_wfw_iskcon_string.split(';')]]
                     print(f'l_wfw_iskcon: {l_wfw_iskcon_list}')
             else:
                 l_sk_iskcon = '<unavailable>'
@@ -789,13 +828,16 @@ if __name__ == '__main__':
 
             # test of Sanskrit consistency
             l_sk_from_trans = re.sub(r'\s+', ' ', devtrans.iast2dev(l_translit)).strip()
-            l_sk_test_local = re.sub(r'\s+', ' ', re.sub(r'\|\|[^|]+\|\|$', '', l_sk_local).replace('|', '')).strip()
-            l_sk_test = re.sub(r'\s+', ' ',
-                               re.sub(r'\d+\.\d+$', '',
-                                      l_sk.replace('।', '')
-                                      )
-                               ).strip()
-            l_sk_gs_test = re.sub(r'\s+', ' ',
+            l_sk_test_api_local = re.sub(r'\s+', ' ',
+                                         re.sub(r'\|\|[^|]+\|\|$', '',
+                                                l_sk_api_local).replace('|', '')
+                                         ).strip()
+            l_sk_test_api_online = re.sub(r'\s+', ' ',
+                                          re.sub(r'॥\d+\.\d+॥$', '',
+                                                 l_sk_api_online.replace('।', '')
+                                                 )
+                                          ).strip()
+            l_sk_test_gs = re.sub(r'\s+', ' ',
                                   re.sub(r'॥[^॥]+॥', '', l_sk_gs).replace('।', '').replace('<br/>', '')
                                   ).strip()
             # l_trl_iskcon_comp = re.sub(r'\s+', ' ',
@@ -803,17 +845,19 @@ if __name__ == '__main__':
             #                                            ).strip()
             # l_sk_iskcon_from_trl = devtrans.iast2dev(l_trl_iskcon_comp).replace('-', '')
 
+            # ######################################### Sanskrit Comparison ############################################
             print('-------------------------- SK consistency check -------------------------------------------------')
-            print(f"l_sk_test:            [{l_sk_test.replace(' ', '').strip()}]")
-            print(f"l_sk_gs_comp:         [{l_sk_gs_test.replace(' ', '').strip()}]")
-            print(f"l_sk_test_local:      [{l_sk_test_local.replace(' ', '').strip()}]")
-            if l_sk_test != l_sk_gs_test:
+            print(f"l_sk_test_api_online: [{l_sk_test_api_online.replace(' ', '').strip()}]")
+            print(f"l_sk_test_gs:         [{l_sk_test_gs.replace(' ', '').strip()}]")
+            print(f"l_sk_test_api_local:  [{l_sk_test_api_local.replace(' ', '').strip()}]")
+            if l_sk_test_api_online != l_sk_test_gs:
                 print('!!!!!!!!!!!!!!!!!!!!!!!!!!! SK discrepancy !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
                 print(f'l_sk_from_trans:      {l_sk_from_trans}')
                 print(f'l_translit:           {l_translit}')
                 print(f'l_translit_local:     {l_translit}')
-                print(f'IAST local:           {devtrans.dev2iast(l_sk_test_local)}')
-                print(f'l_sk_gs:              {l_sk_gs}')
+                print(f'IAST api local:       {devtrans.dev2iast(l_sk_test_api_local)}')
+                print(f'IAST api online:      {devtrans.dev2iast(l_sk_test_api_online)}')
+                print(f'IAST l_sk_gs:         {devtrans.dev2iast(l_sk_test_gs)}')
                 print(f'l_sk_iskcon:          {l_sk_iskcon}')
                 print(f'l_trl_iskcon:         {l_trl_iskcon}')
                 # print(f'l_trl_iskcon_comp:    {l_trl_iskcon_comp}')
@@ -822,20 +866,430 @@ if __name__ == '__main__':
                 l_sk = l_sk_gs
                 print(f'   --> New l_sk: {l_sk}')
                 print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+            else:
+                l_sk = l_sk_api_online
 
+            # ######################################### WfW comparison and matching ####################################
+            print('====================== Online API wfw ===============================================================')
+            print(l_wfw_api_string)
+            for l_wfw in l_wfw_api_list:
+                print(l_wfw)
+            print('====================== GITA SUPERSITE wfw ===========================================================')
+            print(l_wfw_gs_string)
+            print(l_wfw_gs_list1)
+            print(l_wfw_gs_list2)
+            for l_wfw in l_gs_wfw_list:
+                print(l_wfw)
+            print('====================== ISKCON wfw ===================================================================')
+            print(l_wfw_iskcon_string)
+            for l_wfw in l_wfw_iskcon_list:
+                print(l_wfw)
+
+            def space_clean(s):
+                return re.sub(rf'[\s{string.punctuation}]+', ' ', s).strip()
+
+            def do_deterministic_sandhi(s):
+                return re.sub(r'[aā]-[aā]', 'ā',
+                          # i + i/ī
+                          re.sub(r'[iī]-[iī]', 'ī',
+                             # u + u/ū
+                             re.sub(r'[uū]-[uū]', 'ū',
+                                # ṛ + ṛ/ṝ
+                                re.sub(r'[ṛṝ]-[ṛṝ]', 'ṝ',
+                                   # a/ā + i/ī → e
+                                   re.sub(r'[aā]-[iī]', 'e',
+                                      # a/ā + u/ū
+                                      re.sub(r'[aā]-[uū]', 'o',
+                                         # a/ā + ṛ/ṝ → ar
+                                         re.sub(r'[aā]-[ṛṝ]', 'ar',
+                                            # a/ā + e/ai → ai
+                                            re.sub(r'[aā]-(e|ai)', 'ai',
+                                               # a/ā + o/au → au
+                                               re.sub(r'[aā]-(o|au)', 'au',
+                                                  # i/ī + any other vowel → y + vowel
+                                                  re.sub(r'[iī]-([aāiīuūṛṝoe])', r'y\1',
+                                                     # u/ū + any other vowel → v + vowel
+                                                     re.sub(r'[uū]-([aāiīuūṛṝoe])', r'v\1',
+                                                        # ṛ/ṝ + any other vowel → r + vowel
+                                                        re.sub(r'[ṛṝ]-([aāiīuūṛṝoe])', r'r\1',
+                                                           # e → ay
+                                                           re.sub(r'e-([aāiīuūṛṝoe])', r'ay\1',
+                                                              # ai → āy
+                                                              re.sub(r'ay-([aāiīuūṛṝoe])', r'āy\1',
+                                                                 # o → av
+                                                                 re.sub(r'o-([aāiīuūṛṝoe])', r'av\1',
+                                                                    # au → āv
+                                                                    re.sub(r'au-([aāiīuūṛṝoe])', r'āv\1',
+                                                                       # aḥ + voiced (non a) → o
+                                                                       re.sub(r'aḥ-([bgdvmnliīuūṛṝoe])', r'o\1', s))))))))))))))))) # aḥ
+
+
+            def iast_cleanup(s):
+                return ((do_deterministic_sandhi(re.sub(rf'[\s{string.punctuation}]+', '-', s)) # ṅ
+                        .replace('aa', 'ā')
+                        .replace('āa', 'ā')
+                        .replace('aā', 'ā')
+                        .replace('āā', 'ā')
+                        .replace('w', 'v')
+                        .replace('ṁ', 'ṃ')
+                        .replace('ṅ', 'ṃ')
+                        .replace('rṛ', 'ṛ') #
+                        .replace('jirṇāni', 'jīrṇāni')
+                        .replace('m-j', 'ñj')
+                        .replace('t-a', 'da')
+                        .replace('ch', 'c')
+                        .replace('ṛ़', 'ṝ')
+                        .replace('ṝī', 'ṝ')
+                        .replace('ṛī', 'ṝ')
+                        .replace('ṛi', 'ṛ')
+                        .replace('śh', 'ś')
+                        .replace('ch', 'c')
+                        .replace('ṣh', 'ṣ')
+                        .replace('-', '')
+                        # .replace('bhīmābhirakṣitam','bhīṣmābhirakṣitam') TODO review this (sl 1.10) abhirakṣitam? bhīmābhirakṣitam?
+                        )
+                        .replace('puruṣariṣabha', 'puruṣarṣabha')) # puruṣariṣabha
+
+            def simplify_iast(s):
+                return re.sub(r'm$', 'ṃ',
+                              re.sub(r'([aā])[nm]([ybkhṣśspt])', r'\1ṃ\2', s
+                                     .replace('ṃm', 'mm')
+                                     .replace('ṇ', 'n')
+                                     .replace('anjñ', 'aṃjñ')
+                                     .replace('anj', 'añj')
+                                     .replace('aṃj', 'añj')))
+
+            try:
+                l_wfw_dict = dict([(iast_cleanup(k), ([space_clean(t)], {space_clean(t)})) for k, t in l_wfw_api_list])
+            except ValueError as e:
+                print(e)
+                for l_item in l_wfw_api_list:
+                    print(l_item)
+                sys.exit(0)
+
+            print(l_wfw_dict)
+            for k, t in l_gs_wfw_list:
+                l_key = iast_cleanup(devtrans.dev2iast(k))
+                l_tl, l_ts = l_wfw_dict.setdefault(l_key, ([], set()))
+                print(f'GS {l_key:20}', l_tl, l_ts)
+                t = space_clean(t)
+                l_wfw_dict[l_key] = (l_tl + [t], l_ts.union({t}))
+
+            print(l_wfw_dict)
+            for k, t in l_wfw_iskcon_list:
+                l_key = iast_cleanup(k)
+                p = l_wfw_dict.setdefault(l_key, ([], set()))
+                l_tl, l_ts = p
+                print(f'IK {l_key:20}', p, l_tl, l_ts)
+                t = space_clean(t)
+                l_wfw_dict[l_key] = (l_tl + [t], l_ts.union({t}))
+
+            print('====================== Less than strict max ==================================================================')
+            l_max_repeats = 0
+            l_small_words = set()
+            for k in sorted(l_wfw_dict.keys()):
+                l_tl, _ = l_wfw_dict[k]
+                if len(l_tl) > l_max_repeats: l_max_repeats = len(l_tl)
+                if len(l_tl) > 3: l_small_words.add(k)
+
+            l_max_repeats = 3 if l_max_repeats > 3 else l_max_repeats
+
+            l_less_then_three_dict = dict()
+            for k in sorted(l_wfw_dict.keys()):
+                l_tl, l_ts = l_wfw_dict[k]
+                if len(l_tl) < l_max_repeats:
+                    l_less_then_three_dict[k] = (l_tl, l_ts)
+                    print(f'{k:30} ({len(l_tl)}) {"/".join(list(l_ts))} {l_tl}')
+
+            l_key_list = sorted(list(set(l_less_then_three_dict.keys()).union(l_small_words)), key=lambda k: f'{len(k):03}-{k}', reverse=True)
+            print(f'v {l_chap_number}.{l_verse_number} len(l_key_list): {len(l_key_list)}')
+            if len(l_key_list) < 12:
+            # if not (l_chap_number == 1 and len(l_key_list) > 10):
+                while len(l_key_list) >= 2:
+                    # print(l_key_list)
+                    print(f'TOP: {l_key_list}')
+
+                    l_found_2 = False
+                    # first 2 keys comparisons
+                    if len(l_key_list) >= 2:
+                        a = l_key_list[0]
+                        l_max_len = len(a)
+
+                        l_same_len = [v for v in l_key_list[1:] if len(v) == l_max_len]
+
+                        for i in range(len(l_same_len)):
+                            b = l_same_len[i]
+                            print('2', a, b, i)
+                            if simplify_iast(a) == simplify_iast(b):
+                                l_tla, l_tsa = l_wfw_dict[a]
+                                l_tlb, l_tsb = l_wfw_dict[b]
+
+                                l_ks, l_kd = (a, b) if a == simplify_iast(a) else (b, a)
+                                l_wfw_dict[l_ks] = (l_tla + l_tlb, l_tsa.union(l_tsb))
+                                del l_wfw_dict[l_kd]
+                                print(f'FOUND EQUALITY: {a} {b} --> {l_wfw_dict[l_ks]}')
+
+                                l_key_list.pop(0)  # a
+                                l_key_list.pop(i)  # b
+                                print(f'    l_key_list: {l_key_list}')
+                                l_found_2 = True
+                                break
+
+                    l_found_3 = False
+                    # 2 --> 1 key comparison
+                    if len(l_key_list) >= 3:
+                        l_longest = l_key_list[0]
+                        l_rest = l_key_list[1:]
+                        print('3', l_longest, l_rest)
+
+                        for i in range(len(l_rest)):
+                            if l_found_3: break
+                            for j in range(len(l_rest)):
+                                if i== j:
+                                    continue
+                                if l_found_3: break
+
+                                a = l_rest[i]
+                                b = l_rest[j]
+                                if iast_cleanup(f'{a}-{b}') == l_longest:
+                                    # print(f'FOUND INCLUSION: {a} {b} --> {l_longest}')
+                                    l_tla, l_tsa = l_wfw_dict[a]
+                                    l_tlb, l_tsb = l_wfw_dict[b]
+                                    l_tl, l_ts = l_wfw_dict[l_longest]
+
+                                    # print(f'l_tla: {l_tla}')
+                                    # print(f'l_tlb: {l_tlb}')
+                                    l_tl_zip = list(zip(l_tla, l_tlb))
+                                    # print(f'l_tl_zip: {l_tl_zip}')
+                                    l_tl_conc = [f'{u} {v}' for u, v in l_tl_zip]
+                                    # print(f'l_tl_conc: {l_tl_conc}')
+                                    l_wfw_dict[l_longest] = (l_tl + l_tl_conc, l_ts.union(set(l_tl_conc)))
+                                    if len(l_tla) < l_max_repeats: del l_wfw_dict[a]
+                                    if len(l_tlb) < l_max_repeats: del l_wfw_dict[b]
+                                    print(f'FOUND INCLUSION: {a} ({i+1}) {b} ({j+1}) --> {l_longest} {l_wfw_dict[l_longest]}')
+
+                                    l_new_list = [l_key_list[n] for n in range(len(l_key_list)) if n not in [0, i+1, j+1]]
+                                    l_key_list = l_new_list
+                                    print(f'    l_key_list: {l_key_list}')
+                                    # l_key_list.pop(0)
+                                    # l_key_list.pop(i)
+                                    # l_key_list.pop(j)
+
+                                    l_found_3 = True
+
+                    l_found_4 = False
+                    # 3 --> 1 key comparison
+                    if len(l_key_list) >= 4:
+                        l_longest = l_key_list[0]
+                        l_rest = l_key_list[1:]
+                        print('4', l_longest, l_rest)
+                        for i in range(len(l_rest)):
+                            if l_found_4: break
+                            for j in range(len(l_rest)):
+                                if l_found_4: break
+                                if i == j:
+                                    continue
+                                for k in range(len(l_rest)):
+                                    if l_found_4: break
+                                    if i == k or j == k:
+                                        continue
+
+                                    a = l_rest[i]
+                                    b = l_rest[j]
+                                    c = l_rest[k]
+                                    if iast_cleanup(f'{a}-{b}-{c}') == l_longest:
+                                    # (
+                                    #                                         iast_cleanup(f'{a}-{b}-{c}') == l_longest or
+                                    #                                         iast_cleanup(f'{a}-{c}-{b}') == l_longest or
+                                    #                                         iast_cleanup(f'{b}-{a}-{c}') == l_longest or
+                                    #                                         iast_cleanup(f'{b}-{c}-{a}') == l_longest or
+                                    #                                         iast_cleanup(f'{c}-{a}-{b}') == l_longest or
+                                    #                                         iast_cleanup(f'{c}-{b}-{a}') == l_longest
+                                    #                                 ):
+                                        l_tla, l_tsa = l_wfw_dict[a]
+                                        l_tlb, l_tsb = l_wfw_dict[b]
+                                        l_tlc, l_tsc = l_wfw_dict[c]
+                                        l_tl, l_ts = l_wfw_dict[l_longest]
+
+                                        l_tl_zip = list(zip(l_tla, l_tlb, l_tlc))
+                                        l_tl_conc = [f'{u} {v} {w}' for u, v, w in l_tl_zip]
+                                        l_wfw_dict[l_longest] = (l_tl + l_tl_conc, l_ts.union(set(l_tl_conc)))
+                                        if len(l_tla) < l_max_repeats: del l_wfw_dict[a]
+                                        if len(l_tlb) < l_max_repeats: del l_wfw_dict[b]
+                                        if len(l_tlc) < l_max_repeats: del l_wfw_dict[c]
+                                        print(f'FOUND INCLUSION: {a} {b} {c} --> {l_longest} {l_wfw_dict[l_longest]}')
+
+                                        l_key_list = [l_key_list[n] for n in range(len(l_key_list)) if n not in [0, i+1, j+1, k+1]]
+                                        print(f'    l_key_list: {l_key_list}')
+                                        l_found_4 = True
+
+                    l_found_5 = False
+                    # 4 --> 1 key comparison
+                    if len(l_key_list) >= 5:
+                        l_longest = l_key_list[0]
+                        l_rest = l_key_list[1:]
+                        print('5', l_longest, l_rest)
+                        for i in range(len(l_rest)):
+                            if l_found_5: break
+                            for j in range(len(l_rest)):
+                                if l_found_5: break
+                                if i == j:
+                                    continue
+                                for k in range(len(l_rest)):
+                                    if l_found_5: break
+                                    if i == k or j == k:
+                                        continue
+                                    for l in range(len(l_rest)):
+                                        if l_found_5: break
+                                        if i == l or j == l or k == l:
+                                            continue
+
+                                        a = l_rest[i]
+                                        b = l_rest[j]
+                                        c = l_rest[k]
+                                        d = l_rest[l]
+                                        if iast_cleanup(f'{a}-{b}-{c}-{d}') == l_longest:
+                                            l_tla, l_tsa = l_wfw_dict[a]
+                                            l_tlb, l_tsb = l_wfw_dict[b]
+                                            l_tlc, l_tsc = l_wfw_dict[c]
+                                            l_tld, l_tsd = l_wfw_dict[d]
+                                            l_tl, l_ts = l_wfw_dict[l_longest]
+
+                                            l_tl_zip = list(zip(l_tla, l_tlb, l_tlc, l_tld))
+                                            l_tl_conc = [f'{u} {v} {w} {x}' for u, v, w, x in l_tl_zip]
+                                            l_wfw_dict[l_longest] = (l_tl + l_tl_conc, l_ts.union(set(l_tl_conc)))
+                                            if len(l_tla) < l_max_repeats: del l_wfw_dict[a]
+                                            if len(l_tlb) < l_max_repeats: del l_wfw_dict[b]
+                                            if len(l_tlc) < l_max_repeats: del l_wfw_dict[c]
+                                            if len(l_tld) < l_max_repeats: del l_wfw_dict[d]
+                                            print(f'FOUND INCLUSION: {a} {b} {c} {5} --> {l_longest} {l_wfw_dict[l_longest]}')
+
+                                            l_key_list = [l_key_list[n] for n in range(len(l_key_list)) if n not in [0, i+1, j+1, k+1, l+1]]
+                                            print(f'    l_key_list: {l_key_list}')
+
+                                            l_found_5 = True
+
+                    l_found_6 = False
+                    # 5 --> 1 key comparison
+                    if len(l_key_list) >= 5:
+                        l_longest = l_key_list[0]
+                        l_rest = l_key_list[1:]
+                        print('6', l_longest, l_rest)
+                        for i in range(len(l_rest)):
+                            if l_found_6: break
+                            for j in range(len(l_rest)):
+                                if l_found_6: break
+                                if i == j:
+                                    continue
+                                for k in range(len(l_rest)):
+                                    if l_found_6: break
+                                    if i == k or j == k:
+                                        continue
+                                    for l in range(len(l_rest)):
+                                        if l_found_6: break
+                                        if i == l or j == l or k == l:
+                                            continue
+                                        for m in range(len(l_rest)):
+                                            if l_found_6: break
+                                            if i == m or j == m or k == m or l == m:
+                                                continue
+
+                                            a = l_rest[i]
+                                            b = l_rest[j]
+                                            c = l_rest[k]
+                                            d = l_rest[l]
+                                            e = l_rest[m]
+                                            if iast_cleanup(f'{a}-{b}-{c}-{d}-{e}') == l_longest:
+                                                l_tla, l_tsa = l_wfw_dict[a]
+                                                l_tlb, l_tsb = l_wfw_dict[b]
+                                                l_tlc, l_tsc = l_wfw_dict[c]
+                                                l_tld, l_tsd = l_wfw_dict[d]
+                                                l_tle, l_tse = l_wfw_dict[e]
+                                                l_tl, l_ts = l_wfw_dict[l_longest]
+
+                                                l_tl_zip = list(zip(l_tla, l_tlb, l_tlc, l_tld, l_tle))
+                                                l_tl_conc = [f'{u} {v} {w} {x} {y}' for u, v, w, x, y in l_tl_zip]
+                                                l_wfw_dict[l_longest] = (l_tl + l_tl_conc, l_ts.union(set(l_tl_conc)))
+                                                if len(l_tla) < l_max_repeats: del l_wfw_dict[a]
+                                                if len(l_tlb) < l_max_repeats: del l_wfw_dict[b]
+                                                if len(l_tlc) < l_max_repeats: del l_wfw_dict[c]
+                                                if len(l_tld) < l_max_repeats: del l_wfw_dict[d]
+                                                if len(l_tle) < l_max_repeats: del l_wfw_dict[e]
+                                                print(f'FOUND INCLUSION: {a} {b} {c} {d} {e} --> {l_longest} {l_wfw_dict[l_longest]}')
+
+                                                l_key_list = [l_key_list[n] for n in range(len(l_key_list)) if n not in [0, i+1, j+1, k+1, l+1, m+1]]
+                                                print(f'    l_key_list: {l_key_list}')
+
+                                                l_found_6 = True
+
+                    if not (l_found_6 or l_found_5 or l_found_4 or l_found_3 or l_found_2):
+                        print('POPPING')
+                        l_key_list.pop(0)
+
+
+            print('====================== Combined dict ================================================================')
+            for k in sorted(l_wfw_dict.keys()):
+                l_tl, l_ts = l_wfw_dict[k]
+                print(f'{k:30} ({len(l_tl)}) {"/".join(list(l_ts))} {l_tl}')
+            print('=====================================================================================================')
+
+            # ######################################### INRIA Grammar from l_sk ########################################
             # get grammatical analysis from INRIA
             l_wfw_inria_list = inria_sloka_words(l_chap_number, l_verse_number, l_sk)
+            l_wfw_new = []
             for l_wfw_inria in l_wfw_inria_list:
+                if 'unknown-form' in str(l_wfw_inria['morph']):
+                    print(f'!!!!! {l_wfw_inria}')
+
+                    l_form = l_wfw_inria['form']
+                    l_split = True
+                    #                     if l_chap_number == 1 and l_verse_number == 25 and l_wfw_inria['form'] == 'paśyaitānsamavetānkuruniti':
+                    #                         l_form = 'paśyaitānsamavetānkurun iti'
+                    #                         l_split = False
+
+                    l_form_cleansed = devtrans.iast2dev(
+                        re.sub(r'\s+', ' ',
+                               re.sub(r'[\W_]', ' ', l_form))).strip()
+                    # True at end indicates that it is a fragment and not a full verse (for cache handling)
+                    for l_frag in l_form_cleansed.split(' ') if l_split else [l_form_cleansed] :
+                        l_wfw_inria_alt = inria_sloka_words(l_chap_number, l_verse_number, l_frag, True)
+
+                        l_wfw_new += l_wfw_inria_alt
+                        print(f'    {devtrans.dev2iast(l_frag)}/{l_frag} --> {l_wfw_inria_alt}')
+                        for f in l_wfw_inria_alt:
+                            print('INRIA:', f)
+                else:
+                    print('INRIA:', l_wfw_inria)
+                    l_wfw_new.append(l_wfw_inria)
+
+            l_wfw_inria_list = sorted(l_wfw_new, key=lambda l_element: f'{len(l_element["form"]):04}-{l_element["form"]}', reverse=True)
+            print('After Sort:')
+            l_wfw_new = []
+            for l_wfw_inria in l_wfw_inria_list:
+                if l_chap_number == 1 and l_verse_number == 3 and l_wfw_inria['form'] == 'putrāṇām':
+                    l_wfw_inria['form-simplified'] = 'putrānām'
+                elif l_chap_number == 1 and l_verse_number == 7 and l_wfw_inria['form'] == 'sañjñā':
+                    l_wfw_inria['form-simplified'] = 'saṁjñā'
+                elif l_chap_number == 1 and l_verse_number == 12 and l_wfw_inria['form'] == 'siṃha':
+                    l_wfw_inria['form-simplified'] = 'siṁha'
+                elif l_chap_number == 1 and l_verse_number == 19 and l_wfw_inria['form'] == 'abhī':
+                    l_wfw_inria['form-simplified'] = 'abhy'
+                elif l_chap_number == 1 and l_verse_number == 29 and l_wfw_inria['form'] == 'sraṃsate':
+                    l_wfw_inria['form-simplified'] = 'sraṁsate'
+                else:
+                    l_wfw_inria['form-simplified'] = l_wfw_inria['form']
+                l_wfw_new.append(l_wfw_inria)
                 print('INRIA:', l_wfw_inria)
+            l_wfw_inria_list = l_wfw_new
 
             # ISKCON wfw print for comparison purposes
-            for l_wfw_iskcon in l_wfw_iskcon_list:
-                print(l_wfw_iskcon)
+            for l_wfw_iskcon_string in l_wfw_iskcon_list:
+                print(l_wfw_iskcon_string)
 
             # matching INRIA morphology with wfw translation
-            l_matching_list = [(k, k, t, []) for k, t in l_wfw_iskcon_list]
+            l_matching_list = [(k.lower(), k, t, []) for k, t in l_wfw_iskcon_list]
             for l_wfw_inria in l_wfw_inria_list:
-                l_form_inria = l_wfw_inria['form']
+                l_form_inria = l_wfw_inria['form-simplified']
 
                 l_matching_list_new = []
                 for l_consumable_key_wfw, k, t, l_morph_list in l_matching_list:
@@ -847,7 +1301,21 @@ if __name__ == '__main__':
 
                 l_matching_list = l_matching_list_new
 
-            l_wfw_list = [(k, t, m) for _, k, t, m in l_matching_list]
+            l_wfw_list = []
+            for l_consumable_key, k, t, m in l_matching_list:
+                l_key_cleansed = re.sub(r'\W', '',
+                                        re.sub(r'(^|\W)\w(\W|$)', '', l_consumable_key)
+                                        ).strip()
+                print(f'[{l_consumable_key:20}] {k:20} ({l_key_cleansed}) {t} {m}')
+                if len(l_key_cleansed) > 0:
+                    if re.match('[A-Z]', t[0]):
+                        l_wfw_list.append((k, t, [{'form': t.lower(), 'morph': [[[{'entry': t.lower()}], {'grammar-list': ['NPPPN', 'CSNOM-GMASC-NSING']}]]}]))
+                    else:
+                        print('Non-empty l_consumable_key')
+                        # sys.exit(0)
+                else: l_wfw_list.append((k, t, m))
+
+            # l_wfw_list = [(k, t, m) for _, k, t, m in l_matching_list]
 
             print(f'--------------------- {l_chap_number}.{l_verse_number} --------------------------------')
             for k, t, m in l_wfw_list:
@@ -856,6 +1324,7 @@ if __name__ == '__main__':
                     print(f"    {d['form']}", file=sys.stderr)
                     print_im(d['morph'], p_depth=1, p_out=sys.stderr)
 
+            # ######################################### TEI Output #####################################################
             # start of TEI output for this sloka +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             # start of sloka block (<div2>)
             l_bg_chapters_xml += f'{l_indent_prefix}<div2 type="sloka-block" n="{l_verse_number}" xml:id="{l_verse_id}">\n'
