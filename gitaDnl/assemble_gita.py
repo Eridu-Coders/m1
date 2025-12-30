@@ -151,6 +151,12 @@ g_gs_cochonneries = [ # saṃjayan
 
 g_wfw_allowed_empty = ['1.47']
 
+# श्िच
+def deva_correct(s):
+    return (s
+            .replace('श्िच', 'श्चि')
+            .replace(':', 'ः'))
+
 def author_normalize(p_author):
     if p_author in g_author_normalize.keys():
         return g_author_normalize[p_author]
@@ -244,8 +250,6 @@ def store_grammar_values(p_gv_list):
             g_grammar_abbr_dict.setdefault(l_grabr, set()).add(l_gv)
 
     return p_gv_list
-
-import random
 
 def group_near_identical(p_grammar_values_split):
     l_grammar_values_split = p_grammar_values_split
@@ -449,7 +453,10 @@ def inria_sloka_words(p_chap_number, p_sloka_num, p_sloka_txt, p_is_fragment=Fal
             '&t=VH&topic=&mode=g&corpmode=&corpdir=&sentno='
 
     l_url = l_url.replace(' ', '+').replace('.a', '%27').replace('\u200c', '').replace('\u200d', '')
-    l_inria_cache_path = f'cache/inria_{re.sub(r"[^a-z]", "_", l_velthuis_text)}.html' if p_is_fragment else f'cache/inria_{p_chap_number}_{p_sloka_num}.html'
+    l_verse_id_tag = f'{p_chap_number}_{p_sloka_num}'
+    # re.sub(r"[^a-z]", "_",
+    l_inria_cache_path = f'inria_cache/inria_{l_verse_id_tag}_{devtrans.dev2iast(l_deva_txt)}.html' \
+        if p_is_fragment else f'cache/inria_{l_verse_id_tag}.html'
     print(f'l_deva_txt:         [{l_deva_txt}]')
     print(f'l_txt_devtrans:     [{l_txt_devtrans}]')
     print(f'l_velthuis_text:    [{l_velthuis_text}]')
@@ -457,12 +464,13 @@ def inria_sloka_words(p_chap_number, p_sloka_num, p_sloka_txt, p_is_fragment=Fal
     l_url_disp = l_url.replace('&t', '\n&t')
     print(f'l_url:\n{l_url_disp}')
 
+    l_frag_indicator = f' (fragment: {devtrans.dev2iast(l_deva_txt)})' if p_is_fragment else ''
     if os.path.exists(l_inria_cache_path):
-        print(f'Loading inria for v. {p_sloka_num} from cache')
+        print(f'Loading inria for v. {p_chap_number}.{p_sloka_num}{l_frag_indicator} from cache')
         with open(l_inria_cache_path, 'r', encoding='utf-8') as l_f_inria:
             l_html = l_f_inria.read()
     else:
-        print(f'Downloading inria v. {p_chap_number}.{p_sloka_num}')
+        print(f'Downloading inria v. {p_chap_number}.{p_sloka_num}{l_frag_indicator}')
 
         l_page = urllib.request.urlopen(l_url)
 
@@ -516,7 +524,6 @@ def inria_sloka_words(p_chap_number, p_sloka_num, p_sloka_txt, p_is_fragment=Fal
 
     print(f'-------------------------------------------------------------------------------------------------------------')
     return l_word_list
-
 
 # ------------- main() -------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
@@ -585,7 +592,7 @@ if __name__ == '__main__':
                 l_sk_gs = re.sub(r'\s+', ' ',
                                  re.sub(r'(<br\s*/>)+', '<br/>',
                                         re.sub(r'>\s+<', '><',
-                                               l_match_sk.group(1).replace('।।', '॥')
+                                               deva_correct(l_match_sk.group(1)).replace('।।', '॥')
                                                )
                                         )
                                  ).strip()
@@ -620,7 +627,7 @@ if __name__ == '__main__':
 
             # top-level attributes
             # sanskrit text
-            l_sk_api_online = universal_cleanup(l_json_verse['text'])
+            l_sk_api_online = deva_correct(universal_cleanup(l_json_verse['text']))
             # IAST transliteration
             l_translit = universal_cleanup(l_json_verse['transliteration'])
             # Word-for-Word translation (API version) kapidvajaḥ
@@ -646,8 +653,8 @@ if __name__ == '__main__':
                 print('=============================================', l_local_file)
                 l_json_local = json.load(l_f_local_json)
 
-                l_sk_api_local = l_json_local['slok']
-                l_translit_local = l_json_local['transliteration']
+                l_sk_api_local = deva_correct(universal_cleanup(l_json_local['slok']))
+                l_translit_local = universal_cleanup(l_json_local['transliteration'])
 
                 l_source = "Kaggle/Bhagavad Gita API Database"
                 for k in l_json_local:
@@ -791,7 +798,7 @@ if __name__ == '__main__':
                 # <div class="em-mb-4 em-leading-8 em-text-lg text-center">धृतराष्ट्र उवाच<br>धर्मक्षेत्रे कुरुक्षेत्रे समवेता युयुत्सव: ।<br>मामका: पाण्डवाश्चैव किमकुर्वत सञ्जय ॥ १ ॥</div>
                 l_match_sk_iskcon = re.search(r'<div class="em-mb-4 em-leading-8 em-text-lg text-center">(.*?)</div>', l_html_iskcon)
                 if l_match_sk_iskcon:
-                    l_sk_iskcon = l_match_sk_iskcon.group(1).replace(':', 'ः').strip()
+                    l_sk_iskcon = deva_correct(universal_cleanup(l_match_sk_iskcon.group(1)))
                     # <div class="em-mb-4 em-leading-8 em-text-base text-center italic"><em>dhṛtarāṣṭra uvāca</em><br>dharma-kṣetre kuru-kṣetre<br>samavetā yuyutsavaḥ<br>māmakāḥ pāṇḍavāś caiva<br>kim akurvata sañjaya</div></div>
 
                 l_match_trl_iskcon = re.search(r'<div class="em-mb-4 em-leading-8 em-text-base text-center italic">(.*?)</div>', l_html_iskcon)
@@ -945,6 +952,7 @@ if __name__ == '__main__':
                         .replace('rṛ', 'ṛ') #
                         .replace('jirṇāni', 'jīrṇāni')
                         .replace('niśicataṃ', 'niścitaṃ')
+                        .replace('śribhagavān', 'śrībhagavān')
                         .replace('m-j', 'ñj')
                         .replace('t-a', 'da')
                         .replace('ch', 'c')
@@ -955,19 +963,22 @@ if __name__ == '__main__':
                         .replace('śh', 'ś')
                         .replace('ch', 'c')
                         .replace('ṣh', 'ṣ')
+                        .replace('ऽऽ', 'ऽ')
                         .replace('-', '')
                         # .replace('bhīmābhirakṣitam','bhīṣmābhirakṣitam') TODO review this (sl 1.10) abhirakṣitam? bhīmābhirakṣitam?
                         )
                      .replace('puruṣariṣabha', 'puruṣarṣabha')
                      .replace('bharatariṣabha', 'bharatarṣabha')) # puruṣariṣabha
 
-            def simplify_iast(s): # ank
+            def simplify_iast(s): # ans
                 return (s
                         .replace('ṃm', 'mm')
                         .replace('ṇ', 'n')
                         .replace('anjñ', 'aṃjñ')
                         .replace('inh', 'iṃh')
                         .replace('ank', 'aṃk')
+                        .replace('ans', 'aṃs')
+                        .replace('ānt', 'āṃt')
                         .replace('anj', 'añj')
                         .replace('aṃj', 'añj')
                         .replace('ṃ', 'm')
@@ -988,6 +999,7 @@ if __name__ == '__main__':
                 for l_item in l_wfw_api_list:
                     print(l_item)
                 sys.exit(0)
+
             for k, t in l_wfw_dict.items():
                 print(f'AP {k:35}', t)
 
@@ -1299,92 +1311,139 @@ if __name__ == '__main__':
             l_iast_sk = l_iast_sk.replace(' ', '')
             print('l_iast_sk (no_space):         ', l_iast_sk)
 
-            l_place_dict = dict()
             #             for k in l_key_list:
             #                 l_km = simplify_iast(k)
             #                 l_sk_to_test = simplify_iast(l_iast_sk)
             #                 print(f'{l_km:30} {l_sk_to_test} {"*" if l_km in l_sk_to_test else ""}')
 
-            def add_candidates(p_k):
-                l_list_candidate = [p_k,  # cet
-                                    re.sub(r' cet', r'cait', p_k),
-                                    re.sub(r'( |^)e', r'\1i', p_k),
-                                    re.sub(r'( |^)a', r'\1ā', p_k),
-                                    re.sub(r'( |^)a', r'\1', p_k),
-                                    re.sub(r'( |^)a', r'\1ऽ', p_k),
-                                    re.sub(r' a', r'ऽ', p_k),
-                                    re.sub(r'^a', r'ऽ', p_k),
-                                    re.sub(r'( |^)ā', r'\1ऽ', p_k),
-                                    re.sub(r' ā', r'ऽ', p_k),
-                                    re.sub(r'^ā', r'ऽ', p_k),
-                                    re.sub(r'( |^)ś', r'\1c', p_k),
-                                    re.sub(r'( |^)ś', r'\1', p_k),
-                                    re.sub(r'( |^)u', r'\1o', p_k),
-                                    re.sub(r'( |^)i', r'\1e', p_k),
-                                    re.sub(r'( |^)ī', r'\1e', p_k),
-                                    re.sub(r'( |^)i', r'\1ī', p_k),
-                                    re.sub(r'( |^)ī', r'\1ī', p_k),
+            def add_candidates_alt(p_k):
+                l_list_candidate = [ #
+                    re.sub(r'( |^)o(.)', r'\1u\2', p_k),
+                    re.sub(r'( |^)ṛ(.)', r'\1r\2', p_k),
+                    re.sub(r'( |^)ā(.)', r'\1\2', p_k),
+                    re.sub(r'(.)au( |$)', r'\1ā\2', p_k),
+                    re.sub(r'(.)m( |$)', r'\1n\2', p_k),
+                ]
+                return list(set(l_list_candidate))
 
-                                    re.sub(r'e( |$)', r'a\1', p_k),
-                                    re.sub(r'a( |$)', r'\1', p_k),
-                                    re.sub(r'ā( |$)', r'a\1', p_k),
-                                    re.sub(r'au( |$)', r'āv\1', p_k),
-                                    re.sub(r'u( |$)', r'v\1', p_k),
-                                    re.sub(r'i( |$)', r'y\1', p_k),
-                                    re.sub(r'i( |$)', r'\1', p_k),
-                                    re.sub(r'ḥ( |$)', r'ś\1', p_k),
-                                    re.sub(r'ḥ( |$)', r's\1', p_k),
-                                    re.sub(r'ḥ( |$)', r'r\1', p_k),
-                                    re.sub(r'ḥ( |$)', r'\1', p_k),
-                                    re.sub(r'aḥ( |$)', r'o\1', p_k),
-                                    re.sub(r'm( |$)', r'ṃ\1', p_k),
-                                    re.sub(r'm ', r'ṃ ', p_k),
-                                    re.sub(r'm$', r'ṃ', p_k),
+            def add_candidates(p_k):
+                l_list_candidate = [p_k,
+                                    # Initial vowels
+                                    re.sub(r' cet', r'cait', p_k),
+                                    re.sub(r'( |^)e(.)', r'\1i\2', p_k),
+                                    re.sub(r'( |^)a(.)', r'\1ā\2', p_k),
+                                    re.sub(r'( |^)a(.)', r'\1\2', p_k),
+                                    re.sub(r'( |^)a(.)', r'\1ऽ\2', p_k),
+                                    re.sub(r' a(.)', r'ऽ\1', p_k),
+                                    re.sub(r'^a(.)', r'ऽ\1', p_k),
+                                    re.sub(r'( |^)ā(.)', r'\1ऽ\2', p_k),
+                                    re.sub(r' ā(.)', r'ऽ\1', p_k),
+                                    re.sub(r'^ā(.)', r'ऽ\1', p_k),
+                                    re.sub(r'( |^)u(.)', r'\1o\2', p_k),
+                                    re.sub(r'( |^)u(.)', r'\1ū\2', p_k),
+                                    re.sub(r'( |^)i(.)', r'\1e\2', p_k),
+                                    re.sub(r'( |^)ī(.)', r'\1e\2', p_k),
+                                    re.sub(r'( |^)i(.)', r'\1ī\2', p_k),
+                                    re.sub(r'( |^)ī(.)', r'\1ī\2', p_k),
+
+                                    # initial consonants
+                                    re.sub(r'( |^)ś(.)', r'\1c\2', p_k),
+                                    re.sub(r'( |^)ś(.)', r'\1\2', p_k),
+                                    re.sub(r'( |^)c(.)', r'\1\2', p_k),
+                                    re.sub(r'( |^)r(.)', r'\1\2', p_k),
+
+                                    # final vowels
+                                    re.sub(r'(.)e( |$)', r'\1a\2', p_k),
+                                    re.sub(r'(.)a( |$)', r'\1\2', p_k),
+                                    re.sub(r'(.)ā( |$)', r'\1a\2', p_k),
+                                    re.sub(r'(.)au( |$)', r'\1āv\2', p_k),
+                                    re.sub(r'(.)u( |$)', r'\1v\2', p_k),
+                                    re.sub(r'(.)u( |$)', r'\1\2', p_k),
+                                    re.sub(r'(.)i( |$)', r'\1y\2', p_k),
+                                    re.sub(r'(.)i( |$)', r'\1\2', p_k),
+
+                                    # final consonants
+                                    re.sub(r'(.)ḥ( |$)', r'\1ś\2', p_k),
+                                    re.sub(r'(.)ḥ( |$)', r'\1s\2', p_k),
+                                    re.sub(r'(.)ḥ( |$)', r'\1r\2', p_k),
+                                    re.sub(r'(.)ḥ( |$)', r'\1\2', p_k),
+                                    re.sub(r'(.)aḥ( |$)', r'\1o\2', p_k),
+                                    re.sub(r'(.)m( |$)', r'\1ṃ\2', p_k),
+                                    re.sub(r'(.)m ', r'\1ṃ ', p_k),
+                                    re.sub(r'(.)m$', r'\1ṃ', p_k),
+                                    re.sub(r'(.)n( |$)', r'\1ṃ\2', p_k),
                                     re.sub(r'(.)n( |$)', r'\1ṃs\2', p_k),
                                     re.sub(r'(.)n( |$)', r'\1ṃś\2', p_k),
                                     # re.sub(r'n( |$)', r'nn\1', p_k),
-                                    re.sub(r't( |$)', r'd\1', p_k),
-                                    re.sub(r't( |$)', r'j\1', p_k),
-                                    re.sub(r't( |$)', r'n\1', p_k),
-                                    re.sub(r'd( |$)', r'c\1', p_k),
+                                    re.sub(r'(.)t( |$)', r'\1d\2', p_k),
+                                    re.sub(r'(.)t( |$)', r'\1j\2', p_k),
+                                    re.sub(r'(.)t( |$)', r'\1n\2', p_k),
+                                    re.sub(r'(.)d( |$)', r'\1c\2', p_k),
                                     ]
                 return list(set(l_list_candidate))
 
+            l_verse_tag = f'{l_chap_number}.{l_verse_number}'
             l_mod_key_list = []
             for l_key in l_key_list:
+                # indriyasya indriyasya 3.34
+                if l_verse_tag == '3.34' and l_key == 'indriyasya indriyasya':
+                    l_key = 'indriyasya'
+                    l_wfw_dict[l_key] = (['of the senses'], {'of the senses'})
+
                 l_list_ck_1 = list(set(add_candidates(l_key) + add_candidates(iast_cleanup(re.sub(r'\s+', '-', l_key)))))
+                l_list_ck_1 = [l_km for l_km in l_list_ck_1 if len(l_km) > 0]
 
                 l_list_ck_2 = []
                 for l_kc in l_list_ck_1:
                     l_list_ck_2 += add_candidates(l_kc)
+                l_list_ck_2 = [l_km for l_km in l_list_ck_2 if len(l_km) > 0]
 
                 l_list_ck_3 = list(set(l_list_ck_2))
 
                 for l_km in l_list_ck_3:
                     l_mod_key_list.append((l_key, l_km.replace(' ', '')))
 
-            l_mod_key_list = sorted(l_mod_key_list, key=lambda p: f'{len(p[1]):03}-{p[1]}', reverse=True)
+            l_mod_key_list_1 = sorted(l_mod_key_list, key=lambda p: f'{len(p[1]):03}-{p[1]}', reverse=True)
+            l_mod_key_list_2 = sorted(l_mod_key_list, key=lambda p: f'{999-len(p[1]):03}-{p[1]}')
             #             for l_key, l_km in l_mod_key_list:
             #                 print(f'{l_key:30} {l_km}')
 
-            for l_key, l_km in l_mod_key_list:
-                l_sk_to_test = ''
-                #l_km = l_km.replace(' ', '')
-                if l_km in l_iast_sk:
-                    l_sk_to_test = l_iast_sk
-                elif simplify_iast(l_km) in simplify_iast(l_iast_sk):
-                    l_km = simplify_iast(l_km)
-                    l_sk_to_test = simplify_iast(l_iast_sk)
+            l_place_dict = dict()
+            l_list_no = 1
+            for l_mod_key_list in [l_mod_key_list_1, l_mod_key_list_2]:
+                l_place_dict = dict()
+                l_iast_sk_work = l_iast_sk
+                for l_key, l_km in l_mod_key_list:
+                    l_sk_to_test = ''
+                    #l_km = l_km.replace(' ', '')
+                    if l_km in l_iast_sk_work:
+                        l_sk_to_test = l_iast_sk_work
+                    elif simplify_iast(l_km) in simplify_iast(l_iast_sk_work):
+                        l_km = simplify_iast(l_km)
+                        l_sk_to_test = simplify_iast(l_iast_sk_work)
 
-                if len(l_iast_sk) != len(l_sk_to_test):
-                    continue
+                    # if l_km == 'sampaśyan':
+                    #     print(f'{l_km:30} {simplify_iast(l_iast_sk)} <<<<<<<<')
+
+                    if len(l_iast_sk_work) != len(l_sk_to_test):
+                        continue
+                    else:
+                        for l_find in re.finditer(l_km, l_sk_to_test):
+                            l_place_dict.setdefault(l_key, []).append(l_find.start())
+                            l_iast_sk_work = l_iast_sk_work[0:l_find.start()] + '_' * len(l_find.group(0)) + l_iast_sk_work[l_find.end():]
+
+                            print(f'{l_key:30} {l_iast_sk_work} ({l_km})')
+                            l_key_found = True
+
+                l_remainder_sk = l_iast_sk_work.replace('_', '').strip()
+                if len(l_remainder_sk) > 0 and l_verse_tag not in ['1.21', '2.31', '3.36', '2.10', '1.28']:
+                    if l_list_no == 1:
+                        print('**RESTART**')
+                        l_list_no += 1
+                    else:
+                        print('**REMAINDER**')
                 else:
-                    for l_find in re.finditer(l_km, l_sk_to_test):
-                        l_place_dict.setdefault(l_key, []).append(l_find.start())
-                        l_iast_sk = l_iast_sk[0:l_find.start()] + '_' * len(l_find.group(0)) + l_iast_sk[l_find.end():]
-
-                        print(f'{l_key:30} {l_iast_sk} ({l_km})')
-                        l_key_found = True
+                    break
 
             l_place_list = []
             for k, v in l_place_dict.items():
@@ -1393,8 +1452,121 @@ if __name__ == '__main__':
             # print(l_place_list)
             l_place_list = sorted(l_place_list, key=lambda x: x[1])
             for k, v in l_place_list:
-                print(f'{k:30} {v:3} {l_breakup_dict[k] if k in l_breakup_dict.keys() else ""}')
+                print(f'{k:30} {v:3} {f"B {l_breakup_dict[k]} " if k in l_breakup_dict.keys() else ""}F {l_wfw_dict[k]}')
             print('=====================================================================================================')
+
+            # ######################################### INRIA Grammar from wfw ########################################
+            l_wfw_with_inria_list = []
+            for k, _ in l_place_list:
+                l_breakup = l_breakup_dict.setdefault(k, None)
+                l_tl, l_ts = l_wfw_dict[k]
+                # print(f'{k:30} {"|".join(list(l_ts))}{f"{l_breakup}" if l_breakup else ""}')
+
+                if l_breakup is None:
+                    l_wfw_inria_list = inria_sloka_words(l_chap_number, l_verse_number, devtrans.iast2dev(k), p_is_fragment=True)
+                else:
+                    l_wfw_inria_list = []
+                    for l_w_sk, _ in l_breakup:
+                        l_wfw_inria_list += inria_sloka_words(l_chap_number, l_verse_number, devtrans.iast2dev(l_w_sk), p_is_fragment=True)
+                # print(l_wfw_inria_list)
+                l_wfw_with_inria_list.append((k, "|".join(list(l_ts)), l_breakup, l_wfw_inria_list))
+
+            print('====================== WFW + INRIA ==================================================================')
+            l_new_wfw_list = []
+            for l_sk_word, l_meaning, l_breakup, l_wfw_inria_list in l_wfw_with_inria_list:
+                l_grammar_dict = dict()
+                for l_inria_gr in l_wfw_inria_list:
+                    # print(f'    {l_inria_gr}')
+                    l_form = l_inria_gr['form'].replace('_', ' ')
+                    if 'unknown-form' in str(l_inria_gr['morph']):
+                        l_grammar_dict[l_form] = [['**no lemma**', '**no reference**', '**no POS tag**', '**no analysis**']]
+                    else:
+                        for l_alternative in l_inria_gr['morph']:
+                            l_ll, l_gl = extract_im(l_alternative)
+                            L_lemma = '-'.join([l_lem for l_lem, _ in l_ll if len(l_lem) > 0])
+                            L_dict_ref = '|'.join([l_dr for _, l_dr in l_ll if len(l_dr) > 0])
+                            l_grammar_dict.setdefault(l_form, []).append([L_lemma, L_dict_ref] + l_gl)
+                            # print(f'    {l_form} {l_ll} {l_gl}')
+                print(f'{l_sk_word}: {l_meaning}{f" {l_breakup}" if l_breakup else ""} {l_wfw_inria_list} {l_grammar_dict}')
+
+                l_form_list = sorted(l_grammar_dict.keys(), key=lambda s: f'{len(s)}-{s}', reverse=True)
+                l_mod_key_list = []
+                for l_form in l_form_list:
+                    print(f'    {l_form:20} {l_grammar_dict[l_form]}')
+
+                for l_form in l_form_list:
+                    l_list_ck_1 = list(set(add_candidates(l_form) +
+                                           add_candidates(iast_cleanup(re.sub(r'\s+', '-', l_form))) +
+                                           add_candidates_alt(l_form)
+                                           )
+                                       )
+                    l_list_ck_1 = [l_km for l_km in l_list_ck_1 if len(l_km) > 0]
+
+                    l_list_ck_2 = []
+                    for l_kc in l_list_ck_1:
+                        l_list_ck_2 += (add_candidates(l_kc) + add_candidates_alt(l_kc))
+                    l_list_ck_2 = [l_km for l_km in l_list_ck_2 if len(l_km) > 0]
+
+                    l_list_ck_3 = list(set(l_list_ck_2))
+
+                    l_mod_key_list += [(l_form, l_km) for l_km in l_list_ck_3]
+                    # for l_km in l_list_ck_3:
+                    #    l_mod_key_list.append((l_form, l_km.replace(' ', '')))
+
+                l_mod_key_list_1 = sorted(l_mod_key_list, key=lambda p: f'{len(p[1]):03}-{p[1]}', reverse=True)
+                l_mod_key_list_2 = sorted(l_mod_key_list, key=lambda p: f'{999 - len(p[1]):03}-{p[1]}')
+                if l_sk_word == 'dhṛtarāṣṭraḥ uvāca':
+                    for s in l_mod_key_list_1:
+                        print(s)
+
+                l_place_dict = dict()
+                l_list_no = 1
+                l_components_list = []
+                for l_mod_key_list in [l_mod_key_list_1, l_mod_key_list_2]:
+                    l_place_dict = dict()
+                    l_iast_sk_work = l_sk_word
+                    for l_key, l_km in l_mod_key_list:
+                        l_sk_to_test = ''
+                        # l_km = l_km.replace(' ', '')
+                        if l_km in l_iast_sk_work:
+                            l_sk_to_test = l_iast_sk_work
+                        elif simplify_iast(l_km) in simplify_iast(l_iast_sk_work):
+                            l_km = simplify_iast(l_km)
+                            l_sk_to_test = simplify_iast(l_iast_sk_work)
+
+                        # if l_km == 'sampaśyan':
+                        #     print(f'{l_km:30} {simplify_iast(l_iast_sk)} <<<<<<<<')
+
+                        if len(l_iast_sk_work) != len(l_sk_to_test):
+                            continue
+                        else:
+                            for l_find in re.finditer(l_km, l_sk_to_test):
+                                l_place_dict.setdefault(l_key, []).append(l_find.start())
+                                l_iast_sk_work = l_iast_sk_work[0:l_find.start()] + '_' * len(
+                                    l_find.group(0)) + l_iast_sk_work[l_find.end():]
+
+                                l_components_list.append((l_key, l_grammar_dict[l_key]))
+                                print(f'    {l_key:20} {l_iast_sk_work} ({l_km})')
+
+                    l_remainder_sk = l_iast_sk_work.replace('_', '').strip()
+                    if len(l_remainder_sk) > 0:
+                        if l_list_no == 1:
+                            print('**RESTART**')
+                            l_list_no += 1
+                        else:
+                            print('**REMAINDER**')
+                    else:
+                        break
+
+                l_new_wfw_list.append((l_sk_word, l_meaning, l_components_list))
+                for l_key, l_grammar_list in l_components_list:
+                    print(f'--> {l_key:20} {l_grammar_list}')
+
+            print('====================== NEW WFW FINAL ================================================================')
+            for l_sk_word, l_meaning, l_components_list in l_new_wfw_list:
+                print(f'{l_sk_word}: {l_meaning}')
+                for l_component_form, l_grammar_list in l_components_list:
+                    print(f'    {l_component_form:20} {l_grammar_list}')
 
             # ######################################### INRIA Grammar from l_sk ########################################
             # get grammatical analysis from INRIA
@@ -1512,9 +1684,11 @@ if __name__ == '__main__':
             l_bg_chapters_xml += f'{l_indent_prefix}<seg type="transliteration" standard="IAST">{l_translit_gs}</seg>\n'
 
             # Adding WfW block to TEI file
+            # OLD VERSION
             # start of wfw block (<div3>)
+            l_wfw_block_1 = ''
             l_empty_indicator = f'subtype="empty" ' if len(l_wfw_list) == 0 and f'{l_chap_number}.{l_verse_number}' in g_wfw_allowed_empty else ''
-            l_bg_chapters_xml += f'{l_indent_prefix}<div3 type="wfw-block" {l_empty_indicator}xml:id="{l_verse_id}_wfw">\n'
+            l_wfw_block_1 += f'{l_indent_prefix}<div3 type="wfw-block" {l_empty_indicator}xml:id="{l_verse_id}_wfw">\n'
             g_prefix_stack.append(l_indent_prefix)
             l_indent_prefix += g_indent
 
@@ -1567,7 +1741,7 @@ if __name__ == '__main__':
                 l_interp_list_join = ''.join(l_interp_list)
                 t = re.sub(rf'\s+([.?:;!])', r'\1', t)
 
-                l_bg_chapters_xml += (f'{l_indent_prefix}<seg type="wfw-unit">{devtrans.iast2dev(k)}\n'
+                l_wfw_block_1 += (f'{l_indent_prefix}<seg type="wfw-unit">{devtrans.iast2dev(k)}\n'
                                f'{l_indent_prefix}    <interp type="transliteration" source="ISKCON" standard="IAST">{k}</interp>\n'
                                f'{l_indent_prefix}    <interp type="transliteration" source="INRIA" standard="IAST">{l_form}</interp>\n'
                                f'{l_indent_prefix}    <interp type="translation" source="ISKCON">{t}</interp>\n'
@@ -1576,10 +1750,62 @@ if __name__ == '__main__':
                                f'{l_indent_prefix}    </interpGrp>\n'
                                f'{l_indent_prefix}</seg>\n')
 
-            # end of wfw block (<div3>)
-            l_bg_chapters_xml += f'{l_indent_prefix}<!-- End of wfw block for {l_verse_id} -->\n'
+            # end of OLD VERSION wfw block (<div3>)
+            l_wfw_block_1 += f'{l_indent_prefix}<!-- End of wfw block for {l_verse_id} -->\n'
             l_indent_prefix = g_prefix_stack.pop()
-            l_bg_chapters_xml += f'{l_indent_prefix}</div3>\n'
+            l_wfw_block_1 += f'{l_indent_prefix}</div3>\n'
+
+            # Adding WfW block to TEI file
+            # NEW VERSION
+            # start of wfw block (<div3>)
+            l_wfw_block_2 = ''
+            l_empty_indicator = f'subtype="empty" ' if len(l_new_wfw_list) == 0 and f'{l_chap_number}.{l_verse_number}' in g_wfw_allowed_empty else ''
+            l_wfw_block_2 += f'{l_indent_prefix}<div3 type="wfw-block" {l_empty_indicator}xml:id="{l_verse_id}_wfw">\n'
+            g_prefix_stack.append(l_indent_prefix)
+            l_indent_prefix += g_indent
+
+            for l_sk_word, l_meaning, l_components_list in l_new_wfw_list:
+                # print(f'{l_sk_word}: {l_meaning}')
+                l_wfw_block_2 += (f'{l_indent_prefix}<seg type="wfw-unit">{devtrans.iast2dev(l_sk_word)}\n'
+                                  f'{l_indent_prefix}    <interp type="transliteration" source="ISKCON/Ved Vyas Foundation/Gita Supersite" standard="IAST">{l_sk_word}</interp>\n'
+                                  # f'{l_indent_prefix}    <interp type="transliteration" source="INRIA" standard="IAST">{l_form}</interp>\n'
+                                  f'{l_indent_prefix}    <interp type="translation" source="ISKCON/Ved Vyas Foundation/Gita Supersite">{l_meaning}</interp>\n'
+                                  f'{l_indent_prefix}    <interpGrp type="morphology" source="INRIA">\n')
+
+                for l_component_form, l_grammar_list in l_components_list:
+                    l_lemma_set = set()
+                    l_ref_set = set()
+                    l_pos_set = set()
+                    l_ana_set = set()
+                    for l_g_value in l_grammar_list:
+                        l_lemma, l_ref, l_pos = l_g_value[0:3]
+                        l_analysis = '|'.join(l_g_value[3:])
+
+                        if l_pos == '__IND':
+                            l_pos = 'NPADV' if 'ADV' in l_analysis else 'NPIND'
+                        elif l_pos == '__VOC':
+                            l_pos = 'NPNON'
+
+                        l_lemma_set.add(l_lemma)
+                        l_ref_set.add(l_ref)
+                        l_pos_set.add(l_pos)
+                        l_ana_set.add(l_analysis)
+                    l_wfw_block_2 += (f'{l_indent_prefix}        <interp type="morphology" '
+                                      f'lemma="{"॥".join(l_lemma_set)}" '
+                                      f'pos="{"॥".join(l_pos_set)}" lemmaRef="{"॥".join(l_ref_set)}" '
+                                      f'msd="{"॥".join(l_ana_set)}">{l_component_form}</interp>\n')
+                    # print(f'    {l_component_form:20} {l_grammar_list}')
+
+                l_wfw_block_2 += (f'{l_indent_prefix}    </interpGrp>\n'
+                                  f'{l_indent_prefix}</seg>\n')
+
+            # end of OLD VERSION wfw block (<div3>)
+            l_wfw_block_2 += f'{l_indent_prefix}<!-- End of wfw block for {l_verse_id} -->\n'
+            l_indent_prefix = g_prefix_stack.pop()
+            l_wfw_block_2 += f'{l_indent_prefix}</div3>\n'
+
+            # l_bg_chapters_xml += l_wfw_block_1
+            l_bg_chapters_xml += l_wfw_block_2
 
             # Adding Translations to TEI file
             # start of translations block (<div3>)
