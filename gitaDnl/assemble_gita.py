@@ -701,7 +701,7 @@ if __name__ == '__main__':
         l_verse_count = int(l_chap['verses_count'])
         l_chap_number = int(l_chap['chapter_number'])
 
-        if l_chap_number == 4:
+        if l_chap_number == 3:
             break
 
         # TEI chapter start (<div1>)
