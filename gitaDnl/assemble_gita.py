@@ -1914,6 +1914,16 @@ if __name__ == '__main__':
         # end of TEI file
         l_bg_file_out.write(g_footer)
 
+    with open('bg_only.xml', 'w', encoding='utf-8') as l_bg_file_out:
+        # TEI header
+        l_bg_file_out.write(g_header)
+
+        # output chapters
+        l_bg_file_out.write(l_bg_chapters_xml)
+
+        # end of TEI file
+        l_bg_file_out.write(g_footer)
+
     with open('bg_lex.xml', 'w', encoding='utf-8') as l_bg_file_out:
         # TEI header
         l_bg_file_out.write(g_header)
