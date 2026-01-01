@@ -139,13 +139,17 @@ g_author_normalize = {
 }
 
 g_gs_cochonneries = [ #
+    ('ther</b>y', 'thereby'),
     ('twic</b>orn', 'twice born'),
-    ('अर्जुन O Arjuna निर्द्वन्द्वः', 'अर्जुन O Arjuna, निर्द्वन्द्वः'),
-    ('then शङ्खाः conches', 'then? शङ्खाः conches'),
     ('som</b>ody', 'somebody'),
-    ('संजयन्', 'संजनयन्'),
     ('ric</b>all', 'rice-ball'),
     ('ass</b>led', 'assembled'),
+    ('r</b>uke', 'rebuke'),
+    ('अर्जुन O Arjuna निर्द्वन्द्वः', 'अर्जुन O Arjuna, निर्द्वन्द्वः'),
+    ('then शङ्खाः conches', 'then? शङ्खाः conches'),
+    # Does not seem to work TODO: look into this
+    # ('<b>न। मनसेति। <b><i>', '<b>न। मनसेति।</b>'),
+    ('संजयन्', 'संजनयन्'),
     ('भूरिश्रवाः।<br><br></b>&nbsp;</font>', 'भूरिश्रवाः।</font>'),
     ('परिगणयति &nbsp;<b>भवानित्यादिना।</b><br />', 'परिगणयति&nbsp;<b>भवानित्यादिना।</b></p>')
 ]
@@ -177,17 +181,17 @@ def do_deterministic_sandhi(s):
         # a/ā + o/au → au
         re.sub(r'[aā]-(o|au)', 'au',
         # i/ī + any other vowel → y + vowel
-        re.sub(r'[iī]-([aāiīuūṛṝoe])', r'y\1',
+        re.sub(r'[iī]-([aāuūṛṝoe])', r'y\1',
         # u/ū + any other vowel → v + vowel
-        re.sub(r'[uū]-([aāiīuūṛṝoe])', r'v\1',
+        re.sub(r'[uū]-([aāiīṛṝoe])', r'v\1',
         # ṛ/ṝ + any other vowel → r + vowel
-        re.sub(r'[ṛṝ]-([aāiīuūṛṝoe])', r'r\1',
+        re.sub(r'[ṛṝ]-([aāiīuūoe])', r'r\1',
         # e → ay
         re.sub(r'e-([aāiīuūṛṝoe])', r'ay\1',
         # ai → āy
         re.sub(r'ay-([aāiīuūṛṝoe])', r'āy\1',
         # o → av
-        re.sub(r'o-([aāiīuūṛṝoe])', r'av\1',
+        re.sub(r'o-([aāiīuūṛṝe])', r'av\1',
         # au → āv
         re.sub(r'au-([aāiīuūṛṝoe])', r'āv\1',
         # aḥ + voiced (non a) → o
@@ -216,7 +220,8 @@ def iast_cleanup(s):
           .replace('śribhagavān', 'śrībhagavān')
           .replace('m-j', 'ñj')
           .replace('t-a', 'da')
-          .replace('ch', 'c')
+          .replace('ch', 'c') # to़
+          .replace('to़', 'to')
           .replace('ṛ़', 'ṝ')
           .replace('ṝī', 'ṝ')
           .replace('ṛī', 'ṝ')
@@ -277,6 +282,7 @@ def add_candidates(p_k):
                         re.sub(r'( |^)ś(.)', r'\1\2', p_k),
                         re.sub(r'( |^)c(.)', r'\1\2', p_k),
                         re.sub(r'( |^)r(.)', r'\1\2', p_k),
+                        re.sub(r'( |^)l(.)', r'\1ll\2', p_k),
 
                         # final vowels
                         re.sub(r'(.)e( |$)', r'\1a\2', p_k),
@@ -300,7 +306,7 @@ def add_candidates(p_k):
                         re.sub(r'(.)n( |$)', r'\1ṃ\2', p_k),
                         re.sub(r'(.)n( |$)', r'\1ṃs\2', p_k),
                         re.sub(r'(.)n( |$)', r'\1ṃś\2', p_k),
-                        # re.sub(r'n( |$)', r'nn\1', p_k),
+                        # re.sub(r'(.)n( |$)', r'\1nn\2', p_k),
                         re.sub(r'(.)t( |$)', r'\1d\2', p_k),
                         re.sub(r'(.)t( |$)', r'\1j\2', p_k),
                         re.sub(r'(.)t( |$)', r'\1n\2', p_k),
@@ -315,6 +321,7 @@ def add_candidates_alt(p_k):
         re.sub(r'( |^)ā(.)', r'\1\2', p_k),
         re.sub(r'(.)au( |$)', r'\1ā\2', p_k),
         re.sub(r'(.)m( |$)', r'\1n\2', p_k),
+        re.sub(r'(.)o( |$)', r'\1a\2', p_k),
     ]
     return list(set(l_list_candidate))
 
@@ -330,9 +337,15 @@ def author_normalize(p_author):
 
 def sloka_numbers_normalize(s):
     return re.sub(r'॥(\d+\.\d+)॥(\S)', r'॥\1॥ \2',
-                  re.sub(r'॥\s*(\d+\.\d+)\s*॥(\s*\.)', r'॥\1॥',
-                         re.sub(r'^(<p>\s*)?(\d+\.\d+)\s*', r'\1॥\2॥ ',
-                                re.sub(r'^(<p>\s*)?॥?\s*(\d+\.\d+)\s*-?\s*(\d+\.\d+)\s*॥?\s*', r'\1॥\2 - \3॥ ',s)
+                  re.sub(r'<p>\s+॥', r'<p>॥',
+                         re.sub(r'॥\s*(\d+\.\d+)\s*॥(\s*\.)', r'॥\1॥',
+                                re.sub(r'^(<p>\s*)?(\d+\.\d+)\s*', r'\1॥\2॥ ',
+                                       # WARNING: the dash used below on the replacement side is not an ordinary ASCII dash but a UNICODE "En Dash"
+                                       # to prevent the following two lines from messing up each other's work
+                                       re.sub(r'^(<p>\s*)?॥?\s*(\d+\.\d+)\s*-\s*(\d+)\s*॥?\s*', r'\1॥\2 – \3॥ ',
+                                              re.sub(r'^(<p>\s*)?॥?\s*(\d+\.\d+)\s*-?\s*(\d+\.\d+)\s*॥?\s*', r'\1॥\2 – \3॥ ', s)
+                                              )
+                                       )
                                 )
                          )
                   )
@@ -701,7 +714,7 @@ if __name__ == '__main__':
         l_verse_count = int(l_chap['verses_count'])
         l_chap_number = int(l_chap['chapter_number'])
 
-        if l_chap_number == 3:
+        if l_chap_number == 5:
             break
 
         # TEI chapter start (<div1>)
@@ -792,11 +805,12 @@ if __name__ == '__main__':
             l_sk_api_online = deva_correct(universal_cleanup(l_json_verse['text']))
             # IAST transliteration
             l_translit = universal_cleanup(l_json_verse['transliteration'])
-            # Word-for-Word translation (API version) kapidvajaḥ
+            # Word-for-Word translation (API version)
             l_wfw_api_string = (re.sub(r';$', '', universal_cleanup(l_json_verse['word_meanings']))
                                 .replace('dhṛitarāśhtraḥ', 'dhṛtarāṣṭraḥ')
                                 .replace('kapi-dwajaḥ', 'kapi-dhvajaḥ')
                                 .replace('pariśhuṣhyati—is drying up vepathuḥ', 'pariśhuṣhyati—is drying up; vepathuḥ')
+                                .replace('parāyaṇāḥ—wholly devoted apare', 'parāyaṇāḥ—wholly devoted; apare')
                                 .replace('babhūva—became ha', 'babhūva—became; ha—certainly'))
             l_wfw_api_list = [s.strip().split('—') for s in l_wfw_api_string.split(';')]
             # translations
@@ -1391,8 +1405,11 @@ if __name__ == '__main__':
                     l_key = 'indriyasya'
                     l_wfw_dict[l_key] = (['of the senses'], {'of the senses'})
 
-                l_list_ck_1 = list(set(add_candidates(l_key) + add_candidates(iast_cleanup(re.sub(r'\s+', '-', l_key)))))
+                l_key_contracted = iast_cleanup(re.sub(r'\s+', '-', l_key))
+                l_list_ck_1 = list(set(add_candidates(l_key) + add_candidates(l_key_contracted)))
                 l_list_ck_1 = [l_km for l_km in l_list_ck_1 if len(l_km) > 0]
+                # if l_key == 'śrotrādīni indriyāṇi': print(l_key_contracted, sorted(l_list_ck_1, key=lambda s: f'{len(s):3}-{s}', reverse=True))
+                if l_key == 'san': print(sorted(l_list_ck_1, key=lambda s: f'{len(s):3}-{s}', reverse=True))
 
                 l_list_ck_2 = []
                 for l_kc in l_list_ck_1:
@@ -1400,18 +1417,21 @@ if __name__ == '__main__':
                 l_list_ck_2 = [l_km for l_km in l_list_ck_2 if len(l_km) > 0]
 
                 l_list_ck_3 = list(set(l_list_ck_2))
+                if l_key == 'san': print(sorted(l_list_ck_2, key=lambda s: f'{len(s):3}-{s}', reverse=True))
 
                 for l_km in l_list_ck_3:
                     l_mod_key_list.append((l_key, l_km.replace(' ', '')))
 
             l_mod_key_list_1 = sorted(l_mod_key_list, key=lambda p: f'{len(p[1]):03}-{p[1]}', reverse=True)
             l_mod_key_list_2 = sorted(l_mod_key_list, key=lambda p: f'{999-len(p[1]):03}-{p[1]}')
+            # if l_key == 'śrotrādīni indriyāṇi': print(l_mod_key_list_1)
             #   for l_key, l_km in l_mod_key_list:
             #       print(f'{l_key:30} {l_km}')
 
             l_place_dict = dict()
             l_list_no = 1
             for l_mod_key_list in [l_mod_key_list_1, l_mod_key_list_2]:
+                print([l_km for _, l_km in l_mod_key_list])
                 l_place_dict = dict()
                 l_iast_sk_work = l_iast_sk
                 for l_key, l_km in l_mod_key_list:
@@ -1437,7 +1457,7 @@ if __name__ == '__main__':
                             l_key_found = True
 
                 l_remainder_sk = l_iast_sk_work.replace('_', '').strip()
-                if len(l_remainder_sk) > 0 and l_verse_tag not in ['1.21', '2.31', '3.36', '2.10', '1.28']:
+                if len(l_remainder_sk) > 0 and l_verse_tag not in ['1.21', '2.31', '3.36', '2.10', '1.28', '4.6']:
                     if l_list_no == 1:
                         print('**RESTART**')
                         l_list_no += 1
@@ -1496,11 +1516,13 @@ if __name__ == '__main__':
                     print(f'    {l_form:20} {l_grammar_dict[l_form]}')
 
                 for l_form in l_form_list:
+                    l_form_contracted = iast_cleanup(re.sub(r'\s+', '-', l_form))
                     l_list_ck_1 = list(set(add_candidates(l_form) +
-                                           add_candidates(iast_cleanup(re.sub(r'\s+', '-', l_form))) +
+                                           add_candidates(l_form_contracted) +
                                            add_candidates_alt(l_form)
                                            )
                                        )
+                    # if l_sk_word == 'atha u': print(l_form_contracted, sorted(l_list_ck_1, key=lambda s: f'{len(s):3}-{s}', reverse=True))
                     l_list_ck_1 = [l_km for l_km in l_list_ck_1 if len(l_km) > 0]
 
                     l_list_ck_2 = []
@@ -1516,9 +1538,9 @@ if __name__ == '__main__':
 
                 l_mod_key_list_1 = sorted(l_mod_key_list, key=lambda p: f'{len(p[1]):03}-{p[1]}', reverse=True)
                 l_mod_key_list_2 = sorted(l_mod_key_list, key=lambda p: f'{999 - len(p[1]):03}-{p[1]}')
-                if l_sk_word == 'dhṛtarāṣṭraḥ uvāca':
-                    for s in l_mod_key_list_1:
-                        print(s)
+                # if l_sk_word == 'dhṛtarāṣṭraḥ uvāca':
+                #     for s in l_mod_key_list_1:
+                #         print(s)
 
                 l_place_dict = dict()
                 l_list_no = 1
@@ -1720,11 +1742,11 @@ if __name__ == '__main__':
                         l_alt_ref.append(l_ref_join)
                         l_alt_gr.append(l_grammar_join)
 
-                        l_lemma_key = f'{l_lemma_join}/{l_pos}'
-                        g_lexicon_gr_forms.setdefault(l_form, set(l_gl[1:])).union(set(l_gl[1:]))
-                        g_lexicon_2_lemma.setdefault(l_form, {l_lemma_key}).add(l_lemma_key)
-                        g_lexicon_lemmas.setdefault(l_lemma_key, {l_ref_join}).add(l_ref_join)
-                        g_lexicon_lemma_2_form.setdefault(l_lemma_key, set()).add(l_form)
+                        # l_lemma_key = f'{l_lemma_join}/{l_pos}'
+                        # g_lexicon_gr_forms.setdefault(l_form, set(l_gl[1:])).union(set(l_gl[1:]))
+                        # g_lexicon_2_lemma.setdefault(l_form, {l_lemma_key}).add(l_lemma_key)
+                        # g_lexicon_lemmas.setdefault(l_lemma_key, {l_ref_join}).add(l_ref_join)
+                        # g_lexicon_lemma_2_form.setdefault(l_lemma_key, set()).add(l_form)
 
                         print(f"    {d['form']}")
                         print(f"        {l_lemma_join} {[r for _, r in l_ll]}")
@@ -1787,6 +1809,14 @@ if __name__ == '__main__':
                         l_ref_set.add(l_ref)
                         l_pos_set.add(l_pos)
                         l_ana_set.add(l_analysis)
+
+                        l_pos_lex = 'NPNOM' if l_pos == 'NPIIC' else l_pos
+                        l_lemma_key = f'{l_lemma}/{l_pos_lex}'
+                        g_lexicon_gr_forms.setdefault(l_component_form, set(l_g_value[3:])).union(set(l_g_value[3:]))
+                        g_lexicon_2_lemma.setdefault(l_component_form, {l_lemma_key}).add(l_lemma_key)
+                        g_lexicon_lemmas.setdefault(l_lemma_key, {l_ref}).add(l_ref)
+                        g_lexicon_lemma_2_form.setdefault(l_lemma_key, set()).add(l_component_form)
+
                     l_wfw_block_2 += (f'{l_indent_prefix}        <interp type="morphology" '
                                       f'lemma="{"॥".join(l_lemma_set)}" '
                                       f'pos="{"॥".join(l_pos_set)}" lemmaRef="{"॥".join(l_ref_set)}" '
@@ -1817,21 +1847,28 @@ if __name__ == '__main__':
 
                 l_author_ctv, l_language_ctv, l_text_ctv, l_source_ctv = p_row
 
+                print(f'      Source       : {l_source_ctv} --------------------------------------------------------------')
+                print(f'      Author       : {l_author_ctv}')
+                print(f'      Language     : {l_language_ctv}')
+                print(f'      Text         : {l_text_ctv}')
+
                 # proper use of single and double danda and the spaces around them
                 l_text_ctv = sloka_numbers_normalize(l_text_ctv)
                 # XML validation
                 try:
                     ET.fromstring(f'<TEI xmlns="http://www.tei-c.org/ns/1.0">{l_text_ctv}</TEI>')
                 except ET.ParseError as e:
-                    print(f'XML parse ERROR: {e.code} {e.msg} in [{l_text_ctv}]')
+                    print(f'{l_verse_tag} XML parse ERROR: {e.code} {e.msg} in [{l_text_ctv}]')
                     g_cochonneries_list.append((e.code, e.msg, f'{l_chap_number}.{l_verse_number}', l_source_ctv, l_author_ctv, l_language_ctv, l_text_ctv))
-                    # sys.exit(0)
-                    l_text_ctv = re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', '', l_text_ctv)).strip()
 
-                print(f'      Source   : {l_source} --------------------------------------------------------------')
-                print(f'      Author   : {l_author}')
-                print(f'      Language : {l_language}')
-                print(f'      Text     : {l_text}')
+                    try:
+                        ET.fromstring(l_text_ctv + '</p>')
+                        l_text_ctv += '</p>'
+                    except ET.ParseError as e:
+                        print('Adding </p> does not improve things. Giving up ...')
+                        l_text_ctv = re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', '', l_text_ctv)).strip()
+
+                print(f'      Text (corr.) : {l_text_ctv}')
 
                 return l_author_ctv, l_language_ctv, l_text_ctv, l_source_ctv
 
