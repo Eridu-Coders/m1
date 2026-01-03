@@ -1690,7 +1690,7 @@ if __name__ == '__main__':
                 l_author, l_language, l_text, l_source = l_local_translations[l_ak]
                 if l_author == 'Sri Shankaracharya' and l_language == 'hindi': #
                     l_local_commentaries[author_key(l_author)] = (l_author, l_language, l_text, l_source)
-                elif l_author == 'Sri Ramanuja' and l_language == 'english':
+                elif l_author == 'Sri Ramanujacharya' and l_language == 'english':
                     pass
                 elif l_author == 'Sri Abhinavagupta' and l_language == 'english':
                     pass

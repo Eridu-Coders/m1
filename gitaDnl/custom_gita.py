@@ -7,6 +7,7 @@ import xml.etree.ElementTree as ET
 
 import regex
 import re
+import itertools
 
 g_work_title = '   <text:p text:style-name="WorkTitle">{0}</text:p>\n'
 g_sub_title = '   <text:p text:style-name="WorSubTitle">{0}</text:p>\n'
@@ -143,8 +144,8 @@ if __name__ == '__main__':
 
     l_title_section_elem = l_root.find(f'{l_tei_namespace}teiHeader/{l_tei_namespace}titleStmt')
     l_text_elem = l_root.find(f'{l_tei_namespace}text')
-    print(l_title_section_elem)
-    print(l_text_elem)
+    # print(l_title_section_elem)
+    # print(l_text_elem)
 
     l_translator_list, l_bhashya_author_list = get_transl_bhashya_list(l_text_elem)
 
@@ -171,12 +172,21 @@ if __name__ == '__main__':
     print(f'Work Sub-Title       : {l_sub_title}')
     print(f'Work Alternate Title : {l_alt_title}')
     print(f'Work Author          : {l_author}')
-    print('Available Translations:')
+
+    l_col_1 = ['Available Translations:']
     for i in range(len(l_translator_list)):
-        print(f'    {i+1:2}. {[l for _, l in l_translator_list][i]}')
-    print('Available Bhashyas:')
+        l_col_1.append(f'    {i+1:2}. {[l for _, l in l_translator_list][i]}')
+
+    l_col_2 = ['Available Bhashyas:']
     for i in range(len(l_bhashya_author_list)):
-        print(f'    {i+1:2}. {[l for _, l in l_bhashya_author_list][i]}')
+        l_col_2.append(f'    {i+1:2}. {[l for _, l in l_bhashya_author_list][i]}')
+
+    l_max_len_col_1 = 0
+    for s in l_col_1:
+        if len(s) > l_max_len_col_1: l_max_len_col_1 = len(s)
+
+    for l_left, l_right in itertools.zip_longest(l_col_1, l_col_2, fillvalue=''):
+        print(f'{l_left:<{l_max_len_col_1 + 5}} {l_right}')
 
     l_translator_choice = input('Translators choice (list of numbers separated by spaces): ')
     l_commentators_choice = input('Bhashya authors choice (list of numbers separated by spaces): ')
@@ -188,8 +198,8 @@ if __name__ == '__main__':
         l_wfw_gr_choice = re.sub(r'[^yn]', '', input('Word-for-Word Translation with grammar? (Y/N): ').lower())
         l_wfw_gr_choice = 'y' in l_wfw_gr_choice
 
-    l_translator_choice = re.sub('\s+', ' ', re.sub('[^\d ]+', '', l_translator_choice)).strip()
-    l_commentators_choice = re.sub('\s+', ' ', re.sub('[^\d ]+', '', l_commentators_choice)).strip()
+    l_translator_choice = re.sub(r'\s+', ' ', re.sub(r'[^\d ]+', '', l_translator_choice)).strip()
+    l_commentators_choice = re.sub(r'\s+', ' ', re.sub(r'[^\d ]+', '', l_commentators_choice)).strip()
 
     l_transl_ch_list = [l_translator_list[int(l_num)-1][0] for l_num in l_translator_choice.split(' ') if int(l_num)-1 < len(l_translator_list)]
     l_comm_ch_list = [l_bhashya_author_list[int(l_num)-1][0] for l_num in l_commentators_choice.split(' ') if int(l_num)-1 < len(l_bhashya_author_list)]
@@ -197,7 +207,7 @@ if __name__ == '__main__':
     l_xml_output += g_work_title.format(l_main_title)
     l_xml_output += g_alt_title.format(samskrit_beautify(l_alt_title, p_big=True))
     l_xml_output += g_sub_title.format(samskrit_beautify(l_sub_title))
-    l_xml_output += g_author.format(samskrit_beautify(l_author))
+    l_xml_output += g_author.format('by: ' + samskrit_beautify(l_author))
 
     l_note_count = 0
     l_codes = set()
@@ -262,7 +272,7 @@ if __name__ == '__main__':
                                     for l_gv in g_code_transl.keys():
                                         l_analysis = l_analysis.replace(l_gv, g_code_transl[l_gv])
 
-                                    print('l_analysis:', l_analysis)
+                                    # print('l_analysis:', l_analysis)
                                     l_grammar_list.append(f'{l_form_iast} [{l_lemma} {l_pos}] {l_analysis}')
 
                                 l_grammar_note = ' + '.join(l_grammar_list)
@@ -287,7 +297,7 @@ if __name__ == '__main__':
                             for l_mn in l_meanings[1:]:
                                 l_xml_output += g_table_row_add.format(l_mn)
 
-                            print(f'Word: {l_sk_word} {l_translit} --> {l_meaning}')
+                            # print(f'Word: {l_sk_word} {l_translit} --> {l_meaning}')
 
                         l_xml_output += g_table_end
                     elif l_div3.attrib['type'] == 'translations-block' or l_div3.attrib['type'] == 'commentaries-block':
@@ -322,7 +332,7 @@ if __name__ == '__main__':
                                             l_text_list.append(' '.join(l_p.itertext()) if l_p.text else '')
                                     l_text = ' '.join(l_text_list)
 
-                                print(f'        {l_type} {l_language} [{l_author}] {l_text}')
+                                print(f'        {l_type} {l_language} [{l_author}] {l_text[:100]}')
                                 l_text = samskrit_beautify(l_text)
                                 l_xml_output += g_translBhashya.format(f'{g_author_span.format(l_author)} ({l_language}) : {l_text}')
 
