@@ -133,8 +133,12 @@ g_footer = """</text>
 </TEI>
 """
 
-g_author_normalize = {
+g_author_normalize = { # Sri Ramanuja
     'Sri Abhinavgupta': 'Sri Abhinavagupta',
+    'Sri Jayatritha': 'Sri Jayatirtha',
+    'Sri Ramanuja': 'Sri Ramanujacharya',
+    'Sri Madhavacharya': 'Sri Madhvacharya',
+    'Dr.S.Sankaranarayan': 'Dr. S. Sankaranarayan',
     'Sri Abhinav Gupta': 'Sri Abhinavagupta'
 }
 
@@ -1680,6 +1684,21 @@ if __name__ == '__main__':
                     print(f"    {d['form']}", file=sys.stderr)
                     print_im(d['morph'], p_depth=1, p_out=sys.stderr)
 
+            # ################################ Bhashya/translation Requalification ####################################
+            l_new_dt = dict()
+            for l_ak in l_local_translations.keys():
+                l_author, l_language, l_text, l_source = l_local_translations[l_ak]
+                if l_author == 'Sri Shankaracharya' and l_language == 'hindi': #
+                    l_local_commentaries[author_key(l_author)] = (l_author, l_language, l_text, l_source)
+                elif l_author == 'Sri Ramanuja' and l_language == 'english':
+                    pass
+                elif l_author == 'Sri Abhinavagupta' and l_language == 'english':
+                    pass
+                else:
+                    l_new_dt[author_key(l_author)] = (l_author, l_language, l_text, l_source)
+
+            l_local_translations = l_new_dt
+
             # ######################################### TEI Output #####################################################
             # start of TEI output for this sloka +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             # start of sloka block (<div2>)
@@ -1890,7 +1909,7 @@ if __name__ == '__main__':
 
             print(f'***************************** Commentaries TEI insertion for v. {l_verse_tag} **********************')
             for l_ak in l_local_commentaries:
-                # l_author, l_language, l_text, l_source = l_local_commentaries[l_ak]
+                # l_author, l_language, l_text_elem, l_source = l_local_commentaries[l_ak]
                 l_author, l_language, l_text, l_source = com_tran_validate(l_local_commentaries[l_ak])
                 l_bg_chapters_xml += f'{l_indent_prefix}<div4 type="commentary" source="{l_source}" xml:lang="{l_language}"><author>{l_author}</author>{l_text}</div4>\n'
 

@@ -258,18 +258,18 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                 QString l_lemma_text;
                 QString l_url_dict_list;
 
-                class Form{
+                class FormLexicon{
                 private:
                     QString m_orth;
                     QString m_grammar;
                 public:
-                    Form(const QString& p_orth, const QString& p_grammar){m_orth = p_orth; m_grammar = p_grammar;}
+                    FormLexicon(const QString& p_orth, const QString& p_grammar){m_orth = p_orth; m_grammar = p_grammar;}
 
                     const QString& form(){return m_orth;}
                     const QString& grammar(){return m_grammar;}
                 };
 
-                QList<Form> l_form_list;
+                QList<FormLexicon> l_form_list;
 
                 while (!l_xml_reader.atEnd()) {
                     QXmlStreamReader::TokenType l_tt = l_xml_reader.readNext();
@@ -294,9 +294,9 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
 
                         cm_indent.chop(l_indent_count);
                         qCDebug(g_cat_tei).noquote() << cm_indent << "<entryFree/> End of lexicon entry";
-                        qCDebug(g_cat_tei).noquote() << cm_indent << QString("lemma: %1 POS: %2 Dictionary ref: %3").arg(l_lemma_text).arg(l_pos_text).arg(l_url_dict_list);
-                        for(Form f: l_form_list)
-                            qCDebug(g_cat_tei).noquote() << cm_indent << QString("    form: %1 Grammar: %2").arg(f.form()).arg(f.grammar());
+                        qCDebug(g_cat_tmp_spotlight).noquote() << cm_indent << QString("lemma: %1 POS: %2 Dictionary ref: %3").arg(l_lemma_text).arg(l_pos_text).arg(l_url_dict_list);
+                        for(FormLexicon f: l_form_list)
+                            qCDebug(g_cat_tmp_spotlight).noquote() << cm_indent << QString("    form: %1 Grammar: %2").arg(f.form()).arg(f.grammar());
                         l_found_one_entry = true;
                     }
                     // POS
@@ -343,7 +343,7 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                             if(l_tt_gr != QXmlStreamReader::Characters) throw M1Env::M1Exception("<gram> not followed by Characters", 1011);
                             QString l_gram_text = l_xml_reader.text().toString().trimmed();
 
-                            l_form_list.append(Form(l_orth_text, l_gram_text));
+                            l_form_list.append(FormLexicon(l_orth_text, l_gram_text));
 
                             qCDebug(g_cat_tei).noquote() << cm_indent << QString("<form type=%1> gram: %2 orth: %3").arg(l_type).arg(l_gram_text).arg(l_orth_text);
                         }
@@ -439,6 +439,41 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
             else if(l_type == "wfw-block"){
                 l_found_wfw = true;
 
+                QString l_sk_segment;
+                QString l_transliteration;
+                QString l_translation;
+
+                class Form_WfW{
+                private:
+                    QString m_form;
+                    QString m_lemma;
+                    QString m_pos;
+                    QString m_ref;
+                    QString m_grammar;
+                public:
+                    Form_WfW(const QString& p_form,
+                             const QString& p_lemma,
+                             const QString& p_pos,
+                             const QString& p_ref,
+                             const QString& p_grammar){
+                        m_form = p_form;
+                        m_lemma = p_lemma;
+                        m_pos = p_pos;
+                        m_ref = p_ref;
+                        m_grammar = p_grammar;
+                    }
+
+                    const QString& form(){return m_form;}
+                    const QString& lemma(){return m_lemma;}
+                    const QString& pos(){return m_pos;}
+                    const QString& ref(){return m_ref;}
+                    const QString& grammar(){return m_grammar;}
+
+                    const QString dbgOneLiner(){return QString("%1 [%2 %3 %5] %4").arg(m_form).arg(m_lemma).arg(m_pos).arg(m_ref).arg(m_grammar);}
+                };
+
+                QList<Form_WfW> l_form_list;
+
                 bool l_found_one_wfw = false;
                 bool l_found_wfw_translation = false;
                 bool l_found_wfw_transliteration = false;
@@ -468,6 +503,7 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                             qCDebug(g_cat_tei).noquote() << cm_indent << QString("Word Word %1.%2.%3 <seg type=\"%4\"> %5")
                                                                              .arg(cm_cur_chapter_number).arg(cm_cur_sloka_number).arg(l_cur_word)
                                                                              .arg(l_type).arg(l_wfw_form);
+                            l_sk_segment = l_wfw_form;
                         }
                     }
                     // <interp> --> wfw transliteration/wfw translation/one wfw morphology line inside interpGrp
@@ -482,6 +518,7 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                             if(l_tt_interp == QXmlStreamReader::Characters){
                                 QString l_trl_text = l_xml_reader.text().toString().trimmed();
                                 qCDebug(g_cat_tei).noquote() << cm_indent << QString("<interp type=\"%1\" source=\"%2\" standard=\"%3\"> %4").arg(l_type).arg(l_source).arg(l_standard).arg(l_trl_text);
+                                l_transliteration = l_trl_text;
                             }
                         }
                         // wfw translation
@@ -492,6 +529,7 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                             if(l_tt_interp != QXmlStreamReader::Characters) throw M1Env::M1Exception("<interp type=translation> not followed by Characters", 1017);
                             QString l_trl_text = l_xml_reader.text().toString().trimmed();
                             qCDebug(g_cat_tei).noquote() << cm_indent << QString("<interp type=\"%1\" source=\"%2\"> %3").arg(l_type).arg(l_source).arg(l_trl_text);
+                            l_translation = l_trl_text;
                         }
                         // one wfw morphology line inside interpGrp
                         else if(l_type == "morphology"){
@@ -506,6 +544,8 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                             QString l_form_text = l_xml_reader.text().toString().trimmed();
                             qCDebug(g_cat_tei).noquote() << cm_indent << QString("<interp type=\"%1\" lemma=\"%2\" pos=\"%3\" msg=\"%4\" lemmaRef=\"%5\"> %6")
                                                                              .arg(l_type).arg(l_lemma).arg(l_pos).arg(l_grv).arg(l_ref).arg(l_form_text);
+
+                            l_form_list.append(Form_WfW(l_form_text, l_lemma, l_pos, l_ref, l_grv));
                         }
                     }
                     // start wfw morphology (<interpGrp>)
@@ -534,6 +574,14 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                                                          .arg(cm_cur_chapter_number).arg(cm_cur_sloka_number).arg(l_cur_word), 0);
 
                         qCDebug(g_cat_tei).noquote() << cm_indent << "<seg/> End of wfw group";
+                        qCDebug(g_cat_tmp_spotlight).noquote() << cm_indent << QString("WfW segment: %1 Translit: %2 Translat: %3")
+                                                                                   .arg(l_sk_segment)
+                                                                                   .arg(l_transliteration)
+                                                                                   .arg(l_translation);
+                        for(Form_WfW f: l_form_list)
+                            qCDebug(g_cat_tmp_spotlight).noquote() << cm_indent << QString("    %1").arg(f.dbgOneLiner());
+                        l_form_list.clear();
+
                     }
                     // end of wfw block <div3>
                     else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "div3"){
