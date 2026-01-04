@@ -119,11 +119,13 @@ g_color_2_pos = {
 g_header = """<TEI xmlns="http://www.tei-c.org/ns/1.0">
 <teiHeader xml:lang="en">
 <titleStmt>
-<title type="main">Bhagavad-gītā</title>
-<title type="alt">श्रीमद् भगवद्गीता</title>
-<title type="sub">Original Sanskrit text with word-for-word translation, morphological analysis (INRIA), 12 sloka-by-sloka translations and 22 sloka-by-sloka commentaries</title>
-<editor role="compiler">Nicolas A. L. Reimen (nicolas.reimen@gmail.com, WhatsApp: +91 9900192517)</editor>
-<author>अपौरुषेय + various translators and commentators</author>
+    <title type="main">Bhagavad-gītā</title>
+    <title type="alt">श्रीमद् भगवद्गीता</title>
+    <title type="sub">Original Sanskrit text with 3 word-for-word translations, morphological analysis (INRIA), 8 sloka-by-sloka translations and 21 sloka-by-sloka commentaries</title>
+    <editor role="compiler">Nicolas A. L. Reimen (nicolas.reimen@gmail.com, WhatsApp: +91 9900192517)</editor>
+    <author>
+        अपौरुषेय__OTHER_AUTHORS__
+    </author>
 </titleStmt>
 </teiHeader>
 <text xml:lang="en, sk">
@@ -709,6 +711,7 @@ if __name__ == '__main__':
     # chapters block creation ==========================================================================================
     l_indent_prefix = ''
 
+    l_author_set = set()
     l_bg_chapters_xml = ''
     with open('chap.json', 'r', encoding='utf-8') as l_f_in:
         # Load the JSON data from the file
@@ -1894,7 +1897,9 @@ if __name__ == '__main__':
             print(f'***************************** Translations TEI insertion for v. {l_verse_tag} **********************')
             for l_ak in l_local_translations:
                 l_author, l_language, l_text, l_source = com_tran_validate(l_local_translations[l_ak])
-                l_bg_chapters_xml += f'{l_indent_prefix}<div4 type="translation" source="{l_source}" xml:lang="{l_language}"><author>{l_author}</author>{l_text}</div4>\n'
+                l_auth_tag = f'<persName>{l_author}<roleName>Translator</roleName></persName>'
+                l_author_set.add(l_auth_tag)
+                l_bg_chapters_xml += f'{l_indent_prefix}<div4 type="translation" source="{l_source}" xml:lang="{l_language}"><author>{l_auth_tag}</author>{l_text}</div4>\n'
 
             # end of translations block (<div3>)
             l_bg_chapters_xml += f'{l_indent_prefix}<!-- End of translations block for {l_verse_id} -->\n'
@@ -1911,7 +1916,21 @@ if __name__ == '__main__':
             for l_ak in l_local_commentaries:
                 # l_author, l_language, l_text_elem, l_source = l_local_commentaries[l_ak]
                 l_author, l_language, l_text, l_source = com_tran_validate(l_local_commentaries[l_ak])
-                l_bg_chapters_xml += f'{l_indent_prefix}<div4 type="commentary" source="{l_source}" xml:lang="{l_language}"><author>{l_author}</author>{l_text}</div4>\n'
+                l_match = re.match('(.*)\s+\(transl\.\s+([^)]+)\)', l_author)
+                if l_match:
+                    l_author_1 = l_match.group(1)
+                    l_author_2 = l_match.group(2)
+                    l_auth_tag_1 = f'<persName>{l_author_1}<roleName>Bhashya Author</roleName></persName>'
+                    l_auth_tag_2 = f'<persName>{l_author_2}<roleName>Bhashya Translator</roleName></persName>'
+                    l_author_set.add(l_auth_tag_1)
+                    l_author_set.add(l_auth_tag_2)
+                    l_auth_tag = l_auth_tag_1 + l_auth_tag_2
+                else:
+                    l_auth_tag = f'<persName>{l_author}<roleName>Bhashya Author</roleName></persName>'
+                    l_role = 'Bhashya Author'
+                    l_author_set.add(l_auth_tag)
+
+                l_bg_chapters_xml += f'{l_indent_prefix}<div4 type="commentary" source="{l_source}" xml:lang="{l_language}"><author>{l_auth_tag}</author>{l_text}</div4>\n'
 
             # end of commentaries block (<div3>)
             l_bg_chapters_xml += f'{l_indent_prefix}<!-- End of commentaries block for {l_verse_id} -->\n'
@@ -1957,9 +1976,10 @@ if __name__ == '__main__':
     l_bg_lexicon_xml += f'{l_indent_prefix}</div1>\n'
 
     # writing to files =================================================================================================
+    l_author_list = [''] + [f'        {a}' for a in sorted(list(l_author_set))]
     with open('bg.xml', 'w', encoding='utf-8') as l_bg_file_out:
         # TEI header
-        l_bg_file_out.write(g_header)
+        l_bg_file_out.write(g_header.replace('__OTHER_AUTHORS__', '\n'.join(l_author_list)))
 
         # output lexicon
         l_bg_file_out.write(l_bg_lexicon_xml)
@@ -1972,7 +1992,7 @@ if __name__ == '__main__':
 
     with open('bg_only.xml', 'w', encoding='utf-8') as l_bg_file_out:
         # TEI header
-        l_bg_file_out.write(g_header)
+        l_bg_file_out.write(g_header.replace('__OTHER_AUTHORS__', '\n'.join(l_author_list)))
 
         # output chapters
         l_bg_file_out.write(l_bg_chapters_xml)
@@ -1982,7 +2002,7 @@ if __name__ == '__main__':
 
     with open('bg_lex.xml', 'w', encoding='utf-8') as l_bg_file_out:
         # TEI header
-        l_bg_file_out.write(g_header)
+        l_bg_file_out.write(g_header.replace('__OTHER_AUTHORS__', ''))
 
         # output lexicon
         l_bg_file_out.write(l_bg_lexicon_xml)

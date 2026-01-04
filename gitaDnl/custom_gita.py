@@ -19,6 +19,7 @@ g_sloka_title = '   <text:p text:style-name="SlokaTitle">{0}</text:p>\n'
 g_sloka_line = '   <text:p text:style-name="P6">{0}</text:p>\n'
 g_interTitle = '   <text:p text:style-name="InterTitle">{0}</text:p>\n'
 g_translBhashya = '   <text:p text:style-name="P8">{0}</text:p>\n'
+g_author_sec = '   <text:p text:style-name="Author_20_Secondary">{0}</text:p>\n'
 g_ftn = '<text:note text:id="ftn{0}" text:note-class="footnote"><text:note-citation>{1}</text:note-citation><text:note-body><text:p text:style-name="P12">{2}</text:p></text:note-body></text:note>'
 
 g_table_init = """   <table:table table:name="Table1" table:style-name="Table1">
@@ -118,6 +119,7 @@ def samskrit_beautify(s, p_big=False):
 def get_transl_bhashya_list(p_elem):
     l_translators = set()
     l_bhashya_authors = set()
+    l_authors = set()
     for l_div1_a in p_elem.findall(f'{l_tei_namespace}div1'):
         if l_div1_a.attrib['type'] == 'chapter':
             for l_div2_a in l_div1_a.findall(f'{l_tei_namespace}div2'):
@@ -126,14 +128,25 @@ def get_transl_bhashya_list(p_elem):
                         if l_div3_a.attrib['type'] in ['translations-block', 'commentaries-block']:
                             l_is_transl_a = l_div3_a.attrib['type'] == 'translations-block'
                             for l_div4_a in l_div3_a.findall(f'{l_tei_namespace}div4'):
-                                l_author_txt = l_div4_a.find(f'{l_tei_namespace}author').text
                                 l_lang = l_div4_a.attrib['{http://www.w3.org/XML/1998/namespace}lang'].capitalize()
-                                if l_is_transl_a:
-                                    l_translators.add((l_author_txt, f'{l_author_txt} ({l_lang})'))
-                                else:
-                                    l_bhashya_authors.add((l_author_txt, f'{l_author_txt} ({l_lang})'))
 
-    return sorted(list(l_translators)), sorted(list(l_bhashya_authors))
+                                l_author_tag = l_div4_a.find(f'{l_tei_namespace}author')
+                                l_pers_list_a = []
+                                for l_pers_name_a in l_author_tag.findall(f'{l_tei_namespace}persName'):
+                                    l_name_a = l_pers_name_a.text
+                                    l_role_a = l_pers_name_a.find(f'{l_tei_namespace}roleName').text
+                                    l_pers_list_a.append(l_name_a)
+                                    l_authors.add(f'{l_name_a} ({l_role_a})')
+
+                                l_author_id_a = '-'.join(l_pers_list_a)
+                                l_author_label_a = l_pers_list_a[0] if len(l_pers_list_a) == 1 else f'{l_pers_list_a[0]} (translator: {l_pers_list_a[1]})'
+
+                                if l_is_transl_a:
+                                    l_translators.add((l_author_id_a, f'{l_author_label_a} ({l_lang})'))
+                                else:
+                                    l_bhashya_authors.add((l_author_id_a, f'{l_author_label_a} ({l_lang})'))
+
+    return sorted(list(l_translators)), sorted(list(l_bhashya_authors)), sorted(list(l_authors))
 
 # ------------- main() -------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
@@ -147,7 +160,7 @@ if __name__ == '__main__':
     # print(l_title_section_elem)
     # print(l_text_elem)
 
-    l_translator_list, l_bhashya_author_list = get_transl_bhashya_list(l_text_elem)
+    l_translator_list, l_bhashya_author_list, l_authors_list_body = get_transl_bhashya_list(l_text_elem)
 
     with open('gita_template.fodt', 'r') as l_fin:
         l_fodt_template = l_fin.read()
@@ -157,7 +170,8 @@ if __name__ == '__main__':
     l_main_title = ''
     l_sub_title = ''
     l_alt_title = ''
-    l_author = ''
+    l_author_main = ''
+    l_authors_list_header = []
     for l_elem in l_title_section_elem.findall('*'):
         # print(l_elem.attrib, l_elem.text)
         if l_elem.tag == f'{l_tei_namespace}title':
@@ -166,12 +180,21 @@ if __name__ == '__main__':
             elif l_elem.attrib['type'] == 'alt': l_alt_title = l_elem.text
             elif l_elem.attrib['type'] == 'sub': l_sub_title = l_elem.text
         elif l_elem.tag == f'{l_tei_namespace}author':
-            l_author = l_elem.text
+            l_author_main = l_elem.text
+            for l_pers_name in l_elem.findall(f'{l_tei_namespace}persName'):
+                l_auth_2nd = l_pers_name.text
+                l_role_elem = l_pers_name.find(f'{l_tei_namespace}roleName')
+                if l_role_elem is not None:
+                    l_role = f' ({l_role_elem.text})'
+                else:
+                    l_role = ''
+                l_authors_list_header.append(f'{l_auth_2nd}{l_role}')
 
     print(f'Work Title           : {l_main_title}')
     print(f'Work Sub-Title       : {l_sub_title}')
     print(f'Work Alternate Title : {l_alt_title}')
-    print(f'Work Author          : {l_author}')
+    print(f'Main Work Author     : {l_author_main}')
+    print(f'Secondary Authors    : {l_authors_list_header}')
 
     l_col_1 = ['Available Translations:']
     for i in range(len(l_translator_list)):
@@ -204,10 +227,25 @@ if __name__ == '__main__':
     l_transl_ch_list = [l_translator_list[int(l_num)-1][0] for l_num in l_translator_choice.split(' ') if int(l_num)-1 < len(l_translator_list)]
     l_comm_ch_list = [l_bhashya_author_list[int(l_num)-1][0] for l_num in l_commentators_choice.split(' ') if int(l_num)-1 < len(l_bhashya_author_list)]
 
+    l_ch_list = sorted(list(set([f'{p} (Translator)' for p in l_transl_ch_list] +
+                                list(itertools.chain.from_iterable([
+                                    [f'{k.split("-")[0]} (Bhashya Author)', f'{k.split("-")[1]} (Bhashya Translator)'] if '-' in k else [f'{k} (Bhashya Author)']
+                                    for k in l_comm_ch_list
+                                ])
+                                )
+                                )
+                            )
+                       )
+
     l_xml_output += g_work_title.format(l_main_title)
     l_xml_output += g_alt_title.format(samskrit_beautify(l_alt_title, p_big=True))
     l_xml_output += g_sub_title.format(samskrit_beautify(l_sub_title))
-    l_xml_output += g_author.format('by: ' + samskrit_beautify(l_author))
+    l_xml_output += g_author.format('by: ' + samskrit_beautify(l_author_main))
+    if len(l_ch_list) > 0:
+        l_xml_output += g_author_sec.format('and:')
+
+    for l_auth_sec in l_ch_list:
+        l_xml_output += g_author_sec.format(l_auth_sec)
 
     l_note_count = 0
     l_codes = set()
@@ -318,10 +356,13 @@ if __name__ == '__main__':
                         for l_div4 in l_div3.findall(f'{l_tei_namespace}div4'):
                             l_language = l_div4.attrib['{http://www.w3.org/XML/1998/namespace}lang'].capitalize()
                             l_author_elem = l_div4.find(f'{l_tei_namespace}author')
-                            l_author = l_author_elem.text
 
-                            if (l_is_transl and l_author in l_transl_ch_list) or \
-                                    (not l_is_transl and l_author in l_comm_ch_list):
+                            l_pers_list = [l_pers_name.text for l_pers_name in l_author_elem.findall(f'{l_tei_namespace}persName')]
+                            l_author_id = '-'.join(l_pers_list)
+                            l_author_label = l_pers_list[0] if len(l_pers_list) == 1 else f'{l_pers_list[0]} (Translator: {l_pers_list[1]})'
+
+                            if (l_is_transl and l_author_id in l_transl_ch_list) or \
+                                    (not l_is_transl and l_author_id in l_comm_ch_list):
 
                                 l_text = l_author_elem.tail
 
@@ -332,9 +373,9 @@ if __name__ == '__main__':
                                             l_text_list.append(' '.join(l_p.itertext()) if l_p.text else '')
                                     l_text = ' '.join(l_text_list)
 
-                                print(f'        {l_type} {l_language} [{l_author}] {l_text[:100]}')
+                                print(f'        {l_type} {l_language} [{l_author_label}] {l_text[:100]}')
                                 l_text = samskrit_beautify(l_text)
-                                l_xml_output += g_translBhashya.format(f'{g_author_span.format(l_author)} ({l_language}) : {l_text}')
+                                l_xml_output += g_translBhashya.format(f'{g_author_span.format(l_author_label)} ({l_language}) : {l_text}')
 
 
     with open('output.fodt', 'w') as l_fout:
