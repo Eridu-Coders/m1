@@ -151,9 +151,11 @@ namespace M1Env{
     static const char* TYPE_NODE_ICON_PATH = "../m1_src/Icons/Type.svg";                        ///<
     static const char* PERSON_ICON_PATH = "../m1_src/Icons/Person.svg";                         ///<
     static const char* ORGANIZATION_ICON_PATH = "../m1_src/Icons/Organization.svg";             ///<
+    static const char* ROLE_FOLDER_ICON_PATH = "../m1_src/Icons/RoleFolder.svg";                ///<
     static const char* TEXT_URL_LINK_ICON_PATH = "../m1_src/Icons/Url.svg";                     ///<
     static const char* TEXT_WROTE_ICON_PATH = "../m1_src/Icons/Wrote.svg";                      ///<
     static const char* TEXT_WRITTEN_BY_ICON_PATH = "../m1_src/Icons/WrittenBy.svg";             ///<
+    static const char* DATA_SOURCE_ICON_PATH = "../m1_src/Icons/DataSource.svg";                ///<
     static const char* BOOK_ICON_PATH = "../m1_src/Icons/Book.svg";                             ///<
     static const char* CHAPTER_ICON_PATH = "../m1_src/Icons/Chapter.svg";                       ///<
     static const char* SENTENCE_ICON_PATH = "../m1_src/Icons/Sentence.svg";                     ///<

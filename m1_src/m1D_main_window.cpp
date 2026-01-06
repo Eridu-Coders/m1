@@ -117,7 +117,7 @@ void M1UI::MainWindow::mouseMoveEvent(QMouseEvent *p_event){
 
 void M1UI::MainWindow::htmlReceive(const QString& p_html){
     // printf("%s\n", p_html.toUtf8().constData());
-    M1_FUNC_ENTRY(g_cat_main_window, QString("Html: %1").arg(p_html));
+    M1_FUNC_ENTRY(g_cat_tmp_spotlight, QString("Html: %1").arg(p_html.length()));
 
     if(p_html.left(4) == "http")
         m_web_view->setUrl(QUrl(p_html));

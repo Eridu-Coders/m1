@@ -187,9 +187,9 @@ public:
 
     virtual QWidget *get_edit_widget();
     virtual bool displayOpenClose(){ return true; }
-    virtual QString inTreeDisplayText();
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual QIcon* edgeIcon(const M1Store::Item_lv2* p_edge);
-    virtual QIcon* vertexIcon();
+    virtual QIcon* vertexIcon(const M1Store::Item_lv2* p_edge);
     virtual M1Store::Item_lv2* targetForGotoVertex(){return m_myself;}
     virtual void createDescendant(M1Store::SpecialItem* p_new_edge_type, M1Store::SpecialItem* p_new_vertex_type);
 
@@ -224,10 +224,10 @@ public:
     FieldInterp(M1Store::Item_lv2* p_myself);
     virtual QString className() {return "FieldInterp";}
     virtual QIcon* edgeIcon(const M1Store::Item_lv2* p_edge);
-    virtual QIcon* vertexIcon();
+    virtual QIcon* vertexIcon(const M1Store::Item_lv2* p_edge=nullptr);
     virtual bool displayOpenClose(){ return false; }
     // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
-    virtual QString inTreeDisplayText();
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     // virtual void paintEvent(QPaintEvent* p_event);
 };
 
@@ -239,12 +239,26 @@ public:
     TextInterp(M1Store::Item_lv2* p_myself);
     virtual QString className() {return "TextInterp";}
     // virtual QIcon* edgeIcon(const M1Store::Item_lv2* p_edge);
-    // virtual QIcon* vertexIcon();
+    // virtual QIcon* vertexIcon(const M1Store::Item_lv2* p_edge=nullptr);
     // virtual bool displayOpenClose(){ return false; }
     // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
-    virtual QString inTreeDisplayText();
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
     // virtual void paintEvent(QPaintEvent* p_event);
+};
+
+class RoleInterp : public Interp{
+    Q_OBJECT
+private:
+    M1Store::Item_lv2* getlUtimateTarget(const M1Store::Item_lv2* p_edge);
+public:
+    static RoleInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    RoleInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "RoleInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QIcon* vertexIcon(const M1Store::Item_lv2* p_edge=nullptr);
+    // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
 };
 
 } // namespace M1MidPlane

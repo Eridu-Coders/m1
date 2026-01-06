@@ -54,7 +54,7 @@ void M1UI::TreeDisplay::mouseMoveEvent(QMouseEvent *p_event){
 }*/
 
 void M1UI::TreeDisplay::htmlReceive(const QString& p_html){
-    M1_FUNC_ENTRY(g_cat_tree_display, QString("html received"))
+    M1_FUNC_ENTRY(g_cat_tmp_spotlight, QString("html received - len: %1").arg(p_html.length()))
     emit emitHtml(p_html);
     M1_FUNC_EXIT
 }

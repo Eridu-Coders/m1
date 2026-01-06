@@ -404,6 +404,9 @@ g_special_vertices = [
     # --------------------------- WROTE / WRTBY ---------------------------
     ['WROTE', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'TEXT_WROTE_ICON_PATH',      'TEXT_WROTE_SIID',
     ('WRTBY', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'TEXT_WRITTEN_BY_ICON_PATH', 'TEXT_WRITTEN_BY_SIID'), 'Special Vertex ID (Edge type) wrote / written by'],
+    # --------------------------- WROTE / WRTBY ---------------------------
+    ['DTSDN', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'DATA_SOURCE_ICON_PATH',     'DATA_SOURCE_FROM_SIID',
+    ('DTSUP', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'DATA_SOURCE_ICON_PATH',     'DATA_SOURCE_TO_SIID'),  'Special Vertex ID (Edge type) DS from / to'],
     # ---------------------------------------------------------------------
     ['OCCUR', ['SI_IS_TYPE', 'SI_EDGE_TYPE',
                'SI_IS_SPECIAL_EDGE'],                      'OCCURRENCE_ICON_PATH',      'OCCUR_SIID', None,          'Special Vertex ID (Edge type) of occurrence edges'],
@@ -441,6 +444,7 @@ g_vertices = [
                                                                                                                'SI_IS_SELECTABLE'],                'PERSON_ICON_PATH',       'PERS_TYPE_SIID'],
 ['Organization (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'ORGN_', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
                                                                                                                'SI_IS_SELECTABLE'],                'ORGANIZATION_ICON_PATH', 'ORG_TYPE_SIID'],
+['Role folder',                  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'RLFLD', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'ROLE_FOLDER_ICON_PATH',  'ROLE_FLDR_SIID'],
 ['Texts Root (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TEXT_', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
                                                                                                                'SI_IS_SELECTABLE'],                'TEXT_ICON_PATH',         'TEXT_SIID'],
 #['Baghavad Gita',                ['FULL_VERTEX',  'IS_SPECIAL'],  ['FOLDR'],  [('BLNGS',  'HOME_')], 'BGRT_', '0',                                 None,                     'BG_ROOT_SIID'],

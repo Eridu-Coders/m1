@@ -180,7 +180,7 @@ if __name__ == '__main__':
             elif l_elem.attrib['type'] == 'alt': l_alt_title = l_elem.text
             elif l_elem.attrib['type'] == 'sub': l_sub_title = l_elem.text
         elif l_elem.tag == f'{l_tei_namespace}author':
-            l_author_main = l_elem.text
+            l_author_main = re.sub(r'\s+', ' ', l_elem.text).strip()
             for l_pers_name in l_elem.findall(f'{l_tei_namespace}persName'):
                 l_auth_2nd = l_pers_name.text
                 l_role_elem = l_pers_name.find(f'{l_tei_namespace}roleName')
@@ -194,7 +194,7 @@ if __name__ == '__main__':
     print(f'Work Sub-Title       : {l_sub_title}')
     print(f'Work Alternate Title : {l_alt_title}')
     print(f'Main Work Author     : {l_author_main}')
-    print(f'Secondary Authors    : {l_authors_list_header}')
+    # print(f'Secondary Authors    : {l_authors_list_header}')
 
     l_col_1 = ['Available Translations:']
     for i in range(len(l_translator_list)):

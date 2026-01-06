@@ -197,6 +197,7 @@ QString M1Store::Item_lv2::dbgStringHtml(){
 
     // string to contain the representation of edges coming off of this item (only for full items)
     QString l_edges;
+    int l_edge_count = 0;
     if((flags() & ITEM_NATURE_MASK) == FULL_VERTEX || (flags() & ITEM_NATURE_MASK) == FULL_EDGE){
         QStringList l_edge_list;
         // list of edges construction : same logic as recurGraph() above, minus the recursiveness
@@ -205,28 +206,33 @@ QString M1Store::Item_lv2::dbgStringHtml(){
             // l_edges += "\nSpecial edges:";
             ItemID l_stop_id = l_current_edge->item_id();
             do {
-                l_edge_list.append(QString("<p style=\"margin: 0;\">%1</p>\n").arg(l_current_edge->dbgShort().replace(g_re_tags, "").replace(g_re_space, " ").trimmed()));
+                if(l_edge_count < 200)
+                    l_edge_list.append(QString("<p style=\"margin: 0;\">%1</p>\n").arg(l_current_edge->dbgShort().replace(g_re_tags, "").replace(g_re_space, " ").trimmed()));
                 // l_edges += "\n" + l_current_edge->dbgShort();
                 Item_lv2* l_next_edge = l_current_edge->get_next_lv2();
                 l_current_edge = l_next_edge;
+                l_edge_count += 1;
             } while (l_current_edge->item_id() != l_stop_id);
         }
         if(!l_edge_list.empty())
-            l_edges = "<p style=\"margin: 0;font-weight: bold;\">Special edges:</p>\n" + l_edge_list.join("");
+            l_edges = QString("<p style=\"margin: 0;font-weight: bold;\">Special edges (%1):</p>\n").arg(l_edge_count) + l_edge_list.join("");
         l_edge_list.clear();
+        l_edge_count = 0;
         // ordinary edges
         if(Item_lv2* l_current_edge = getExisting(firstEdge_item_id())){
             //l_edges += "\nOrdinary edges:";
             ItemID l_stop_id = l_current_edge->item_id();
             do {
-                l_edge_list.append(QString("<p style=\"margin: 0;\">%1</p>\n").arg(l_current_edge->dbgShort().replace(g_re_tags, "").replace(g_re_space, " ").trimmed()));
+                if(l_edge_count < 200)
+                    l_edge_list.append(QString("<p style=\"margin: 0;\">%1</p>\n").arg(l_current_edge->dbgShort().replace(g_re_tags, "").replace(g_re_space, " ").trimmed()));
                 // l_edges += "\n" + l_current_edge->dbgShort();
                 Item_lv2* l_next_edge = l_current_edge->get_next_lv2();
                 l_current_edge = l_next_edge;
+                l_edge_count += 1;
             } while (l_current_edge->item_id() != l_stop_id);
         }
         if(!l_edge_list.empty())
-            l_edges += "<p style=\"margin: 0;font-weight: bold;\">Ordinary edges:</p>\n" + l_edge_list.join("");
+            l_edges += QString("<p style=\"margin: 0;font-weight: bold;\">Ordinary edges (%1):</p>\n").arg(l_edge_count) + l_edge_list.join("");
     }
 
     QString l_text(text());

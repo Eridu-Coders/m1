@@ -190,7 +190,7 @@ void M1UI::TreeRow::paintEvent(QPaintEvent* p_event){
     // edge type icon
     m_target->edgeIcon(m_edge)->paint(&p, m_target_padding, m_target_padding, m_icon_size, m_icon_size);
     // target type icon
-    m_target->vertexIcon()->paint(&p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
+    m_target->vertexIcon(m_edge)->paint(&p, m_oc_x + m_target_height, m_target_padding, m_icon_size, m_icon_size);
 
     // AUTO edge
     if(m_edge->isOfType(M1Env::AUTO_SIID)){
@@ -204,7 +204,7 @@ void M1UI::TreeRow::paintEvent(QPaintEvent* p_event){
 
     // text
     p.setPen(Qt::white);
-    p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_baseline), m_target->inTreeDisplayText());
+    p.drawText(QPoint(m_oc_x + m_target_height * 2, m_target_baseline), m_target->inTreeDisplayText(m_edge));
 
     // drag markers
     p.setPen(QPen(QBrush(Qt::darkRed), 2.0));
@@ -491,6 +491,7 @@ std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_
             // else if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break;
             if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = TextInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = RoleInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else l_interp_raw = new Interp(p_myself);
         }
         qCDebug(g_cat_interp_base) << QString("B l_interp_raw: %1").arg(l_interp_raw == nullptr ? "null" : "instanciated");
@@ -612,7 +613,7 @@ M1MidPlane::Interp::Interp(M1Store::Item_lv2* p_myself){
  * @brief M1MidPlane::Interp::inTreeDisplayText
  * @return
  */
-QString M1MidPlane::Interp::inTreeDisplayText(){
+QString M1MidPlane::Interp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
     return m_myself->text();
 }
 
@@ -629,7 +630,7 @@ QIcon* M1MidPlane::Interp::edgeIcon(const M1Store::Item_lv2* p_edge){
  * @brief M1MidPlane::Interp::vertexIcon
  * @return
  */
-QIcon* M1MidPlane::Interp::vertexIcon(){
+QIcon* M1MidPlane::Interp::vertexIcon(const M1Store::Item_lv2* p_edge){
     return M1Store::StorageStatic::getQIcon(m_myself->getIconSITypeID());
 }
 
@@ -648,9 +649,8 @@ QString M1MidPlane::Interp::base_edge_html_fragment(const M1Store::Item_lv2* p_e
         ));
     l_self_list.append(QString("<tr><td>Type</td><td>:</td><td>%1</td></tr>\n").arg(p_edge->dbgTypeShort()));
     QString l_self_html = QString("<table class=\"technical\">%1</table>\n").arg(l_self_list.join("\n"));
-    qCDebug(g_cat_interp_base) << "l_self_html:" << l_self_html;
-
     QString l_ret = QString("<p class=\"technical\" style=\"font-weight: bold;\">Edge:</p>\n%1").arg(l_self_html);
+    qCDebug(g_cat_interp_base) << "l_self_html:" << l_ret.length();
 
     M1_FUNC_EXIT
     return l_ret;
@@ -667,6 +667,7 @@ QString M1MidPlane::Interp::base_html_fragment(){
         QString("<p class=\"technical\"><span style=\"font-weight: bold;\">Field Payload</span>: %1</p>\n").arg(m_myself->text()) :
         QString("<p class=\"technical\" style=\"font-weight: bold;\">Target:</p>\n<div class=\"technical\">%1</div>\n").arg(m_myself->dbgStringHtml());
 
+    qCDebug(g_cat_interp_base) << "l_html:" << l_html.length();
     M1_FUNC_EXIT
     return QString("<div\">%1</div>\n").arg(l_html);
 }
@@ -688,7 +689,7 @@ QString M1MidPlane::Interp::getHtmlVirtual(const M1Store::Item_lv2* p_edge){
  * @return
  */
 QString M1MidPlane::Interp::getHtml(const M1Store::Item_lv2* p_edge){
-    M1_FUNC_ENTRY(g_cat_interp_base, QString("Interp getHtml(): %1").arg(this->dbgOneLiner()))
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Interp getHtml(): (Edge ID: %2) %1").arg(this->dbgOneLiner()).arg(p_edge->item_id()))
     QString l_ret_html;
     if(m_edge_cache_iid == p_edge->item_id())
         l_ret_html = m_html_cache;
@@ -702,6 +703,7 @@ QString M1MidPlane::Interp::getHtml(const M1Store::Item_lv2* p_edge){
         m_edge_cache_iid = p_edge->item_id();
         m_html_cache = l_ret_html;
     }
+    qCDebug(g_cat_interp_base) << "l_ret_html:" << l_ret_html.length();
     M1_FUNC_EXIT
     return l_ret_html;
 }
@@ -818,7 +820,7 @@ M1MidPlane::FieldInterp* M1MidPlane::FieldInterp::getOneIfMatch(M1Store::Item_lv
  */
 M1MidPlane::FieldInterp::FieldInterp(M1Store::Item_lv2* p_myself) : Interp(p_myself){}
 
-QString M1MidPlane::FieldInterp::inTreeDisplayText(){
+QString M1MidPlane::FieldInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
     return QString("[%1] %2").arg(m_myself->dbgTypeShort()).arg(m_myself->text());
 }
 
@@ -826,7 +828,7 @@ QIcon* M1MidPlane::FieldInterp::edgeIcon(const M1Store::Item_lv2* p_edge){
     static QIcon ls_field_icon(M1Env::CROOKED_ICON_PATH);
     return &ls_field_icon;
 }
-QIcon* M1MidPlane::FieldInterp::vertexIcon(){
+QIcon* M1MidPlane::FieldInterp::vertexIcon(const M1Store::Item_lv2* p_edge){
     static QIcon ls_field_icon(M1Env::FIELD_ICON_PATH);
     return &ls_field_icon;
 }
@@ -855,7 +857,7 @@ M1MidPlane::TextInterp::TextInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::In
  * @brief M1MidPlane::TextInterp::inTreeDisplayText
  * @return
  */
-QString M1MidPlane::TextInterp::inTreeDisplayText(){
+QString M1MidPlane::TextInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
     M1Store::Item_lv2* l_author_edge = m_myself->find_edge_edge_type(M1Env::TEXT_WRITTEN_BY_SIID);
     return QString("%1%2").arg(l_author_edge != nullptr ? QString("[%1] ").arg(l_author_edge->getTarget_lv2()->text()) : "").arg(m_myself->text());
 }
@@ -883,3 +885,61 @@ QString M1MidPlane::TextInterp::getHtmlVirtual(const M1Store::Item_lv2* p_edge){
     return l_html;
 }
 
+/** --------------------------------------------------------------- RoleInterp ---------------------------------
+ * @brief M1MidPlane::RoleInterp::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
+M1MidPlane::RoleInterp* M1MidPlane::RoleInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be a RoleInterp? %1").arg(p_myself->dbgShort()))
+    M1MidPlane::RoleInterp* l_ret = nullptr;
+    if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::ROLE_FLDR_SIID))
+        l_ret = new RoleInterp(p_myself);
+    M1_FUNC_EXIT
+    return l_ret;
+}
+
+/**
+ * @brief M1MidPlane::RoleInterp::RoleInterp
+ * @param p_myself
+ */
+M1MidPlane::RoleInterp::RoleInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){}
+
+/**
+ * @brief M1MidPlane::RoleInterp::getlUtimateTarget
+ * @param p_edge
+ * @return
+ */
+M1Store::Item_lv2* M1MidPlane::RoleInterp::getlUtimateTarget(const M1Store::Item_lv2* p_edge){
+    if(p_edge->isOfType(M1Env::TEXT_WRITTEN_BY_SIID) || p_edge->isOfType(M1Env::DATA_SOURCE_FROM_SIID)){
+        M1Store::Item_lv2* l_ultimate_target = m_myself->find_edge_generic(M1Store::BLNGS_SIID, M1Store::PERS_TYPE_SIID);
+        if(l_ultimate_target == nullptr) l_ultimate_target = m_myself->find_edge_generic(M1Store::BLNGS_SIID, M1Env::ORG_TYPE_SIID);
+        return l_ultimate_target->getTarget_lv2();
+    }
+    else return nullptr;
+}
+
+/**
+ * @brief M1MidPlane::RoleInterp::vertexIcon
+ * @param p_edge
+ * @return
+ */
+QIcon* M1MidPlane::RoleInterp::vertexIcon(const M1Store::Item_lv2* p_edge){
+    M1Store::Item_lv2* l_ultimate_target = this->getlUtimateTarget(p_edge);
+    if(l_ultimate_target != nullptr)
+        return M1Store::StorageStatic::getQIcon(l_ultimate_target->getIconSITypeID());
+    else return M1Store::StorageStatic::getQIcon(m_myself->getIconSITypeID());
+}
+
+/**
+ * @brief M1MidPlane::RoleInterp::inTreeDisplayText
+ * @param p_edge
+ * @return
+ */
+QString M1MidPlane::RoleInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
+    M1Store::Item_lv2* l_ultimate_target = this->getlUtimateTarget(p_edge);
+    if(l_ultimate_target != nullptr)
+        return QString("%1 (%2)").arg(l_ultimate_target->text()).arg(m_myself->text());
+    else return m_myself->text();
+}
+// QString M1MidPlane::RoleInterp::getHtmlVirtual(const M1Store::Item_lv2* p_edge){}

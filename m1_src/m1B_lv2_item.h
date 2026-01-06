@@ -17,7 +17,6 @@ class Item_lv2_iterator;
  *
  * \todo convert obsolete Item_lv2::linkTo() calls to the new method with InsertionPoint parameter
  * \todo test Magic Enum C++ (https://github.com/Neargye/magic_enum) to display enum labels in debug messages
- * \todo remove getNext_lv2(xxx) and getPrevious_lv2(xxx) now replaced by iterators
  */
 enum class InsertionPoint{
     at_top = 1,
@@ -32,6 +31,7 @@ enum class InsertionPoint{
  *
  * The Item_lv2 class also handles the basic interactions between items, i.e. mainly their connections by means of edges (Which are also items in their own right).
  *
+ * \todo remove getNext_lv2(xxx) and getPrevious_lv2(xxx) from Item_lv2 now replaced by iterators
  * \ingroup LV2
  */
 class Item_lv2 : public Item_lv1 {

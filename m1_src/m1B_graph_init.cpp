@@ -19,6 +19,10 @@ M1Env::SpecialItemID M1Env::ITO_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_WROTE_SIID = G_NONEX_SI_ID;
 // [WRTBY] Special Vertex ID (Edge type) wrote / written by (reciprocal of WROTE above))
 M1Env::SpecialItemID M1Env::TEXT_WRITTEN_BY_SIID = G_NONEX_SI_ID;
+// [DTSDN] Special Vertex ID (Edge type) DS from / to
+M1Env::SpecialItemID M1Env::DATA_SOURCE_FROM_SIID = G_NONEX_SI_ID;
+// [DTSUP] Special Vertex ID (Edge type) DS from / to (reciprocal of DTSDN above))
+M1Env::SpecialItemID M1Env::DATA_SOURCE_TO_SIID = G_NONEX_SI_ID;
 // [OCCUR] Special Vertex ID (Edge type) of occurrence edges
 M1Env::SpecialItemID M1Env::OCCUR_SIID = G_NONEX_SI_ID;
 // [WFORM] Special Vertex ID (Vertex type) of word form vertices
@@ -64,6 +68,7 @@ M1Env::SpecialItemID M1Env::TYPE_NODE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_WORK_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::PERS_TYPE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::ORG_TYPE_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::ROLE_FLDR_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::MSG_TYPE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::ME_SIID = G_NONEX_SI_ID;
@@ -217,6 +222,8 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::ITO_SIID = M1Store::StorageStatic::getSpecialID("_ITO_");
     M1Env::TEXT_WROTE_SIID = M1Store::StorageStatic::getSpecialID("WROTE");
     M1Env::TEXT_WRITTEN_BY_SIID = M1Store::StorageStatic::getSpecialID("WRTBY");
+    M1Env::DATA_SOURCE_FROM_SIID = M1Store::StorageStatic::getSpecialID("DTSDN");
+    M1Env::DATA_SOURCE_TO_SIID = M1Store::StorageStatic::getSpecialID("DTSUP");
     M1Env::OCCUR_SIID = M1Store::StorageStatic::getSpecialID("OCCUR");
     M1Env::WFORM_SIID = M1Store::StorageStatic::getSpecialID("WFORM");
     M1Env::TEXT_ALT_TITLE_SIID = M1Store::StorageStatic::getSpecialID("TXATL");
@@ -242,6 +249,7 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::TEXT_WORK_SIID = M1Store::StorageStatic::getSpecialID("TXWKK");
     M1Env::PERS_TYPE_SIID = M1Store::StorageStatic::getSpecialID("PERSN");
     M1Env::ORG_TYPE_SIID = M1Store::StorageStatic::getSpecialID("ORGN_");
+    M1Env::ROLE_FLDR_SIID = M1Store::StorageStatic::getSpecialID("RLFLD");
     M1Env::TEXT_SIID = M1Store::StorageStatic::getSpecialID("TEXT_");
     M1Env::MSG_TYPE_SIID = M1Store::StorageStatic::getSpecialID("_MSG_");
     M1Env::ME_SIID = M1Store::StorageStatic::getSpecialID("ME___");
@@ -426,6 +434,7 @@ void M1Env::GraphInit::dbg_dump_pseudo_constants(){
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::OWNS_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("OWNS_"), 4, 16, QChar('0')).arg("OWNS_");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::ISA_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("_ISA_"), 4, 16, QChar('0')).arg("_ISA_");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WROTE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WROTE"), 4, 16, QChar('0')).arg("WROTE");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::DATA_SOURCE_FROM_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("DTSDN"), 4, 16, QChar('0')).arg("DTSDN");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::OCCUR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("OCCUR"), 4, 16, QChar('0')).arg("OCCUR");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::WFORM_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WFORM"), 4, 16, QChar('0')).arg("WFORM");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_ALT_TITLE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TXATL"), 4, 16, QChar('0')).arg("TXATL");
@@ -464,6 +473,11 @@ void M1Env::GraphInit::init_base(){
     M1Store::StorageStatic::getNewSpecialWithReciprocal(SI_IS_TYPE | SI_EDGE_TYPE,
         "WROTE", M1Env::TEXT_WROTE_ICON_PATH,
         "WRTBY", M1Env::TEXT_WRITTEN_BY_ICON_PATH,
+        SI_IS_TYPE | SI_EDGE_TYPE);
+    // Special Vertex ID (Edge type) DS from / to
+    M1Store::StorageStatic::getNewSpecialWithReciprocal(SI_IS_TYPE | SI_EDGE_TYPE,
+        "DTSDN", M1Env::DATA_SOURCE_ICON_PATH,
+        "DTSUP", M1Env::DATA_SOURCE_ICON_PATH,
         SI_IS_TYPE | SI_EDGE_TYPE);
     // Special Vertex ID (Edge type) of occurrence edges
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SPECIAL_EDGE, "OCCUR", M1Env::OCCURRENCE_ICON_PATH);
@@ -600,6 +614,21 @@ void M1Env::GraphInit::init_base(){
         M1Env::ORGANIZATION_ICON_PATH);
     l_orgn->setType("TYPE_");
     l_orgn->linkTo(l_txwkk, "BLNGS", nullptr, true);
+
+    // creation of "Role folder"
+    qCDebug(g_cat_silence) << QString("Creating <[RLFLD]-Role folder> item");
+    M1Store::Item_lv2* l_rlfld = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Role folder",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "RLFLD",
+        // icon path
+        M1Env::ROLE_FOLDER_ICON_PATH);
+    l_rlfld->setType("TYPE_");
 
     // creation of "Texts Root (type)"
     qCDebug(g_cat_silence) << QString("Creating <[TEXT_]-Texts Root (type)> item");

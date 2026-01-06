@@ -19,6 +19,10 @@ extern M1Env::SpecialItemID ITO_SIID;
 extern M1Env::SpecialItemID TEXT_WROTE_SIID;
 // [WRTBY] Special Vertex ID (Edge type) wrote / written by (reciprocal of WROTE above))
 extern M1Env::SpecialItemID TEXT_WRITTEN_BY_SIID;
+// [DTSDN] Special Vertex ID (Edge type) DS from / to
+extern M1Env::SpecialItemID DATA_SOURCE_FROM_SIID;
+// [DTSUP] Special Vertex ID (Edge type) DS from / to (reciprocal of DTSDN above))
+extern M1Env::SpecialItemID DATA_SOURCE_TO_SIID;
 // [OCCUR] Special Vertex ID (Edge type) of occurrence edges
 extern M1Env::SpecialItemID OCCUR_SIID;
 // [WFORM] Special Vertex ID (Vertex type) of word form vertices
@@ -70,6 +74,8 @@ extern M1Env::SpecialItemID TEXT_WORK_SIID;
 extern M1Env::SpecialItemID PERS_TYPE_SIID;
 // [ORGN_] Special Vertex ID of "Organization (type)"
 extern M1Env::SpecialItemID ORG_TYPE_SIID;
+// [RLFLD] Special Vertex ID of "Role folder"
+extern M1Env::SpecialItemID ROLE_FLDR_SIID;
 // [TEXT_] Special Vertex ID of "Texts Root (type)"
 extern M1Env::SpecialItemID TEXT_SIID;
 // [_MSG_] Special Vertex ID of "Inboxes / Message Root Type"
