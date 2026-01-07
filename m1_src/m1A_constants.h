@@ -163,6 +163,7 @@ namespace M1Env{
     static const char* HL_CHUNK_ICON_PATH = "../m1_src/Icons/Highlighter2.svg";                 ///<
     static const char* HL_QUOTE_ICON_PATH = "../m1_src/Icons/Quote.svg";                        ///<
     static const char* SLOKA_FOLDER_ICON_PATH = "../m1_src/Icons/SlokaFolder.svg";              ///<
+    static const char* TEXT_WFW_FORM_ICON_PATH = "../m1_src/Icons/word-form.svg";               ///<
 /**@}*/ //end of IconPaths
 
     static const bool SKIP_HEAVY_CHECKING = true; ///< true --> skip time-consuming Q_ASSERT in setType() and linkTo()

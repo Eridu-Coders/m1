@@ -27,6 +27,7 @@ Q_LOGGING_CATEGORY(g_cat_interp_drag, "interp.drag")
 
 QIcon M1UI::TreeRow::cm_open;
 QIcon M1UI::TreeRow::cm_closed;
+std::vector<M1UI::TreeRow*> M1UI::TreeRow::cm_row_list;
 
 /**
  * @brief M1UI::TreeRow::init
@@ -64,6 +65,7 @@ M1UI::TreeRow::TreeRow(M1Store::Item_lv2* p_edge, M1UI::TreeDisplay* p_tree, int
     else m_target = M1MidPlane::Interp::getInterp(p_edge); // simple edge field case only
 
     m_target->setParent(this);
+    cm_row_list.push_back(this);
 
     m_edge = p_edge;
 
@@ -162,7 +164,8 @@ void M1UI::TreeRow::paintOpenClose(QPainter& p){
  */
 void M1UI::TreeRow::emitSignals(){
     M1_FUNC_ENTRY(g_cat_tree_row, QString("emit signals(): %1").arg(this->dbgOneLiner()))
-    emit emitHtml(m_target->getHtml(m_edge));
+    if(m_html_cache.length() == 0) m_html_cache = m_target->getHtml(m_edge);
+    emit emitHtml(m_html_cache);
     emit emitEdit(m_target->get_edit_widget());
     M1_FUNC_EXIT
 }
@@ -174,11 +177,20 @@ void M1UI::TreeRow::emitSignals(){
  */
 void M1UI::TreeRow::performPostUpdate(){
     M1MidPlane::Interp::invalidateAllCaches();
+    M1UI::TreeRow::invalidateAllCaches();
     m_td_parent->repaint();
     this->emitSignals();
     QWidget::setFocus(Qt::OtherFocusReason);
 }
 
+void M1UI::TreeRow::invalidateCache(){
+    m_html_cache = "";
+}
+
+void M1UI::TreeRow::invalidateAllCaches(){
+    for(const auto& l_row : cm_row_list)
+        l_row->invalidateCache();
+}
 /**
  * @brief M1UI::TreeRow::paintEvent
  * @param p_event
@@ -470,47 +482,49 @@ std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Getting appropriate Interp for: %1").arg(p_myself->dbgShort()))
 
     std::shared_ptr<M1MidPlane::Interp> l_ret = nullptr;
-    qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
-    qCDebug(g_cat_interp_base).noquote() << M1MidPlane::Interp::dbgMapContents();
-    qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
+    // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
+    // qCDebug(g_cat_interp_base).noquote() << M1MidPlane::Interp::dbgMapContents();
+    // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
 
     auto l_it = cm_interp_map.find(p_myself->item_id());
     if(l_it != cm_interp_map.end()){
         l_ret = l_it->second;
-        qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
-        qCDebug(g_cat_interp_base) << "after cache lookup : Exists";
+        // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
+        // qCDebug(g_cat_interp_base) << "after cache lookup : Exists";
     }
     else{
-        qCDebug(g_cat_interp_base) << "after cache lookup : Not found -> creating it";
-        qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
+        // qCDebug(g_cat_interp_base) << "after cache lookup : Not found -> creating it";
+        // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
         Interp* l_interp_raw = nullptr;
         while(l_interp_raw == nullptr){
-            qCDebug(g_cat_interp_base) << QString("A l_interp_raw: %1").arg(l_interp_raw == nullptr ? "null" : "instanciated");
+            // qCDebug(g_cat_interp_base) << QString("A l_interp_raw: %1").arg(l_interp_raw == nullptr ? "null" : "instanciated");
 
             //if((l_interp_raw = AutoInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            // else if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            // else if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break; UrlInterp
             if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = TextInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = RoleInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = WfWUnit::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = UrlInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else l_interp_raw = new Interp(p_myself);
         }
-        qCDebug(g_cat_interp_base) << QString("B l_interp_raw: %1").arg(l_interp_raw == nullptr ? "null" : "instanciated");
-        qCDebug(g_cat_interp_base) << QString("B l_interp_raw class name: %1").arg(l_interp_raw->className());
-        qCDebug(g_cat_interp_base) << QString("l_interp_raw: %1").arg(l_interp_raw->dbgOneLiner());
+        // qCDebug(g_cat_interp_base) << QString("B l_interp_raw: %1").arg(l_interp_raw == nullptr ? "null" : "instanciated");
+        // qCDebug(g_cat_interp_base) << QString("B l_interp_raw class name: %1").arg(l_interp_raw->className());
+        // qCDebug(g_cat_interp_base) << QString("l_interp_raw: %1").arg(l_interp_raw->dbgOneLiner());
 
-        qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
+        // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
         l_ret = std::shared_ptr<M1MidPlane::Interp>(l_interp_raw);
-        qCDebug(g_cat_interp_base) << QString("l_ret one-liner: %1").arg(l_ret->dbgOneLiner());
-        qCDebug(g_cat_interp_base) << "C";
-        qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
+        // qCDebug(g_cat_interp_base) << QString("l_ret one-liner: %1").arg(l_ret->dbgOneLiner());
+        // qCDebug(g_cat_interp_base) << "C";
+        // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
         cm_interp_map[p_myself->item_id()] = l_ret;
-        qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
-        qCDebug(g_cat_interp_base) << "D";
+        // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
+        // qCDebug(g_cat_interp_base) << "D";
     }
-    qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
-    qCDebug(g_cat_interp_base) << QString("Returning: %1").arg(l_ret->dbgOneLiner());
+    // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
+    // qCDebug(g_cat_interp_base) << QString("Returning: %1").arg(l_ret->dbgOneLiner());
 
-    qCDebug(g_cat_interp_base).noquote() << M1MidPlane::Interp::dbgMapContents();
+    // qCDebug(g_cat_interp_base).noquote() << M1MidPlane::Interp::dbgMapContents();
 
     M1_FUNC_EXIT
     return l_ret;
@@ -690,20 +704,17 @@ QString M1MidPlane::Interp::getHtmlVirtual(const M1Store::Item_lv2* p_edge){
  */
 QString M1MidPlane::Interp::getHtml(const M1Store::Item_lv2* p_edge){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Interp getHtml(): (Edge ID: %2) %1").arg(this->dbgOneLiner()).arg(p_edge->item_id()))
-    QString l_ret_html;
-    if(m_edge_cache_iid == p_edge->item_id())
-        l_ret_html = m_html_cache;
-    else{
-        l_ret_html = cm_html_template.arg(
-            getHtmlVirtual(p_edge) +
+
+    QString l_own_html = getHtmlVirtual(p_edge);
+    QString l_ret_html =
+        l_own_html.left(4) == "http" ? l_own_html : cm_html_template.arg(l_own_html +
             QString("<p class=\"technical sepabove\"><span style=\"font-weight: bold;\">Class</span>: %1</p>\n").arg(className()) +
             base_edge_html_fragment(p_edge) +
             base_html_fragment()
         );
-        m_edge_cache_iid = p_edge->item_id();
-        m_html_cache = l_ret_html;
-    }
+
     qCDebug(g_cat_interp_base) << "l_ret_html:" << l_ret_html.length();
+
     M1_FUNC_EXIT
     return l_ret_html;
 }
@@ -712,7 +723,7 @@ QString M1MidPlane::Interp::getHtml(const M1Store::Item_lv2* p_edge){
  * @brief M1MidPlane::Interp::invalidateCache
  */
 void M1MidPlane::Interp::invalidateCache(){
-    m_edge_cache_iid = M1Store::G_VOID_ITEM_ID;
+    // m_edge_cache_iid = M1Store::G_VOID_ITEM_ID;
 }
 
 /**
@@ -943,3 +954,46 @@ QString M1MidPlane::RoleInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edg
     else return m_myself->text();
 }
 // QString M1MidPlane::RoleInterp::getHtmlVirtual(const M1Store::Item_lv2* p_edge){}
+
+/** --------------------------------------------------------------- WfWUnit ---------------------------------
+ * @brief M1MidPlane::WfWUnit::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
+M1MidPlane::WfWUnit* M1MidPlane::WfWUnit::getOneIfMatch(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be a WfWUnit? %1").arg(p_myself->dbgShort()))
+    M1MidPlane::WfWUnit* l_ret = nullptr;
+    if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::TEXT_WFW_UNIT_SIID))
+        l_ret = new WfWUnit(p_myself);
+    M1_FUNC_EXIT
+    return l_ret;
+}
+
+M1MidPlane::WfWUnit::WfWUnit(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){}
+
+QString M1MidPlane::WfWUnit::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
+    QString l_translit = m_myself->getField(M1Env::TEXT_WFW_TRANSLIT_SIID);
+    QString l_translat = m_myself->getField(M1Env::TEXT_WFW_TRANSLAT_SIID);
+
+    return QString("%1 (%2) : %3").arg(m_myself->text()).arg(l_translit).arg(l_translat);
+}
+
+/**
+ * @brief M1MidPlane::UrlInterp::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
+M1MidPlane::UrlInterp* M1MidPlane::UrlInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be a WfWUnit? %1").arg(p_myself->dbgShort()))
+    M1MidPlane::UrlInterp* l_ret = nullptr;
+    if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::TEXT_URL_LINK_SIID))
+        l_ret = new UrlInterp(p_myself);
+    M1_FUNC_EXIT
+    return l_ret;
+}
+
+M1MidPlane::UrlInterp::UrlInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){}
+
+QString M1MidPlane::UrlInterp::getHtmlVirtual(const M1Store::Item_lv2* p_edge){
+    return m_myself->text();
+}

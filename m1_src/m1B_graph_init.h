@@ -49,8 +49,14 @@ extern M1Env::SpecialItemID HLCLR_SIID;
 extern M1Env::SpecialItemID TEXT_WORD_TRANSLIT_SIID;
 // [DCTRF] Special Vertex ID (Simple Edge type) of Gita dictionary ref. field
 extern M1Env::SpecialItemID TEXT_WORD_DICT_REF_SIID;
+// [TRSLT] Special Vertex ID (Simple Edge type) of Gita transliteration field
+extern M1Env::SpecialItemID TEXT_WFW_TRANSLIT_SIID;
 // [WFTRN] Special Vertex ID (Simple Edge type) WfW unit Translation field
-extern M1Env::SpecialItemID TEXT_WFW_TRANSL_SIID;
+extern M1Env::SpecialItemID TEXT_WFW_TRANSLAT_SIID;
+// [WFPOS] Special Vertex ID (Simple Edge type) WfW form POS tag
+extern M1Env::SpecialItemID TEXT_WFW_POS_SIID;
+// [WFGRM] Special Vertex ID (Simple Edge type) WfW form Grammatical analysis
+extern M1Env::SpecialItemID TEXT_WFW_GRM_SIID;
 // [URLNK] Special Vertex ID (Vertex type) Url link
 extern M1Env::SpecialItemID TEXT_URL_LINK_SIID;
 // [HS2OB] Special Vertex ID (Edge type) begin section + reciprocal
@@ -144,6 +150,8 @@ extern M1Env::SpecialItemID TEXT_SLOKA_TRANSLIT_SIID;
 extern M1Env::SpecialItemID TEXT_SLOKA_BHASHYA_SIID;
 // [TRLUN] Special Vertex ID of "WfW Translation Unit (type)"
 extern M1Env::SpecialItemID TEXT_WFW_UNIT_SIID;
+// [WFFRM] Special Vertex ID of "WfW Form (type)"
+extern M1Env::SpecialItemID TEXT_WFW_FORM_SIID;
 // [ABBR_] Special Vertex ID of "Abbreviation"
 extern M1Env::SpecialItemID ABBR__SIID;
 // [ANMCY] Special Vertex ID of "Animacy"

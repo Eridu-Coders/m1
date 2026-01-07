@@ -75,6 +75,7 @@ private:
     static QIcon cm_open;
     static QIcon cm_closed;
     // static QList<M1Store::Item_lv2*> cm_gratt;
+    static std::vector<TreeRow*> cm_row_list;
 
     int m_depth;
     int m_target_height;
@@ -96,13 +97,18 @@ private:
     M1Store::Item_lv2* m_edge;
     std::shared_ptr<M1MidPlane::Interp> m_target;
 
+    QString m_html_cache;
+
     void paintOpenClose(QPainter& p);
     void initiateDrag();
     void emitSignals();
+    void invalidateCache();
     // static InterpStaticConstructor cm_the_init;
 public:
     static void init();
     static TreeRow* getTreeRow(M1Store::Item_lv2* p_edge, M1UI::TreeDisplay* p_parent, int p_depth);
+    static void invalidateAllCaches();
+    static void clear_row_list(){cm_row_list.clear();}
 
     TreeRow(M1Store::Item_lv2* p_edge, M1UI::TreeDisplay* p_tree, int p_depth);
     ~TreeRow();
@@ -155,8 +161,6 @@ class Interp : public QObject{
 private:
     static std::map<M1Env::ItemID, std::shared_ptr<Interp>> cm_interp_map;
 
-    M1Store::ItemID m_edge_cache_iid = M1Store::G_VOID_ITEM_ID;
-    QString m_html_cache;
     QTextEdit* m_text_edit = nullptr;
     M1UI::TreeRow* m_tree_row = nullptr;
 
@@ -168,6 +172,7 @@ protected:
     Interp();
     Interp(M1Store::Item_lv2* p_myself);
     virtual QString className() {return "BaseInterp";}
+    void invalidateCache();
 
     QString base_html_fragment();
     QString base_edge_html_fragment(const M1Store::Item_lv2* p_edge);
@@ -182,7 +187,6 @@ public:
 
     bool isEmpty(){return m_myself == nullptr;}
     QString getHtml(const M1Store::Item_lv2* p_edge);
-    void invalidateCache();
     void setParent(M1UI::TreeRow* p_tree_row){m_tree_row = p_tree_row;}
 
     virtual QWidget *get_edit_widget();
@@ -259,6 +263,28 @@ public:
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual QIcon* vertexIcon(const M1Store::Item_lv2* p_edge=nullptr);
     // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
+};
+
+class WfWUnit : public Interp{
+    Q_OBJECT
+public:
+    static WfWUnit* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    WfWUnit(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "WfWUnit";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
+};
+
+class UrlInterp : public Interp{
+    Q_OBJECT
+public:
+    static UrlInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    UrlInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "UrlInterp";}
+    // virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
 };
 
 } // namespace M1MidPlane

@@ -212,6 +212,9 @@ void M1UI::TreeDisplay::gotoVertex(M1Store::Item_lv2* p_new_vertex, M1UI::TreeRo
     m_scroll_area_widget = nullptr;
     m_vb_layout = nullptr;
 
+    // erase TreeRow list
+    M1UI::TreeRow::clear_row_list();
+
     // re-create the scroll area widget and its layout
     this->createScrollWidget();
 

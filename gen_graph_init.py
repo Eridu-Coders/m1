@@ -404,7 +404,7 @@ g_special_vertices = [
     # --------------------------- WROTE / WRTBY ---------------------------
     ['WROTE', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'TEXT_WROTE_ICON_PATH',      'TEXT_WROTE_SIID',
     ('WRTBY', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'TEXT_WRITTEN_BY_ICON_PATH', 'TEXT_WRITTEN_BY_SIID'), 'Special Vertex ID (Edge type) wrote / written by'],
-    # --------------------------- WROTE / WRTBY ---------------------------
+    # --------------------------- DS from / to ----------------------------
     ['DTSDN', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'DATA_SOURCE_ICON_PATH',     'DATA_SOURCE_FROM_SIID',
     ('DTSUP', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'DATA_SOURCE_ICON_PATH',     'DATA_SOURCE_TO_SIID'),  'Special Vertex ID (Edge type) DS from / to'],
     # ---------------------------------------------------------------------
@@ -422,14 +422,17 @@ g_special_vertices = [
     ['HLCLR', 'SI_IS_TYPE',                                None,                        'HLCLR_SIID', None,          'Color of text highlight category'],
     ['TRSLT', 'SI_IS_TYPE',                                None,                        'TEXT_WORD_TRANSLIT_SIID', None, 'Special Vertex ID (Simple Edge type) of Gita transliteration field'],
     ['DCTRF', 'SI_IS_TYPE',                                None,                        'TEXT_WORD_DICT_REF_SIID', None, 'Special Vertex ID (Simple Edge type) of Gita dictionary ref. field'],
-    ['WFTRN', 'SI_IS_TYPE',                                None,                        'TEXT_WFW_TRANSL_SIID', None, 'Special Vertex ID (Simple Edge type) WfW unit Translation field'],
+    ['TRSLT', 'SI_IS_TYPE',                                None,                        'TEXT_WFW_TRANSLIT_SIID', None, 'Special Vertex ID (Simple Edge type) of Gita transliteration field'],
+    ['WFTRN', 'SI_IS_TYPE',                                None,                        'TEXT_WFW_TRANSLAT_SIID', None, 'Special Vertex ID (Simple Edge type) WfW unit Translation field'],
+    ['WFPOS', 'SI_IS_TYPE',                                None,                        'TEXT_WFW_POS_SIID', None, 'Special Vertex ID (Simple Edge type) WfW form POS tag'],
+    ['WFGRM', 'SI_IS_TYPE',                                None,                        'TEXT_WFW_GRM_SIID', None, 'Special Vertex ID (Simple Edge type) WfW form Grammatical analysis'],
     ['URLNK', 'SI_IS_TYPE',                                'TEXT_URL_LINK_ICON_PATH',   'TEXT_URL_LINK_SIID', None,  'Special Vertex ID (Vertex type) Url link'],
     # --------------------------- HS2OB / OC2HB ---------------------------
     ['HS2OB', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_BEGIN_ICON_PATH', 'TW_SECTION_2_OCC_BEGIN_SIID',
     ('OC2HB', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_BEGIN_ICON_PATH', 'TW_REV_SECTION_2_OCC_BEGIN_SIID'),  'Special Vertex ID (Edge type) begin section + reciprocal'],
     # --------------------------- HS2OE / OC2HE ---------------------------
     ['HS2OE', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_END_ICON_PATH', 'TW_SECTION_2_OCC_END_SIID',
-    ('OC2HE', 'SI_IS_TYPE',                                'TW_SECTION_2_OCC_END_ICON_PATH', 'TW_REV_SECTION_2_OCC_END_SIID'),'Special Vertex ID (Edge type) end section + reciprocal'],
+    ('OC2HE', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_END_ICON_PATH', 'TW_REV_SECTION_2_OCC_END_SIID'),'Special Vertex ID (Edge type) end section + reciprocal'],
 ]
 
 g_vertices = [
@@ -485,6 +488,7 @@ g_vertices = [
 ['Sloka Transliteration (type)', ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'SLTRL', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], 'TEXT_SLOKA_TRANSLIT_ICON_PATH', 'TEXT_SLOKA_TRANSLIT_SIID'],
 ['Sloka Bhashya (type)',         ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'SLBHS', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], 'TEXT_SLOKA_BHASHYA_ICON_PATH', 'TEXT_SLOKA_BHASHYA_SIID'],
 ['WfW Translation Unit (type)',  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'TRLUN', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], 'TEXT_WFW_UNIT_ICON_PATH', 'TEXT_WFW_UNIT_SIID'],
+['WfW Form (type)',              ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'WFFRM', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], 'TEXT_WFW_FORM_ICON_PATH', 'TEXT_WFW_FORM_SIID'],
 ]
 
 g_special_vertices_gita = [

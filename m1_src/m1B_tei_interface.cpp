@@ -1,5 +1,6 @@
 #include <QXmlStreamReader>
 #include <QElapsedTimer>
+#include <QRegularExpression>
 
 #include <iostream>
 
@@ -9,6 +10,8 @@
 #include "m1B_graph_init.h"
 // #include "m1B_lv2_item.h"
 // #include "m1B_lv2_iterators.h"
+
+QRegularExpression g_re_space(R"(\s+)");
 
 // g_cat_tei
 Q_LOGGING_CATEGORY(g_cat_tei, "tei_interface")
@@ -25,6 +28,7 @@ void M1Store::TEIInterface::loadTei(const QString& p_file_path){
  * @brief M1Store::TEIInterface::cm_text_root
  */
 M1Store::Item_lv2* M1Store::TEIInterface::cm_text_root;
+M1Store::Item_lv2* M1Store::TEIInterface::cm_lexicon_root;
 M1Store::Item_lv2* M1Store::TEIInterface::cm_cur_chapter_vertex;
 M1Store::Item_lv2* M1Store::TEIInterface::cm_cur_sloka_vertex;
 
@@ -58,29 +62,41 @@ void M1Store::TEIInterface::create_text(const QString& p_title, const QString& p
     // Author (main author role is just 'Author')
     M1Store::Item_lv2* l_author = getPersonOrg(p_author_text, "Author", OrgOrPerson::Person, ReturnEntityOrRole::Entity);
     cm_text_root->linkTo(l_author, M1Env::TEXT_WRITTEN_BY_SIID);
-}
 
-void M1Store::TEIInterface::addTranslationBhashya(const QString& p_text, const QString& p_source, const QString& p_author_text, const QString& p_author_role, bool p_is_translation){
-    // Text node
-    M1Store::Item_lv2* l_new_text = M1Store::Item_lv2::getNew(
+    // Lexicon Root
+    cm_lexicon_root = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX,
         // label
-        p_text);
-    if(p_is_translation) l_new_text->setType(M1Env::TEXT_SLOKA_TRANSLATION_SIID);
-    else l_new_text->setType(M1Env::TEXT_SLOKA_BHASHYA_SIID);
-    cm_cur_sloka_vertex->linkTo(l_new_text, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+        "Lexicon");
+    cm_lexicon_root->setType(M1Env::FOLDER_SIID);
+    cm_text_root->linkTo(cm_lexicon_root, M1Env::OWNS_SIID);
+}
 
-    // Author
-    M1Store::Item_lv2* l_author_folder = getPersonOrg(p_author_text, p_author_role, OrgOrPerson::Person, ReturnEntityOrRole::RoleFolder);
-    l_new_text->linkTo(l_author_folder, M1Env::TEXT_WRITTEN_BY_SIID, InsertionPoint::at_top, InsertionPoint::at_bottom);
+void M1Store::TEIInterface::addTranslationBhashya(const QString& p_text, const QString& p_source, const QString& p_author_text, const QString& p_author_role, bool p_is_translation){
+    QString l_text = p_text;
+    l_text = l_text.replace(g_re_space, QString(" ")).trimmed();
+    if(l_text.length() > 0){
+        // Text node creation
+        M1Store::Item_lv2* l_new_text = M1Store::Item_lv2::getNew(
+            // vertex flags
+            M1Env::FULL_VERTEX,
+            // label
+            l_text);
+        if(p_is_translation) l_new_text->setType(M1Env::TEXT_SLOKA_TRANSLATION_SIID);
+        else l_new_text->setType(M1Env::TEXT_SLOKA_BHASHYA_SIID);
+        cm_cur_sloka_vertex->linkTo(l_new_text, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
 
-    // Source
-    if(p_source.length() > 0){ // role for an org = data source
-        M1Store::Item_lv2* l_source_folder = getPersonOrg(p_source, "Data Source", OrgOrPerson::Organization, ReturnEntityOrRole::RoleFolder);
-        l_new_text->linkTo(l_source_folder, M1Env::DATA_SOURCE_FROM_SIID, InsertionPoint::at_top, InsertionPoint::at_bottom);
+        // Author
+        M1Store::Item_lv2* l_author_folder = getPersonOrg(p_author_text, p_author_role, OrgOrPerson::Person, ReturnEntityOrRole::RoleFolder);
+        l_new_text->linkTo(l_author_folder, M1Env::TEXT_WRITTEN_BY_SIID, InsertionPoint::at_top, InsertionPoint::at_bottom);
+
+        // Source
+        if(p_source.length() > 0){ // role for an org = data source
+            M1Store::Item_lv2* l_source_folder = getPersonOrg(p_source, "Data Source", OrgOrPerson::Organization, ReturnEntityOrRole::RoleFolder);
+            l_new_text->linkTo(l_source_folder, M1Env::DATA_SOURCE_FROM_SIID, InsertionPoint::at_top, InsertionPoint::at_bottom);
+        }
     }
-
 }
 
 /**
@@ -130,6 +146,49 @@ M1Store::Item_lv2* M1Store::TEIInterface::getPersonOrg(const QString& p_name, co
         return l_entity_existing;
     else
         return l_role_folder;
+}
+
+void M1Store::TEIInterface::create_Lexicon_Entry(const QString& p_lemma_text, const QString& p_pos_text, const QString& p_url_dict_list, QList<FormLexicon>& p_form_list){
+    M1Store::Item_lv2* l_new_lemma = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX,
+        // label
+        p_lemma_text);
+    l_new_lemma->setType(M1Env::LEMMA_SIID);
+    cm_lexicon_root->linkTo(l_new_lemma, M1Env::OWNS_SIID);
+    l_new_lemma->setFieldEdge(p_pos_text, M1Env::TEXT_WFW_POS_SIID);
+
+    M1Store::Item_lv2* l_new_url = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX,
+        // label
+        p_url_dict_list);
+    l_new_url->setType(M1Env::TEXT_URL_LINK_SIID);
+    l_new_lemma->linkTo(l_new_url, M1Env::OWNS_SIID);
+}
+
+void M1Store::TEIInterface::create_wfw_unit(const QString& p_sk_segment, const QString& p_transliteration, const QString& p_translation, QList<Form_WfW>& p_form_list){
+    M1Store::Item_lv2* l_new_wfw_unit = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX,
+        // label
+        p_sk_segment);
+    l_new_wfw_unit->setType(M1Env::TEXT_WFW_UNIT_SIID);
+    cm_cur_sloka_vertex->linkTo(l_new_wfw_unit, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+    l_new_wfw_unit->setFieldEdge(p_transliteration, M1Env::TEXT_WFW_TRANSLIT_SIID);
+    l_new_wfw_unit->setFieldEdge(p_translation, M1Env::TEXT_WFW_TRANSLAT_SIID);
+
+    for(Form_WfW f: p_form_list){
+        M1Store::Item_lv2* l_new_wfw_form = M1Store::Item_lv2::getNew(
+            // vertex flags
+            M1Env::FULL_VERTEX,
+            // label
+            f.form());
+        l_new_wfw_form->setType(M1Env::TEXT_WFW_FORM_SIID);
+        l_new_wfw_unit->linkTo(l_new_wfw_form, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+        l_new_wfw_form->setFieldEdge(f.pos(), M1Env::TEXT_WFW_POS_SIID);
+        l_new_wfw_form->setFieldEdge(f.grammar(), M1Env::TEXT_WFW_GRM_SIID);
+    }
 }
 
 /**
@@ -307,17 +366,6 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                 QString l_lemma_text;
                 QString l_url_dict_list;
 
-                class FormLexicon{
-                private:
-                    QString m_orth;
-                    QString m_grammar;
-                public:
-                    FormLexicon(const QString& p_orth, const QString& p_grammar){m_orth = p_orth; m_grammar = p_grammar;}
-
-                    const QString& form(){return m_orth;}
-                    const QString& grammar(){return m_grammar;}
-                };
-
                 QList<FormLexicon> l_form_list;
 
                 while (!l_xml_reader.atEnd()) {
@@ -347,6 +395,8 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                         for(FormLexicon f: l_form_list)
                             qCDebug(g_cat_tmp_spotlight).noquote() << cm_indent << QString("    form: %1 Grammar: %2").arg(f.form()).arg(f.grammar());
                         l_found_one_entry = true;
+
+                        create_Lexicon_Entry(l_lemma_text, l_pos_text, l_url_dict_list, l_form_list);
                     }
                     // POS
                     else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "pos"){
@@ -397,7 +447,7 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                             qCDebug(g_cat_tei).noquote() << cm_indent << QString("<form type=%1> gram: %2 orth: %3").arg(l_type).arg(l_gram_text).arg(l_orth_text);
                         }
                     }
-                    // end of lexicon (</div1>)
+                    // end of lexicon section (</div1>)
                     else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "div1"){
                         cm_indent.chop(l_indent_count);
                         cm_indent.chop(l_indent_count);
@@ -492,35 +542,6 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                 QString l_sk_segment;
                 QString l_transliteration;
                 QString l_translation;
-
-                class Form_WfW{
-                private:
-                    QString m_form;
-                    QString m_lemma;
-                    QString m_pos;
-                    QString m_ref;
-                    QString m_grammar;
-                public:
-                    Form_WfW(const QString& p_form,
-                             const QString& p_lemma,
-                             const QString& p_pos,
-                             const QString& p_ref,
-                             const QString& p_grammar){
-                        m_form = p_form;
-                        m_lemma = p_lemma;
-                        m_pos = p_pos;
-                        m_ref = p_ref;
-                        m_grammar = p_grammar;
-                    }
-
-                    const QString& form(){return m_form;}
-                    const QString& lemma(){return m_lemma;}
-                    const QString& pos(){return m_pos;}
-                    const QString& ref(){return m_ref;}
-                    const QString& grammar(){return m_grammar;}
-
-                    const QString dbgOneLiner(){return QString("%1 [%2 %3 %5] %4").arg(m_form).arg(m_lemma).arg(m_pos).arg(m_ref).arg(m_grammar);}
-                };
 
                 QList<Form_WfW> l_form_list;
 
@@ -630,8 +651,10 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                                                                                    .arg(l_translation);
                         for(Form_WfW f: l_form_list)
                             qCDebug(g_cat_tei).noquote() << cm_indent << QString("    %1").arg(f.dbgOneLiner());
-                        l_form_list.clear();
 
+                        create_wfw_unit(l_sk_segment, l_transliteration, l_translation, l_form_list);
+
+                        l_form_list.clear();
                     }
                     // end of wfw block <div3>
                     else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "div3"){

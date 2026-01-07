@@ -49,8 +49,14 @@ M1Env::SpecialItemID M1Env::HLCLR_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_WORD_TRANSLIT_SIID = G_NONEX_SI_ID;
 // [DCTRF] Special Vertex ID (Simple Edge type) of Gita dictionary ref. field
 M1Env::SpecialItemID M1Env::TEXT_WORD_DICT_REF_SIID = G_NONEX_SI_ID;
+// [TRSLT] Special Vertex ID (Simple Edge type) of Gita transliteration field
+M1Env::SpecialItemID M1Env::TEXT_WFW_TRANSLIT_SIID = G_NONEX_SI_ID;
 // [WFTRN] Special Vertex ID (Simple Edge type) WfW unit Translation field
-M1Env::SpecialItemID M1Env::TEXT_WFW_TRANSL_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::TEXT_WFW_TRANSLAT_SIID = G_NONEX_SI_ID;
+// [WFPOS] Special Vertex ID (Simple Edge type) WfW form POS tag
+M1Env::SpecialItemID M1Env::TEXT_WFW_POS_SIID = G_NONEX_SI_ID;
+// [WFGRM] Special Vertex ID (Simple Edge type) WfW form Grammatical analysis
+M1Env::SpecialItemID M1Env::TEXT_WFW_GRM_SIID = G_NONEX_SI_ID;
 // [URLNK] Special Vertex ID (Vertex type) Url link
 M1Env::SpecialItemID M1Env::TEXT_URL_LINK_SIID = G_NONEX_SI_ID;
 // [HS2OB] Special Vertex ID (Edge type) begin section + reciprocal
@@ -103,6 +109,7 @@ M1Env::SpecialItemID M1Env::TEXT_SLOKA_TRANSLATION_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_SLOKA_TRANSLIT_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_SLOKA_BHASHYA_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_WFW_UNIT_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::TEXT_WFW_FORM_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::ABBR__SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::ANMCY_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::ASPCT_SIID = G_NONEX_SI_ID;
@@ -237,7 +244,10 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::HLCLR_SIID = M1Store::StorageStatic::getSpecialID("HLCLR");
     M1Env::TEXT_WORD_TRANSLIT_SIID = M1Store::StorageStatic::getSpecialID("TRSLT");
     M1Env::TEXT_WORD_DICT_REF_SIID = M1Store::StorageStatic::getSpecialID("DCTRF");
-    M1Env::TEXT_WFW_TRANSL_SIID = M1Store::StorageStatic::getSpecialID("WFTRN");
+    M1Env::TEXT_WFW_TRANSLIT_SIID = M1Store::StorageStatic::getSpecialID("TRSLT");
+    M1Env::TEXT_WFW_TRANSLAT_SIID = M1Store::StorageStatic::getSpecialID("WFTRN");
+    M1Env::TEXT_WFW_POS_SIID = M1Store::StorageStatic::getSpecialID("WFPOS");
+    M1Env::TEXT_WFW_GRM_SIID = M1Store::StorageStatic::getSpecialID("WFGRM");
     M1Env::TEXT_URL_LINK_SIID = M1Store::StorageStatic::getSpecialID("URLNK");
     M1Env::TW_SECTION_2_OCC_BEGIN_SIID = M1Store::StorageStatic::getSpecialID("HS2OB");
     M1Env::TW_REV_SECTION_2_OCC_BEGIN_SIID = M1Store::StorageStatic::getSpecialID("OC2HB");
@@ -284,6 +294,7 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::TEXT_SLOKA_TRANSLIT_SIID = M1Store::StorageStatic::getSpecialID("SLTRL");
     M1Env::TEXT_SLOKA_BHASHYA_SIID = M1Store::StorageStatic::getSpecialID("SLBHS");
     M1Env::TEXT_WFW_UNIT_SIID = M1Store::StorageStatic::getSpecialID("TRLUN");
+    M1Env::TEXT_WFW_FORM_SIID = M1Store::StorageStatic::getSpecialID("WFFRM");
     M1Env::ABBR__SIID = M1Store::StorageStatic::getSpecialID("ABBR_");
     M1Env::ANMCY_SIID = M1Store::StorageStatic::getSpecialID("ANMCY");
     M1Env::ASPCT_SIID = M1Store::StorageStatic::getSpecialID("ASPCT");
@@ -448,7 +459,10 @@ void M1Env::GraphInit::dbg_dump_pseudo_constants(){
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::HLCLR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("HLCLR"), 4, 16, QChar('0')).arg("HLCLR");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WORD_TRANSLIT_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TRSLT"), 4, 16, QChar('0')).arg("TRSLT");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WORD_DICT_REF_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("DCTRF"), 4, 16, QChar('0')).arg("DCTRF");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_TRANSL_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WFTRN"), 4, 16, QChar('0')).arg("WFTRN");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_TRANSLIT_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TRSLT"), 4, 16, QChar('0')).arg("TRSLT");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_TRANSLAT_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WFTRN"), 4, 16, QChar('0')).arg("WFTRN");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_POS_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WFPOS"), 4, 16, QChar('0')).arg("WFPOS");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_GRM_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WFGRM"), 4, 16, QChar('0')).arg("WFGRM");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_URL_LINK_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("URLNK"), 4, 16, QChar('0')).arg("URLNK");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TW_SECTION_2_OCC_BEGIN_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("HS2OB"), 4, 16, QChar('0')).arg("HS2OB");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TW_SECTION_2_OCC_END_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("HS2OE"), 4, 16, QChar('0')).arg("HS2OE");
@@ -505,8 +519,14 @@ void M1Env::GraphInit::init_base(){
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TRSLT", nullptr);
     // Special Vertex ID (Simple Edge type) of Gita dictionary ref. field
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "DCTRF", nullptr);
+    // Special Vertex ID (Simple Edge type) of Gita transliteration field
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TRSLT", nullptr);
     // Special Vertex ID (Simple Edge type) WfW unit Translation field
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "WFTRN", nullptr);
+    // Special Vertex ID (Simple Edge type) WfW form POS tag
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "WFPOS", nullptr);
+    // Special Vertex ID (Simple Edge type) WfW form Grammatical analysis
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "WFGRM", nullptr);
     // Special Vertex ID (Vertex type) Url link
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "URLNK", M1Env::TEXT_URL_LINK_ICON_PATH);
     // Special Vertex ID (Edge type) begin section + reciprocal
@@ -1166,6 +1186,22 @@ void M1Env::GraphInit::init_base(){
         M1Env::TEXT_WFW_UNIT_ICON_PATH);
     l_trlun->setType("TYPE_");
     l_trlun->linkTo(l_txwkk, "BLNGS", nullptr, true);
+
+    // creation of "WfW Form (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[WFFRM]-WfW Form (type)> item");
+    M1Store::Item_lv2* l_wffrm = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "WfW Form (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "WFFRM",
+        // icon path
+        M1Env::TEXT_WFW_FORM_ICON_PATH);
+    l_wffrm->setType("TYPE_");
+    l_wffrm->linkTo(l_txwkk, "BLNGS", nullptr, true);
 
     // creation of "Abbreviation"
     qCDebug(g_cat_silence) << QString("Creating <[ABBR_]-Abbreviation> item");
