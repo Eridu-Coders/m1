@@ -131,6 +131,7 @@ public:
     virtual void dropEvent(QDropEvent *p_event);
 
     void restore_acept_drops();
+    M1Store::Item_lv2* where_to_go();
     // virtual void mouseMoveEvent(QMouseEvent *p_event);
 
     // void deleteProxy();
@@ -177,7 +178,8 @@ protected:
     QString base_html_fragment();
     QString base_edge_html_fragment(const M1Store::Item_lv2* p_edge);
 
-    virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
+    // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
     virtual QString dbgOneLinerVirtual();
 public:
     static void init(){cm_interp_map.clear();}
@@ -194,8 +196,8 @@ public:
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual QIcon* edgeIcon(const M1Store::Item_lv2* p_edge);
     virtual QIcon* vertexIcon(const M1Store::Item_lv2* p_edge);
-    virtual M1Store::Item_lv2* targetForGotoVertex(){return m_myself;}
     virtual void createDescendant(M1Store::SpecialItem* p_new_edge_type, M1Store::SpecialItem* p_new_vertex_type);
+    virtual M1Store::Item_lv2* where_to_go(const M1Store::Item_lv2* p_edge);
 
     QString dbgOneLiner(){
         m_dbgOneLinerCache = dbgOneLinerVirtual();
@@ -247,7 +249,7 @@ public:
     // virtual bool displayOpenClose(){ return false; }
     // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
-    virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
     // virtual void paintEvent(QPaintEvent* p_event);
 };
 
@@ -284,7 +286,56 @@ public:
     UrlInterp(M1Store::Item_lv2* p_myself);
     virtual QString className() {return "UrlInterp";}
     // virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
-    virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
+};
+
+class OccurInterp : public Interp{
+    Q_OBJECT
+private:
+    std::shared_ptr<Interp> m_target;
+public:
+    static OccurInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    OccurInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "OccurInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
+    virtual M1Store::Item_lv2* where_to_go(const M1Store::Item_lv2* p_edge);
+};
+
+class LemmaInterp : public Interp{
+    Q_OBJECT
+public:
+    static LemmaInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    LemmaInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "LemmaInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
+};
+
+class FormInterp : public Interp{
+    Q_OBJECT
+private:
+    std::shared_ptr<Interp> m_lemma;
+public:
+    static FormInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    FormInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "FormInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
+};
+
+class TranslationBhashya : public Interp{
+    Q_OBJECT
+public:
+    static TranslationBhashya* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    TranslationBhashya(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "TranslationBhashya";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
 };
 
 } // namespace M1MidPlane

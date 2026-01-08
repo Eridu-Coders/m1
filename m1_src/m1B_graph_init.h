@@ -23,8 +23,10 @@ extern M1Env::SpecialItemID TEXT_WRITTEN_BY_SIID;
 extern M1Env::SpecialItemID DATA_SOURCE_FROM_SIID;
 // [DTSUP] Special Vertex ID (Edge type) DS from / to (reciprocal of DTSDN above))
 extern M1Env::SpecialItemID DATA_SOURCE_TO_SIID;
-// [OCCUR] Special Vertex ID (Edge type) of occurrence edges
+// [OCCUR] Special Vertex ID (Edge type) of form occurrence edges
 extern M1Env::SpecialItemID OCCUR_SIID;
+// [OCCIN] Special Vertex ID (Edge type) of form to point of occurrence edges
+extern M1Env::SpecialItemID OCCURS_IN_SIID;
 // [WFORM] Special Vertex ID (Vertex type) of word form vertices
 extern M1Env::SpecialItemID WFORM_SIID;
 // [TXATL] Special Vertex ID (Simple edge type) alternate text title

@@ -409,7 +409,8 @@ g_special_vertices = [
     ('DTSUP', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'DATA_SOURCE_ICON_PATH',     'DATA_SOURCE_TO_SIID'),  'Special Vertex ID (Edge type) DS from / to'],
     # ---------------------------------------------------------------------
     ['OCCUR', ['SI_IS_TYPE', 'SI_EDGE_TYPE',
-               'SI_IS_SPECIAL_EDGE'],                      'OCCURRENCE_ICON_PATH',      'OCCUR_SIID', None,          'Special Vertex ID (Edge type) of occurrence edges'],
+               'SI_IS_SPECIAL_EDGE'],                      'OCCURRENCE_ICON_PATH',      'OCCUR_SIID', None,          'Special Vertex ID (Edge type) of form occurrence edges'],
+    ['OCCIN', ['SI_IS_TYPE', 'SI_EDGE_TYPE',],             'OCCURRENCE_ICON_PATH',      'OCCURS_IN_SIID', None,      'Special Vertex ID (Edge type) of form to point of occurrence edges'],
     ['WFORM', 'SI_IS_TYPE | SI_IS_ICON_TYPE',              'WFORM_ICON_PATH',           'WFORM_SIID', None,          'Special Vertex ID (Vertex type) of word form vertices'],
     ['TXATL', 'SI_IS_TYPE',                                None,                        'TEXT_ALT_TITLE_SIID', None, 'Special Vertex ID (Simple edge type) alternate text title'],
     ['TXSBT', 'SI_IS_TYPE',                                None,                        'TEXT_SUB_TITLE_SIID', None, 'Special Vertex ID (Simple edge type) text subtitle'],

@@ -21,8 +21,6 @@ Q_LOGGING_CATEGORY(g_cat_tmp_spotlight, "tmp")
 // cloc count
 // cloc --by-file-by-lang --exclude-content="M1Env::GraphInit::init_base()" --include-lang=C++,"C/C++ Header",Python --fullpath --not-match-d='^build.*|.*stringcase.*' *
 
-QRegularExpression g_re_punc(R"(^(\W*)(\w+)(\W*))");
-
 /*
 void loadEnoch();
 int loadGita();
@@ -98,12 +96,13 @@ int main(int argc, char *argv[])
                                         "lv1.*=false\n"
                                         "lv2.*=false\n"
                                         // "lv2.type_iterators=true\n"
-                                        // "interp.*=false\n"
+                                        "interp.*=false\n"
                                         // "interp.drag=true\n"
                                         "tree_display=false\n"
                                         "passages_panel=false\n"
                                         "main_window=false\n"
                                         "tei_interface=false\n"
+                                        "tree_row=false\n"
                                         "qt.*.debug=false");
 
     M1MidPlane::Interp::init();

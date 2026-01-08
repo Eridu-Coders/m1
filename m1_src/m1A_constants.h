@@ -57,8 +57,9 @@ namespace M1Env{
     const unsigned long long IS_SPECIAL             = 0x0000000000000010; ///< 1 --> this item is a special vertex
     const unsigned long long IS_AUTO                = 0x0000000000000020; ///< 1 --> this is an AUTO_ edge
     const unsigned long long EDGE_IS_OPEN           = 0x0000000000000080; ///< 1 --> this edge is open (recursive descent)
+    const unsigned long long EDGE_SEPABOVE          = 0x0000000000000100; ///< 1 --> this edge has a horizontal separator above it
 
-    const unsigned long long SPECIAL_ITEM_ID_MASK   = 0xFFFF000000000080; ///< Mask of the area used to store the SpecialItemID of a vertex, when applicable (IS_SPECIAL is set)
+    const unsigned long long SPECIAL_ITEM_ID_MASK   = 0xFFFF000000000000; ///< Mask of the area used to store the SpecialItemID of a vertex, when applicable (IS_SPECIAL is set)
 
     // bit masks for testing the values below           XXXX____XXXX____
     const unsigned long long ITEM_NATURE_MASK       = 0x0000000000000003; ///< all bits to determine Item nature

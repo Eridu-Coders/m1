@@ -2,6 +2,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDateTime>
+#include <QRegularExpression>
 
 #include <iostream>
 
@@ -17,6 +18,10 @@ QString M1Env::EnvStatic::cm_normal_filter;
 std::stack<QString> M1Env::EnvStatic::cm_current_category;
 int M1Env::EnvStatic::cm_depth = 0;
 QStringList M1Env::EnvStatic::cm_list_excluded_catergory_for_screen;
+
+QRegularExpression g_re_space(R"(\s+)");
+QRegularExpression g_re_punc(R"(^(\W*)(\w+)(\W*))");
+QRegularExpression g_re_tags(R"(<[^>]+>)");
 
 /**
  * @brief M1Store::M1Env::myMessageHandler message handler callback for Qt debug infra

@@ -1079,7 +1079,7 @@ if __name__ == '__main__':
 
             # Building combined WfW dict (keys = words from earch WfW) from BGS, online API and ISKCON
             try:
-                l_wfw_dict = dict([(iast_cleanup(k), ([space_clean(t)], {space_clean(t)})) for k, t in l_wfw_api_list])
+                l_wfw_dict = dict([(iast_cleanup(k), ([space_clean(t.lower())], {space_clean(t.lower())})) for k, t in l_wfw_api_list])
             except ValueError as e:
                 print(e)
                 for l_item in l_wfw_api_list:
@@ -1094,7 +1094,7 @@ if __name__ == '__main__':
                 l_key = iast_cleanup(devtrans.dev2iast(k))
                 l_tl, l_ts = l_wfw_dict.setdefault(l_key, ([], set()))
                 print(f'GS {l_key:35}', l_tl, l_ts)
-                t = space_clean(t)
+                t = space_clean(t).lower()
                 l_wfw_dict[l_key] = (l_tl + [t], l_ts.union({t}))
 
             print(l_wfw_dict)
@@ -1103,7 +1103,7 @@ if __name__ == '__main__':
                 p = l_wfw_dict.setdefault(l_key, ([], set()))
                 l_tl, l_ts = p
                 print(f'IK {l_key:35}', p, l_tl, l_ts)
-                t = space_clean(t)
+                t = space_clean(t).lower()
                 l_wfw_dict[l_key] = (l_tl + [t], l_ts.union({t}))
 
             # merging smaller keys into longer keys (example: adhyātma + cetasā --> adhyātmacetasā)
@@ -1832,7 +1832,7 @@ if __name__ == '__main__':
                         l_pos_set.add(l_pos)
                         l_ana_set.add(l_analysis)
 
-                        l_pos_lex = 'NPNOM' if l_pos == 'NPIIC' else l_pos
+                        l_pos_lex = 'NPNON' if l_pos == 'NPIIC' else l_pos
                         l_lemma_key = f'{l_lemma}/{l_pos_lex}'
                         g_lexicon_gr_forms.setdefault(l_component_form, set(l_g_value[3:])).union(set(l_g_value[3:]))
                         g_lexicon_2_lemma.setdefault(l_component_form, {l_lemma_key}).add(l_lemma_key)

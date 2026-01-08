@@ -130,13 +130,13 @@ M1UI::TreeRow* M1UI::TreeDisplay::addRowRecur(
     M1UI::TreeRow* l_auto_edge_row = nullptr;
 
     for(M1Store::Item_lv2_iterator it = p_root->getIteratorTop(); !it.beyondEnd(); it.next()){
-        M1UI::TreeRow* l_ti = nullptr;
+        M1UI::TreeRow* l_tr = nullptr;
         // instantiate the line for this edge
         if(it.at()->isOfType(M1Env::AUTO_SIID)){
             qCDebug(g_cat_tree_display) << "current edge (auto) : " << it.at()->dbgShort() << " Auto? " << it.at()->isOfType(M1Env::AUTO_SIID);
             if(p_depth == 0){
-                l_ti = new M1UI::TreeRow(it.at(), this, p_depth);
-                l_auto_edge_row = l_ti;
+                l_tr = new M1UI::TreeRow(it.at(), this, p_depth);
+                l_auto_edge_row = l_tr;
             }
             // AUTO edges are ignored if encountered at depths > 0
             else continue;
@@ -146,16 +146,16 @@ M1UI::TreeRow* M1UI::TreeDisplay::addRowRecur(
         else {
             // any other edge, i.e. not AUTO or already traversed
             qCDebug(g_cat_tree_display) << "current edge (regular) : " << it.at()->dbgShort();
-            l_ti = new M1UI::TreeRow(it.at(), this, p_depth);
+            l_tr = new M1UI::TreeRow(it.at(), this, p_depth);
         }
         // because of the else clause above, l_ti is always non-null at this point
-        m_tree_row_list.append(l_ti);
+        m_tree_row_list.append(l_tr);
 
-        QObject::connect(l_ti, &M1UI::TreeRow::gotoVertex,
+        QObject::connect(l_tr, &M1UI::TreeRow::gotoVertex,
                          this, &M1UI::TreeDisplay::gotoVertex);
-        QObject::connect(l_ti, &M1UI::TreeRow::emitHtml,
+        QObject::connect(l_tr, &M1UI::TreeRow::emitHtml,
                          this, &M1UI::TreeDisplay::htmlReceive);
-        QObject::connect(l_ti, &M1UI::TreeRow::emitEdit,
+        QObject::connect(l_tr, &M1UI::TreeRow::emitEdit,
                          m_main_window, &M1UI::MainWindow::editReceive);
 
         // recur if this edge is open and not already traversed
@@ -163,13 +163,19 @@ M1UI::TreeRow* M1UI::TreeDisplay::addRowRecur(
             qCDebug(g_cat_tree_display) << "current edge (open) : " << it.at()->dbgShort();
             p_edges_alrady_traversed.append(it.at()->item_id());
 
+            if(it.at()->hasReciprocal())
+                p_edges_alrady_traversed.append(it.at()->getReciprocalEdge_lv2()->item_id());
+            addRowRecur(l_tr->where_to_go(), p_depth+1, p_edges_alrady_traversed);
+
             // special case of edges to edges (occurrence endges) --> to be generalized (see todo item in doc header)
+            /*
             if(it.at()->isOfType(M1Env::TW_SECTION_2_OCC_BEGIN_SIID) || it.at()->isOfType(M1Env::TW_SECTION_2_OCC_END_SIID))
                 addRowRecur(it.at()->getTarget_lv2()->getTarget_lv2(), p_depth+1, p_edges_alrady_traversed);
             else{
                 p_edges_alrady_traversed.append(it.at()->getReciprocalEdge_lv2()->item_id());
                 addRowRecur(it.at()->getTarget_lv2(), p_depth+1, p_edges_alrady_traversed);
             }
+            */
         }
     }
     M1_FUNC_EXIT

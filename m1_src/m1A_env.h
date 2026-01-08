@@ -8,6 +8,10 @@
 #include <stack>
 // #include <exception>
 
+extern QRegularExpression g_re_space;
+extern QRegularExpression g_re_punc;
+extern QRegularExpression g_re_tags;
+
 /**
  * \defgroup EntryExit function Entry and Exit macros
  * @ingroup DebugLog

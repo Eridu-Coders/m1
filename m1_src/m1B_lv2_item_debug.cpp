@@ -4,9 +4,6 @@
 
 #include <QRegularExpression>
 
-extern QRegularExpression g_re_space;
-QRegularExpression g_re_tags(R"(<[^>]+>)");
-
 // ---------------------------------- Debug data -------------------------------------------
 /** \defgroup DebugLv2 Level 2 Debug messages
  *  \ingroup DebugLog

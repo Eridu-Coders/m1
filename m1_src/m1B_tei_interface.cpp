@@ -2,7 +2,7 @@
 #include <QElapsedTimer>
 #include <QRegularExpression>
 
-#include <iostream>
+// #include <iostream>
 
 #include "m1B_tei_interface.h"
 #include "m1A_env.h"
@@ -10,8 +10,6 @@
 #include "m1B_graph_init.h"
 // #include "m1B_lv2_item.h"
 // #include "m1B_lv2_iterators.h"
-
-QRegularExpression g_re_space(R"(\s+)");
 
 // g_cat_tei
 Q_LOGGING_CATEGORY(g_cat_tei, "tei_interface")
@@ -37,6 +35,7 @@ int M1Store::TEIInterface::cm_cur_sloka_number;
 QString M1Store::TEIInterface::cm_indent;
 
 QList<M1Store::AuthorTEI> M1Store::TEIInterface::m_author_list;
+QMap<QString, M1Store::Item_lv2*> M1Store::TEIInterface::m_form_map;
 
 /**
  * @brief M1Store::TEIInterface::create_text
@@ -73,7 +72,13 @@ void M1Store::TEIInterface::create_text(const QString& p_title, const QString& p
     cm_text_root->linkTo(cm_lexicon_root, M1Env::OWNS_SIID);
 }
 
-void M1Store::TEIInterface::addTranslationBhashya(const QString& p_text, const QString& p_source, const QString& p_author_text, const QString& p_author_role, bool p_is_translation){
+void M1Store::TEIInterface::addTranslationBhashya(
+    const QString& p_text,
+    const QString& p_source,
+    const QString& p_author_text,
+    const QString& p_author_role,
+    bool p_is_translation, bool p_sep_above)
+{
     QString l_text = p_text;
     l_text = l_text.replace(g_re_space, QString(" ")).trimmed();
     if(l_text.length() > 0){
@@ -85,7 +90,9 @@ void M1Store::TEIInterface::addTranslationBhashya(const QString& p_text, const Q
             l_text);
         if(p_is_translation) l_new_text->setType(M1Env::TEXT_SLOKA_TRANSLATION_SIID);
         else l_new_text->setType(M1Env::TEXT_SLOKA_BHASHYA_SIID);
-        cm_cur_sloka_vertex->linkTo(l_new_text, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+
+        M1Store::Item_lv2* l_new_edge = cm_cur_sloka_vertex->linkTo(l_new_text, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+        if(p_sep_above) l_new_edge->setFlag(M1Env::EDGE_SEPABOVE);
 
         // Author
         M1Store::Item_lv2* l_author_folder = getPersonOrg(p_author_text, p_author_role, OrgOrPerson::Person, ReturnEntityOrRole::RoleFolder);
@@ -155,7 +162,7 @@ void M1Store::TEIInterface::create_Lexicon_Entry(const QString& p_lemma_text, co
         // label
         p_lemma_text);
     l_new_lemma->setType(M1Env::LEMMA_SIID);
-    cm_lexicon_root->linkTo(l_new_lemma, M1Env::OWNS_SIID);
+    cm_lexicon_root->linkTo(l_new_lemma, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
     l_new_lemma->setFieldEdge(p_pos_text, M1Env::TEXT_WFW_POS_SIID);
 
     M1Store::Item_lv2* l_new_url = M1Store::Item_lv2::getNew(
@@ -164,21 +171,63 @@ void M1Store::TEIInterface::create_Lexicon_Entry(const QString& p_lemma_text, co
         // label
         p_url_dict_list);
     l_new_url->setType(M1Env::TEXT_URL_LINK_SIID);
-    l_new_lemma->linkTo(l_new_url, M1Env::OWNS_SIID);
+    l_new_lemma->linkTo(l_new_url, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+
+    // forms
+    for(const auto &f: p_form_list){
+        M1Store::Item_lv2* l_new_form = M1Store::Item_lv2::getNew(
+            // vertex flags
+            M1Env::FULL_VERTEX,
+            // label
+            f.form());
+        l_new_form->setType(M1Env::TEXT_WFW_FORM_SIID);
+        l_new_lemma->linkTo(l_new_form, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+        QString l_key = QString("%1-%2").arg(f.form()).arg(p_lemma_text);
+        qCDebug(g_cat_tmp_spotlight).noquote() << QString("l_key: [%1]").arg(l_key);
+        m_form_map[l_key] = l_new_form;
+    }
 }
 
-void M1Store::TEIInterface::create_wfw_unit(const QString& p_sk_segment, const QString& p_transliteration, const QString& p_translation, QList<Form_WfW>& p_form_list){
+/**
+ * @brief M1Store::TEIInterface::create_wfw_unit
+ *
+ * \todo properly handle InsertionPoint::none in M1Store::Item_lv2::linkTo()
+ *
+ * @param p_sk_segment
+ * @param p_transliteration
+ * @param p_translation
+ * @param p_form_list
+ */
+void M1Store::TEIInterface::create_wfw_unit(
+    const QString& p_sk_segment,
+    const QString& p_transliteration,
+    const QString& p_translation,
+    QList<Form_WfW>& p_form_list,
+    bool p_sep_above)
+{
     M1Store::Item_lv2* l_new_wfw_unit = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX,
         // label
         p_sk_segment);
     l_new_wfw_unit->setType(M1Env::TEXT_WFW_UNIT_SIID);
-    cm_cur_sloka_vertex->linkTo(l_new_wfw_unit, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+
+    M1Store::Item_lv2* l_new_edge = cm_cur_sloka_vertex->linkTo(l_new_wfw_unit, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+    if(p_sep_above) l_new_edge->setFlag(M1Env::EDGE_SEPABOVE);
+
     l_new_wfw_unit->setFieldEdge(p_transliteration, M1Env::TEXT_WFW_TRANSLIT_SIID);
     l_new_wfw_unit->setFieldEdge(p_translation, M1Env::TEXT_WFW_TRANSLAT_SIID);
 
     for(Form_WfW f: p_form_list){
+        for(const auto& l_lemma : f.lemma().split("॥")){
+            QString l_key = QString("%1-%2").arg(f.form()).arg(f.lemma());
+            qCDebug(g_cat_tmp_spotlight).noquote() << QString("l_key: [%1] found: %2").arg(l_key).arg(m_form_map.constFind(l_key) == m_form_map.cend() ? "No" : "yes");
+            M1Store::Item_lv2* l_form = m_form_map[QString("%1-%2").arg(f.form()).arg(l_lemma)];
+            M1Store::Item_lv2* l_occur_edge = cm_text_root->linkTo(l_form, M1Env::OCCUR_SIID, InsertionPoint::special_override, InsertionPoint::none);
+            l_new_wfw_unit->linkTo(l_occur_edge, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+            l_form->linkTo(l_new_wfw_unit, M1Env::OCCURS_IN_SIID, InsertionPoint::at_bottom, InsertionPoint::none);
+        }
+        /*
         M1Store::Item_lv2* l_new_wfw_form = M1Store::Item_lv2::getNew(
             // vertex flags
             M1Env::FULL_VERTEX,
@@ -188,6 +237,7 @@ void M1Store::TEIInterface::create_wfw_unit(const QString& p_sk_segment, const Q
         l_new_wfw_unit->linkTo(l_new_wfw_form, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
         l_new_wfw_form->setFieldEdge(f.pos(), M1Env::TEXT_WFW_POS_SIID);
         l_new_wfw_form->setFieldEdge(f.grammar(), M1Env::TEXT_WFW_GRM_SIID);
+        */
     }
 }
 
@@ -543,6 +593,8 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                 QString l_transliteration;
                 QString l_translation;
 
+                bool l_is_first = true;
+
                 QList<Form_WfW> l_form_list;
 
                 bool l_found_one_wfw = false;
@@ -652,7 +704,8 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                         for(Form_WfW f: l_form_list)
                             qCDebug(g_cat_tei).noquote() << cm_indent << QString("    %1").arg(f.dbgOneLiner());
 
-                        create_wfw_unit(l_sk_segment, l_transliteration, l_translation, l_form_list);
+                        create_wfw_unit(l_sk_segment, l_transliteration, l_translation, l_form_list, l_is_first);
+                        l_is_first = false;
 
                         l_form_list.clear();
                     }
@@ -673,9 +726,13 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                 l_found_translations = true;
                 qCDebug(g_cat_tmp_spotlight).noquote() << cm_indent << QString("<div3> start of translation block for sloka %1.%2").arg(cm_cur_chapter_number).arg(cm_cur_sloka_number);
                 cm_indent += QString(" ").repeated(l_indent_count);
+
                 QString l_source_txt;
                 QString l_author_text;
                 QString l_author_role;
+
+                bool l_is_first = true;
+
                 while (!l_xml_reader.atEnd()) {
                     QXmlStreamReader::TokenType l_tt = l_xml_reader.readNext();
                     QStringView l_tok_name = l_xml_reader.name();
@@ -708,7 +765,8 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                         qCDebug(g_cat_tei).noquote() << cm_indent << QString("translation (%1/%2) [%3]:")
                                                                          .arg(l_source_txt).arg(l_author_text).arg(l_translation_text.length()) << l_translation_text;
 
-                        addTranslationBhashya(l_translation_text, l_source_txt, l_author_text, l_author_role, true);
+                        addTranslationBhashya(l_translation_text, l_source_txt, l_author_text, l_author_role, true, l_is_first);
+                        l_is_first = false;
                     }
                     else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "div3"){
                         cm_indent.chop(l_indent_count);
@@ -722,9 +780,13 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                 l_found_commentaries = true;
                 qCDebug(g_cat_tmp_spotlight).noquote() << cm_indent << QString("<div3> start of commentaries block for sloka %1.%2").arg(cm_cur_chapter_number).arg(cm_cur_sloka_number);
                 cm_indent += QString(" ").repeated(l_indent_count);
+
                 QString l_source_txt;
                 QString l_author_text;
                 QString l_author_role;
+
+                bool l_is_first = true;
+
                 while (!l_xml_reader.atEnd()) {
                     QXmlStreamReader::TokenType l_tt = l_xml_reader.readNext();
                     QStringView l_tok_name = l_xml_reader.name();
@@ -756,7 +818,9 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                             qCDebug(g_cat_tei).noquote() << "XML parsing ERROR" << l_xml_reader.error() << l_xml_reader.errorString();
                         qCDebug(g_cat_tei).noquote() << cm_indent << QString("commentary (%1/%2) [%3]:")
                                                                          .arg(l_source_txt).arg(l_author_text).arg(l_commentary_text.length()) << l_commentary_text;
-                        addTranslationBhashya(l_commentary_text, l_source_txt, l_author_text, l_author_role, false);
+
+                        addTranslationBhashya(l_commentary_text, l_source_txt, l_author_text, l_author_role, false, l_is_first);
+                        l_is_first = false;
                     }
                     else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "div3"){
                         cm_indent.chop(l_indent_count);

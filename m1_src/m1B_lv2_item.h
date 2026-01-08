@@ -23,7 +23,8 @@ enum class InsertionPoint{
     at_bottom,
     below_auto,
     below_specified,
-    special_override
+    special_override,
+    none // for edges without reciprocal
 };
 
 /**
@@ -101,6 +102,7 @@ class Item_lv2 : public Item_lv1 {
         Item_lv2* getAutoEdge_lv2() const;
         Item_lv2* getFirstEdgeSpecial_lv2() const;
         Item_lv2* getReciprocalEdge_lv2() const;
+        bool hasReciprocal() const {return this->reciprocal_item_id() != G_VOID_ITEM_ID;}
         Item_lv2* getTarget_lv2() const;
         Item_lv2* getOrigin_lv2() const;
 

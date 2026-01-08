@@ -23,8 +23,10 @@ M1Env::SpecialItemID M1Env::TEXT_WRITTEN_BY_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::DATA_SOURCE_FROM_SIID = G_NONEX_SI_ID;
 // [DTSUP] Special Vertex ID (Edge type) DS from / to (reciprocal of DTSDN above))
 M1Env::SpecialItemID M1Env::DATA_SOURCE_TO_SIID = G_NONEX_SI_ID;
-// [OCCUR] Special Vertex ID (Edge type) of occurrence edges
+// [OCCUR] Special Vertex ID (Edge type) of form occurrence edges
 M1Env::SpecialItemID M1Env::OCCUR_SIID = G_NONEX_SI_ID;
+// [OCCIN] Special Vertex ID (Edge type) of form to point of occurrence edges
+M1Env::SpecialItemID M1Env::OCCURS_IN_SIID = G_NONEX_SI_ID;
 // [WFORM] Special Vertex ID (Vertex type) of word form vertices
 M1Env::SpecialItemID M1Env::WFORM_SIID = G_NONEX_SI_ID;
 // [TXATL] Special Vertex ID (Simple edge type) alternate text title
@@ -232,6 +234,7 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::DATA_SOURCE_FROM_SIID = M1Store::StorageStatic::getSpecialID("DTSDN");
     M1Env::DATA_SOURCE_TO_SIID = M1Store::StorageStatic::getSpecialID("DTSUP");
     M1Env::OCCUR_SIID = M1Store::StorageStatic::getSpecialID("OCCUR");
+    M1Env::OCCURS_IN_SIID = M1Store::StorageStatic::getSpecialID("OCCIN");
     M1Env::WFORM_SIID = M1Store::StorageStatic::getSpecialID("WFORM");
     M1Env::TEXT_ALT_TITLE_SIID = M1Store::StorageStatic::getSpecialID("TXATL");
     M1Env::TEXT_SUB_TITLE_SIID = M1Store::StorageStatic::getSpecialID("TXSBT");
@@ -447,6 +450,7 @@ void M1Env::GraphInit::dbg_dump_pseudo_constants(){
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WROTE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WROTE"), 4, 16, QChar('0')).arg("WROTE");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::DATA_SOURCE_FROM_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("DTSDN"), 4, 16, QChar('0')).arg("DTSDN");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::OCCUR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("OCCUR"), 4, 16, QChar('0')).arg("OCCUR");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::OCCURS_IN_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("OCCIN"), 4, 16, QChar('0')).arg("OCCIN");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::WFORM_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WFORM"), 4, 16, QChar('0')).arg("WFORM");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_ALT_TITLE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TXATL"), 4, 16, QChar('0')).arg("TXATL");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_SUB_TITLE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TXSBT"), 4, 16, QChar('0')).arg("TXSBT");
@@ -493,8 +497,10 @@ void M1Env::GraphInit::init_base(){
         "DTSDN", M1Env::DATA_SOURCE_ICON_PATH,
         "DTSUP", M1Env::DATA_SOURCE_ICON_PATH,
         SI_IS_TYPE | SI_EDGE_TYPE);
-    // Special Vertex ID (Edge type) of occurrence edges
+    // Special Vertex ID (Edge type) of form occurrence edges
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SPECIAL_EDGE, "OCCUR", M1Env::OCCURRENCE_ICON_PATH);
+    // Special Vertex ID (Edge type) of form to point of occurrence edges
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE, "OCCIN", M1Env::OCCURRENCE_ICON_PATH);
     // Special Vertex ID (Vertex type) of word form vertices
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_IS_ICON_TYPE, "WFORM", M1Env::WFORM_ICON_PATH);
     // Special Vertex ID (Simple edge type) alternate text title

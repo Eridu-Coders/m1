@@ -19,7 +19,7 @@
 #include <QComboBox>
 
 // g_cat_interp_dev g_cat_tree_row
-// Q_LOGGING_CATEGORY(g_cat_interp_dev, "interp.dev")
+// Q_LOGGING_CATEGORY(g_cat_interp_dev, "interp.dev") q_re_space
 Q_LOGGING_CATEGORY(g_cat_tree_row, "tree_row")
 Q_LOGGING_CATEGORY(g_cat_interp_base, "interp.base")
 // g_cat_interp_drag
@@ -239,6 +239,12 @@ void M1UI::TreeRow::paintEvent(QPaintEvent* p_event){
                               QPoint(x-4, this->height()-10) <<
                               QPoint(x+4, this->height()-10));
     }
+
+    // Separator above
+    p.setPen(Qt::white);
+    if(m_edge->flags() & M1Env::EDGE_SEPABOVE)
+        p.drawLine(QPoint(m_oc_x + m_target_height * 2, 0), QPoint(this->width()-1, 0));
+
     // qCDebug(g_cat_interp_drag) << "Accepting Drops" << this->acceptDrops() << m_myself->getTarget_lv2()->text();
 }
 
@@ -256,7 +262,7 @@ void M1UI::TreeRow::resizeEvent(QResizeEvent *p_event){
  */
 void M1UI::TreeRow::mouseDoubleClickEvent(QMouseEvent *p_event){
     qCDebug(g_cat_tree_row) << this->dbgOneLiner() << " double click: " << p_event->pos();
-    emit gotoVertex(m_target->targetForGotoVertex(), this);
+    emit gotoVertex(this->where_to_go(), this);
 }
 
 /**
@@ -369,13 +375,13 @@ void M1UI::TreeRow::dropEvent(QDropEvent *p_event){
     M1Store::Item_lv2* l_item_to = M1Store::Item_lv2::getExisting(l_payload_item_id);
 
     if(m_drag_top && m_drag_bottom){
-        M1Store::Item_lv2* l_item_from = m_target->targetForGotoVertex();
+        M1Store::Item_lv2* l_item_from = this->where_to_go();
         qCDebug(g_cat_interp_drag) << QString("Creating edge of type") << m_td_parent->newEdgeType()->mnemonic() <<
             " From " << l_item_from->dbgShort() << " to " << l_item_to->dbgShort();
         l_item_from->linkTo(l_item_to, m_td_parent->newEdgeType()->specialId());
     }
     else{
-        M1Store::Item_lv2* l_item_from = m_target->targetForGotoVertex();
+        M1Store::Item_lv2* l_item_from = this->where_to_go();
         qCDebug(g_cat_interp_drag) << QString("Creating edge of type") << m_td_parent->newEdgeType()->mnemonic() <<
             " From " << l_item_from->dbgShort() << " to " << l_item_to->dbgShort();
         if(m_drag_bottom)
@@ -413,7 +419,7 @@ void M1UI::TreeRow::contextMenuEvent(QContextMenuEvent *p_event) {
 void M1UI::TreeRow::initiateDrag(){
     Drag *l_drag = new Drag(this, m_td_parent);
 
-    QString l_payload = QString("%1").arg(m_target->targetForGotoVertex()->item_id());
+    QString l_payload = QString("%1").arg(this->where_to_go()->item_id());
     QMimeData *l_data = new QMimeData;
     l_data->setText(l_payload);
     qCDebug(g_cat_tree_row) << QString("Drag INITIATION ") << this->acceptDrops() << l_payload << l_data->formats();
@@ -500,12 +506,16 @@ std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_
             // qCDebug(g_cat_interp_base) << QString("A l_interp_raw: %1").arg(l_interp_raw == nullptr ? "null" : "instanciated");
 
             //if((l_interp_raw = AutoInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            // else if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break; UrlInterp
+            // else if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break; TranslationBhashya
             if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = TextInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = RoleInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = WfWUnit::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = UrlInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = OccurInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = FormInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = LemmaInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = TranslationBhashya::getOneIfMatch(p_myself)) != nullptr) break;
             else l_interp_raw = new Interp(p_myself);
         }
         // qCDebug(g_cat_interp_base) << QString("B l_interp_raw: %1").arg(l_interp_raw == nullptr ? "null" : "instanciated");
@@ -691,7 +701,7 @@ QString M1MidPlane::Interp::base_html_fragment(){
  * @param p_edge
  * @return
  */
-QString M1MidPlane::Interp::getHtmlVirtual(const M1Store::Item_lv2* p_edge){
+QString M1MidPlane::Interp::getHtmlVirtual(){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Interp getHtmlVirtual(): %1").arg(this->dbgOneLiner()))
     M1_FUNC_EXIT
     return "";
@@ -705,7 +715,7 @@ QString M1MidPlane::Interp::getHtmlVirtual(const M1Store::Item_lv2* p_edge){
 QString M1MidPlane::Interp::getHtml(const M1Store::Item_lv2* p_edge){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Interp getHtml(): (Edge ID: %2) %1").arg(this->dbgOneLiner()).arg(p_edge->item_id()))
 
-    QString l_own_html = getHtmlVirtual(p_edge);
+    QString l_own_html = getHtmlVirtual();
     QString l_ret_html =
         l_own_html.left(4) == "http" ? l_own_html : cm_html_template.arg(l_own_html +
             QString("<p class=\"technical sepabove\"><span style=\"font-weight: bold;\">Class</span>: %1</p>\n").arg(className()) +
@@ -878,7 +888,7 @@ QString M1MidPlane::TextInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edg
  * @param p_edge
  * @return
  */
-QString M1MidPlane::TextInterp::getHtmlVirtual(const M1Store::Item_lv2* p_edge){
+QString M1MidPlane::TextInterp::getHtmlVirtual(){
     QString l_html;
     // title
     l_html += QString("<h2>%1</h2>").arg(m_myself->text());
@@ -994,6 +1004,109 @@ M1MidPlane::UrlInterp* M1MidPlane::UrlInterp::getOneIfMatch(M1Store::Item_lv2* p
 
 M1MidPlane::UrlInterp::UrlInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){}
 
-QString M1MidPlane::UrlInterp::getHtmlVirtual(const M1Store::Item_lv2* p_edge){
+QString M1MidPlane::UrlInterp::getHtmlVirtual(){
+    return m_myself->text();
+}
+
+/** --------------------------------------------------------------- OccurInterp ---------------------------------
+ * @brief M1MidPlane::OccurInterp::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
+M1MidPlane::OccurInterp* M1MidPlane::OccurInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be an OccurInterp? %1").arg(p_myself->dbgShort()))
+    M1MidPlane::OccurInterp* l_ret = nullptr;
+    if(p_myself->isFullEdge() && p_myself->isOfType(M1Env::OCCUR_SIID))
+        l_ret = new OccurInterp(p_myself);
+    M1_FUNC_EXIT
+    return l_ret;
+}
+
+M1MidPlane::OccurInterp::OccurInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){
+    m_target = Interp::getInterp(p_myself->getTarget_lv2());
+}
+QString M1MidPlane::OccurInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
+    return QString("Occurrence of: %1").arg(m_target->inTreeDisplayText(m_myself));
+}
+
+M1Store::Item_lv2* M1UI::TreeRow::where_to_go(){
+    return m_target->where_to_go(m_edge);
+}
+M1Store::Item_lv2* M1MidPlane::Interp::where_to_go(const M1Store::Item_lv2* p_edge){
+    return m_myself;
+}
+M1Store::Item_lv2* M1MidPlane::OccurInterp::where_to_go(const M1Store::Item_lv2* p_edge){
+    return m_target->where_to_go(m_myself);
+}
+
+/** --------------------------------------------------------------- LemmaInterp ---------------------------------
+ * @brief M1MidPlane::LemmaInterp::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
+M1MidPlane::LemmaInterp* M1MidPlane::LemmaInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be an FormInterp? %1").arg(p_myself->dbgShort()))
+    M1MidPlane::LemmaInterp* l_ret = nullptr;
+    if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::LEMMA_SIID))
+        l_ret = new LemmaInterp(p_myself);
+    M1_FUNC_EXIT
+    return l_ret;
+}
+
+M1MidPlane::LemmaInterp::LemmaInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){}
+
+QString M1MidPlane::LemmaInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
+    return QString("%1 [%2]").arg(m_myself->text()).arg(m_myself->getField(M1Env::TEXT_WFW_POS_SIID));
+}
+
+/** --------------------------------------------------------------- FormInterp ---------------------------------
+ * @brief M1MidPlane::FormInterp::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
+M1MidPlane::FormInterp* M1MidPlane::FormInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be an FormInterp? %1").arg(p_myself->dbgShort()))
+    M1MidPlane::FormInterp* l_ret = nullptr;
+    if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::TEXT_WFW_FORM_SIID))
+        l_ret = new FormInterp(p_myself);
+    M1_FUNC_EXIT
+    return l_ret;
+}
+
+M1MidPlane::FormInterp::FormInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){
+    M1Store::Item_lv2* l_lemma_edge = p_myself->find_edge_generic(M1Env::BLNGS_SIID, M1Env::LEMMA_SIID);
+    if(l_lemma_edge != nullptr)
+        m_lemma = Interp::getInterp(l_lemma_edge->getTarget_lv2());
+}
+
+QString M1MidPlane::FormInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
+    return QString("%1 <-- %2").arg(m_myself->text()).arg(m_lemma->inTreeDisplayText(p_edge));
+}
+
+/** --------------------------------------------------------------- TranslationBhashya ---------------------------------
+ * @brief M1MidPlane::TranslationBhashya::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
+M1MidPlane::TranslationBhashya* M1MidPlane::TranslationBhashya::getOneIfMatch(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be an FormInterp? %1").arg(p_myself->dbgShort()))
+    M1MidPlane::TranslationBhashya* l_ret = nullptr;
+    if(p_myself->isFullVertex() && (p_myself->isOfType(M1Env::TEXT_SLOKA_BHASHYA_SIID) || p_myself->isOfType(M1Env::TEXT_SLOKA_TRANSLATION_SIID)))
+        l_ret = new TranslationBhashya(p_myself);
+    M1_FUNC_EXIT
+    return l_ret;
+}
+
+M1MidPlane::TranslationBhashya::TranslationBhashya(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){}
+
+QString M1MidPlane::TranslationBhashya::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
+    QString l_text_cleanup = QString("%1").arg(m_myself->text()).replace(g_re_tags, "").replace(g_re_space, " ").trimmed();
+    if(l_text_cleanup.length() > 100)
+        return l_text_cleanup.slice(0, 100) + " ...";
+    else
+        return l_text_cleanup;
+}
+
+QString M1MidPlane::TranslationBhashya::getHtmlVirtual(){
     return m_myself->text();
 }
