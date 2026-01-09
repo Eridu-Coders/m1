@@ -2,7 +2,7 @@
 #include "m1A_env.h"
 #include "m1B_graph_init.h"
 #include "m1B_store.h"
-// #include "m1B_lv2_iterators.h"
+#include "m1B_lv2_iterators.h"
 #include "m1D_tree_display.h"
 // #include "m1D_passages_panel.h"
 
@@ -506,7 +506,7 @@ std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_
             // qCDebug(g_cat_interp_base) << QString("A l_interp_raw: %1").arg(l_interp_raw == nullptr ? "null" : "instanciated");
 
             //if((l_interp_raw = AutoInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            // else if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break; TranslationBhashya
+            // else if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break; SlokaInterp
             if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = TextInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = RoleInterp::getOneIfMatch(p_myself)) != nullptr) break;
@@ -516,6 +516,7 @@ std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_
             else if((l_interp_raw = FormInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = LemmaInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = TranslationBhashya::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = SlokaInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else l_interp_raw = new Interp(p_myself);
         }
         // qCDebug(g_cat_interp_base) << QString("B l_interp_raw: %1").arg(l_interp_raw == nullptr ? "null" : "instanciated");
@@ -924,13 +925,19 @@ M1MidPlane::RoleInterp* M1MidPlane::RoleInterp::getOneIfMatch(M1Store::Item_lv2*
  * @brief M1MidPlane::RoleInterp::RoleInterp
  * @param p_myself
  */
-M1MidPlane::RoleInterp::RoleInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){}
+M1MidPlane::RoleInterp::RoleInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){
+    M1Store::Item_lv2* l_author_edge = p_myself->find_edge_generic(M1Env::BLNGS_SIID, M1Env::PERS_TYPE_SIID);
+    if(l_author_edge == nullptr)
+        l_author_edge = p_myself->find_edge_generic(M1Env::BLNGS_SIID, M1Env::ORG_TYPE_SIID);
+    m_author = M1MidPlane::Interp::getInterp(l_author_edge->getTarget_lv2());
+}
 
 /**
  * @brief M1MidPlane::RoleInterp::getlUtimateTarget
  * @param p_edge
  * @return
  */
+/*
 M1Store::Item_lv2* M1MidPlane::RoleInterp::getlUtimateTarget(const M1Store::Item_lv2* p_edge){
     if(p_edge->isOfType(M1Env::TEXT_WRITTEN_BY_SIID) || p_edge->isOfType(M1Env::DATA_SOURCE_FROM_SIID)){
         M1Store::Item_lv2* l_ultimate_target = m_myself->find_edge_generic(M1Store::BLNGS_SIID, M1Store::PERS_TYPE_SIID);
@@ -938,7 +945,7 @@ M1Store::Item_lv2* M1MidPlane::RoleInterp::getlUtimateTarget(const M1Store::Item
         return l_ultimate_target->getTarget_lv2();
     }
     else return nullptr;
-}
+}*/
 
 /**
  * @brief M1MidPlane::RoleInterp::vertexIcon
@@ -946,10 +953,7 @@ M1Store::Item_lv2* M1MidPlane::RoleInterp::getlUtimateTarget(const M1Store::Item
  * @return
  */
 QIcon* M1MidPlane::RoleInterp::vertexIcon(const M1Store::Item_lv2* p_edge){
-    M1Store::Item_lv2* l_ultimate_target = this->getlUtimateTarget(p_edge);
-    if(l_ultimate_target != nullptr)
-        return M1Store::StorageStatic::getQIcon(l_ultimate_target->getIconSITypeID());
-    else return M1Store::StorageStatic::getQIcon(m_myself->getIconSITypeID());
+    return m_author->vertexIcon(p_edge);
 }
 
 /**
@@ -958,10 +962,7 @@ QIcon* M1MidPlane::RoleInterp::vertexIcon(const M1Store::Item_lv2* p_edge){
  * @return
  */
 QString M1MidPlane::RoleInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
-    M1Store::Item_lv2* l_ultimate_target = this->getlUtimateTarget(p_edge);
-    if(l_ultimate_target != nullptr)
-        return QString("%1 (%2)").arg(l_ultimate_target->text()).arg(m_myself->text());
-    else return m_myself->text();
+    return m_author->inTreeDisplayText(p_edge) + QString(" (%1)").arg(m_myself->text());
 }
 // QString M1MidPlane::RoleInterp::getHtmlVirtual(const M1Store::Item_lv2* p_edge){}
 
@@ -1089,7 +1090,7 @@ QString M1MidPlane::FormInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edg
  * @return
  */
 M1MidPlane::TranslationBhashya* M1MidPlane::TranslationBhashya::getOneIfMatch(M1Store::Item_lv2* p_myself){
-    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be an FormInterp? %1").arg(p_myself->dbgShort()))
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be an TranslationBhashya? %1").arg(p_myself->dbgShort()))
     M1MidPlane::TranslationBhashya* l_ret = nullptr;
     if(p_myself->isFullVertex() && (p_myself->isOfType(M1Env::TEXT_SLOKA_BHASHYA_SIID) || p_myself->isOfType(M1Env::TEXT_SLOKA_TRANSLATION_SIID)))
         l_ret = new TranslationBhashya(p_myself);
@@ -1097,16 +1098,75 @@ M1MidPlane::TranslationBhashya* M1MidPlane::TranslationBhashya::getOneIfMatch(M1
     return l_ret;
 }
 
-M1MidPlane::TranslationBhashya::TranslationBhashya(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){}
+M1MidPlane::TranslationBhashya::TranslationBhashya(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){
+    m_language = m_myself->getField(M1Env::TEXT_LANGUAGE_SIID);
+
+    int l_count = 0;
+    for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorTop(M1Env::TEXT_WRITTEN_BY_SIID, M1Env::ROLE_FLDR_SIID); !l_it.beyondEnd(); l_it.next()){
+        if(l_count == 0) m_author_1 = M1MidPlane::Interp::getInterp(l_it.at()->getTarget_lv2());
+        else m_author_2 = M1MidPlane::Interp::getInterp(l_it.at()->getTarget_lv2());
+        l_count += 1;
+    }
+}
 
 QString M1MidPlane::TranslationBhashya::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
-    QString l_text_cleanup = QString("%1").arg(m_myself->text()).replace(g_re_tags, "").replace(g_re_space, " ").trimmed();
-    if(l_text_cleanup.length() > 100)
-        return l_text_cleanup.slice(0, 100) + " ...";
+    QString l_text_cleanup = QString("%1%2 [%3] %4")
+                                 .arg(m_author_1->inTreeDisplayText(p_edge))
+                                 .arg(m_author_2 != nullptr ? QString(" + %1").arg(m_author_2->inTreeDisplayText(p_edge)) : "")
+                                 .arg(m_language)
+                                 .arg(m_myself->text()).replace(g_re_tags, "").replace(g_re_space, " ").trimmed();
+    if(l_text_cleanup.length() > 200)
+        return l_text_cleanup.slice(0, 200) + " ...";
     else
         return l_text_cleanup;
 }
 
 QString M1MidPlane::TranslationBhashya::getHtmlVirtual(){
-    return m_myself->text();
+    QString l_text = m_myself->text();
+    QString l_author = QString("%1%2")
+                           .arg(m_author_1->inTreeDisplayText(nullptr))
+                           .arg(m_author_2 != nullptr ? QString(" + %1").arg(m_author_2->inTreeDisplayText(nullptr)) : "");
+
+    if(g_re_initial_p.match(l_text).hasMatch())
+        l_text = l_text.replace(g_re_final_p, "").replace(g_re_initial_p, "");
+
+    return QString("<p>%1 <span style=\"font-style: italic; font-size: smaller; color: maroon;\">%2</span></p>\n").arg(l_text).arg(l_author);
+}
+
+/** --------------------------------------------------------------- SlokaInterp ---------------------------------
+ * @brief M1MidPlane::SlokaInterp::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
+M1MidPlane::SlokaInterp* M1MidPlane::SlokaInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be an TranslationBhashya? %1").arg(p_myself->dbgShort()))
+    M1MidPlane::SlokaInterp* l_ret = nullptr;
+    if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::SLOKA_SIID))
+        l_ret = new SlokaInterp(p_myself);
+    M1_FUNC_EXIT
+    return l_ret;
+}
+
+M1MidPlane::SlokaInterp::SlokaInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){
+    m_sloka_num = m_myself->getField(M1Env::TEXT_SLOKA_NUMBER_SIID).toInt();
+    M1Store::Item_lv2* l_chapter_edge = m_myself->find_edge_generic(M1Env::BLNGS_SIID, M1Env::TEXT_CHAPTER_SIID);
+    if(l_chapter_edge != nullptr)
+        m_chapter_num = l_chapter_edge->getTarget_lv2()->getField(M1Env::TEXT_CHAP_NUMBER_SIID).toInt();
+    else
+        m_chapter_num = -1;
+
+    M1Store::Item_lv2* l_sk_edge = m_myself->find_edge_generic(M1Env::OWNS_SIID, M1Env::TEXT_SLOKA_LINE_SIID);
+    if(l_sk_edge != nullptr)
+        m_sk = l_sk_edge->getTarget_lv2()->text();
+
+    M1Store::Item_lv2* l_transl_edge = m_myself->find_edge_generic(M1Env::OWNS_SIID, M1Env::TEXT_SLOKA_TRANSLIT_SIID);
+    if(l_transl_edge != nullptr)
+        m_iast = l_transl_edge->getTarget_lv2()->text();
+}
+
+QString M1MidPlane::SlokaInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
+    return QString("[%1.%2] %3 (%4)").arg(m_chapter_num).arg(m_sloka_num).arg(m_sk).arg(m_iast);
+}
+QString M1MidPlane::SlokaInterp::getHtmlVirtual(){
+    return QString("<p>Sloka %1.%2</p>\n<p>%3</p>\n<p>%4 (IAST)</p>\n").arg(m_chapter_num).arg(m_sloka_num).arg(m_sk).arg(m_iast);
 }

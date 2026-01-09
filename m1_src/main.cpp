@@ -125,6 +125,8 @@ int main(int argc, char *argv[])
         }
     }
 
+    qCDebug(g_cat_main).noquote() << "Testing g_re_final_p: " << QString("भोगिनः। विष्णोश्चलति तद्भोगोऽत्यतीव हरितोषणम् इति पाद्मे।</p>").replace(g_re_final_p, "");
+
     // throw M1Env::M1Exception("", 0);
     QApplication a(argc, argv);
     M1UI::MainWindow w;

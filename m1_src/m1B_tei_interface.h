@@ -24,10 +24,13 @@ private:
     QString m_name;
     QString m_role;
 public:
-    AuthorTEI(const QString& p_name, const QString& p_role){m_name = p_name; m_role = p_role;}
+    AuthorTEI(const QString& p_name, const QString& p_role){set(p_name, p_role);}
+    AuthorTEI(){}
 
-    const QString& name(){return m_name;}
-    const QString& role(){return m_role;}
+    void set(const QString& p_name, const QString& p_role){m_name = p_name; m_role = p_role;}
+    const QString& name() const {return m_name;}
+    const QString& role() const {return m_role;}
+    const bool isEmpty() const {return m_name.length() == 0;}
 };
 
 // Lexicon form Data
@@ -63,13 +66,13 @@ public:
         m_grammar = p_grammar;
     }
 
-    const QString& form(){return m_form;}
-    const QString& lemma(){return m_lemma;}
-    const QString& pos(){return m_pos;}
-    const QString& ref(){return m_ref;}
-    const QString& grammar(){return m_grammar;}
+    const QString& form() const {return m_form;}
+    const QString& lemma() const {return m_lemma;}
+    const QString& pos() const {return m_pos;}
+    const QString& ref() const {return m_ref;}
+    const QString& grammar() const {return m_grammar;}
 
-    const QString dbgOneLiner(){return QString("%1 [%2 %3 %5] %4").arg(m_form).arg(m_lemma).arg(m_pos).arg(m_ref).arg(m_grammar);}
+    const QString dbgOneLiner() const {return QString("%1 [%2 %3 %5] %4").arg(m_form).arg(m_lemma).arg(m_pos).arg(m_ref).arg(m_grammar);}
 };
 
 class TEIInterface{
@@ -83,17 +86,22 @@ private:
     static QString cm_indent;
     static QList<AuthorTEI> m_author_list;
     static QMap<QString, M1Store::Item_lv2*> m_form_map;
+    static QXmlStreamReader::TokenType m_tt;
+    static bool m_no_read;
 
     static QString skipUntil(int p_indent_count, QString& p_indent, QXmlStreamReader& p_xml_reader, const QString& p_elem_close);
+    static AuthorTEI readPersName(QXmlStreamReader& p_xml_reader);
     static void loadTeiInternal(const QString& p_file_path, bool p_validate_only=false);
 
     static void create_text(const QString& p_title, const QString& p_alt_title, const QString& p_sub_title, const QString& p_author_text);
     static void addTranslationBhashya(
         const QString& p_translation_text,
+        const QString& p_language,
         const QString& p_source,
-        const QString& p_author_text,
-        const QString& p_author_role,
-        bool p_is_translation, bool p_sep_above);
+        const AuthorTEI& p_main_author,
+        const AuthorTEI& p_secondary_author,
+        bool p_is_translation,
+        bool p_sep_above);
     static void create_Lexicon_Entry(const QString& p_lemma_text, const QString& p_pos_text, const QString& p_url_dict_list, QList<FormLexicon>& p_form_list);
     static void create_wfw_unit(
         const QString& p_sk_segment,

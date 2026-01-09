@@ -11,6 +11,9 @@
 extern QRegularExpression g_re_space;
 extern QRegularExpression g_re_punc;
 extern QRegularExpression g_re_tags;
+extern QRegularExpression g_re_initial_p;
+extern QRegularExpression g_re_final_p;
+
 
 /**
  * \defgroup EntryExit function Entry and Exit macros

@@ -23,6 +23,12 @@ extern M1Env::SpecialItemID TEXT_WRITTEN_BY_SIID;
 extern M1Env::SpecialItemID DATA_SOURCE_FROM_SIID;
 // [DTSUP] Special Vertex ID (Edge type) DS from / to (reciprocal of DTSDN above))
 extern M1Env::SpecialItemID DATA_SOURCE_TO_SIID;
+// [TXLNG] Special Vertex ID (Simple Edge type) of text language field
+extern M1Env::SpecialItemID TEXT_LANGUAGE_SIID;
+// [SLKNM] Special Vertex ID (Simple Edge type) of sloka number field
+extern M1Env::SpecialItemID TEXT_SLOKA_NUMBER_SIID;
+// [CHPNM] Special Vertex ID (Simple Edge type) of chapter number field
+extern M1Env::SpecialItemID TEXT_CHAP_NUMBER_SIID;
 // [OCCUR] Special Vertex ID (Edge type) of form occurrence edges
 extern M1Env::SpecialItemID OCCUR_SIID;
 // [OCCIN] Special Vertex ID (Edge type) of form to point of occurrence edges

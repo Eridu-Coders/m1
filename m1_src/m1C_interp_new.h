@@ -22,30 +22,6 @@ namespace M1UI{
 class TreeDisplay;
 
 /*
-class InterpProxyWidget : public QWidget{
-        Q_OBJECT
-private:
-    M1MidPlane::Interp* m_main_instance;
-public:
-    InterpProxyWidget(M1MidPlane::Interp* p_main_instance, QWidget* p_parent) : QWidget(p_parent){m_main_instance = p_main_instance;}
-    //~InterpProxyWidget();
-
-    virtual void paintEvent(QPaintEvent* p_event);
-    virtual void resizeEvent(QResizeEvent *p_event);
-    virtual void mouseDoubleClickEvent(QMouseEvent *p_event);
-    virtual void mousePressEvent(QMouseEvent *p_event);
-    virtual void mouseReleaseEvent(QMouseEvent *p_event);
-    virtual void focusOutEvent(QFocusEvent *p_event);
-    virtual void focusInEvent(QFocusEvent *p_event);
-    virtual void contextMenuEvent(QContextMenuEvent *p_event);
-
-    virtual void dragEnterEvent(QDragEnterEvent *p_event);
-    virtual void dragMoveEvent(QDragMoveEvent *p_event);
-    virtual void dragLeaveEvent(QDragLeaveEvent *p_event);
-    virtual void dropEvent(QDropEvent *p_event);
-};*/
-
-/*
 class InterpStaticConstructor{
 public:
     InterpStaticConstructor();
@@ -256,7 +232,9 @@ public:
 class RoleInterp : public Interp{
     Q_OBJECT
 private:
-    M1Store::Item_lv2* getlUtimateTarget(const M1Store::Item_lv2* p_edge);
+    std::shared_ptr<Interp> m_author;
+
+//    M1Store::Item_lv2* getlUtimateTarget(const M1Store::Item_lv2* p_edge);
 public:
     static RoleInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
 
@@ -329,11 +307,32 @@ public:
 
 class TranslationBhashya : public Interp{
     Q_OBJECT
+private:
+    QString m_language;
+    std::shared_ptr<Interp> m_author_1 = nullptr; // RoleInterp both
+    std::shared_ptr<Interp> m_author_2 = nullptr;
 public:
     static TranslationBhashya* getOneIfMatch(M1Store::Item_lv2* p_myself);
 
     TranslationBhashya(M1Store::Item_lv2* p_myself);
     virtual QString className() {return "TranslationBhashya";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
+};
+
+class SlokaInterp : public Interp{
+    Q_OBJECT
+private:
+    int m_chapter_num;
+    int m_sloka_num;
+
+    QString m_sk;
+    QString m_iast;
+public:
+    static SlokaInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    SlokaInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "SlokaInterp";}
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual QString getHtmlVirtual();
 };

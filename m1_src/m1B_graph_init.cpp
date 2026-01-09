@@ -23,6 +23,12 @@ M1Env::SpecialItemID M1Env::TEXT_WRITTEN_BY_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::DATA_SOURCE_FROM_SIID = G_NONEX_SI_ID;
 // [DTSUP] Special Vertex ID (Edge type) DS from / to (reciprocal of DTSDN above))
 M1Env::SpecialItemID M1Env::DATA_SOURCE_TO_SIID = G_NONEX_SI_ID;
+// [TXLNG] Special Vertex ID (Simple Edge type) of text language field
+M1Env::SpecialItemID M1Env::TEXT_LANGUAGE_SIID = G_NONEX_SI_ID;
+// [SLKNM] Special Vertex ID (Simple Edge type) of sloka number field
+M1Env::SpecialItemID M1Env::TEXT_SLOKA_NUMBER_SIID = G_NONEX_SI_ID;
+// [CHPNM] Special Vertex ID (Simple Edge type) of chapter number field
+M1Env::SpecialItemID M1Env::TEXT_CHAP_NUMBER_SIID = G_NONEX_SI_ID;
 // [OCCUR] Special Vertex ID (Edge type) of form occurrence edges
 M1Env::SpecialItemID M1Env::OCCUR_SIID = G_NONEX_SI_ID;
 // [OCCIN] Special Vertex ID (Edge type) of form to point of occurrence edges
@@ -233,6 +239,9 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::TEXT_WRITTEN_BY_SIID = M1Store::StorageStatic::getSpecialID("WRTBY");
     M1Env::DATA_SOURCE_FROM_SIID = M1Store::StorageStatic::getSpecialID("DTSDN");
     M1Env::DATA_SOURCE_TO_SIID = M1Store::StorageStatic::getSpecialID("DTSUP");
+    M1Env::TEXT_LANGUAGE_SIID = M1Store::StorageStatic::getSpecialID("TXLNG");
+    M1Env::TEXT_SLOKA_NUMBER_SIID = M1Store::StorageStatic::getSpecialID("SLKNM");
+    M1Env::TEXT_CHAP_NUMBER_SIID = M1Store::StorageStatic::getSpecialID("CHPNM");
     M1Env::OCCUR_SIID = M1Store::StorageStatic::getSpecialID("OCCUR");
     M1Env::OCCURS_IN_SIID = M1Store::StorageStatic::getSpecialID("OCCIN");
     M1Env::WFORM_SIID = M1Store::StorageStatic::getSpecialID("WFORM");
@@ -449,6 +458,9 @@ void M1Env::GraphInit::dbg_dump_pseudo_constants(){
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::ISA_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("_ISA_"), 4, 16, QChar('0')).arg("_ISA_");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WROTE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WROTE"), 4, 16, QChar('0')).arg("WROTE");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::DATA_SOURCE_FROM_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("DTSDN"), 4, 16, QChar('0')).arg("DTSDN");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_LANGUAGE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TXLNG"), 4, 16, QChar('0')).arg("TXLNG");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_SLOKA_NUMBER_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("SLKNM"), 4, 16, QChar('0')).arg("SLKNM");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_CHAP_NUMBER_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("CHPNM"), 4, 16, QChar('0')).arg("CHPNM");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::OCCUR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("OCCUR"), 4, 16, QChar('0')).arg("OCCUR");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::OCCURS_IN_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("OCCIN"), 4, 16, QChar('0')).arg("OCCIN");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::WFORM_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WFORM"), 4, 16, QChar('0')).arg("WFORM");
@@ -497,6 +509,12 @@ void M1Env::GraphInit::init_base(){
         "DTSDN", M1Env::DATA_SOURCE_ICON_PATH,
         "DTSUP", M1Env::DATA_SOURCE_ICON_PATH,
         SI_IS_TYPE | SI_EDGE_TYPE);
+    // Special Vertex ID (Simple Edge type) of text language field
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TXLNG", nullptr);
+    // Special Vertex ID (Simple Edge type) of sloka number field
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "SLKNM", nullptr);
+    // Special Vertex ID (Simple Edge type) of chapter number field
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "CHPNM", nullptr);
     // Special Vertex ID (Edge type) of form occurrence edges
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SPECIAL_EDGE, "OCCUR", M1Env::OCCURRENCE_ICON_PATH);
     // Special Vertex ID (Edge type) of form to point of occurrence edges

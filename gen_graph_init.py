@@ -408,6 +408,9 @@ g_special_vertices = [
     ['DTSDN', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'DATA_SOURCE_ICON_PATH',     'DATA_SOURCE_FROM_SIID',
     ('DTSUP', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'DATA_SOURCE_ICON_PATH',     'DATA_SOURCE_TO_SIID'),  'Special Vertex ID (Edge type) DS from / to'],
     # ---------------------------------------------------------------------
+    ['TXLNG', 'SI_IS_TYPE',                                None,                        'TEXT_LANGUAGE_SIID', None, 'Special Vertex ID (Simple Edge type) of text language field'],
+    ['SLKNM', 'SI_IS_TYPE',                                None,                        'TEXT_SLOKA_NUMBER_SIID', None, 'Special Vertex ID (Simple Edge type) of sloka number field'],
+    ['CHPNM', 'SI_IS_TYPE',                                None,                        'TEXT_CHAP_NUMBER_SIID', None, 'Special Vertex ID (Simple Edge type) of chapter number field'],
     ['OCCUR', ['SI_IS_TYPE', 'SI_EDGE_TYPE',
                'SI_IS_SPECIAL_EDGE'],                      'OCCURRENCE_ICON_PATH',      'OCCUR_SIID', None,          'Special Vertex ID (Edge type) of form occurrence edges'],
     ['OCCIN', ['SI_IS_TYPE', 'SI_EDGE_TYPE',],             'OCCURRENCE_ICON_PATH',      'OCCURS_IN_SIID', None,      'Special Vertex ID (Edge type) of form to point of occurrence edges'],
