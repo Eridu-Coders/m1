@@ -134,6 +134,7 @@ public:
 namespace M1MidPlane{
 
 class Interp : public QObject{
+    friend class SlokaInterp;
     Q_OBJECT
 private:
     static std::map<M1Env::ItemID, std::shared_ptr<Interp>> cm_interp_map;
@@ -328,6 +329,9 @@ private:
 
     QString m_sk;
     QString m_iast;
+
+    std::vector<std::shared_ptr<Interp>> m_translations_list;
+    std::vector<std::shared_ptr<Interp>> m_bhashya_list;
 public:
     static SlokaInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
 

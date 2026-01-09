@@ -567,6 +567,7 @@ QString M1MidPlane::Interp::cm_html_template =
         "h1 {font-size: 20pt; text-align: center;}\n" +
         "h2 {font-size: 16pt; font-weight: normal; text-align: center;}\n" +
         "h3 {font-size: 12pt; font-weight: normal; text-align: center;}\n" +
+        "h4 {font-size: 14pt; font-weight: normal; border-top: 1px solid black; font-style: italic}\n" +
         "p.sepabove {border-top: 1px solid black; margin-top: 2em; padding-top: 1em;}\n" +
         ".technical {font-size: 12pt; font-weight: normal; font-family: \"Noto Mono\", FreeMono, Monospace}\n}\n" +
         "table.wb {border: 1px solid black;border-collapse: collapse;}\n"
@@ -1162,11 +1163,29 @@ M1MidPlane::SlokaInterp::SlokaInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::
     M1Store::Item_lv2* l_transl_edge = m_myself->find_edge_generic(M1Env::OWNS_SIID, M1Env::TEXT_SLOKA_TRANSLIT_SIID);
     if(l_transl_edge != nullptr)
         m_iast = l_transl_edge->getTarget_lv2()->text();
+
+    for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorTop(M1Env::OWNS_SIID, M1Env::TEXT_SLOKA_TRANSLATION_SIID); !l_it.beyondEnd(); l_it.next())
+        m_translations_list.push_back(getInterp(l_it.at()->getTarget_lv2()));
+
+    for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorTop(M1Env::OWNS_SIID, M1Env::TEXT_SLOKA_BHASHYA_SIID); !l_it.beyondEnd(); l_it.next())
+        m_bhashya_list.push_back(getInterp(l_it.at()->getTarget_lv2()));
 }
 
 QString M1MidPlane::SlokaInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
     return QString("[%1.%2] %3 (%4)").arg(m_chapter_num).arg(m_sloka_num).arg(m_sk).arg(m_iast);
 }
 QString M1MidPlane::SlokaInterp::getHtmlVirtual(){
-    return QString("<p>Sloka %1.%2</p>\n<p>%3</p>\n<p>%4 (IAST)</p>\n").arg(m_chapter_num).arg(m_sloka_num).arg(m_sk).arg(m_iast);
+    QStringList l_translation_html_list;
+    for(const std::shared_ptr<Interp>& t: m_translations_list) l_translation_html_list.append(t->getHtmlVirtual());
+
+    QStringList l_bhashya_html_list;
+    for(const std::shared_ptr<Interp>& b: m_bhashya_list) l_bhashya_html_list.append(b->getHtmlVirtual());
+
+    return QString("<p>Sloka %1.%2</p>\n<p>%3</p>\n<p>%4 (IAST)</p>\n<h4>Translations</h4><div>%5</div>\n<h4>Bhashyas</h4><div>%6</div>\n")
+        .arg(m_chapter_num)
+        .arg(m_sloka_num)
+        .arg(m_sk)
+        .arg(m_iast)
+        .arg(l_translation_html_list.join("\n"))
+        .arg(l_bhashya_html_list.join("\n"));
 }
