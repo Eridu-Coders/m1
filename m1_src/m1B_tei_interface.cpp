@@ -176,7 +176,11 @@ void M1Store::TEIInterface::create_Lexicon_Entry(const QString& p_lemma_text, co
         p_lemma_text);
     l_new_lemma->setType(M1Env::LEMMA_SIID);
     cm_lexicon_root->linkTo(l_new_lemma, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+
     l_new_lemma->setFieldEdge(p_pos_text, M1Env::TEXT_WFW_POS_SIID);
+
+    if(p_pos_text.length() == 5)
+        l_new_lemma->setType(M1Store::StorageStatic::getSpecialItemPointer(p_pos_text.toUtf8().constData()));
 
     M1Store::Item_lv2* l_new_url = M1Store::Item_lv2::getNew(
         // vertex flags
@@ -198,6 +202,15 @@ void M1Store::TEIInterface::create_Lexicon_Entry(const QString& p_lemma_text, co
         QString l_key = QString("%1-%2").arg(f.form()).arg(p_lemma_text);
         qCDebug(g_cat_tmp_spotlight).noquote() << QString("l_key: [%1]").arg(l_key);
         m_form_map[l_key] = l_new_form;
+
+        for(const QString& l_gram_alternative : f.grammar().split("|")){
+            for(const QString& l_gram_code_1 : l_gram_alternative.split("-"))
+                if(l_gram_code_1 == "GNFEM/GNEUT/GMASC" || l_gram_code_1 == "**no analysis**")
+                    l_new_form->setFieldEdge(l_gram_code_1, M1Env::TEXT_LEXICON_GRAMMAR_SIID);
+                else
+                    for(const QString& l_gram_code_2 : l_gram_code_1.split("/"))
+                        l_new_form->setType(M1Store::StorageStatic::getSpecialItemPointer(l_gram_code_2.toUtf8().constData()));
+        }
     }
 }
 

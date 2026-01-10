@@ -411,6 +411,7 @@ g_special_vertices = [
     ['TXLNG', 'SI_IS_TYPE',                                None,                        'TEXT_LANGUAGE_SIID', None, 'Special Vertex ID (Simple Edge type) of text language field'],
     ['SLKNM', 'SI_IS_TYPE',                                None,                        'TEXT_SLOKA_NUMBER_SIID', None, 'Special Vertex ID (Simple Edge type) of sloka number field'],
     ['CHPNM', 'SI_IS_TYPE',                                None,                        'TEXT_CHAP_NUMBER_SIID', None, 'Special Vertex ID (Simple Edge type) of chapter number field'],
+    ['LFGRM', 'SI_IS_TYPE',                                None,                        'TEXT_LEXICON_GRAMMAR_SIID', None, 'Special Vertex ID (Simple Edge type) Lexicon form Grammatical analysis'],
     ['OCCUR', ['SI_IS_TYPE', 'SI_EDGE_TYPE',
                'SI_IS_SPECIAL_EDGE'],                      'OCCURRENCE_ICON_PATH',      'OCCUR_SIID', None,          'Special Vertex ID (Edge type) of form occurrence edges'],
     ['OCCIN', ['SI_IS_TYPE', 'SI_EDGE_TYPE',],             'OCCURRENCE_ICON_PATH',      'OCCURS_IN_SIID', None,      'Special Vertex ID (Edge type) of form to point of occurrence edges'],
@@ -464,6 +465,7 @@ g_vertices = [
 ['GChat Inbox',                  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  '_MSG_')], 'GCHAT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'GCHAT_TYPE_SIID'],
 ['SMS Inbox',                    ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  '_MSG_')], 'SMS__', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  None,                     'SMS_TYPE_SIID'],
 ['Grammar Attributes (type)',    ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'GRATT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'GRAMMAR_ATTR_SIID'],
+['Grammar Attr. Value (type)',   ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'GRATV', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'GRAMMAR_ATTR_VAL_SIID'],
 ['Lemma (type)',                 ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'LEMMA', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
                                                                                                                'SI_IS_ICON_TYPE'],                 'LEMMA_ICON_PATH',        'LEMMA_SIID'],
 ['NLP Entity (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'NLENT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'ENTITY_ICON_PATH',       'NLENT_SIID'],
@@ -598,7 +600,7 @@ if __name__ == '__main__':
         g_vertices.append([
             l_vertex_label,
             ['FULL_VERTEX',  'IS_SPECIAL'],
-            ['GRATT'],
+            ['TYPE_', 'GRATT'],
             None,
             l_mn_class,
             ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],
@@ -617,7 +619,7 @@ if __name__ == '__main__':
             g_vertices.append([
                 l_vertex_label,
                 ['FULL_VERTEX',  'IS_SPECIAL'],
-                ['TYPE_', l_mn_class],
+                ['TYPE_', l_mn_class, 'GRATV'],
                 None,
                 l_mn_attr,
                 ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],
@@ -635,7 +637,7 @@ if __name__ == '__main__':
         l_pos_2_mn[l_pos] = l_mn
         # ['NLP Tag code (type)', ['FULL_VERTEX',  'IS_SPECIAL'], ['TYPE_'], [('BLNGS',  'HOME_')], 'NLTAG', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], 'ENTITY_ICON_PATH', 'NLTAG_SIID'],
         g_vertices.append([
-            f'[{l_pos}]-{l_label}',
+            f'{l_pos}-{l_label}',
             ['FULL_VERTEX', 'IS_SPECIAL'],
             ['TYPE_', 'NLPOS'],
             None,
@@ -650,7 +652,7 @@ if __name__ == '__main__':
         l_tag_2_mn[l_tag] = l_mn
         # ['NLP Tag code (type)', ['FULL_VERTEX',  'IS_SPECIAL'], ['TYPE_'], [('BLNGS',  'HOME_')], 'NLTAG', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], 'ENTITY_ICON_PATH', 'NLTAG_SIID'],
         g_vertices.append([
-            f'[{l_tag}]-{l_label}',
+            f'{l_tag}-{l_label}',
             ['FULL_VERTEX', 'IS_SPECIAL'],
             ['TYPE_', 'NLTAG'],
             None,

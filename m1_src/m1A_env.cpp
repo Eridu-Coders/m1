@@ -22,9 +22,13 @@ QStringList M1Env::EnvStatic::cm_list_excluded_catergory_for_screen;
 QRegularExpression g_re_space(R"(\s+)");
 QRegularExpression g_re_punc(R"(^(\W*)(\w+)(\W*))");
 QRegularExpression g_re_tags(R"(<[^>]+>)");
-QRegularExpression g_re_initial_p(R"(^\s*<p>\s*)");
-QRegularExpression g_re_final_p(R"(\s*<\/p>\s*$)");
+QRegularExpression g_re_initial_p(R"(^\s*<p>\s*)", QRegularExpression::DotMatchesEverythingOption);
+QRegularExpression g_re_final_p(R"(\s*<\/p>\s*$)", QRegularExpression::DotMatchesEverythingOption);
+QRegularExpression g_re_initial_table(R"(^\s*<table>\s*)", QRegularExpression::DotMatchesEverythingOption);
+QRegularExpression g_re_final_table(R"(\s*<\/table>\s*$)", QRegularExpression::DotMatchesEverythingOption);
+QRegularExpression g_re_capture_gammar(R"(<div\s+class=\"+grammar\"+>(.*)<\/div>)", QRegularExpression::DotMatchesEverythingOption);
 
+// <div class=\"grammar\">
 /**
  * @brief M1Store::M1Env::myMessageHandler message handler callback for Qt debug infra
  * @param p_type Qt log level (Debug/Warning/Critical/Fatal)

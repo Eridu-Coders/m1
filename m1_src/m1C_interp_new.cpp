@@ -568,6 +568,10 @@ QString M1MidPlane::Interp::cm_html_template =
         "h2 {font-size: 16pt; font-weight: normal; text-align: center;}\n" +
         "h3 {font-size: 12pt; font-weight: normal; text-align: center;}\n" +
         "h4 {font-size: 14pt; font-weight: normal; border-top: 1px solid black; font-style: italic}\n" +
+        "h5 {font-size: 16pt; font-weight: normal;}\n" +
+        "td.wfw-top {padding-top: 1em; padding-right: 1em;}\n" +
+        "td.wfw {padding-right: 1em;}\n" + // grammar
+        "p.grammar {margin: 0}\n" +
         "p.sepabove {border-top: 1px solid black; margin-top: 2em; padding-top: 1em;}\n" +
         ".technical {font-size: 12pt; font-weight: normal; font-family: \"Noto Mono\", FreeMono, Monospace}\n}\n" +
         "table.wb {border: 1px solid black;border-collapse: collapse;}\n"
@@ -981,8 +985,21 @@ M1MidPlane::WfWUnit* M1MidPlane::WfWUnit::getOneIfMatch(M1Store::Item_lv2* p_mys
     return l_ret;
 }
 
-M1MidPlane::WfWUnit::WfWUnit(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){}
+/**
+ * @brief M1MidPlane::WfWUnit::WfWUnit
+ * @param p_myself
+ */
+M1MidPlane::WfWUnit::WfWUnit(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){
+    //m_forms_list
+    for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorTop(M1Env::OWNS_SIID, M1Env::OCCUR_SIID); !l_it.beyondEnd(); l_it.next())
+        m_forms_list.push_back(M1MidPlane::Interp::getInterp(l_it.at()->getTarget_lv2()->getTarget_lv2()));
+}
 
+/**
+ * @brief M1MidPlane::WfWUnit::inTreeDisplayText
+ * @param p_edge
+ * @return
+ */
 QString M1MidPlane::WfWUnit::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
     QString l_translit = m_myself->getField(M1Env::TEXT_WFW_TRANSLIT_SIID);
     QString l_translat = m_myself->getField(M1Env::TEXT_WFW_TRANSLAT_SIID);
@@ -990,7 +1007,32 @@ QString M1MidPlane::WfWUnit::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
     return QString("%1 (%2) : %3").arg(m_myself->text()).arg(l_translit).arg(l_translat);
 }
 
-/**
+QString M1MidPlane::WfWUnit::getHtmlVirtual(){
+    QStringList l_translate_list = m_myself->getField(M1Env::TEXT_WFW_TRANSLAT_SIID).split('|');
+    QString l_row_span = l_translate_list.length() >= 2 ? QString(" rowspan=\"%1\"").arg(l_translate_list.length()) : "";
+    QString l_ret = QString("<table><tr><td%4 class=\"wfw-top\" style=\"color: maroon;\">%1</td><td%4 class=\"wfw-top\">%2</td><td class=\"wfw-top\">%3</td></tr>\n")
+                        .arg(m_myself->text())
+                        .arg(m_myself->getField(M1Env::TEXT_WFW_TRANSLIT_SIID))
+                        .arg(l_translate_list[0])
+                        .arg(l_row_span);
+
+    for(int i=1; i<l_translate_list.length(); i++)
+        l_ret += QString("<tr><td class=\"wfw\">%1</td></tr>\n").arg(l_translate_list[i]);
+    l_ret += "</table>\n";
+
+    QStringList l_form_html_list;
+    for(const std::shared_ptr<Interp>& l_form : m_forms_list)
+        l_form_html_list.append(l_form->getHtmlVirtual());
+
+    l_ret += QString("<div class=\"grammar\">\n<p><span style=\"color: maroon;\">%1</span> (%2)</p>\n%3</div>\n")
+                 .arg(m_myself->text())
+                 .arg(m_myself->getField(M1Env::TEXT_WFW_TRANSLIT_SIID))
+                 .arg(l_form_html_list.join("\n"));
+
+    return l_ret;
+}
+
+/** --------------------------------------------------------------- UrlInterp ---------------------------------
  * @brief M1MidPlane::UrlInterp::getOneIfMatch
  * @param p_myself
  * @return
@@ -1041,6 +1083,9 @@ M1Store::Item_lv2* M1MidPlane::OccurInterp::where_to_go(const M1Store::Item_lv2*
     return m_target->where_to_go(m_myself);
 }
 
+QString M1MidPlane::OccurInterp::getHtmlVirtual(){
+    return QString("<p>Occurrence of:</p>%1").arg(m_target->getHtmlVirtual());
+}
 /** --------------------------------------------------------------- LemmaInterp ---------------------------------
  * @brief M1MidPlane::LemmaInterp::getOneIfMatch
  * @param p_myself
@@ -1055,10 +1100,16 @@ M1MidPlane::LemmaInterp* M1MidPlane::LemmaInterp::getOneIfMatch(M1Store::Item_lv
     return l_ret;
 }
 
-M1MidPlane::LemmaInterp::LemmaInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){}
+M1MidPlane::LemmaInterp::LemmaInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){
+    M1Store::Item_lv2* l_pos_edge = p_myself->find_edge_generic(M1Env::ISA_SIID, M1Env::NLPOS_SIID, true);
+    if(l_pos_edge != nullptr)
+        m_pos = l_pos_edge->getTarget_lv2()->text();
+    else
+        m_pos = m_myself->getField(M1Env::TEXT_WFW_POS_SIID);
+}
 
 QString M1MidPlane::LemmaInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
-    return QString("%1 [%2]").arg(m_myself->text()).arg(m_myself->getField(M1Env::TEXT_WFW_POS_SIID));
+    return QString("%1 [%2]").arg(m_myself->text()).arg(m_pos);
 }
 
 /** --------------------------------------------------------------- FormInterp ---------------------------------
@@ -1082,9 +1133,17 @@ M1MidPlane::FormInterp::FormInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::In
 }
 
 QString M1MidPlane::FormInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
-    return QString("%1 <-- %2").arg(m_myself->text()).arg(m_lemma->inTreeDisplayText(p_edge));
+    return QString("%1 ← %2").arg(m_myself->text()).arg(m_lemma->inTreeDisplayText(p_edge));
 }
 
+QString M1MidPlane::FormInterp::getHtmlVirtual(){
+    // GRAMMAR_ATTR_VAL_SIID
+    QStringList l_grammar_values;
+    for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorSpecial(M1Env::ISA_SIID, M1Env::GRAMMAR_ATTR_VAL_SIID); !l_it.beyondEnd(); l_it.next())
+        l_grammar_values.append(l_it.at()->getTarget_lv2()->text());
+
+    return QString("<p class=\"grammar\">%1: %2</p>").arg(this->inTreeDisplayText(nullptr)).arg(l_grammar_values.join(", "));
+}
 /** --------------------------------------------------------------- TranslationBhashya ---------------------------------
  * @brief M1MidPlane::TranslationBhashya::getOneIfMatch
  * @param p_myself
@@ -1131,7 +1190,8 @@ QString M1MidPlane::TranslationBhashya::getHtmlVirtual(){
     if(g_re_initial_p.match(l_text).hasMatch())
         l_text = l_text.replace(g_re_final_p, "").replace(g_re_initial_p, "");
 
-    return QString("<p>%1 <span style=\"font-style: italic; font-size: smaller; color: maroon;\">%2</span></p>\n").arg(l_text).arg(l_author);
+    return QString("<p>%1 <span style=\"font-style: italic; font-size: smaller; color: maroon;\">%2 Lang.: %3</span></p>\n")
+        .arg(l_text).arg(l_author).arg(m_language);
 }
 
 /** --------------------------------------------------------------- SlokaInterp ---------------------------------
@@ -1148,6 +1208,10 @@ M1MidPlane::SlokaInterp* M1MidPlane::SlokaInterp::getOneIfMatch(M1Store::Item_lv
     return l_ret;
 }
 
+/**
+ * @brief M1MidPlane::SlokaInterp::SlokaInterp
+ * @param p_myself
+ */
 M1MidPlane::SlokaInterp::SlokaInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){
     m_sloka_num = m_myself->getField(M1Env::TEXT_SLOKA_NUMBER_SIID).toInt();
     M1Store::Item_lv2* l_chapter_edge = m_myself->find_edge_generic(M1Env::BLNGS_SIID, M1Env::TEXT_CHAPTER_SIID);
@@ -1168,24 +1232,58 @@ M1MidPlane::SlokaInterp::SlokaInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::
         m_translations_list.push_back(getInterp(l_it.at()->getTarget_lv2()));
 
     for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorTop(M1Env::OWNS_SIID, M1Env::TEXT_SLOKA_BHASHYA_SIID); !l_it.beyondEnd(); l_it.next())
-        m_bhashya_list.push_back(getInterp(l_it.at()->getTarget_lv2()));
+        m_bhashya_list.push_back(getInterp(l_it.at()->getTarget_lv2())); // m_wfw_list
+
+    for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorTop(M1Env::OWNS_SIID, M1Env::TEXT_WFW_UNIT_SIID); !l_it.beyondEnd(); l_it.next())
+        m_wfw_list.push_back(getInterp(l_it.at()->getTarget_lv2()));
 }
 
+/**
+ * @brief M1MidPlane::SlokaInterp::inTreeDisplayText
+ * @param p_edge
+ * @return
+ */
 QString M1MidPlane::SlokaInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
     return QString("[%1.%2] %3 (%4)").arg(m_chapter_num).arg(m_sloka_num).arg(m_sk).arg(m_iast);
 }
+
+/**
+ * @brief M1MidPlane::SlokaInterp::getHtmlVirtual
+ * @return
+ */
 QString M1MidPlane::SlokaInterp::getHtmlVirtual(){
+    QStringList l_wfw_html_list;
+    QStringList l_grammar_html_list;
+    for(const std::shared_ptr<Interp>& w: m_wfw_list){
+        QString l_html_raw = w->getHtmlVirtual();
+
+        qCDebug(g_cat_interp_base).noquote() << "l_html_raw:\n" << l_html_raw;
+        QRegularExpressionMatch l_match = g_re_capture_gammar.match(l_html_raw, QRegularExpression::DotMatchesEverythingOption);
+        if(l_match.hasMatch()){
+            qCDebug(g_cat_interp_base).noquote() << "l_match.captured(0/1)" << l_match.captured(0) << l_match.captured(1);
+            l_grammar_html_list.append(l_match.captured(1));
+        }
+        else
+            qCDebug(g_cat_interp_base).noquote() << "Not Matched";
+
+        QString l_wfw_html = l_html_raw.replace(g_re_capture_gammar, "").replace(g_re_initial_table, "").replace(g_re_final_table, "");
+        l_wfw_html_list.append(l_wfw_html);
+    }
+
     QStringList l_translation_html_list;
     for(const std::shared_ptr<Interp>& t: m_translations_list) l_translation_html_list.append(t->getHtmlVirtual());
 
     QStringList l_bhashya_html_list;
     for(const std::shared_ptr<Interp>& b: m_bhashya_list) l_bhashya_html_list.append(b->getHtmlVirtual());
 
-    return QString("<p>Sloka %1.%2</p>\n<p>%3</p>\n<p>%4 (IAST)</p>\n<h4>Translations</h4><div>%5</div>\n<h4>Bhashyas</h4><div>%6</div>\n")
-        .arg(m_chapter_num)
-        .arg(m_sloka_num)
-        .arg(m_sk)
-        .arg(m_iast)
-        .arg(l_translation_html_list.join("\n"))
-        .arg(l_bhashya_html_list.join("\n"));
+    return (QString("<h5>Sloka %1.%2</h5>\n<p>%3</p>\n<p>%4 (IAST)</p>\n<h4>Word-for-Word Analysis</h4><table>%5</table>") +
+            QString("\n<h4>Translations</h4><div>%6</div>\n<h4>Bhashyas</h4><div>%7<h4>Grammar</h4><div>%8</div>\n"))
+        .arg(m_chapter_num)                         // 1
+        .arg(m_sloka_num)                           // 2
+        .arg(m_sk)                                  // 3
+        .arg(m_iast)                                // 4
+        .arg(l_wfw_html_list.join("\n"))            // 5
+        .arg(l_translation_html_list.join("\n"))    // 6
+        .arg(l_bhashya_html_list.join("\n"))        // 7
+        .arg(l_grammar_html_list.join("\n"));       // 8
 }

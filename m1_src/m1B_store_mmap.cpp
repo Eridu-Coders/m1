@@ -215,8 +215,8 @@ M1Store::Item_lv1* M1Store::StorageStatic::getItemPointer_lv1(ItemID p_item_id){
     unsigned int l_segment_number = p_item_id >> ITEMS_MMAP_INCREMENT_COUNT_P2;
     ItemID l_item_id_displacement = p_item_id & ITEMS_MMAP_SEG_DISPLACEMENT_MASK;
     M1_FUNC_EXIT
-        // shift left by 7 bits = mult by 128 (Item size)
-        return (Item_lv1*)(cm_item_mmap_base[l_segment_number] + (l_item_id_displacement << ITEM_SIZE_P2));
+    // shift left by 7 bits = mult by 128 (Item size)
+    return (Item_lv1*)(cm_item_mmap_base[l_segment_number] + (l_item_id_displacement << ITEM_SIZE_P2));
 }
 
 /**
@@ -231,7 +231,7 @@ M1Store::SpecialItem* M1Store::StorageStatic::getSpecialItemPointer(const Specia
     // shift left by 5 bits = mult by 32
 
     M1_FUNC_EXIT
-        return (SpecialItem*)(cm_special_mmap_base + (p_si_id << 5));
+    return (SpecialItem*)(cm_special_mmap_base + (p_si_id << 5));
 }
 
 /**
@@ -261,6 +261,6 @@ M1Store::Item_lv1* M1Store::StorageStatic::getNewItemPointer_lv1(const FlagField
     l_ret->initializeMembers_lv1(l_new_id, p_flags, p_type);
 
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 /**@}*/ //end of StoreMmap

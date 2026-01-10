@@ -29,6 +29,8 @@ M1Env::SpecialItemID M1Env::TEXT_LANGUAGE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_SLOKA_NUMBER_SIID = G_NONEX_SI_ID;
 // [CHPNM] Special Vertex ID (Simple Edge type) of chapter number field
 M1Env::SpecialItemID M1Env::TEXT_CHAP_NUMBER_SIID = G_NONEX_SI_ID;
+// [LFGRM] Special Vertex ID (Simple Edge type) Lexicon form Grammatical analysis
+M1Env::SpecialItemID M1Env::TEXT_LEXICON_GRAMMAR_SIID = G_NONEX_SI_ID;
 // [OCCUR] Special Vertex ID (Edge type) of form occurrence edges
 M1Env::SpecialItemID M1Env::OCCUR_SIID = G_NONEX_SI_ID;
 // [OCCIN] Special Vertex ID (Edge type) of form to point of occurrence edges
@@ -92,6 +94,7 @@ M1Env::SpecialItemID M1Env::DSCRD_TYPE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::GCHAT_TYPE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::SMS_TYPE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::GRAMMAR_ATTR_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::GRAMMAR_ATTR_VAL_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::LEMMA_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::NLENT_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::NLPOS_SIID = G_NONEX_SI_ID;
@@ -242,6 +245,7 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::TEXT_LANGUAGE_SIID = M1Store::StorageStatic::getSpecialID("TXLNG");
     M1Env::TEXT_SLOKA_NUMBER_SIID = M1Store::StorageStatic::getSpecialID("SLKNM");
     M1Env::TEXT_CHAP_NUMBER_SIID = M1Store::StorageStatic::getSpecialID("CHPNM");
+    M1Env::TEXT_LEXICON_GRAMMAR_SIID = M1Store::StorageStatic::getSpecialID("LFGRM");
     M1Env::OCCUR_SIID = M1Store::StorageStatic::getSpecialID("OCCUR");
     M1Env::OCCURS_IN_SIID = M1Store::StorageStatic::getSpecialID("OCCIN");
     M1Env::WFORM_SIID = M1Store::StorageStatic::getSpecialID("WFORM");
@@ -281,6 +285,7 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::GCHAT_TYPE_SIID = M1Store::StorageStatic::getSpecialID("GCHAT");
     M1Env::SMS_TYPE_SIID = M1Store::StorageStatic::getSpecialID("SMS__");
     M1Env::GRAMMAR_ATTR_SIID = M1Store::StorageStatic::getSpecialID("GRATT");
+    M1Env::GRAMMAR_ATTR_VAL_SIID = M1Store::StorageStatic::getSpecialID("GRATV");
     M1Env::LEMMA_SIID = M1Store::StorageStatic::getSpecialID("LEMMA");
     M1Env::NLENT_SIID = M1Store::StorageStatic::getSpecialID("NLENT");
     M1Env::NLPOS_SIID = M1Store::StorageStatic::getSpecialID("NLPOS");
@@ -461,6 +466,7 @@ void M1Env::GraphInit::dbg_dump_pseudo_constants(){
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_LANGUAGE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TXLNG"), 4, 16, QChar('0')).arg("TXLNG");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_SLOKA_NUMBER_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("SLKNM"), 4, 16, QChar('0')).arg("SLKNM");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_CHAP_NUMBER_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("CHPNM"), 4, 16, QChar('0')).arg("CHPNM");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_LEXICON_GRAMMAR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("LFGRM"), 4, 16, QChar('0')).arg("LFGRM");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::OCCUR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("OCCUR"), 4, 16, QChar('0')).arg("OCCUR");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::OCCURS_IN_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("OCCIN"), 4, 16, QChar('0')).arg("OCCIN");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::WFORM_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WFORM"), 4, 16, QChar('0')).arg("WFORM");
@@ -515,6 +521,8 @@ void M1Env::GraphInit::init_base(){
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "SLKNM", nullptr);
     // Special Vertex ID (Simple Edge type) of chapter number field
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "CHPNM", nullptr);
+    // Special Vertex ID (Simple Edge type) Lexicon form Grammatical analysis
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "LFGRM", nullptr);
     // Special Vertex ID (Edge type) of form occurrence edges
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SPECIAL_EDGE, "OCCUR", M1Env::OCCURRENCE_ICON_PATH);
     // Special Vertex ID (Edge type) of form to point of occurrence edges
@@ -817,6 +825,22 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_gratt->setType("TYPE_");
     l_gratt->linkTo(l_txwkk, "BLNGS", nullptr, true);
+
+    // creation of "Grammar Attr. Value (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[GRATV]-Grammar Attr. Value (type)> item");
+    M1Store::Item_lv2* l_gratv = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Grammar Attr. Value (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "GRATV",
+        // icon path
+        M1Env::FOLDER_ICON_PATH);
+    l_gratv->setType("TYPE_");
+    l_gratv->linkTo(l_txwkk, "BLNGS", nullptr, true);
 
     // creation of "Lemma (type)"
     qCDebug(g_cat_silence) << QString("Creating <[LEMMA]-Lemma (type)> item");
@@ -1240,6 +1264,7 @@ void M1Env::GraphInit::init_base(){
         "ABBR_",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_abbr->setType("TYPE_");
     l_abbr->setType("GRATT");
 
     // creation of "[Yes]-it is abbreviation"
@@ -1257,6 +1282,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_abyes->setType("TYPE_");
     l_abyes->setType("ABBR_");
+    l_abyes->setType("GRATV");
 
     // creation of "Animacy"
     qCDebug(g_cat_silence) << QString("Creating <[ANMCY]-Animacy> item");
@@ -1271,6 +1297,7 @@ void M1Env::GraphInit::init_base(){
         "ANMCY",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_anmcy->setType("TYPE_");
     l_anmcy->setType("GRATT");
 
     // creation of "[Anim]-animate"
@@ -1288,6 +1315,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ananm->setType("TYPE_");
     l_ananm->setType("ANMCY");
+    l_ananm->setType("GRATV");
 
     // creation of "[Hum]-human"
     qCDebug(g_cat_silence) << QString("Creating <[ANHUM]-[Hum]-human> item");
@@ -1304,6 +1332,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_anhum->setType("TYPE_");
     l_anhum->setType("ANMCY");
+    l_anhum->setType("GRATV");
 
     // creation of "[Inan]-inanimate"
     qCDebug(g_cat_silence) << QString("Creating <[ANINN]-[Inan]-inanimate> item");
@@ -1320,6 +1349,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_aninn->setType("TYPE_");
     l_aninn->setType("ANMCY");
+    l_aninn->setType("GRATV");
 
     // creation of "[Nhum]-non-human"
     qCDebug(g_cat_silence) << QString("Creating <[ANNHM]-[Nhum]-non-human> item");
@@ -1336,6 +1366,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_annhm->setType("TYPE_");
     l_annhm->setType("ANMCY");
+    l_annhm->setType("GRATV");
 
     // creation of "Aspect"
     qCDebug(g_cat_silence) << QString("Creating <[ASPCT]-Aspect> item");
@@ -1350,6 +1381,7 @@ void M1Env::GraphInit::init_base(){
         "ASPCT",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_aspct->setType("TYPE_");
     l_aspct->setType("GRATT");
 
     // creation of "[Hab]-habitual aspect"
@@ -1367,6 +1399,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ashab->setType("TYPE_");
     l_ashab->setType("ASPCT");
+    l_ashab->setType("GRATV");
 
     // creation of "[Imp]-imperfect aspect"
     qCDebug(g_cat_silence) << QString("Creating <[ASIMP]-[Imp]-imperfect aspect> item");
@@ -1383,6 +1416,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_asimp->setType("TYPE_");
     l_asimp->setType("ASPCT");
+    l_asimp->setType("GRATV");
 
     // creation of "[Iter]-iterative / frequentative aspect"
     qCDebug(g_cat_silence) << QString("Creating <[ASITR]-[Iter]-iterative / frequentative aspect> item");
@@ -1399,6 +1433,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_asitr->setType("TYPE_");
     l_asitr->setType("ASPCT");
+    l_asitr->setType("GRATV");
 
     // creation of "[Perf]-perfect aspect"
     qCDebug(g_cat_silence) << QString("Creating <[ASPRF]-[Perf]-perfect aspect> item");
@@ -1415,6 +1450,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_asprf->setType("TYPE_");
     l_asprf->setType("ASPCT");
+    l_asprf->setType("GRATV");
 
     // creation of "[Prog]-progressive aspect"
     qCDebug(g_cat_silence) << QString("Creating <[ASPRG]-[Prog]-progressive aspect> item");
@@ -1431,6 +1467,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_asprg->setType("TYPE_");
     l_asprg->setType("ASPCT");
+    l_asprg->setType("GRATV");
 
     // creation of "[Prosp]-prospective aspect"
     qCDebug(g_cat_silence) << QString("Creating <[ASPRS]-[Prosp]-prospective aspect> item");
@@ -1447,6 +1484,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_asprs->setType("TYPE_");
     l_asprs->setType("ASPCT");
+    l_asprs->setType("GRATV");
 
     // creation of "Case"
     qCDebug(g_cat_silence) << QString("Creating <[CASE_]-Case> item");
@@ -1461,6 +1499,7 @@ void M1Env::GraphInit::init_base(){
         "CASE_",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_case->setType("TYPE_");
     l_case->setType("GRATT");
 
     // creation of "[Abs]-absolutive"
@@ -1478,6 +1517,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_csabs->setType("TYPE_");
     l_csabs->setType("CASE_");
+    l_csabs->setType("GRATV");
 
     // creation of "[Acc]-accusative / oblique"
     qCDebug(g_cat_silence) << QString("Creating <[CSACC]-[Acc]-accusative / oblique> item");
@@ -1494,6 +1534,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_csacc->setType("TYPE_");
     l_csacc->setType("CASE_");
+    l_csacc->setType("GRATV");
 
     // creation of "[Erf]-ergative"
     qCDebug(g_cat_silence) << QString("Creating <[CSERG]-[Erf]-ergative> item");
@@ -1510,6 +1551,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_cserg->setType("TYPE_");
     l_cserg->setType("CASE_");
+    l_cserg->setType("GRATV");
 
     // creation of "[Nom]-nominative / direct"
     qCDebug(g_cat_silence) << QString("Creating <[CSNOM]-[Nom]-nominative / direct> item");
@@ -1526,6 +1568,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_csnom->setType("TYPE_");
     l_csnom->setType("CASE_");
+    l_csnom->setType("GRATV");
 
     // creation of "[Abe]-abessive / caritive / privative"
     qCDebug(g_cat_silence) << QString("Creating <[CSABE]-[Abe]-abessive / caritive / privative> item");
@@ -1542,6 +1585,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_csabe->setType("TYPE_");
     l_csabe->setType("CASE_");
+    l_csabe->setType("GRATV");
 
     // creation of "[Ben]-benefactive / destinative"
     qCDebug(g_cat_silence) << QString("Creating <[CSBEN]-[Ben]-benefactive / destinative> item");
@@ -1558,6 +1602,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_csben->setType("TYPE_");
     l_csben->setType("CASE_");
+    l_csben->setType("GRATV");
 
     // creation of "[Cau]-causative / motivative / purposive"
     qCDebug(g_cat_silence) << QString("Creating <[CSCAU]-[Cau]-causative / motivative / purposive> item");
@@ -1574,6 +1619,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_cscau->setType("TYPE_");
     l_cscau->setType("CASE_");
+    l_cscau->setType("GRATV");
 
     // creation of "[Cmp]-comparative"
     qCDebug(g_cat_silence) << QString("Creating <[CSCMP]-[Cmp]-comparative> item");
@@ -1590,6 +1636,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_cscmp->setType("TYPE_");
     l_cscmp->setType("CASE_");
+    l_cscmp->setType("GRATV");
 
     // creation of "[Cns]-considerative"
     qCDebug(g_cat_silence) << QString("Creating <[CSCNS]-[Cns]-considerative> item");
@@ -1606,6 +1653,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_cscns->setType("TYPE_");
     l_cscns->setType("CASE_");
+    l_cscns->setType("GRATV");
 
     // creation of "[Com]-comitative / associative"
     qCDebug(g_cat_silence) << QString("Creating <[CSCOM]-[Com]-comitative / associative> item");
@@ -1622,6 +1670,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_cscom->setType("TYPE_");
     l_cscom->setType("CASE_");
+    l_cscom->setType("GRATV");
 
     // creation of "[Dat]-dative"
     qCDebug(g_cat_silence) << QString("Creating <[CSDAT]-[Dat]-dative> item");
@@ -1638,6 +1687,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_csdat->setType("TYPE_");
     l_csdat->setType("CASE_");
+    l_csdat->setType("GRATV");
 
     // creation of "[Dis]-distributive"
     qCDebug(g_cat_silence) << QString("Creating <[CSDIS]-[Dis]-distributive> item");
@@ -1654,6 +1704,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_csdis->setType("TYPE_");
     l_csdis->setType("CASE_");
+    l_csdis->setType("GRATV");
 
     // creation of "[Equ]-equative"
     qCDebug(g_cat_silence) << QString("Creating <[CSEQU]-[Equ]-equative> item");
@@ -1670,6 +1721,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_csequ->setType("TYPE_");
     l_csequ->setType("CASE_");
+    l_csequ->setType("GRATV");
 
     // creation of "[Gen]-genitive"
     qCDebug(g_cat_silence) << QString("Creating <[CSGEN]-[Gen]-genitive> item");
@@ -1686,6 +1738,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_csgen->setType("TYPE_");
     l_csgen->setType("CASE_");
+    l_csgen->setType("GRATV");
 
     // creation of "[Ins]-instrumental / instructive"
     qCDebug(g_cat_silence) << QString("Creating <[CSINS]-[Ins]-instrumental / instructive> item");
@@ -1702,6 +1755,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_csins->setType("TYPE_");
     l_csins->setType("CASE_");
+    l_csins->setType("GRATV");
 
     // creation of "[Par]-partitive"
     qCDebug(g_cat_silence) << QString("Creating <[CSPAR]-[Par]-partitive> item");
@@ -1718,6 +1772,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_cspar->setType("TYPE_");
     l_cspar->setType("CASE_");
+    l_cspar->setType("GRATV");
 
     // creation of "[Tem]-temporal"
     qCDebug(g_cat_silence) << QString("Creating <[CSTEM]-[Tem]-temporal> item");
@@ -1734,6 +1789,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_cstem->setType("TYPE_");
     l_cstem->setType("CASE_");
+    l_cstem->setType("GRATV");
 
     // creation of "[Tra]-translative / factive"
     qCDebug(g_cat_silence) << QString("Creating <[CSTRA]-[Tra]-translative / factive> item");
@@ -1750,6 +1806,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_cstra->setType("TYPE_");
     l_cstra->setType("CASE_");
+    l_cstra->setType("GRATV");
 
     // creation of "[Voc]-vocative"
     qCDebug(g_cat_silence) << QString("Creating <[CSVOC]-[Voc]-vocative> item");
@@ -1766,6 +1823,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_csvoc->setType("TYPE_");
     l_csvoc->setType("CASE_");
+    l_csvoc->setType("GRATV");
 
     // creation of "[Abl]-ablative / adelative"
     qCDebug(g_cat_silence) << QString("Creating <[CSABL]-[Abl]-ablative / adelative> item");
@@ -1782,6 +1840,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_csabl->setType("TYPE_");
     l_csabl->setType("CASE_");
+    l_csabl->setType("GRATV");
 
     // creation of "[Add]-additive"
     qCDebug(g_cat_silence) << QString("Creating <[CSADD]-[Add]-additive> item");
@@ -1798,6 +1857,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_csadd->setType("TYPE_");
     l_csadd->setType("CASE_");
+    l_csadd->setType("GRATV");
 
     // creation of "[Ade]-adessive"
     qCDebug(g_cat_silence) << QString("Creating <[CSADE]-[Ade]-adessive> item");
@@ -1814,6 +1874,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_csade->setType("TYPE_");
     l_csade->setType("CASE_");
+    l_csade->setType("GRATV");
 
     // creation of "[All]-allative / adlative"
     qCDebug(g_cat_silence) << QString("Creating <[CSALL]-[All]-allative / adlative> item");
@@ -1830,6 +1891,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_csall->setType("TYPE_");
     l_csall->setType("CASE_");
+    l_csall->setType("GRATV");
 
     // creation of "[Del]-delative / superelative"
     qCDebug(g_cat_silence) << QString("Creating <[CSDEL]-[Del]-delative / superelative> item");
@@ -1846,6 +1908,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_csdel->setType("TYPE_");
     l_csdel->setType("CASE_");
+    l_csdel->setType("GRATV");
 
     // creation of "[Ela]-elative / inelative"
     qCDebug(g_cat_silence) << QString("Creating <[CSELA]-[Ela]-elative / inelative> item");
@@ -1862,6 +1925,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_csela->setType("TYPE_");
     l_csela->setType("CASE_");
+    l_csela->setType("GRATV");
 
     // creation of "[Ess]-essive / prolative"
     qCDebug(g_cat_silence) << QString("Creating <[CSESS]-[Ess]-essive / prolative> item");
@@ -1878,6 +1942,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_csess->setType("TYPE_");
     l_csess->setType("CASE_");
+    l_csess->setType("GRATV");
 
     // creation of "[Ill]-illative / inlative"
     qCDebug(g_cat_silence) << QString("Creating <[CSILL]-[Ill]-illative / inlative> item");
@@ -1894,6 +1959,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_csill->setType("TYPE_");
     l_csill->setType("CASE_");
+    l_csill->setType("GRATV");
 
     // creation of "[Ine]-inessive"
     qCDebug(g_cat_silence) << QString("Creating <[CSINE]-[Ine]-inessive> item");
@@ -1910,6 +1976,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_csine->setType("TYPE_");
     l_csine->setType("CASE_");
+    l_csine->setType("GRATV");
 
     // creation of "[Lat]-lative / directional allative"
     qCDebug(g_cat_silence) << QString("Creating <[CSLAT]-[Lat]-lative / directional allative> item");
@@ -1926,6 +1993,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_cslat->setType("TYPE_");
     l_cslat->setType("CASE_");
+    l_cslat->setType("GRATV");
 
     // creation of "[Loc]-locative"
     qCDebug(g_cat_silence) << QString("Creating <[CSLOC]-[Loc]-locative> item");
@@ -1942,6 +2010,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_csloc->setType("TYPE_");
     l_csloc->setType("CASE_");
+    l_csloc->setType("GRATV");
 
     // creation of "[Per]-perlative"
     qCDebug(g_cat_silence) << QString("Creating <[CSPER]-[Per]-perlative> item");
@@ -1958,6 +2027,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_csper->setType("TYPE_");
     l_csper->setType("CASE_");
+    l_csper->setType("GRATV");
 
     // creation of "[Sbe]-subelative"
     qCDebug(g_cat_silence) << QString("Creating <[CSSBE]-[Sbe]-subelative> item");
@@ -1974,6 +2044,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_cssbe->setType("TYPE_");
     l_cssbe->setType("CASE_");
+    l_cssbe->setType("GRATV");
 
     // creation of "[Sbl]-sublative"
     qCDebug(g_cat_silence) << QString("Creating <[CSSBL]-[Sbl]-sublative> item");
@@ -1990,6 +2061,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_cssbl->setType("TYPE_");
     l_cssbl->setType("CASE_");
+    l_cssbl->setType("GRATV");
 
     // creation of "[Spl]-superlative"
     qCDebug(g_cat_silence) << QString("Creating <[CSSPL]-[Spl]-superlative> item");
@@ -2006,6 +2078,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_csspl->setType("TYPE_");
     l_csspl->setType("CASE_");
+    l_csspl->setType("GRATV");
 
     // creation of "[Sub]-subessive"
     qCDebug(g_cat_silence) << QString("Creating <[CSSUB]-[Sub]-subessive> item");
@@ -2022,6 +2095,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_cssub->setType("TYPE_");
     l_cssub->setType("CASE_");
+    l_cssub->setType("GRATV");
 
     // creation of "[Sup]-superessive"
     qCDebug(g_cat_silence) << QString("Creating <[CSSUP]-[Sup]-superessive> item");
@@ -2038,6 +2112,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_cssup->setType("TYPE_");
     l_cssup->setType("CASE_");
+    l_cssup->setType("GRATV");
 
     // creation of "[Ter]-terminative / terminal allative"
     qCDebug(g_cat_silence) << QString("Creating <[CSTER]-[Ter]-terminative / terminal allative> item");
@@ -2054,6 +2129,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_cster->setType("TYPE_");
     l_cster->setType("CASE_");
+    l_cster->setType("GRATV");
 
     // creation of "Conjunction type"
     qCDebug(g_cat_silence) << QString("Creating <[CTNJY]-Conjunction type> item");
@@ -2068,6 +2144,7 @@ void M1Env::GraphInit::init_base(){
         "CTNJY",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_ctnjy->setType("TYPE_");
     l_ctnjy->setType("GRATT");
 
     // creation of "[Cmp]-comparing conjunction"
@@ -2085,6 +2162,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ctcmp->setType("TYPE_");
     l_ctcmp->setType("CTNJY");
+    l_ctcmp->setType("GRATV");
 
     // creation of "[Oper]-mathematical operator"
     qCDebug(g_cat_silence) << QString("Creating <[CTOPR]-[Oper]-mathematical operator> item");
@@ -2101,6 +2179,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ctopr->setType("TYPE_");
     l_ctopr->setType("CTNJY");
+    l_ctopr->setType("GRATV");
 
     // creation of "[Pred]-subordinating conjunction introducing a secondary predi"
     qCDebug(g_cat_silence) << QString("Creating <[CTPRD]-[Pred]-subordinating conjunction introducing a secondary predi> item");
@@ -2117,6 +2196,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ctprd->setType("TYPE_");
     l_ctprd->setType("CTNJY");
+    l_ctprd->setType("GRATV");
 
     // creation of "Clusivity"
     qCDebug(g_cat_silence) << QString("Creating <[CLSVT]-Clusivity> item");
@@ -2131,6 +2211,7 @@ void M1Env::GraphInit::init_base(){
         "CLSVT",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_clsvt->setType("TYPE_");
     l_clsvt->setType("GRATT");
 
     // creation of "[Ex]-exclusive"
@@ -2148,6 +2229,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_clsex->setType("TYPE_");
     l_clsex->setType("CLSVT");
+    l_clsex->setType("GRATV");
 
     // creation of "[In]-inclusive"
     qCDebug(g_cat_silence) << QString("Creating <[CLSIN]-[In]-inclusive> item");
@@ -2164,6 +2246,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_clsin->setType("TYPE_");
     l_clsin->setType("CLSVT");
+    l_clsin->setType("GRATV");
 
     // creation of "Definiteness or state"
     qCDebug(g_cat_silence) << QString("Creating <[DEFIN]-Definiteness or state> item");
@@ -2178,6 +2261,7 @@ void M1Env::GraphInit::init_base(){
         "DEFIN",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_defin->setType("TYPE_");
     l_defin->setType("GRATT");
 
     // creation of "[Com]-complex"
@@ -2195,6 +2279,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_dfcom->setType("TYPE_");
     l_dfcom->setType("DEFIN");
+    l_dfcom->setType("GRATV");
 
     // creation of "[Cons]-construct state / reduced definiteness"
     qCDebug(g_cat_silence) << QString("Creating <[DFCNS]-[Cons]-construct state / reduced definiteness> item");
@@ -2211,6 +2296,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_dfcns->setType("TYPE_");
     l_dfcns->setType("DEFIN");
+    l_dfcns->setType("GRATV");
 
     // creation of "[Def]-definite"
     qCDebug(g_cat_silence) << QString("Creating <[DFDEF]-[Def]-definite> item");
@@ -2227,6 +2313,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_dfdef->setType("TYPE_");
     l_dfdef->setType("DEFIN");
+    l_dfdef->setType("GRATV");
 
     // creation of "[Ind]-indefinite"
     qCDebug(g_cat_silence) << QString("Creating <[DFIND]-[Ind]-indefinite> item");
@@ -2243,6 +2330,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_dfind->setType("TYPE_");
     l_dfind->setType("DEFIN");
+    l_dfind->setType("GRATV");
 
     // creation of "[Spec]-specific indefinite"
     qCDebug(g_cat_silence) << QString("Creating <[DFSPC]-[Spec]-specific indefinite> item");
@@ -2259,6 +2347,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_dfspc->setType("TYPE_");
     l_dfspc->setType("DEFIN");
+    l_dfspc->setType("GRATV");
 
     // creation of "Degree"
     qCDebug(g_cat_silence) << QString("Creating <[DEGRE]-Degree> item");
@@ -2273,6 +2362,7 @@ void M1Env::GraphInit::init_base(){
         "DEGRE",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_degre->setType("TYPE_");
     l_degre->setType("GRATT");
 
     // creation of "[Abs]-absolute superlative"
@@ -2290,6 +2380,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_dgabs->setType("TYPE_");
     l_dgabs->setType("DEGRE");
+    l_dgabs->setType("GRATV");
 
     // creation of "[Auf]-augmentative"
     qCDebug(g_cat_silence) << QString("Creating <[DGAUG]-[Auf]-augmentative> item");
@@ -2306,6 +2397,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_dgaug->setType("TYPE_");
     l_dgaug->setType("DEGRE");
+    l_dgaug->setType("GRATV");
 
     // creation of "[Cmp]-comparative, second degree"
     qCDebug(g_cat_silence) << QString("Creating <[DGCMP]-[Cmp]-comparative, second degree> item");
@@ -2322,6 +2414,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_dgcmp->setType("TYPE_");
     l_dgcmp->setType("DEGRE");
+    l_dgcmp->setType("GRATV");
 
     // creation of "[Dim]-diminutive"
     qCDebug(g_cat_silence) << QString("Creating <[DGDIM]-[Dim]-diminutive> item");
@@ -2338,6 +2431,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_dgdim->setType("TYPE_");
     l_dgdim->setType("DEGRE");
+    l_dgdim->setType("GRATV");
 
     // creation of "[Equ]-equative"
     qCDebug(g_cat_silence) << QString("Creating <[DGEQU]-[Equ]-equative> item");
@@ -2354,6 +2448,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_dgequ->setType("TYPE_");
     l_dgequ->setType("DEGRE");
+    l_dgequ->setType("GRATV");
 
     // creation of "[Pos]-positive, first degree"
     qCDebug(g_cat_silence) << QString("Creating <[DGPOS]-[Pos]-positive, first degree> item");
@@ -2370,6 +2465,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_dgpos->setType("TYPE_");
     l_dgpos->setType("DEGRE");
+    l_dgpos->setType("GRATV");
 
     // creation of "[Sup]-superlative, third degree"
     qCDebug(g_cat_silence) << QString("Creating <[DGSUP]-[Sup]-superlative, third degree> item");
@@ -2386,6 +2482,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_dgsup->setType("TYPE_");
     l_dgsup->setType("DEGRE");
+    l_dgsup->setType("GRATV");
 
     // creation of "Relative location encoded in demonstratives"
     qCDebug(g_cat_silence) << QString("Creating <[DEIXI]-Relative location encoded in demonstratives> item");
@@ -2400,6 +2497,7 @@ void M1Env::GraphInit::init_base(){
         "DEIXI",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_deixi->setType("TYPE_");
     l_deixi->setType("GRATT");
 
     // creation of "[Abv]-above the reference point"
@@ -2417,6 +2515,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_dxabv->setType("TYPE_");
     l_dxabv->setType("DEIXI");
+    l_dxabv->setType("GRATV");
 
     // creation of "[Bel]-below the reference point"
     qCDebug(g_cat_silence) << QString("Creating <[DXBEL]-[Bel]-below the reference point> item");
@@ -2433,6 +2532,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_dxbel->setType("TYPE_");
     l_dxbel->setType("DEIXI");
+    l_dxbel->setType("GRATV");
 
     // creation of "[Even]-at the same level as the reference point"
     qCDebug(g_cat_silence) << QString("Creating <[DXEVN]-[Even]-at the same level as the reference point> item");
@@ -2449,6 +2549,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_dxevn->setType("TYPE_");
     l_dxevn->setType("DEIXI");
+    l_dxevn->setType("GRATV");
 
     // creation of "[Med]-medial"
     qCDebug(g_cat_silence) << QString("Creating <[DXMED]-[Med]-medial> item");
@@ -2465,6 +2566,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_dxmed->setType("TYPE_");
     l_dxmed->setType("DEIXI");
+    l_dxmed->setType("GRATV");
 
     // creation of "[Nvis]-not visible"
     qCDebug(g_cat_silence) << QString("Creating <[DXNVS]-[Nvis]-not visible> item");
@@ -2481,6 +2583,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_dxnvs->setType("TYPE_");
     l_dxnvs->setType("DEIXI");
+    l_dxnvs->setType("GRATV");
 
     // creation of "[Prox]-proximate"
     qCDebug(g_cat_silence) << QString("Creating <[DXPRX]-[Prox]-proximate> item");
@@ -2497,6 +2600,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_dxprx->setType("TYPE_");
     l_dxprx->setType("DEIXI");
+    l_dxprx->setType("GRATV");
 
     // creation of "[Remt]-remote, distal"
     qCDebug(g_cat_silence) << QString("Creating <[DXRMT]-[Remt]-remote, distal> item");
@@ -2513,6 +2617,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_dxrmt->setType("TYPE_");
     l_dxrmt->setType("DEIXI");
+    l_dxrmt->setType("GRATV");
 
     // creation of "Person to which deixis is relative"
     qCDebug(g_cat_silence) << QString("Creating <[DRXSF]-Person to which deixis is relative> item");
@@ -2527,6 +2632,7 @@ void M1Env::GraphInit::init_base(){
         "DRXSF",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_drxsf->setType("TYPE_");
     l_drxsf->setType("GRATT");
 
     // creation of "[1]-deixis relative to the first person participant (speaker)"
@@ -2544,6 +2650,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_drxs1->setType("TYPE_");
     l_drxs1->setType("DRXSF");
+    l_drxs1->setType("GRATV");
 
     // creation of "[2]-deixis relative to the second person participant (hearer)"
     qCDebug(g_cat_silence) << QString("Creating <[DRXS2]-[2]-deixis relative to the second person participant (hearer)> item");
@@ -2560,6 +2667,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_drxs2->setType("TYPE_");
     l_drxs2->setType("DRXSF");
+    l_drxs2->setType("GRATV");
 
     // creation of "Evidentiality"
     qCDebug(g_cat_silence) << QString("Creating <[EVDNT]-Evidentiality> item");
@@ -2574,6 +2682,7 @@ void M1Env::GraphInit::init_base(){
         "EVDNT",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_evdnt->setType("TYPE_");
     l_evdnt->setType("GRATT");
 
     // creation of "[Fh]-firsthand"
@@ -2591,6 +2700,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_evdfh->setType("TYPE_");
     l_evdfh->setType("EVDNT");
+    l_evdfh->setType("GRATV");
 
     // creation of "[Nfh]-non-firsthand"
     qCDebug(g_cat_silence) << QString("Creating <[EVNFH]-[Nfh]-non-firsthand> item");
@@ -2607,6 +2717,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_evnfh->setType("TYPE_");
     l_evnfh->setType("EVDNT");
+    l_evnfh->setType("GRATV");
 
     // creation of "External part of speech"
     qCDebug(g_cat_silence) << QString("Creating <[EPXTS]-External part of speech> item");
@@ -2621,6 +2732,7 @@ void M1Env::GraphInit::init_base(){
         "EPXTS",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_epxts->setType("TYPE_");
     l_epxts->setType("GRATT");
 
     // creation of "[ADJ]-adjective-like expression"
@@ -2638,6 +2750,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_epadj->setType("TYPE_");
     l_epadj->setType("EPXTS");
+    l_epadj->setType("GRATV");
 
     // creation of "[ADP]-adposition-like expression"
     qCDebug(g_cat_silence) << QString("Creating <[EPADP]-[ADP]-adposition-like expression> item");
@@ -2654,6 +2767,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_epadp->setType("TYPE_");
     l_epadp->setType("EPXTS");
+    l_epadp->setType("GRATV");
 
     // creation of "[ADV]-adverb-like expression"
     qCDebug(g_cat_silence) << QString("Creating <[EPADV]-[ADV]-adverb-like expression> item");
@@ -2670,6 +2784,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_epadv->setType("TYPE_");
     l_epadv->setType("EPXTS");
+    l_epadv->setType("GRATV");
 
     // creation of "[AUX]-auxiliary-like expression"
     qCDebug(g_cat_silence) << QString("Creating <[EPAUX]-[AUX]-auxiliary-like expression> item");
@@ -2686,6 +2801,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_epaux->setType("TYPE_");
     l_epaux->setType("EPXTS");
+    l_epaux->setType("GRATV");
 
     // creation of "[CCONJ]-coordinating conjunction-like expression"
     qCDebug(g_cat_silence) << QString("Creating <[CCONJ]-[CCONJ]-coordinating conjunction-like expression> item");
@@ -2702,6 +2818,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_cconj->setType("TYPE_");
     l_cconj->setType("EPXTS");
+    l_cconj->setType("GRATV");
 
     // creation of "[DET]-determiner-like expression"
     qCDebug(g_cat_silence) << QString("Creating <[EPDET]-[DET]-determiner-like expression> item");
@@ -2718,6 +2835,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_epdet->setType("TYPE_");
     l_epdet->setType("EPXTS");
+    l_epdet->setType("GRATV");
 
     // creation of "[INTJ]-interjection-like expression"
     qCDebug(g_cat_silence) << QString("Creating <[EINTJ]-[INTJ]-interjection-like expression> item");
@@ -2734,6 +2852,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_eintj->setType("TYPE_");
     l_eintj->setType("EPXTS");
+    l_eintj->setType("GRATV");
 
     // creation of "[PRON]-pronoun-like expression"
     qCDebug(g_cat_silence) << QString("Creating <[EPRON]-[PRON]-pronoun-like expression> item");
@@ -2750,6 +2869,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_epron->setType("TYPE_");
     l_epron->setType("EPXTS");
+    l_epron->setType("GRATV");
 
     // creation of "[PROPN]-proper noun-like expression"
     qCDebug(g_cat_silence) << QString("Creating <[PROPN]-[PROPN]-proper noun-like expression> item");
@@ -2766,6 +2886,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_propn->setType("TYPE_");
     l_propn->setType("EPXTS");
+    l_propn->setType("GRATV");
 
     // creation of "[SCONJ]-subordinator-like expression"
     qCDebug(g_cat_silence) << QString("Creating <[SCONJ]-[SCONJ]-subordinator-like expression> item");
@@ -2782,6 +2903,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_sconj->setType("TYPE_");
     l_sconj->setType("EPXTS");
+    l_sconj->setType("GRATV");
 
     // creation of "Is this a foreign word?"
     qCDebug(g_cat_silence) << QString("Creating <[FOREI]-Is this a foreign word?> item");
@@ -2796,6 +2918,7 @@ void M1Env::GraphInit::init_base(){
         "FOREI",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_forei->setType("TYPE_");
     l_forei->setType("GRATT");
 
     // creation of "[Yes]-it is foreign"
@@ -2813,6 +2936,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_fryes->setType("TYPE_");
     l_fryes->setType("FOREI");
+    l_fryes->setType("GRATV");
 
     // creation of "Gender"
     qCDebug(g_cat_silence) << QString("Creating <[GENDE]-Gender> item");
@@ -2827,6 +2951,7 @@ void M1Env::GraphInit::init_base(){
         "GENDE",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_gende->setType("TYPE_");
     l_gende->setType("GRATT");
 
     // creation of "[Com]-common gender"
@@ -2844,6 +2969,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_gncom->setType("TYPE_");
     l_gncom->setType("GENDE");
+    l_gncom->setType("GRATV");
 
     // creation of "[Fem]-feminine gender"
     qCDebug(g_cat_silence) << QString("Creating <[GNFEM]-[Fem]-feminine gender> item");
@@ -2860,6 +2986,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_gnfem->setType("TYPE_");
     l_gnfem->setType("GENDE");
+    l_gnfem->setType("GRATV");
 
     // creation of "[Masc]-masculine gender"
     qCDebug(g_cat_silence) << QString("Creating <[GMASC]-[Masc]-masculine gender> item");
@@ -2876,6 +3003,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_gmasc->setType("TYPE_");
     l_gmasc->setType("GENDE");
+    l_gmasc->setType("GRATV");
 
     // creation of "[Neut]-neuter gender"
     qCDebug(g_cat_silence) << QString("Creating <[GNEUT]-[Neut]-neuter gender> item");
@@ -2892,6 +3020,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_gneut->setType("TYPE_");
     l_gneut->setType("GENDE");
+    l_gneut->setType("GRATV");
 
     // creation of "Mood"
     qCDebug(g_cat_silence) << QString("Creating <[MOOD_]-Mood> item");
@@ -2906,6 +3035,7 @@ void M1Env::GraphInit::init_base(){
         "MOOD_",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_mood->setType("TYPE_");
     l_mood->setType("GRATT");
 
     // creation of "[Ben]-benedictive / precative"
@@ -2923,6 +3053,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_mdben->setType("TYPE_");
     l_mdben->setType("MOOD_");
+    l_mdben->setType("GRATV");
 
     // creation of "[Adm]-admirative"
     qCDebug(g_cat_silence) << QString("Creating <[MDADM]-[Adm]-admirative> item");
@@ -2939,6 +3070,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_mdadm->setType("TYPE_");
     l_mdadm->setType("MOOD_");
+    l_mdadm->setType("GRATV");
 
     // creation of "[Cnd]-conditional"
     qCDebug(g_cat_silence) << QString("Creating <[MDCND]-[Cnd]-conditional> item");
@@ -2955,6 +3087,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_mdcnd->setType("TYPE_");
     l_mdcnd->setType("MOOD_");
+    l_mdcnd->setType("GRATV");
 
     // creation of "[Des]-desiderative"
     qCDebug(g_cat_silence) << QString("Creating <[MDDES]-[Des]-desiderative> item");
@@ -2971,6 +3104,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_mddes->setType("TYPE_");
     l_mddes->setType("MOOD_");
+    l_mddes->setType("GRATV");
 
     // creation of "[Imp]-imperative"
     qCDebug(g_cat_silence) << QString("Creating <[MDIMP]-[Imp]-imperative> item");
@@ -2987,6 +3121,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_mdimp->setType("TYPE_");
     l_mdimp->setType("MOOD_");
+    l_mdimp->setType("GRATV");
 
     // creation of "[Its]-intensive"
     qCDebug(g_cat_silence) << QString("Creating <[MDITS]-[Its]-intensive> item");
@@ -3003,6 +3138,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_mdits->setType("TYPE_");
     l_mdits->setType("MOOD_");
+    l_mdits->setType("GRATV");
 
     // creation of "[Ind]-indicative or realis"
     qCDebug(g_cat_silence) << QString("Creating <[MDIND]-[Ind]-indicative or realis> item");
@@ -3019,6 +3155,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_mdind->setType("TYPE_");
     l_mdind->setType("MOOD_");
+    l_mdind->setType("GRATV");
 
     // creation of "[Int]-interrogative"
     qCDebug(g_cat_silence) << QString("Creating <[MDINT]-[Int]-interrogative> item");
@@ -3035,6 +3172,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_mdint->setType("TYPE_");
     l_mdint->setType("MOOD_");
+    l_mdint->setType("GRATV");
 
     // creation of "[Irr]-irrealis"
     qCDebug(g_cat_silence) << QString("Creating <[MDIRR]-[Irr]-irrealis> item");
@@ -3051,6 +3189,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_mdirr->setType("TYPE_");
     l_mdirr->setType("MOOD_");
+    l_mdirr->setType("GRATV");
 
     // creation of "[Jus]-jussive / injunctive"
     qCDebug(g_cat_silence) << QString("Creating <[MDJUS]-[Jus]-jussive / injunctive> item");
@@ -3067,6 +3206,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_mdjus->setType("TYPE_");
     l_mdjus->setType("MOOD_");
+    l_mdjus->setType("GRATV");
 
     // creation of "[Nec]-necessitative"
     qCDebug(g_cat_silence) << QString("Creating <[MDNEC]-[Nec]-necessitative> item");
@@ -3083,6 +3223,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_mdnec->setType("TYPE_");
     l_mdnec->setType("MOOD_");
+    l_mdnec->setType("GRATV");
 
     // creation of "[Opt]-optative"
     qCDebug(g_cat_silence) << QString("Creating <[MDOPT]-[Opt]-optative> item");
@@ -3099,6 +3240,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_mdopt->setType("TYPE_");
     l_mdopt->setType("MOOD_");
+    l_mdopt->setType("GRATV");
 
     // creation of "[Pot]-potential"
     qCDebug(g_cat_silence) << QString("Creating <[MDPOT]-[Pot]-potential> item");
@@ -3115,6 +3257,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_mdpot->setType("TYPE_");
     l_mdpot->setType("MOOD_");
+    l_mdpot->setType("GRATV");
 
     // creation of "[Prp]-purposive"
     qCDebug(g_cat_silence) << QString("Creating <[MDPRP]-[Prp]-purposive> item");
@@ -3131,6 +3274,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_mdprp->setType("TYPE_");
     l_mdprp->setType("MOOD_");
+    l_mdprp->setType("GRATV");
 
     // creation of "[Qot]-quotative"
     qCDebug(g_cat_silence) << QString("Creating <[MDQOT]-[Qot]-quotative> item");
@@ -3147,6 +3291,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_mdqot->setType("TYPE_");
     l_mdqot->setType("MOOD_");
+    l_mdqot->setType("GRATV");
 
     // creation of "[Sub]-subjunctive / conjunctive"
     qCDebug(g_cat_silence) << QString("Creating <[MDSUB]-[Sub]-subjunctive / conjunctive> item");
@@ -3163,6 +3308,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_mdsub->setType("TYPE_");
     l_mdsub->setType("MOOD_");
+    l_mdsub->setType("GRATV");
 
     // creation of "Noun class"
     qCDebug(g_cat_silence) << QString("Creating <[NCNLS]-Noun class> item");
@@ -3177,6 +3323,7 @@ void M1Env::GraphInit::init_base(){
         "NCNLS",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_ncnls->setType("TYPE_");
     l_ncnls->setType("GRATT");
 
     // creation of "[Bantu1]-singular, persons"
@@ -3194,6 +3341,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncbn1->setType("TYPE_");
     l_ncbn1->setType("NCNLS");
+    l_ncbn1->setType("GRATV");
 
     // creation of "[Bantu2]-plural, persons"
     qCDebug(g_cat_silence) << QString("Creating <[NCBN2]-[Bantu2]-plural, persons> item");
@@ -3210,6 +3358,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncbn2->setType("TYPE_");
     l_ncbn2->setType("NCNLS");
+    l_ncbn2->setType("GRATV");
 
     // creation of "[Bantu3]-singular, plants, thin objects"
     qCDebug(g_cat_silence) << QString("Creating <[NCBN3]-[Bantu3]-singular, plants, thin objects> item");
@@ -3226,6 +3375,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncbn3->setType("TYPE_");
     l_ncbn3->setType("NCNLS");
+    l_ncbn3->setType("GRATV");
 
     // creation of "[Bantu4]-plural, plants, thin objects"
     qCDebug(g_cat_silence) << QString("Creating <[NCBN4]-[Bantu4]-plural, plants, thin objects> item");
@@ -3242,6 +3392,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncbn4->setType("TYPE_");
     l_ncbn4->setType("NCNLS");
+    l_ncbn4->setType("GRATV");
 
     // creation of "[Bantu5]-singular, fruits, round objects, paired things"
     qCDebug(g_cat_silence) << QString("Creating <[NCBN5]-[Bantu5]-singular, fruits, round objects, paired things> item");
@@ -3258,6 +3409,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncbn5->setType("TYPE_");
     l_ncbn5->setType("NCNLS");
+    l_ncbn5->setType("GRATV");
 
     // creation of "[Bantu6]-plural, fruits, round objects, paired things"
     qCDebug(g_cat_silence) << QString("Creating <[NCBN6]-[Bantu6]-plural, fruits, round objects, paired things> item");
@@ -3274,6 +3426,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncbn6->setType("TYPE_");
     l_ncbn6->setType("NCNLS");
+    l_ncbn6->setType("GRATV");
 
     // creation of "[Bantu7]-singular, things, diminutives"
     qCDebug(g_cat_silence) << QString("Creating <[NCBN7]-[Bantu7]-singular, things, diminutives> item");
@@ -3290,6 +3443,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncbn7->setType("TYPE_");
     l_ncbn7->setType("NCNLS");
+    l_ncbn7->setType("GRATV");
 
     // creation of "[Bantu8]-plural, things, diminutives"
     qCDebug(g_cat_silence) << QString("Creating <[NCBN8]-[Bantu8]-plural, things, diminutives> item");
@@ -3306,6 +3460,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncbn8->setType("TYPE_");
     l_ncbn8->setType("NCNLS");
+    l_ncbn8->setType("GRATV");
 
     // creation of "[Bantu9]-singular, animals, things"
     qCDebug(g_cat_silence) << QString("Creating <[NCBN9]-[Bantu9]-singular, animals, things> item");
@@ -3322,6 +3477,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncbn9->setType("TYPE_");
     l_ncbn9->setType("NCNLS");
+    l_ncbn9->setType("GRATV");
 
     // creation of "[Bantu10]-plural, animals, things"
     qCDebug(g_cat_silence) << QString("Creating <[NCB10]-[Bantu10]-plural, animals, things> item");
@@ -3338,6 +3494,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncb10->setType("TYPE_");
     l_ncb10->setType("NCNLS");
+    l_ncb10->setType("GRATV");
 
     // creation of "[Bantu11]-long thin objects, natural phenomena, abstracts"
     qCDebug(g_cat_silence) << QString("Creating <[NCB11]-[Bantu11]-long thin objects, natural phenomena, abstracts> item");
@@ -3354,6 +3511,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncb11->setType("TYPE_");
     l_ncb11->setType("NCNLS");
+    l_ncb11->setType("GRATV");
 
     // creation of "[Bantu12]-singular, small things, diminutives"
     qCDebug(g_cat_silence) << QString("Creating <[NCB12]-[Bantu12]-singular, small things, diminutives> item");
@@ -3370,6 +3528,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncb12->setType("TYPE_");
     l_ncb12->setType("NCNLS");
+    l_ncb12->setType("GRATV");
 
     // creation of "[Bantu13]-plural or mass, small amount of mass"
     qCDebug(g_cat_silence) << QString("Creating <[NCB13]-[Bantu13]-plural or mass, small amount of mass> item");
@@ -3386,6 +3545,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncb13->setType("TYPE_");
     l_ncb13->setType("NCNLS");
+    l_ncb13->setType("GRATV");
 
     // creation of "[Bantu14]-plural, diminutives"
     qCDebug(g_cat_silence) << QString("Creating <[NCB14]-[Bantu14]-plural, diminutives> item");
@@ -3402,6 +3562,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncb14->setType("TYPE_");
     l_ncb14->setType("NCNLS");
+    l_ncb14->setType("GRATV");
 
     // creation of "[Bantu15]-verbal nouns, infinitives"
     qCDebug(g_cat_silence) << QString("Creating <[NCB15]-[Bantu15]-verbal nouns, infinitives> item");
@@ -3418,6 +3579,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncb15->setType("TYPE_");
     l_ncb15->setType("NCNLS");
+    l_ncb15->setType("GRATV");
 
     // creation of "[Bantu16]-definite location, close to somethinf"
     qCDebug(g_cat_silence) << QString("Creating <[NCB16]-[Bantu16]-definite location, close to somethinf> item");
@@ -3434,6 +3596,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncb16->setType("TYPE_");
     l_ncb16->setType("NCNLS");
+    l_ncb16->setType("GRATV");
 
     // creation of "[Bantu17]-indefinite location, direction, movement"
     qCDebug(g_cat_silence) << QString("Creating <[NCB17]-[Bantu17]-indefinite location, direction, movement> item");
@@ -3450,6 +3613,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncb17->setType("TYPE_");
     l_ncb17->setType("NCNLS");
+    l_ncb17->setType("GRATV");
 
     // creation of "[Bantu18]-definite location, inside somethinf"
     qCDebug(g_cat_silence) << QString("Creating <[NCB18]-[Bantu18]-definite location, inside somethinf> item");
@@ -3466,6 +3630,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncb18->setType("TYPE_");
     l_ncb18->setType("NCNLS");
+    l_ncb18->setType("GRATV");
 
     // creation of "[Bantu19]-little bit of, pejorative plural"
     qCDebug(g_cat_silence) << QString("Creating <[NCB19]-[Bantu19]-little bit of, pejorative plural> item");
@@ -3482,6 +3647,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncb19->setType("TYPE_");
     l_ncb19->setType("NCNLS");
+    l_ncb19->setType("GRATV");
 
     // creation of "[Bantu20]-singular, augmentatives"
     qCDebug(g_cat_silence) << QString("Creating <[NCB20]-[Bantu20]-singular, augmentatives> item");
@@ -3498,6 +3664,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncb20->setType("TYPE_");
     l_ncb20->setType("NCNLS");
+    l_ncb20->setType("GRATV");
 
     // creation of "[Bantu21]-singular, augmentatives, derogatives"
     qCDebug(g_cat_silence) << QString("Creating <[NCB21]-[Bantu21]-singular, augmentatives, derogatives> item");
@@ -3514,6 +3681,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncb21->setType("TYPE_");
     l_ncb21->setType("NCNLS");
+    l_ncb21->setType("GRATV");
 
     // creation of "[Bantu22]-plural, augmentatives"
     qCDebug(g_cat_silence) << QString("Creating <[NCB22]-[Bantu22]-plural, augmentatives> item");
@@ -3530,6 +3698,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncb22->setType("TYPE_");
     l_ncb22->setType("NCNLS");
+    l_ncb22->setType("GRATV");
 
     // creation of "[Bantu23]-location with place names"
     qCDebug(g_cat_silence) << QString("Creating <[NCB23]-[Bantu23]-location with place names> item");
@@ -3546,6 +3715,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncb23->setType("TYPE_");
     l_ncb23->setType("NCNLS");
+    l_ncb23->setType("GRATV");
 
     // creation of "[Wol1]-Wolof noun class 1/k (singular human)"
     qCDebug(g_cat_silence) << QString("Creating <[NCWL1]-[Wol1]-Wolof noun class 1/k (singular human)> item");
@@ -3562,6 +3732,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncwl1->setType("TYPE_");
     l_ncwl1->setType("NCNLS");
+    l_ncwl1->setType("GRATV");
 
     // creation of "[Wol2]-Wolof noun class 2/ñ (plural human)"
     qCDebug(g_cat_silence) << QString("Creating <[NCWL2]-[Wol2]-Wolof noun class 2/ñ (plural human)> item");
@@ -3578,6 +3749,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncwl2->setType("TYPE_");
     l_ncwl2->setType("NCNLS");
+    l_ncwl2->setType("GRATV");
 
     // creation of "[Wol3]-Wolof noun class 3/g (singular)"
     qCDebug(g_cat_silence) << QString("Creating <[NCWL3]-[Wol3]-Wolof noun class 3/g (singular)> item");
@@ -3594,6 +3766,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncwl3->setType("TYPE_");
     l_ncwl3->setType("NCNLS");
+    l_ncwl3->setType("GRATV");
 
     // creation of "[Wol4]-Wolof noun class 4/j (singular)"
     qCDebug(g_cat_silence) << QString("Creating <[NCWL4]-[Wol4]-Wolof noun class 4/j (singular)> item");
@@ -3610,6 +3783,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncwl4->setType("TYPE_");
     l_ncwl4->setType("NCNLS");
+    l_ncwl4->setType("GRATV");
 
     // creation of "[Wol5]-Wolof noun class 5/b (singular)"
     qCDebug(g_cat_silence) << QString("Creating <[NCWL5]-[Wol5]-Wolof noun class 5/b (singular)> item");
@@ -3626,6 +3800,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncwl5->setType("TYPE_");
     l_ncwl5->setType("NCNLS");
+    l_ncwl5->setType("GRATV");
 
     // creation of "[Wol6]-Wolof noun class 6/m (singular)"
     qCDebug(g_cat_silence) << QString("Creating <[NCWL6]-[Wol6]-Wolof noun class 6/m (singular)> item");
@@ -3642,6 +3817,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncwl6->setType("TYPE_");
     l_ncwl6->setType("NCNLS");
+    l_ncwl6->setType("GRATV");
 
     // creation of "[Wol7]-Wolof noun class 7/l (singular)"
     qCDebug(g_cat_silence) << QString("Creating <[NCWL7]-[Wol7]-Wolof noun class 7/l (singular)> item");
@@ -3658,6 +3834,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncwl7->setType("TYPE_");
     l_ncwl7->setType("NCNLS");
+    l_ncwl7->setType("GRATV");
 
     // creation of "[Wol8]-Wolof noun class 8/y (plural non-human)"
     qCDebug(g_cat_silence) << QString("Creating <[NCWL8]-[Wol8]-Wolof noun class 8/y (plural non-human)> item");
@@ -3674,6 +3851,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncwl8->setType("TYPE_");
     l_ncwl8->setType("NCNLS");
+    l_ncwl8->setType("GRATV");
 
     // creation of "[Wol9]-Wolof noun class 9/s (singular)"
     qCDebug(g_cat_silence) << QString("Creating <[NCWL9]-[Wol9]-Wolof noun class 9/s (singular)> item");
@@ -3690,6 +3868,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncwl9->setType("TYPE_");
     l_ncwl9->setType("NCNLS");
+    l_ncwl9->setType("GRATV");
 
     // creation of "[Wol10]-Wolof noun class 10/w (singular)"
     qCDebug(g_cat_silence) << QString("Creating <[NCW10]-[Wol10]-Wolof noun class 10/w (singular)> item");
@@ -3706,6 +3885,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncw10->setType("TYPE_");
     l_ncw10->setType("NCNLS");
+    l_ncw10->setType("GRATV");
 
     // creation of "[Wol11]-Wolof noun class 11/g (location)"
     qCDebug(g_cat_silence) << QString("Creating <[NCW11]-[Wol11]-Wolof noun class 11/g (location)> item");
@@ -3722,6 +3902,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncw11->setType("TYPE_");
     l_ncw11->setType("NCNLS");
+    l_ncw11->setType("GRATV");
 
     // creation of "[Wol12]-Wolof noun class 12/n (manner)"
     qCDebug(g_cat_silence) << QString("Creating <[NCW12]-[Wol12]-Wolof noun class 12/n (manner)> item");
@@ -3738,6 +3919,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ncw12->setType("TYPE_");
     l_ncw12->setType("NCNLS");
+    l_ncw12->setType("GRATV");
 
     // creation of "Numeral type"
     qCDebug(g_cat_silence) << QString("Creating <[NTMYP]-Numeral type> item");
@@ -3752,6 +3934,7 @@ void M1Env::GraphInit::init_base(){
         "NTMYP",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_ntmyp->setType("TYPE_");
     l_ntmyp->setType("GRATT");
 
     // creation of "[Card]-cardinal number or corresponding interrogative / relati"
@@ -3769,6 +3952,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ntcrd->setType("TYPE_");
     l_ntcrd->setType("NTMYP");
+    l_ntcrd->setType("GRATV");
 
     // creation of "[Dist]-distributive numeral"
     qCDebug(g_cat_silence) << QString("Creating <[NTDST]-[Dist]-distributive numeral> item");
@@ -3785,6 +3969,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ntdst->setType("TYPE_");
     l_ntdst->setType("NTMYP");
+    l_ntdst->setType("GRATV");
 
     // creation of "[Frac]-fraction"
     qCDebug(g_cat_silence) << QString("Creating <[NTFRC]-[Frac]-fraction> item");
@@ -3801,6 +3986,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ntfrc->setType("TYPE_");
     l_ntfrc->setType("NTMYP");
+    l_ntfrc->setType("GRATV");
 
     // creation of "[Mult]-multiplicative numeral or corresponding interrogative /"
     qCDebug(g_cat_silence) << QString("Creating <[NTMLT]-[Mult]-multiplicative numeral or corresponding interrogative /> item");
@@ -3817,6 +4003,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ntmlt->setType("TYPE_");
     l_ntmlt->setType("NTMYP");
+    l_ntmlt->setType("GRATV");
 
     // creation of "[Ord]-ordinal number or corresponding interrogative / relative"
     qCDebug(g_cat_silence) << QString("Creating <[NTORD]-[Ord]-ordinal number or corresponding interrogative / relative> item");
@@ -3833,6 +4020,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ntord->setType("TYPE_");
     l_ntord->setType("NTMYP");
+    l_ntord->setType("GRATV");
 
     // creation of "[Range]-range of values"
     qCDebug(g_cat_silence) << QString("Creating <[NTRNG]-[Range]-range of values> item");
@@ -3849,6 +4037,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ntrng->setType("TYPE_");
     l_ntrng->setType("NTMYP");
+    l_ntrng->setType("GRATV");
 
     // creation of "[Sets]-number of sets of things; collective numeral"
     qCDebug(g_cat_silence) << QString("Creating <[NTSTS]-[Sets]-number of sets of things; collective numeral> item");
@@ -3865,6 +4054,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ntsts->setType("TYPE_");
     l_ntsts->setType("NTMYP");
+    l_ntsts->setType("GRATV");
 
     // creation of "Number"
     qCDebug(g_cat_silence) << QString("Creating <[NUMBE]-Number> item");
@@ -3879,6 +4069,7 @@ void M1Env::GraphInit::init_base(){
         "NUMBE",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_numbe->setType("TYPE_");
     l_numbe->setType("GRATT");
 
     // creation of "[Coll]-collective / mass / singulare tantum"
@@ -3896,6 +4087,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_nmcll->setType("TYPE_");
     l_nmcll->setType("NUMBE");
+    l_nmcll->setType("GRATV");
 
     // creation of "[Count]-count plural"
     qCDebug(g_cat_silence) << QString("Creating <[NMCNT]-[Count]-count plural> item");
@@ -3912,6 +4104,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_nmcnt->setType("TYPE_");
     l_nmcnt->setType("NUMBE");
+    l_nmcnt->setType("GRATV");
 
     // creation of "[Dual]-dual number"
     qCDebug(g_cat_silence) << QString("Creating <[NDUAL]-[Dual]-dual number> item");
@@ -3928,6 +4121,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ndual->setType("TYPE_");
     l_ndual->setType("NUMBE");
+    l_ndual->setType("GRATV");
 
     // creation of "[Grpa]-greater paucal number"
     qCDebug(g_cat_silence) << QString("Creating <[NMGRP]-[Grpa]-greater paucal number> item");
@@ -3944,6 +4138,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_nmgrp->setType("TYPE_");
     l_nmgrp->setType("NUMBE");
+    l_nmgrp->setType("GRATV");
 
     // creation of "[Grpl]-greater plural number"
     qCDebug(g_cat_silence) << QString("Creating <[NMGRL]-[Grpl]-greater plural number> item");
@@ -3960,6 +4155,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_nmgrl->setType("TYPE_");
     l_nmgrl->setType("NUMBE");
+    l_nmgrl->setType("GRATV");
 
     // creation of "[Inv]-inverse number"
     qCDebug(g_cat_silence) << QString("Creating <[NMINV]-[Inv]-inverse number> item");
@@ -3976,6 +4172,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_nminv->setType("TYPE_");
     l_nminv->setType("NUMBE");
+    l_nminv->setType("GRATV");
 
     // creation of "[Pauc]-paucal number"
     qCDebug(g_cat_silence) << QString("Creating <[NMBPC]-[Pauc]-paucal number> item");
@@ -3992,6 +4189,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_nmbpc->setType("TYPE_");
     l_nmbpc->setType("NUMBE");
+    l_nmbpc->setType("GRATV");
 
     // creation of "[Plur]-plural number"
     qCDebug(g_cat_silence) << QString("Creating <[NPLUR]-[Plur]-plural number> item");
@@ -4008,6 +4206,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_nplur->setType("TYPE_");
     l_nplur->setType("NUMBE");
+    l_nplur->setType("GRATV");
 
     // creation of "[Ptan]-plurale tantum"
     qCDebug(g_cat_silence) << QString("Creating <[NMPTN]-[Ptan]-plurale tantum> item");
@@ -4024,6 +4223,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_nmptn->setType("TYPE_");
     l_nmptn->setType("NUMBE");
+    l_nmptn->setType("GRATV");
 
     // creation of "[Sing]-singular number"
     qCDebug(g_cat_silence) << QString("Creating <[NSING]-[Sing]-singular number> item");
@@ -4040,6 +4240,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_nsing->setType("TYPE_");
     l_nsing->setType("NUMBE");
+    l_nsing->setType("GRATV");
 
     // creation of "[Tri]-trial number"
     qCDebug(g_cat_silence) << QString("Creating <[NMTRI]-[Tri]-trial number> item");
@@ -4056,6 +4257,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_nmtri->setType("TYPE_");
     l_nmtri->setType("NUMBE");
+    l_nmtri->setType("GRATV");
 
     // creation of "Person"
     qCDebug(g_cat_silence) << QString("Creating <[PERSO]-Person> item");
@@ -4070,6 +4272,7 @@ void M1Env::GraphInit::init_base(){
         "PERSO",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_perso->setType("TYPE_");
     l_perso->setType("GRATT");
 
     // creation of "[0]-zero person"
@@ -4087,6 +4290,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_prsn0->setType("TYPE_");
     l_prsn0->setType("PERSO");
+    l_prsn0->setType("GRATV");
 
     // creation of "[1]-first person"
     qCDebug(g_cat_silence) << QString("Creating <[PRSN1]-[1]-first person> item");
@@ -4103,6 +4307,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_prsn1->setType("TYPE_");
     l_prsn1->setType("PERSO");
+    l_prsn1->setType("GRATV");
 
     // creation of "[2]-second person"
     qCDebug(g_cat_silence) << QString("Creating <[PRSN2]-[2]-second person> item");
@@ -4119,6 +4324,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_prsn2->setType("TYPE_");
     l_prsn2->setType("PERSO");
+    l_prsn2->setType("GRATV");
 
     // creation of "[3]-third person"
     qCDebug(g_cat_silence) << QString("Creating <[PRSN3]-[3]-third person> item");
@@ -4135,6 +4341,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_prsn3->setType("TYPE_");
     l_prsn3->setType("PERSO");
+    l_prsn3->setType("GRATV");
 
     // creation of "[4]-fourth person"
     qCDebug(g_cat_silence) << QString("Creating <[PRSN4]-[4]-fourth person> item");
@@ -4151,6 +4358,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_prsn4->setType("TYPE_");
     l_prsn4->setType("PERSO");
+    l_prsn4->setType("GRATV");
 
     // creation of "Polarity"
     qCDebug(g_cat_silence) << QString("Creating <[PLRTY]-Polarity> item");
@@ -4165,6 +4373,7 @@ void M1Env::GraphInit::init_base(){
         "PLRTY",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_plrty->setType("TYPE_");
     l_plrty->setType("GRATT");
 
     // creation of "[Neg]-negative"
@@ -4182,6 +4391,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_plneg->setType("TYPE_");
     l_plneg->setType("PLRTY");
+    l_plneg->setType("GRATV");
 
     // creation of "[Pos]-positive, affirmative"
     qCDebug(g_cat_silence) << QString("Creating <[PLPOS]-[Pos]-positive, affirmative> item");
@@ -4198,6 +4408,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_plpos->setType("TYPE_");
     l_plpos->setType("PLRTY");
+    l_plpos->setType("GRATV");
 
     // creation of "Politeness"
     qCDebug(g_cat_silence) << QString("Creating <[POLIT]-Politeness> item");
@@ -4212,6 +4423,7 @@ void M1Env::GraphInit::init_base(){
         "POLIT",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_polit->setType("TYPE_");
     l_polit->setType("GRATT");
 
     // creation of "[Elev]-referent elevatinf"
@@ -4229,6 +4441,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_plelv->setType("TYPE_");
     l_plelv->setType("POLIT");
+    l_plelv->setType("GRATV");
 
     // creation of "[Form]-formal register"
     qCDebug(g_cat_silence) << QString("Creating <[PLFRM]-[Form]-formal register> item");
@@ -4245,6 +4458,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_plfrm->setType("TYPE_");
     l_plfrm->setType("POLIT");
+    l_plfrm->setType("GRATV");
 
     // creation of "[Humb]-speaker humblinf"
     qCDebug(g_cat_silence) << QString("Creating <[PLHMB]-[Humb]-speaker humblinf> item");
@@ -4261,6 +4475,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_plhmb->setType("TYPE_");
     l_plhmb->setType("POLIT");
+    l_plhmb->setType("GRATV");
 
     // creation of "[Infm]-informal register"
     qCDebug(g_cat_silence) << QString("Creating <[PLINF]-[Infm]-informal register> item");
@@ -4277,6 +4492,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_plinf->setType("TYPE_");
     l_plinf->setType("POLIT");
+    l_plinf->setType("GRATV");
 
     // creation of "Possessive"
     qCDebug(g_cat_silence) << QString("Creating <[POSS_]-Possessive> item");
@@ -4291,6 +4507,7 @@ void M1Env::GraphInit::init_base(){
         "POSS_",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_poss->setType("TYPE_");
     l_poss->setType("GRATT");
 
     // creation of "[Yes]-it is possessive"
@@ -4308,6 +4525,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_psyes->setType("TYPE_");
     l_psyes->setType("POSS_");
+    l_psyes->setType("GRATV");
 
     // creation of "Pronominal type"
     qCDebug(g_cat_silence) << QString("Creating <[PTRNY]-Pronominal type> item");
@@ -4322,6 +4540,7 @@ void M1Env::GraphInit::init_base(){
         "PTRNY",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_ptrny->setType("TYPE_");
     l_ptrny->setType("GRATT");
 
     // creation of "[Art]-article"
@@ -4339,6 +4558,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ptart->setType("TYPE_");
     l_ptart->setType("PTRNY");
+    l_ptart->setType("GRATV");
 
     // creation of "[Dem]-demonstrative pronoun, determiner, numeral or adverb"
     qCDebug(g_cat_silence) << QString("Creating <[PTDEM]-[Dem]-demonstrative pronoun, determiner, numeral or adverb> item");
@@ -4355,6 +4575,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ptdem->setType("TYPE_");
     l_ptdem->setType("PTRNY");
+    l_ptdem->setType("GRATV");
 
     // creation of "[Emp]-emphatic determiner"
     qCDebug(g_cat_silence) << QString("Creating <[PTEMP]-[Emp]-emphatic determiner> item");
@@ -4371,6 +4592,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ptemp->setType("TYPE_");
     l_ptemp->setType("PTRNY");
+    l_ptemp->setType("GRATV");
 
     // creation of "[Exc]-exclamative determiner"
     qCDebug(g_cat_silence) << QString("Creating <[PTEXC]-[Exc]-exclamative determiner> item");
@@ -4387,6 +4609,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ptexc->setType("TYPE_");
     l_ptexc->setType("PTRNY");
+    l_ptexc->setType("GRATV");
 
     // creation of "[Ind]-indefinite pronoun, determiner, numeral or adverb"
     qCDebug(g_cat_silence) << QString("Creating <[PTIND]-[Ind]-indefinite pronoun, determiner, numeral or adverb> item");
@@ -4403,6 +4626,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ptind->setType("TYPE_");
     l_ptind->setType("PTRNY");
+    l_ptind->setType("GRATV");
 
     // creation of "[Int]-interrogative pronoun, determiner, numeral or adverb"
     qCDebug(g_cat_silence) << QString("Creating <[PTINT]-[Int]-interrogative pronoun, determiner, numeral or adverb> item");
@@ -4419,6 +4643,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ptint->setType("TYPE_");
     l_ptint->setType("PTRNY");
+    l_ptint->setType("GRATV");
 
     // creation of "[Neg]-negative pronoun, determiner or adverb"
     qCDebug(g_cat_silence) << QString("Creating <[PTNEG]-[Neg]-negative pronoun, determiner or adverb> item");
@@ -4435,6 +4660,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ptneg->setType("TYPE_");
     l_ptneg->setType("PTRNY");
+    l_ptneg->setType("GRATV");
 
     // creation of "[Prs]-personal or possessive personal pronoun or determiner"
     qCDebug(g_cat_silence) << QString("Creating <[PTPRS]-[Prs]-personal or possessive personal pronoun or determiner> item");
@@ -4451,6 +4677,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ptprs->setType("TYPE_");
     l_ptprs->setType("PTRNY");
+    l_ptprs->setType("GRATV");
 
     // creation of "[Rcp]-reciprocal pronoun"
     qCDebug(g_cat_silence) << QString("Creating <[PTRCP]-[Rcp]-reciprocal pronoun> item");
@@ -4467,6 +4694,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ptrcp->setType("TYPE_");
     l_ptrcp->setType("PTRNY");
+    l_ptrcp->setType("GRATV");
 
     // creation of "[Rel]-relative pronoun, determiner, numeral or adverb"
     qCDebug(g_cat_silence) << QString("Creating <[PTREL]-[Rel]-relative pronoun, determiner, numeral or adverb> item");
@@ -4483,6 +4711,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_ptrel->setType("TYPE_");
     l_ptrel->setType("PTRNY");
+    l_ptrel->setType("GRATV");
 
     // creation of "[Tot]-total (collective) pronoun, determiner or adverb"
     qCDebug(g_cat_silence) << QString("Creating <[PTTOT]-[Tot]-total (collective) pronoun, determiner or adverb> item");
@@ -4499,6 +4728,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_pttot->setType("TYPE_");
     l_pttot->setType("PTRNY");
+    l_pttot->setType("GRATV");
 
     // creation of "Reflexive"
     qCDebug(g_cat_silence) << QString("Creating <[REFLE]-Reflexive> item");
@@ -4513,6 +4743,7 @@ void M1Env::GraphInit::init_base(){
         "REFLE",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_refle->setType("TYPE_");
     l_refle->setType("GRATT");
 
     // creation of "[Yes]-it is reflexive"
@@ -4530,6 +4761,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_rfyes->setType("TYPE_");
     l_rfyes->setType("REFLE");
+    l_rfyes->setType("GRATV");
 
     // creation of "In initio"
     qCDebug(g_cat_silence) << QString("Creating <[II___]-In initio> item");
@@ -4544,6 +4776,7 @@ void M1Env::GraphInit::init_base(){
         "II___",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_ii->setType("TYPE_");
     l_ii->setType("GRATT");
 
     // creation of "[iic]-in initio compositi"
@@ -4561,6 +4794,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_iicom->setType("TYPE_");
     l_iicom->setType("II___");
+    l_iicom->setType("GRATV");
 
     // creation of "[iiv]-in initio verbi"
     qCDebug(g_cat_silence) << QString("Creating <[IIVRB]-[iiv]-in initio verbi> item");
@@ -4577,6 +4811,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_iivrb->setType("TYPE_");
     l_iivrb->setType("II___");
+    l_iivrb->setType("GRATV");
 
     // creation of "Tense"
     qCDebug(g_cat_silence) << QString("Creating <[TENSE]-Tense> item");
@@ -4591,6 +4826,7 @@ void M1Env::GraphInit::init_base(){
         "TENSE",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_tense->setType("TYPE_");
     l_tense->setType("GRATT");
 
     // creation of "[Fut]-future tense"
@@ -4608,6 +4844,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_tnfut->setType("TYPE_");
     l_tnfut->setType("TENSE");
+    l_tnfut->setType("GRATV");
 
     // creation of "[Imp]-imperfect"
     qCDebug(g_cat_silence) << QString("Creating <[TNIMP]-[Imp]-imperfect> item");
@@ -4624,6 +4861,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_tnimp->setType("TYPE_");
     l_tnimp->setType("TENSE");
+    l_tnimp->setType("GRATV");
 
     // creation of "[Past]-past tense / preterite / aorist"
     qCDebug(g_cat_silence) << QString("Creating <[TNPST]-[Past]-past tense / preterite / aorist> item");
@@ -4640,6 +4878,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_tnpst->setType("TYPE_");
     l_tnpst->setType("TENSE");
+    l_tnpst->setType("GRATV");
 
     // creation of "[Pqp]-pluperfect"
     qCDebug(g_cat_silence) << QString("Creating <[TNPQP]-[Pqp]-pluperfect> item");
@@ -4656,6 +4895,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_tnpqp->setType("TYPE_");
     l_tnpqp->setType("TENSE");
+    l_tnpqp->setType("GRATV");
 
     // creation of "[Pres]-present / non-past tense / aorist"
     qCDebug(g_cat_silence) << QString("Creating <[TNPRS]-[Pres]-present / non-past tense / aorist> item");
@@ -4672,6 +4912,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_tnprs->setType("TYPE_");
     l_tnprs->setType("TENSE");
+    l_tnprs->setType("GRATV");
 
     // creation of "Is this a misspelled word?"
     qCDebug(g_cat_silence) << QString("Creating <[TYPO_]-Is this a misspelled word?> item");
@@ -4686,6 +4927,7 @@ void M1Env::GraphInit::init_base(){
         "TYPO_",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_typo->setType("TYPE_");
     l_typo->setType("GRATT");
 
     // creation of "[Yes]-it is typo"
@@ -4703,6 +4945,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_tyyes->setType("TYPE_");
     l_tyyes->setType("TYPO_");
+    l_tyyes->setType("GRATV");
 
     // creation of "Form of verb or deverbative"
     qCDebug(g_cat_silence) << QString("Creating <[VFRBR]-Form of verb or deverbative> item");
@@ -4717,6 +4960,7 @@ void M1Env::GraphInit::init_base(){
         "VFRBR",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_vfrbr->setType("TYPE_");
     l_vfrbr->setType("GRATT");
 
     // creation of "[Conv]-converb, transgressive, adverbial participle, verbal ad"
@@ -4734,6 +4978,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vfcnv->setType("TYPE_");
     l_vfcnv->setType("VFRBR");
+    l_vfcnv->setType("GRATV");
 
     // creation of "[Fin]-finite verb"
     qCDebug(g_cat_silence) << QString("Creating <[VFFIN]-[Fin]-finite verb> item");
@@ -4750,6 +4995,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vffin->setType("TYPE_");
     l_vffin->setType("VFRBR");
+    l_vffin->setType("GRATV");
 
     // creation of "[Gdv]-gerundive"
     qCDebug(g_cat_silence) << QString("Creating <[VFGDV]-[Gdv]-gerundive> item");
@@ -4766,6 +5012,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vfgdv->setType("TYPE_");
     l_vfgdv->setType("VFRBR");
+    l_vfgdv->setType("GRATV");
 
     // creation of "[Ger]-gerund"
     qCDebug(g_cat_silence) << QString("Creating <[VFGER]-[Ger]-gerund> item");
@@ -4782,6 +5029,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vfger->setType("TYPE_");
     l_vfger->setType("VFRBR");
+    l_vfger->setType("GRATV");
 
     // creation of "[Inf]-infinitive"
     qCDebug(g_cat_silence) << QString("Creating <[VFINF]-[Inf]-infinitive> item");
@@ -4798,6 +5046,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vfinf->setType("TYPE_");
     l_vfinf->setType("VFRBR");
+    l_vfinf->setType("GRATV");
 
     // creation of "[Part]-participle, verbal adjective"
     qCDebug(g_cat_silence) << QString("Creating <[VFPRT]-[Part]-participle, verbal adjective> item");
@@ -4814,6 +5063,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vfprt->setType("TYPE_");
     l_vfprt->setType("VFRBR");
+    l_vfprt->setType("GRATV");
 
     // creation of "[Sup]-supine"
     qCDebug(g_cat_silence) << QString("Creating <[VFSUP]-[Sup]-supine> item");
@@ -4830,6 +5080,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vfsup->setType("TYPE_");
     l_vfsup->setType("VFRBR");
+    l_vfsup->setType("GRATV");
 
     // creation of "[Cau]-causative"
     qCDebug(g_cat_silence) << QString("Creating <[VFCAU]-[Cau]-causative> item");
@@ -4846,6 +5097,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vfcau->setType("TYPE_");
     l_vfcau->setType("VFRBR");
+    l_vfcau->setType("GRATV");
 
     // creation of "[Vnoun]-verbal noun, masdar"
     qCDebug(g_cat_silence) << QString("Creating <[VFVNN]-[Vnoun]-verbal noun, masdar> item");
@@ -4862,6 +5114,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vfvnn->setType("TYPE_");
     l_vfvnn->setType("VFRBR");
+    l_vfvnn->setType("GRATV");
 
     // creation of "Verb conjugation"
     qCDebug(g_cat_silence) << QString("Creating <[VCRBN]-Verb conjugation> item");
@@ -4876,6 +5129,7 @@ void M1Env::GraphInit::init_base(){
         "VCRBN",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_vcrbn->setType("TYPE_");
     l_vcrbn->setType("GRATT");
 
     // creation of "[[1]]-first conjugation"
@@ -4893,6 +5147,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vbcj1->setType("TYPE_");
     l_vbcj1->setType("VCRBN");
+    l_vbcj1->setType("GRATV");
 
     // creation of "[[2]]-second conjugation"
     qCDebug(g_cat_silence) << QString("Creating <[VBCJ2]-[[2]]-second conjugation> item");
@@ -4909,6 +5164,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vbcj2->setType("TYPE_");
     l_vbcj2->setType("VCRBN");
+    l_vbcj2->setType("GRATV");
 
     // creation of "[[3]]-third conjugation"
     qCDebug(g_cat_silence) << QString("Creating <[VBCJ3]-[[3]]-third conjugation> item");
@@ -4925,6 +5181,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vbcj3->setType("TYPE_");
     l_vbcj3->setType("VCRBN");
+    l_vbcj3->setType("GRATV");
 
     // creation of "[[4]]-4th conjugation"
     qCDebug(g_cat_silence) << QString("Creating <[VBCJ4]-[[4]]-4th conjugation> item");
@@ -4941,6 +5198,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vbcj4->setType("TYPE_");
     l_vbcj4->setType("VCRBN");
+    l_vbcj4->setType("GRATV");
 
     // creation of "[[5]]-5th conjugation"
     qCDebug(g_cat_silence) << QString("Creating <[VBCJ5]-[[5]]-5th conjugation> item");
@@ -4957,6 +5215,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vbcj5->setType("TYPE_");
     l_vbcj5->setType("VCRBN");
+    l_vbcj5->setType("GRATV");
 
     // creation of "[[6]]-6th conjugation"
     qCDebug(g_cat_silence) << QString("Creating <[VBCJ6]-[[6]]-6th conjugation> item");
@@ -4973,6 +5232,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vbcj6->setType("TYPE_");
     l_vbcj6->setType("VCRBN");
+    l_vbcj6->setType("GRATV");
 
     // creation of "[[7]]-7th conjugation"
     qCDebug(g_cat_silence) << QString("Creating <[VBCJ7]-[[7]]-7th conjugation> item");
@@ -4989,6 +5249,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vbcj7->setType("TYPE_");
     l_vbcj7->setType("VCRBN");
+    l_vbcj7->setType("GRATV");
 
     // creation of "[[8]]-8th conjugation"
     qCDebug(g_cat_silence) << QString("Creating <[VBCJ8]-[[8]]-8th conjugation> item");
@@ -5005,6 +5266,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vbcj8->setType("TYPE_");
     l_vbcj8->setType("VCRBN");
+    l_vbcj8->setType("GRATV");
 
     // creation of "[[9]]-9th conjugation"
     qCDebug(g_cat_silence) << QString("Creating <[VBCJ9]-[[9]]-9th conjugation> item");
@@ -5021,6 +5283,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vbcj9->setType("TYPE_");
     l_vbcj9->setType("VCRBN");
+    l_vbcj9->setType("GRATV");
 
     // creation of "[[10]]-10th conjugation"
     qCDebug(g_cat_silence) << QString("Creating <[VCJ10]-[[10]]-10th conjugation> item");
@@ -5037,6 +5300,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vcj10->setType("TYPE_");
     l_vcj10->setType("VCRBN");
+    l_vcj10->setType("GRATV");
 
     // creation of "Verb type"
     qCDebug(g_cat_silence) << QString("Creating <[VTRBY]-Verb type> item");
@@ -5051,6 +5315,7 @@ void M1Env::GraphInit::init_base(){
         "VTRBY",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_vtrby->setType("TYPE_");
     l_vtrby->setType("GRATT");
 
     // creation of "[Aux]-auxiliary verb"
@@ -5068,6 +5333,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vtaux->setType("TYPE_");
     l_vtaux->setType("VTRBY");
+    l_vtaux->setType("GRATV");
 
     // creation of "[Cop]-copula verb"
     qCDebug(g_cat_silence) << QString("Creating <[VTCOP]-[Cop]-copula verb> item");
@@ -5084,6 +5350,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vtcop->setType("TYPE_");
     l_vtcop->setType("VTRBY");
+    l_vtcop->setType("GRATV");
 
     // creation of "[Mod]-modal verb"
     qCDebug(g_cat_silence) << QString("Creating <[VTMOD]-[Mod]-modal verb> item");
@@ -5100,6 +5367,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vtmod->setType("TYPE_");
     l_vtmod->setType("VTRBY");
+    l_vtmod->setType("GRATV");
 
     // creation of "[Light]-light (support) verb"
     qCDebug(g_cat_silence) << QString("Creating <[VTLGH]-[Light]-light (support) verb> item");
@@ -5116,6 +5384,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vtlgh->setType("TYPE_");
     l_vtlgh->setType("VTRBY");
+    l_vtlgh->setType("GRATV");
 
     // creation of "[Quasi]-quasi-verb"
     qCDebug(g_cat_silence) << QString("Creating <[VTRQS]-[Quasi]-quasi-verb> item");
@@ -5132,6 +5401,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vtrqs->setType("TYPE_");
     l_vtrqs->setType("VTRBY");
+    l_vtrqs->setType("GRATV");
 
     // creation of "Undecided codes"
     qCDebug(g_cat_silence) << QString("Creating <[UNDCD]-Undecided codes> item");
@@ -5146,6 +5416,7 @@ void M1Env::GraphInit::init_base(){
         "UNDCD",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_undcd->setType("TYPE_");
     l_undcd->setType("GRATT");
 
     // creation of "[act]-"
@@ -5163,6 +5434,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_act->setType("TYPE_");
     l_act->setType("UNDCD");
+    l_act->setType("GRATV");
 
     // creation of "[agt]-"
     qCDebug(g_cat_silence) << QString("Creating <[__AGT]-[agt]-> item");
@@ -5179,6 +5451,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_agt->setType("TYPE_");
     l_agt->setType("UNDCD");
+    l_agt->setType("GRATV");
 
     // creation of "[per]-"
     qCDebug(g_cat_silence) << QString("Creating <[__PER]-[per]-> item");
@@ -5195,6 +5468,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_per->setType("TYPE_");
     l_per->setType("UNDCD");
+    l_per->setType("GRATV");
 
     // creation of "[tasil]-"
     qCDebug(g_cat_silence) << QString("Creating <[__TSL]-[tasil]-> item");
@@ -5211,6 +5485,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_tsl->setType("TYPE_");
     l_tsl->setType("UNDCD");
+    l_tsl->setType("GRATV");
 
     // creation of "Voice"
     qCDebug(g_cat_silence) << QString("Creating <[VOICE]-Voice> item");
@@ -5225,6 +5500,7 @@ void M1Env::GraphInit::init_base(){
         "VOICE",
         // icon path
         M1Env::FOLDER_ICON_PATH);
+    l_voice->setType("TYPE_");
     l_voice->setType("GRATT");
 
     // creation of "[Act]-active or actor-focus voice"
@@ -5242,6 +5518,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vcact->setType("TYPE_");
     l_vcact->setType("VOICE");
+    l_vcact->setType("GRATV");
 
     // creation of "[Antip]-antipassive voice"
     qCDebug(g_cat_silence) << QString("Creating <[VCANT]-[Antip]-antipassive voice> item");
@@ -5258,6 +5535,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vcant->setType("TYPE_");
     l_vcant->setType("VOICE");
+    l_vcant->setType("GRATV");
 
     // creation of "[Bfoc]-beneficiary-focus voice"
     qCDebug(g_cat_silence) << QString("Creating <[VCBFC]-[Bfoc]-beneficiary-focus voice> item");
@@ -5274,6 +5552,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vcbfc->setType("TYPE_");
     l_vcbfc->setType("VOICE");
+    l_vcbfc->setType("GRATV");
 
     // creation of "[Cau]-causative voice"
     qCDebug(g_cat_silence) << QString("Creating <[VCCAU]-[Cau]-causative voice> item");
@@ -5290,6 +5569,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vccau->setType("TYPE_");
     l_vccau->setType("VOICE");
+    l_vccau->setType("GRATV");
 
     // creation of "[Dir]-direct voice"
     qCDebug(g_cat_silence) << QString("Creating <[VCDIR]-[Dir]-direct voice> item");
@@ -5306,6 +5586,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vcdir->setType("TYPE_");
     l_vcdir->setType("VOICE");
+    l_vcdir->setType("GRATV");
 
     // creation of "[Inv]-inverse voice"
     qCDebug(g_cat_silence) << QString("Creating <[VCINV]-[Inv]-inverse voice> item");
@@ -5322,6 +5603,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vcinv->setType("TYPE_");
     l_vcinv->setType("VOICE");
+    l_vcinv->setType("GRATV");
 
     // creation of "[Lfoc]-location-focus voice"
     qCDebug(g_cat_silence) << QString("Creating <[VCLFC]-[Lfoc]-location-focus voice> item");
@@ -5338,6 +5620,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vclfc->setType("TYPE_");
     l_vclfc->setType("VOICE");
+    l_vclfc->setType("GRATV");
 
     // creation of "[Mid]-middle voice"
     qCDebug(g_cat_silence) << QString("Creating <[VCMID]-[Mid]-middle voice> item");
@@ -5354,6 +5637,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vcmid->setType("TYPE_");
     l_vcmid->setType("VOICE");
+    l_vcmid->setType("GRATV");
 
     // creation of "[Pass]-passive or patient-focus voice"
     qCDebug(g_cat_silence) << QString("Creating <[VCPSS]-[Pass]-passive or patient-focus voice> item");
@@ -5370,6 +5654,7 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vcpss->setType("TYPE_");
     l_vcpss->setType("VOICE");
+    l_vcpss->setType("GRATV");
 
     // creation of "[Rcp]-reciprocal voice"
     qCDebug(g_cat_silence) << QString("Creating <[VCRCP]-[Rcp]-reciprocal voice> item");
@@ -5386,14 +5671,15 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_vcrcp->setType("TYPE_");
     l_vcrcp->setType("VOICE");
+    l_vcrcp->setType("GRATV");
 
-    // creation of "[IIC]-in intio compositi"
-    qCDebug(g_cat_silence) << QString("Creating <[NPIIC]-[IIC]-in intio compositi> item");
+    // creation of "IIC-in intio compositi"
+    qCDebug(g_cat_silence) << QString("Creating <[NPIIC]-IIC-in intio compositi> item");
     M1Store::Item_lv2* l_npiic = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[IIC]-in intio compositi",
+        "IIC-in intio compositi",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5403,13 +5689,13 @@ void M1Env::GraphInit::init_base(){
     l_npiic->setType("TYPE_");
     l_npiic->setType("NLPOS");
 
-    // creation of "[IIV]-in intio verbi"
-    qCDebug(g_cat_silence) << QString("Creating <[NPIIV]-[IIV]-in intio verbi> item");
+    // creation of "IIV-in intio verbi"
+    qCDebug(g_cat_silence) << QString("Creating <[NPIIV]-IIV-in intio verbi> item");
     M1Store::Item_lv2* l_npiiv = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[IIV]-in intio verbi",
+        "IIV-in intio verbi",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5419,13 +5705,13 @@ void M1Env::GraphInit::init_base(){
     l_npiiv->setType("TYPE_");
     l_npiiv->setType("NLPOS");
 
-    // creation of "[ADJ]-adjective"
-    qCDebug(g_cat_silence) << QString("Creating <[NPADJ]-[ADJ]-adjective> item");
+    // creation of "ADJ-adjective"
+    qCDebug(g_cat_silence) << QString("Creating <[NPADJ]-ADJ-adjective> item");
     M1Store::Item_lv2* l_npadj = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[ADJ]-adjective",
+        "ADJ-adjective",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5435,13 +5721,13 @@ void M1Env::GraphInit::init_base(){
     l_npadj->setType("TYPE_");
     l_npadj->setType("NLPOS");
 
-    // creation of "[ADP]-adposition"
-    qCDebug(g_cat_silence) << QString("Creating <[NPADP]-[ADP]-adposition> item");
+    // creation of "ADP-adposition"
+    qCDebug(g_cat_silence) << QString("Creating <[NPADP]-ADP-adposition> item");
     M1Store::Item_lv2* l_npadp = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[ADP]-adposition",
+        "ADP-adposition",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5451,13 +5737,13 @@ void M1Env::GraphInit::init_base(){
     l_npadp->setType("TYPE_");
     l_npadp->setType("NLPOS");
 
-    // creation of "[ADV]-adverb"
-    qCDebug(g_cat_silence) << QString("Creating <[NPADV]-[ADV]-adverb> item");
+    // creation of "ADV-adverb"
+    qCDebug(g_cat_silence) << QString("Creating <[NPADV]-ADV-adverb> item");
     M1Store::Item_lv2* l_npadv = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[ADV]-adverb",
+        "ADV-adverb",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5467,13 +5753,13 @@ void M1Env::GraphInit::init_base(){
     l_npadv->setType("TYPE_");
     l_npadv->setType("NLPOS");
 
-    // creation of "[AUX]-auxiliary"
-    qCDebug(g_cat_silence) << QString("Creating <[NPAUX]-[AUX]-auxiliary> item");
+    // creation of "AUX-auxiliary"
+    qCDebug(g_cat_silence) << QString("Creating <[NPAUX]-AUX-auxiliary> item");
     M1Store::Item_lv2* l_npaux = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[AUX]-auxiliary",
+        "AUX-auxiliary",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5483,13 +5769,13 @@ void M1Env::GraphInit::init_base(){
     l_npaux->setType("TYPE_");
     l_npaux->setType("NLPOS");
 
-    // creation of "[CCONJ]-coordinating conjunction"
-    qCDebug(g_cat_silence) << QString("Creating <[NPCNJ]-[CCONJ]-coordinating conjunction> item");
+    // creation of "CCONJ-coordinating conjunction"
+    qCDebug(g_cat_silence) << QString("Creating <[NPCNJ]-CCONJ-coordinating conjunction> item");
     M1Store::Item_lv2* l_npcnj = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[CCONJ]-coordinating conjunction",
+        "CCONJ-coordinating conjunction",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5499,13 +5785,13 @@ void M1Env::GraphInit::init_base(){
     l_npcnj->setType("TYPE_");
     l_npcnj->setType("NLPOS");
 
-    // creation of "[DET]-determiner"
-    qCDebug(g_cat_silence) << QString("Creating <[NPDET]-[DET]-determiner> item");
+    // creation of "DET-determiner"
+    qCDebug(g_cat_silence) << QString("Creating <[NPDET]-DET-determiner> item");
     M1Store::Item_lv2* l_npdet = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[DET]-determiner",
+        "DET-determiner",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5515,13 +5801,13 @@ void M1Env::GraphInit::init_base(){
     l_npdet->setType("TYPE_");
     l_npdet->setType("NLPOS");
 
-    // creation of "[IND]-indeclinable"
-    qCDebug(g_cat_silence) << QString("Creating <[NPIND]-[IND]-indeclinable> item");
+    // creation of "IND-indeclinable"
+    qCDebug(g_cat_silence) << QString("Creating <[NPIND]-IND-indeclinable> item");
     M1Store::Item_lv2* l_npind = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[IND]-indeclinable",
+        "IND-indeclinable",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5531,13 +5817,13 @@ void M1Env::GraphInit::init_base(){
     l_npind->setType("TYPE_");
     l_npind->setType("NLPOS");
 
-    // creation of "[INTJ]-interjection"
-    qCDebug(g_cat_silence) << QString("Creating <[NPINT]-[INTJ]-interjection> item");
+    // creation of "INTJ-interjection"
+    qCDebug(g_cat_silence) << QString("Creating <[NPINT]-INTJ-interjection> item");
     M1Store::Item_lv2* l_npint = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[INTJ]-interjection",
+        "INTJ-interjection",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5547,13 +5833,13 @@ void M1Env::GraphInit::init_base(){
     l_npint->setType("TYPE_");
     l_npint->setType("NLPOS");
 
-    // creation of "[NOUN]-noun"
-    qCDebug(g_cat_silence) << QString("Creating <[NPNON]-[NOUN]-noun> item");
+    // creation of "NOUN-noun"
+    qCDebug(g_cat_silence) << QString("Creating <[NPNON]-NOUN-noun> item");
     M1Store::Item_lv2* l_npnon = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[NOUN]-noun",
+        "NOUN-noun",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5563,13 +5849,13 @@ void M1Env::GraphInit::init_base(){
     l_npnon->setType("TYPE_");
     l_npnon->setType("NLPOS");
 
-    // creation of "[NUM]-numeral"
-    qCDebug(g_cat_silence) << QString("Creating <[NPNUM]-[NUM]-numeral> item");
+    // creation of "NUM-numeral"
+    qCDebug(g_cat_silence) << QString("Creating <[NPNUM]-NUM-numeral> item");
     M1Store::Item_lv2* l_npnum = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[NUM]-numeral",
+        "NUM-numeral",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5579,13 +5865,13 @@ void M1Env::GraphInit::init_base(){
     l_npnum->setType("TYPE_");
     l_npnum->setType("NLPOS");
 
-    // creation of "[PART]-particle"
-    qCDebug(g_cat_silence) << QString("Creating <[NPPRT]-[PART]-particle> item");
+    // creation of "PART-particle"
+    qCDebug(g_cat_silence) << QString("Creating <[NPPRT]-PART-particle> item");
     M1Store::Item_lv2* l_npprt = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[PART]-particle",
+        "PART-particle",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5595,13 +5881,13 @@ void M1Env::GraphInit::init_base(){
     l_npprt->setType("TYPE_");
     l_npprt->setType("NLPOS");
 
-    // creation of "[PRON]-pronoun"
-    qCDebug(g_cat_silence) << QString("Creating <[NPPRN]-[PRON]-pronoun> item");
+    // creation of "PRON-pronoun"
+    qCDebug(g_cat_silence) << QString("Creating <[NPPRN]-PRON-pronoun> item");
     M1Store::Item_lv2* l_npprn = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[PRON]-pronoun",
+        "PRON-pronoun",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5611,13 +5897,13 @@ void M1Env::GraphInit::init_base(){
     l_npprn->setType("TYPE_");
     l_npprn->setType("NLPOS");
 
-    // creation of "[PROPN]-proper noun"
-    qCDebug(g_cat_silence) << QString("Creating <[NPPPN]-[PROPN]-proper noun> item");
+    // creation of "PROPN-proper noun"
+    qCDebug(g_cat_silence) << QString("Creating <[NPPPN]-PROPN-proper noun> item");
     M1Store::Item_lv2* l_npppn = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[PROPN]-proper noun",
+        "PROPN-proper noun",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5627,13 +5913,13 @@ void M1Env::GraphInit::init_base(){
     l_npppn->setType("TYPE_");
     l_npppn->setType("NLPOS");
 
-    // creation of "[PUNCT]-punctuation"
-    qCDebug(g_cat_silence) << QString("Creating <[NPPCT]-[PUNCT]-punctuation> item");
+    // creation of "PUNCT-punctuation"
+    qCDebug(g_cat_silence) << QString("Creating <[NPPCT]-PUNCT-punctuation> item");
     M1Store::Item_lv2* l_nppct = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[PUNCT]-punctuation",
+        "PUNCT-punctuation",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5643,13 +5929,13 @@ void M1Env::GraphInit::init_base(){
     l_nppct->setType("TYPE_");
     l_nppct->setType("NLPOS");
 
-    // creation of "[SCONJ]-subordinating conjunction"
-    qCDebug(g_cat_silence) << QString("Creating <[NPSCJ]-[SCONJ]-subordinating conjunction> item");
+    // creation of "SCONJ-subordinating conjunction"
+    qCDebug(g_cat_silence) << QString("Creating <[NPSCJ]-SCONJ-subordinating conjunction> item");
     M1Store::Item_lv2* l_npscj = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[SCONJ]-subordinating conjunction",
+        "SCONJ-subordinating conjunction",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5659,13 +5945,13 @@ void M1Env::GraphInit::init_base(){
     l_npscj->setType("TYPE_");
     l_npscj->setType("NLPOS");
 
-    // creation of "[SYM]-symbol"
-    qCDebug(g_cat_silence) << QString("Creating <[NPSYM]-[SYM]-symbol> item");
+    // creation of "SYM-symbol"
+    qCDebug(g_cat_silence) << QString("Creating <[NPSYM]-SYM-symbol> item");
     M1Store::Item_lv2* l_npsym = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[SYM]-symbol",
+        "SYM-symbol",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5675,13 +5961,13 @@ void M1Env::GraphInit::init_base(){
     l_npsym->setType("TYPE_");
     l_npsym->setType("NLPOS");
 
-    // creation of "[VERB]-verb"
-    qCDebug(g_cat_silence) << QString("Creating <[NPVRB]-[VERB]-verb> item");
+    // creation of "VERB-verb"
+    qCDebug(g_cat_silence) << QString("Creating <[NPVRB]-VERB-verb> item");
     M1Store::Item_lv2* l_npvrb = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[VERB]-verb",
+        "VERB-verb",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5691,13 +5977,13 @@ void M1Env::GraphInit::init_base(){
     l_npvrb->setType("TYPE_");
     l_npvrb->setType("NLPOS");
 
-    // creation of "[X]-other"
-    qCDebug(g_cat_silence) << QString("Creating <[NPXXX]-[X]-other> item");
+    // creation of "X-other"
+    qCDebug(g_cat_silence) << QString("Creating <[NPXXX]-X-other> item");
     M1Store::Item_lv2* l_npxxx = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[X]-other",
+        "X-other",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5707,13 +5993,13 @@ void M1Env::GraphInit::init_base(){
     l_npxxx->setType("TYPE_");
     l_npxxx->setType("NLPOS");
 
-    // creation of "[.]-punctuation mark, sentence closer"
-    qCDebug(g_cat_silence) << QString("Creating <[NTGSE]-[.]-punctuation mark, sentence closer> item");
+    // creation of ".-punctuation mark, sentence closer"
+    qCDebug(g_cat_silence) << QString("Creating <[NTGSE]-.-punctuation mark, sentence closer> item");
     M1Store::Item_lv2* l_ntgse = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[.]-punctuation mark, sentence closer",
+        ".-punctuation mark, sentence closer",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5723,13 +6009,13 @@ void M1Env::GraphInit::init_base(){
     l_ntgse->setType("TYPE_");
     l_ntgse->setType("NLTAG");
 
-    // creation of "[,]-punctuation mark, comma"
-    qCDebug(g_cat_silence) << QString("Creating <[NTGCM]-[,]-punctuation mark, comma> item");
+    // creation of ",-punctuation mark, comma"
+    qCDebug(g_cat_silence) << QString("Creating <[NTGCM]-,-punctuation mark, comma> item");
     M1Store::Item_lv2* l_ntgcm = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[,]-punctuation mark, comma",
+        ",-punctuation mark, comma",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5739,13 +6025,13 @@ void M1Env::GraphInit::init_base(){
     l_ntgcm->setType("TYPE_");
     l_ntgcm->setType("NLTAG");
 
-    // creation of "[-LRB-]-left round bracket"
-    qCDebug(g_cat_silence) << QString("Creating <[NTLRB]-[-LRB-]-left round bracket> item");
+    // creation of "-LRB--left round bracket"
+    qCDebug(g_cat_silence) << QString("Creating <[NTLRB]--LRB--left round bracket> item");
     M1Store::Item_lv2* l_ntlrb = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[-LRB-]-left round bracket",
+        "-LRB--left round bracket",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5755,13 +6041,13 @@ void M1Env::GraphInit::init_base(){
     l_ntlrb->setType("TYPE_");
     l_ntlrb->setType("NLTAG");
 
-    // creation of "[-RRB-]-right round bracket"
-    qCDebug(g_cat_silence) << QString("Creating <[NTRRB]-[-RRB-]-right round bracket> item");
+    // creation of "-RRB--right round bracket"
+    qCDebug(g_cat_silence) << QString("Creating <[NTRRB]--RRB--right round bracket> item");
     M1Store::Item_lv2* l_ntrrb = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[-RRB-]-right round bracket",
+        "-RRB--right round bracket",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5771,13 +6057,13 @@ void M1Env::GraphInit::init_base(){
     l_ntrrb->setType("TYPE_");
     l_ntrrb->setType("NLTAG");
 
-    // creation of "[``]-opening quotation mark"
-    qCDebug(g_cat_silence) << QString("Creating <[NTOQM]-[``]-opening quotation mark> item");
+    // creation of "``-opening quotation mark"
+    qCDebug(g_cat_silence) << QString("Creating <[NTOQM]-``-opening quotation mark> item");
     M1Store::Item_lv2* l_ntoqm = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[``]-opening quotation mark",
+        "``-opening quotation mark",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5787,13 +6073,13 @@ void M1Env::GraphInit::init_base(){
     l_ntoqm->setType("TYPE_");
     l_ntoqm->setType("NLTAG");
 
-    // creation of "[""]-closing quotation mark"
-    qCDebug(g_cat_silence) << QString("Creating <[NTCQM]-[""]-closing quotation mark> item");
+    // creation of """-closing quotation mark"
+    qCDebug(g_cat_silence) << QString("Creating <[NTCQM]-""-closing quotation mark> item");
     M1Store::Item_lv2* l_ntcqm = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[""]-closing quotation mark",
+        """-closing quotation mark",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5803,13 +6089,13 @@ void M1Env::GraphInit::init_base(){
     l_ntcqm->setType("TYPE_");
     l_ntcqm->setType("NLTAG");
 
-    // creation of "['']-closing quotation mark"
-    qCDebug(g_cat_silence) << QString("Creating <[NTCRM]-['']-closing quotation mark> item");
+    // creation of "''-closing quotation mark"
+    qCDebug(g_cat_silence) << QString("Creating <[NTCRM]-''-closing quotation mark> item");
     M1Store::Item_lv2* l_ntcrm = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "['']-closing quotation mark",
+        "''-closing quotation mark",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5819,13 +6105,13 @@ void M1Env::GraphInit::init_base(){
     l_ntcrm->setType("TYPE_");
     l_ntcrm->setType("NLTAG");
 
-    // creation of "[:]-punctuation mark, colon or ellipsis"
-    qCDebug(g_cat_silence) << QString("Creating <[NTGCL]-[:]-punctuation mark, colon or ellipsis> item");
+    // creation of ":-punctuation mark, colon or ellipsis"
+    qCDebug(g_cat_silence) << QString("Creating <[NTGCL]-:-punctuation mark, colon or ellipsis> item");
     M1Store::Item_lv2* l_ntgcl = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[:]-punctuation mark, colon or ellipsis",
+        ":-punctuation mark, colon or ellipsis",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5835,13 +6121,13 @@ void M1Env::GraphInit::init_base(){
     l_ntgcl->setType("TYPE_");
     l_ntgcl->setType("NLTAG");
 
-    // creation of "[$]-symbol, currency"
-    qCDebug(g_cat_silence) << QString("Creating <[NTDOL]-[$]-symbol, currency> item");
+    // creation of "$-symbol, currency"
+    qCDebug(g_cat_silence) << QString("Creating <[NTDOL]-$-symbol, currency> item");
     M1Store::Item_lv2* l_ntdol = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[$]-symbol, currency",
+        "$-symbol, currency",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5851,13 +6137,13 @@ void M1Env::GraphInit::init_base(){
     l_ntdol->setType("TYPE_");
     l_ntdol->setType("NLTAG");
 
-    // creation of "[#]-symbol, number sign"
-    qCDebug(g_cat_silence) << QString("Creating <[NTSRP]-[#]-symbol, number sign> item");
+    // creation of "#-symbol, number sign"
+    qCDebug(g_cat_silence) << QString("Creating <[NTSRP]-#-symbol, number sign> item");
     M1Store::Item_lv2* l_ntsrp = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[#]-symbol, number sign",
+        "#-symbol, number sign",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5867,13 +6153,13 @@ void M1Env::GraphInit::init_base(){
     l_ntsrp->setType("TYPE_");
     l_ntsrp->setType("NLTAG");
 
-    // creation of "[AFX]-affix"
-    qCDebug(g_cat_silence) << QString("Creating <[NTAFX]-[AFX]-affix> item");
+    // creation of "AFX-affix"
+    qCDebug(g_cat_silence) << QString("Creating <[NTAFX]-AFX-affix> item");
     M1Store::Item_lv2* l_ntafx = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[AFX]-affix",
+        "AFX-affix",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5883,13 +6169,13 @@ void M1Env::GraphInit::init_base(){
     l_ntafx->setType("TYPE_");
     l_ntafx->setType("NLTAG");
 
-    // creation of "[CC]-conjunction, coordinatinf"
-    qCDebug(g_cat_silence) << QString("Creating <[NTGCC]-[CC]-conjunction, coordinatinf> item");
+    // creation of "CC-conjunction, coordinatinf"
+    qCDebug(g_cat_silence) << QString("Creating <[NTGCC]-CC-conjunction, coordinatinf> item");
     M1Store::Item_lv2* l_ntgcc = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[CC]-conjunction, coordinatinf",
+        "CC-conjunction, coordinatinf",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5899,13 +6185,13 @@ void M1Env::GraphInit::init_base(){
     l_ntgcc->setType("TYPE_");
     l_ntgcc->setType("NLTAG");
 
-    // creation of "[CD]-cardinal number"
-    qCDebug(g_cat_silence) << QString("Creating <[NTGCD]-[CD]-cardinal number> item");
+    // creation of "CD-cardinal number"
+    qCDebug(g_cat_silence) << QString("Creating <[NTGCD]-CD-cardinal number> item");
     M1Store::Item_lv2* l_ntgcd = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[CD]-cardinal number",
+        "CD-cardinal number",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5915,13 +6201,13 @@ void M1Env::GraphInit::init_base(){
     l_ntgcd->setType("TYPE_");
     l_ntgcd->setType("NLTAG");
 
-    // creation of "[DT]-determiner"
-    qCDebug(g_cat_silence) << QString("Creating <[NTGDT]-[DT]-determiner> item");
+    // creation of "DT-determiner"
+    qCDebug(g_cat_silence) << QString("Creating <[NTGDT]-DT-determiner> item");
     M1Store::Item_lv2* l_ntgdt = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[DT]-determiner",
+        "DT-determiner",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5931,13 +6217,13 @@ void M1Env::GraphInit::init_base(){
     l_ntgdt->setType("TYPE_");
     l_ntgdt->setType("NLTAG");
 
-    // creation of "[EX]-existential there"
-    qCDebug(g_cat_silence) << QString("Creating <[NTGEX]-[EX]-existential there> item");
+    // creation of "EX-existential there"
+    qCDebug(g_cat_silence) << QString("Creating <[NTGEX]-EX-existential there> item");
     M1Store::Item_lv2* l_ntgex = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[EX]-existential there",
+        "EX-existential there",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5947,13 +6233,13 @@ void M1Env::GraphInit::init_base(){
     l_ntgex->setType("TYPE_");
     l_ntgex->setType("NLTAG");
 
-    // creation of "[FW]-foreign word"
-    qCDebug(g_cat_silence) << QString("Creating <[NTGFW]-[FW]-foreign word> item");
+    // creation of "FW-foreign word"
+    qCDebug(g_cat_silence) << QString("Creating <[NTGFW]-FW-foreign word> item");
     M1Store::Item_lv2* l_ntgfw = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[FW]-foreign word",
+        "FW-foreign word",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5963,13 +6249,13 @@ void M1Env::GraphInit::init_base(){
     l_ntgfw->setType("TYPE_");
     l_ntgfw->setType("NLTAG");
 
-    // creation of "[HYPH]-punctuation mark, hyphen"
-    qCDebug(g_cat_silence) << QString("Creating <[NTHYP]-[HYPH]-punctuation mark, hyphen> item");
+    // creation of "HYPH-punctuation mark, hyphen"
+    qCDebug(g_cat_silence) << QString("Creating <[NTHYP]-HYPH-punctuation mark, hyphen> item");
     M1Store::Item_lv2* l_nthyp = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[HYPH]-punctuation mark, hyphen",
+        "HYPH-punctuation mark, hyphen",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5979,13 +6265,13 @@ void M1Env::GraphInit::init_base(){
     l_nthyp->setType("TYPE_");
     l_nthyp->setType("NLTAG");
 
-    // creation of "[IN]-conjunction, subordinating or preposition"
-    qCDebug(g_cat_silence) << QString("Creating <[NTGIN]-[IN]-conjunction, subordinating or preposition> item");
+    // creation of "IN-conjunction, subordinating or preposition"
+    qCDebug(g_cat_silence) << QString("Creating <[NTGIN]-IN-conjunction, subordinating or preposition> item");
     M1Store::Item_lv2* l_ntgin = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[IN]-conjunction, subordinating or preposition",
+        "IN-conjunction, subordinating or preposition",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -5995,13 +6281,13 @@ void M1Env::GraphInit::init_base(){
     l_ntgin->setType("TYPE_");
     l_ntgin->setType("NLTAG");
 
-    // creation of "[JJ]-adjective (English), other noun-modifier (Chinese)"
-    qCDebug(g_cat_silence) << QString("Creating <[NTGJJ]-[JJ]-adjective (English), other noun-modifier (Chinese)> item");
+    // creation of "JJ-adjective (English), other noun-modifier (Chinese)"
+    qCDebug(g_cat_silence) << QString("Creating <[NTGJJ]-JJ-adjective (English), other noun-modifier (Chinese)> item");
     M1Store::Item_lv2* l_ntgjj = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[JJ]-adjective (English), other noun-modifier (Chinese)",
+        "JJ-adjective (English), other noun-modifier (Chinese)",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6011,13 +6297,13 @@ void M1Env::GraphInit::init_base(){
     l_ntgjj->setType("TYPE_");
     l_ntgjj->setType("NLTAG");
 
-    // creation of "[JJR]-adjective, comparative"
-    qCDebug(g_cat_silence) << QString("Creating <[NTJJR]-[JJR]-adjective, comparative> item");
+    // creation of "JJR-adjective, comparative"
+    qCDebug(g_cat_silence) << QString("Creating <[NTJJR]-JJR-adjective, comparative> item");
     M1Store::Item_lv2* l_ntjjr = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[JJR]-adjective, comparative",
+        "JJR-adjective, comparative",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6027,13 +6313,13 @@ void M1Env::GraphInit::init_base(){
     l_ntjjr->setType("TYPE_");
     l_ntjjr->setType("NLTAG");
 
-    // creation of "[JJS]-adjective, superlative"
-    qCDebug(g_cat_silence) << QString("Creating <[NTJJS]-[JJS]-adjective, superlative> item");
+    // creation of "JJS-adjective, superlative"
+    qCDebug(g_cat_silence) << QString("Creating <[NTJJS]-JJS-adjective, superlative> item");
     M1Store::Item_lv2* l_ntjjs = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[JJS]-adjective, superlative",
+        "JJS-adjective, superlative",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6043,13 +6329,13 @@ void M1Env::GraphInit::init_base(){
     l_ntjjs->setType("TYPE_");
     l_ntjjs->setType("NLTAG");
 
-    // creation of "[LS]-list item marker"
-    qCDebug(g_cat_silence) << QString("Creating <[NTGLS]-[LS]-list item marker> item");
+    // creation of "LS-list item marker"
+    qCDebug(g_cat_silence) << QString("Creating <[NTGLS]-LS-list item marker> item");
     M1Store::Item_lv2* l_ntgls = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[LS]-list item marker",
+        "LS-list item marker",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6059,13 +6345,13 @@ void M1Env::GraphInit::init_base(){
     l_ntgls->setType("TYPE_");
     l_ntgls->setType("NLTAG");
 
-    // creation of "[MD]-verb, modal auxiliary"
-    qCDebug(g_cat_silence) << QString("Creating <[NTGMD]-[MD]-verb, modal auxiliary> item");
+    // creation of "MD-verb, modal auxiliary"
+    qCDebug(g_cat_silence) << QString("Creating <[NTGMD]-MD-verb, modal auxiliary> item");
     M1Store::Item_lv2* l_ntgmd = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[MD]-verb, modal auxiliary",
+        "MD-verb, modal auxiliary",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6075,13 +6361,13 @@ void M1Env::GraphInit::init_base(){
     l_ntgmd->setType("TYPE_");
     l_ntgmd->setType("NLTAG");
 
-    // creation of "[NIL]-missing taf"
-    qCDebug(g_cat_silence) << QString("Creating <[NTNIL]-[NIL]-missing taf> item");
+    // creation of "NIL-missing taf"
+    qCDebug(g_cat_silence) << QString("Creating <[NTNIL]-NIL-missing taf> item");
     M1Store::Item_lv2* l_ntnil = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[NIL]-missing taf",
+        "NIL-missing taf",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6091,13 +6377,13 @@ void M1Env::GraphInit::init_base(){
     l_ntnil->setType("TYPE_");
     l_ntnil->setType("NLTAG");
 
-    // creation of "[NN]-noun, singular or mass"
-    qCDebug(g_cat_silence) << QString("Creating <[NTGNN]-[NN]-noun, singular or mass> item");
+    // creation of "NN-noun, singular or mass"
+    qCDebug(g_cat_silence) << QString("Creating <[NTGNN]-NN-noun, singular or mass> item");
     M1Store::Item_lv2* l_ntgnn = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[NN]-noun, singular or mass",
+        "NN-noun, singular or mass",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6107,13 +6393,13 @@ void M1Env::GraphInit::init_base(){
     l_ntgnn->setType("TYPE_");
     l_ntgnn->setType("NLTAG");
 
-    // creation of "[NNP]-noun, proper singular"
-    qCDebug(g_cat_silence) << QString("Creating <[NTNNP]-[NNP]-noun, proper singular> item");
+    // creation of "NNP-noun, proper singular"
+    qCDebug(g_cat_silence) << QString("Creating <[NTNNP]-NNP-noun, proper singular> item");
     M1Store::Item_lv2* l_ntnnp = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[NNP]-noun, proper singular",
+        "NNP-noun, proper singular",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6123,13 +6409,13 @@ void M1Env::GraphInit::init_base(){
     l_ntnnp->setType("TYPE_");
     l_ntnnp->setType("NLTAG");
 
-    // creation of "[NNPS]-noun, proper plural"
-    qCDebug(g_cat_silence) << QString("Creating <[NTNPP]-[NNPS]-noun, proper plural> item");
+    // creation of "NNPS-noun, proper plural"
+    qCDebug(g_cat_silence) << QString("Creating <[NTNPP]-NNPS-noun, proper plural> item");
     M1Store::Item_lv2* l_ntnpp = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[NNPS]-noun, proper plural",
+        "NNPS-noun, proper plural",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6139,13 +6425,13 @@ void M1Env::GraphInit::init_base(){
     l_ntnpp->setType("TYPE_");
     l_ntnpp->setType("NLTAG");
 
-    // creation of "[NNS]-noun, plural"
-    qCDebug(g_cat_silence) << QString("Creating <[NTNNS]-[NNS]-noun, plural> item");
+    // creation of "NNS-noun, plural"
+    qCDebug(g_cat_silence) << QString("Creating <[NTNNS]-NNS-noun, plural> item");
     M1Store::Item_lv2* l_ntnns = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[NNS]-noun, plural",
+        "NNS-noun, plural",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6155,13 +6441,13 @@ void M1Env::GraphInit::init_base(){
     l_ntnns->setType("TYPE_");
     l_ntnns->setType("NLTAG");
 
-    // creation of "[PDT]-predeterminer"
-    qCDebug(g_cat_silence) << QString("Creating <[NTPDT]-[PDT]-predeterminer> item");
+    // creation of "PDT-predeterminer"
+    qCDebug(g_cat_silence) << QString("Creating <[NTPDT]-PDT-predeterminer> item");
     M1Store::Item_lv2* l_ntpdt = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[PDT]-predeterminer",
+        "PDT-predeterminer",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6171,13 +6457,13 @@ void M1Env::GraphInit::init_base(){
     l_ntpdt->setType("TYPE_");
     l_ntpdt->setType("NLTAG");
 
-    // creation of "[POS]-possessive endinf"
-    qCDebug(g_cat_silence) << QString("Creating <[NTPOS]-[POS]-possessive endinf> item");
+    // creation of "POS-possessive endinf"
+    qCDebug(g_cat_silence) << QString("Creating <[NTPOS]-POS-possessive endinf> item");
     M1Store::Item_lv2* l_ntpos = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[POS]-possessive endinf",
+        "POS-possessive endinf",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6187,13 +6473,13 @@ void M1Env::GraphInit::init_base(){
     l_ntpos->setType("TYPE_");
     l_ntpos->setType("NLTAG");
 
-    // creation of "[PRP]-pronoun, personal"
-    qCDebug(g_cat_silence) << QString("Creating <[NTPRP]-[PRP]-pronoun, personal> item");
+    // creation of "PRP-pronoun, personal"
+    qCDebug(g_cat_silence) << QString("Creating <[NTPRP]-PRP-pronoun, personal> item");
     M1Store::Item_lv2* l_ntprp = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[PRP]-pronoun, personal",
+        "PRP-pronoun, personal",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6203,13 +6489,13 @@ void M1Env::GraphInit::init_base(){
     l_ntprp->setType("TYPE_");
     l_ntprp->setType("NLTAG");
 
-    // creation of "[PRP$]-pronoun, possessive"
-    qCDebug(g_cat_silence) << QString("Creating <[NTPR$]-[PRP$]-pronoun, possessive> item");
+    // creation of "PRP$-pronoun, possessive"
+    qCDebug(g_cat_silence) << QString("Creating <[NTPR$]-PRP$-pronoun, possessive> item");
     M1Store::Item_lv2* l_ntpr$ = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[PRP$]-pronoun, possessive",
+        "PRP$-pronoun, possessive",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6219,13 +6505,13 @@ void M1Env::GraphInit::init_base(){
     l_ntpr$->setType("TYPE_");
     l_ntpr$->setType("NLTAG");
 
-    // creation of "[RB]-adverb"
-    qCDebug(g_cat_silence) << QString("Creating <[NTGRB]-[RB]-adverb> item");
+    // creation of "RB-adverb"
+    qCDebug(g_cat_silence) << QString("Creating <[NTGRB]-RB-adverb> item");
     M1Store::Item_lv2* l_ntgrb = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[RB]-adverb",
+        "RB-adverb",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6235,13 +6521,13 @@ void M1Env::GraphInit::init_base(){
     l_ntgrb->setType("TYPE_");
     l_ntgrb->setType("NLTAG");
 
-    // creation of "[RBR]-adverb, comparative"
-    qCDebug(g_cat_silence) << QString("Creating <[NTRBR]-[RBR]-adverb, comparative> item");
+    // creation of "RBR-adverb, comparative"
+    qCDebug(g_cat_silence) << QString("Creating <[NTRBR]-RBR-adverb, comparative> item");
     M1Store::Item_lv2* l_ntrbr = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[RBR]-adverb, comparative",
+        "RBR-adverb, comparative",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6251,13 +6537,13 @@ void M1Env::GraphInit::init_base(){
     l_ntrbr->setType("TYPE_");
     l_ntrbr->setType("NLTAG");
 
-    // creation of "[RBS]-adverb, superlative"
-    qCDebug(g_cat_silence) << QString("Creating <[NTRBS]-[RBS]-adverb, superlative> item");
+    // creation of "RBS-adverb, superlative"
+    qCDebug(g_cat_silence) << QString("Creating <[NTRBS]-RBS-adverb, superlative> item");
     M1Store::Item_lv2* l_ntrbs = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[RBS]-adverb, superlative",
+        "RBS-adverb, superlative",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6267,13 +6553,13 @@ void M1Env::GraphInit::init_base(){
     l_ntrbs->setType("TYPE_");
     l_ntrbs->setType("NLTAG");
 
-    // creation of "[RP]-adverb, particle"
-    qCDebug(g_cat_silence) << QString("Creating <[NTGRP]-[RP]-adverb, particle> item");
+    // creation of "RP-adverb, particle"
+    qCDebug(g_cat_silence) << QString("Creating <[NTGRP]-RP-adverb, particle> item");
     M1Store::Item_lv2* l_ntgrp = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[RP]-adverb, particle",
+        "RP-adverb, particle",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6283,13 +6569,13 @@ void M1Env::GraphInit::init_base(){
     l_ntgrp->setType("TYPE_");
     l_ntgrp->setType("NLTAG");
 
-    // creation of "[TO]-infinitival “to”"
-    qCDebug(g_cat_silence) << QString("Creating <[NTGTO]-[TO]-infinitival “to”> item");
+    // creation of "TO-infinitival “to”"
+    qCDebug(g_cat_silence) << QString("Creating <[NTGTO]-TO-infinitival “to”> item");
     M1Store::Item_lv2* l_ntgto = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[TO]-infinitival “to”",
+        "TO-infinitival “to”",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6299,13 +6585,13 @@ void M1Env::GraphInit::init_base(){
     l_ntgto->setType("TYPE_");
     l_ntgto->setType("NLTAG");
 
-    // creation of "[UH]-interjection"
-    qCDebug(g_cat_silence) << QString("Creating <[NTGUH]-[UH]-interjection> item");
+    // creation of "UH-interjection"
+    qCDebug(g_cat_silence) << QString("Creating <[NTGUH]-UH-interjection> item");
     M1Store::Item_lv2* l_ntguh = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[UH]-interjection",
+        "UH-interjection",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6315,13 +6601,13 @@ void M1Env::GraphInit::init_base(){
     l_ntguh->setType("TYPE_");
     l_ntguh->setType("NLTAG");
 
-    // creation of "[VB]-verb, base form"
-    qCDebug(g_cat_silence) << QString("Creating <[NTGVB]-[VB]-verb, base form> item");
+    // creation of "VB-verb, base form"
+    qCDebug(g_cat_silence) << QString("Creating <[NTGVB]-VB-verb, base form> item");
     M1Store::Item_lv2* l_ntgvb = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[VB]-verb, base form",
+        "VB-verb, base form",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6331,13 +6617,13 @@ void M1Env::GraphInit::init_base(){
     l_ntgvb->setType("TYPE_");
     l_ntgvb->setType("NLTAG");
 
-    // creation of "[VBD]-verb, past tense"
-    qCDebug(g_cat_silence) << QString("Creating <[NTVBD]-[VBD]-verb, past tense> item");
+    // creation of "VBD-verb, past tense"
+    qCDebug(g_cat_silence) << QString("Creating <[NTVBD]-VBD-verb, past tense> item");
     M1Store::Item_lv2* l_ntvbd = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[VBD]-verb, past tense",
+        "VBD-verb, past tense",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6347,13 +6633,13 @@ void M1Env::GraphInit::init_base(){
     l_ntvbd->setType("TYPE_");
     l_ntvbd->setType("NLTAG");
 
-    // creation of "[VBG]-verb, gerund or present participle"
-    qCDebug(g_cat_silence) << QString("Creating <[NTVBG]-[VBG]-verb, gerund or present participle> item");
+    // creation of "VBG-verb, gerund or present participle"
+    qCDebug(g_cat_silence) << QString("Creating <[NTVBG]-VBG-verb, gerund or present participle> item");
     M1Store::Item_lv2* l_ntvbg = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[VBG]-verb, gerund or present participle",
+        "VBG-verb, gerund or present participle",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6363,13 +6649,13 @@ void M1Env::GraphInit::init_base(){
     l_ntvbg->setType("TYPE_");
     l_ntvbg->setType("NLTAG");
 
-    // creation of "[VBN]-verb, past participle"
-    qCDebug(g_cat_silence) << QString("Creating <[NTVBN]-[VBN]-verb, past participle> item");
+    // creation of "VBN-verb, past participle"
+    qCDebug(g_cat_silence) << QString("Creating <[NTVBN]-VBN-verb, past participle> item");
     M1Store::Item_lv2* l_ntvbn = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[VBN]-verb, past participle",
+        "VBN-verb, past participle",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6379,13 +6665,13 @@ void M1Env::GraphInit::init_base(){
     l_ntvbn->setType("TYPE_");
     l_ntvbn->setType("NLTAG");
 
-    // creation of "[VBP]-verb, non-3rd person singular present"
-    qCDebug(g_cat_silence) << QString("Creating <[NTVBP]-[VBP]-verb, non-3rd person singular present> item");
+    // creation of "VBP-verb, non-3rd person singular present"
+    qCDebug(g_cat_silence) << QString("Creating <[NTVBP]-VBP-verb, non-3rd person singular present> item");
     M1Store::Item_lv2* l_ntvbp = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[VBP]-verb, non-3rd person singular present",
+        "VBP-verb, non-3rd person singular present",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6395,13 +6681,13 @@ void M1Env::GraphInit::init_base(){
     l_ntvbp->setType("TYPE_");
     l_ntvbp->setType("NLTAG");
 
-    // creation of "[VBZ]-verb, 3rd person singular present"
-    qCDebug(g_cat_silence) << QString("Creating <[NTVBZ]-[VBZ]-verb, 3rd person singular present> item");
+    // creation of "VBZ-verb, 3rd person singular present"
+    qCDebug(g_cat_silence) << QString("Creating <[NTVBZ]-VBZ-verb, 3rd person singular present> item");
     M1Store::Item_lv2* l_ntvbz = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[VBZ]-verb, 3rd person singular present",
+        "VBZ-verb, 3rd person singular present",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6411,13 +6697,13 @@ void M1Env::GraphInit::init_base(){
     l_ntvbz->setType("TYPE_");
     l_ntvbz->setType("NLTAG");
 
-    // creation of "[WDT]-wh-determiner"
-    qCDebug(g_cat_silence) << QString("Creating <[NTWDT]-[WDT]-wh-determiner> item");
+    // creation of "WDT-wh-determiner"
+    qCDebug(g_cat_silence) << QString("Creating <[NTWDT]-WDT-wh-determiner> item");
     M1Store::Item_lv2* l_ntwdt = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[WDT]-wh-determiner",
+        "WDT-wh-determiner",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6427,13 +6713,13 @@ void M1Env::GraphInit::init_base(){
     l_ntwdt->setType("TYPE_");
     l_ntwdt->setType("NLTAG");
 
-    // creation of "[WP]-wh-pronoun, personal"
-    qCDebug(g_cat_silence) << QString("Creating <[NTGWP]-[WP]-wh-pronoun, personal> item");
+    // creation of "WP-wh-pronoun, personal"
+    qCDebug(g_cat_silence) << QString("Creating <[NTGWP]-WP-wh-pronoun, personal> item");
     M1Store::Item_lv2* l_ntgwp = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[WP]-wh-pronoun, personal",
+        "WP-wh-pronoun, personal",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6443,13 +6729,13 @@ void M1Env::GraphInit::init_base(){
     l_ntgwp->setType("TYPE_");
     l_ntgwp->setType("NLTAG");
 
-    // creation of "[WP$]-wh-pronoun, possessive"
-    qCDebug(g_cat_silence) << QString("Creating <[NTWP$]-[WP$]-wh-pronoun, possessive> item");
+    // creation of "WP$-wh-pronoun, possessive"
+    qCDebug(g_cat_silence) << QString("Creating <[NTWP$]-WP$-wh-pronoun, possessive> item");
     M1Store::Item_lv2* l_ntwp$ = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[WP$]-wh-pronoun, possessive",
+        "WP$-wh-pronoun, possessive",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6459,13 +6745,13 @@ void M1Env::GraphInit::init_base(){
     l_ntwp$->setType("TYPE_");
     l_ntwp$->setType("NLTAG");
 
-    // creation of "[WRB]-wh-adverb"
-    qCDebug(g_cat_silence) << QString("Creating <[NTWRB]-[WRB]-wh-adverb> item");
+    // creation of "WRB-wh-adverb"
+    qCDebug(g_cat_silence) << QString("Creating <[NTWRB]-WRB-wh-adverb> item");
     M1Store::Item_lv2* l_ntwrb = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[WRB]-wh-adverb",
+        "WRB-wh-adverb",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6475,13 +6761,13 @@ void M1Env::GraphInit::init_base(){
     l_ntwrb->setType("TYPE_");
     l_ntwrb->setType("NLTAG");
 
-    // creation of "[SP]-space (English), sentence-final particle (Chinese)"
-    qCDebug(g_cat_silence) << QString("Creating <[NTGSP]-[SP]-space (English), sentence-final particle (Chinese)> item");
+    // creation of "SP-space (English), sentence-final particle (Chinese)"
+    qCDebug(g_cat_silence) << QString("Creating <[NTGSP]-SP-space (English), sentence-final particle (Chinese)> item");
     M1Store::Item_lv2* l_ntgsp = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[SP]-space (English), sentence-final particle (Chinese)",
+        "SP-space (English), sentence-final particle (Chinese)",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6491,13 +6777,13 @@ void M1Env::GraphInit::init_base(){
     l_ntgsp->setType("TYPE_");
     l_ntgsp->setType("NLTAG");
 
-    // creation of "[ADD]-email"
-    qCDebug(g_cat_silence) << QString("Creating <[NTADD]-[ADD]-email> item");
+    // creation of "ADD-email"
+    qCDebug(g_cat_silence) << QString("Creating <[NTADD]-ADD-email> item");
     M1Store::Item_lv2* l_ntadd = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[ADD]-email",
+        "ADD-email",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6507,13 +6793,13 @@ void M1Env::GraphInit::init_base(){
     l_ntadd->setType("TYPE_");
     l_ntadd->setType("NLTAG");
 
-    // creation of "[NFP]-superfluous punctuation"
-    qCDebug(g_cat_silence) << QString("Creating <[NTNFP]-[NFP]-superfluous punctuation> item");
+    // creation of "NFP-superfluous punctuation"
+    qCDebug(g_cat_silence) << QString("Creating <[NTNFP]-NFP-superfluous punctuation> item");
     M1Store::Item_lv2* l_ntnfp = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[NFP]-superfluous punctuation",
+        "NFP-superfluous punctuation",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6523,13 +6809,13 @@ void M1Env::GraphInit::init_base(){
     l_ntnfp->setType("TYPE_");
     l_ntnfp->setType("NLTAG");
 
-    // creation of "[GW]-additional word in multi-word expression"
-    qCDebug(g_cat_silence) << QString("Creating <[NTGGW]-[GW]-additional word in multi-word expression> item");
+    // creation of "GW-additional word in multi-word expression"
+    qCDebug(g_cat_silence) << QString("Creating <[NTGGW]-GW-additional word in multi-word expression> item");
     M1Store::Item_lv2* l_ntggw = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[GW]-additional word in multi-word expression",
+        "GW-additional word in multi-word expression",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6539,13 +6825,13 @@ void M1Env::GraphInit::init_base(){
     l_ntggw->setType("TYPE_");
     l_ntggw->setType("NLTAG");
 
-    // creation of "[XX]-unknown"
-    qCDebug(g_cat_silence) << QString("Creating <[NTGXX]-[XX]-unknown> item");
+    // creation of "XX-unknown"
+    qCDebug(g_cat_silence) << QString("Creating <[NTGXX]-XX-unknown> item");
     M1Store::Item_lv2* l_ntgxx = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[XX]-unknown",
+        "XX-unknown",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6555,13 +6841,13 @@ void M1Env::GraphInit::init_base(){
     l_ntgxx->setType("TYPE_");
     l_ntgxx->setType("NLTAG");
 
-    // creation of "[BES]-auxiliary “be”"
-    qCDebug(g_cat_silence) << QString("Creating <[NTBES]-[BES]-auxiliary “be”> item");
+    // creation of "BES-auxiliary “be”"
+    qCDebug(g_cat_silence) << QString("Creating <[NTBES]-BES-auxiliary “be”> item");
     M1Store::Item_lv2* l_ntbes = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[BES]-auxiliary “be”",
+        "BES-auxiliary “be”",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6571,13 +6857,13 @@ void M1Env::GraphInit::init_base(){
     l_ntbes->setType("TYPE_");
     l_ntbes->setType("NLTAG");
 
-    // creation of "[HVS]-forms of “have”"
-    qCDebug(g_cat_silence) << QString("Creating <[NTHVS]-[HVS]-forms of “have”> item");
+    // creation of "HVS-forms of “have”"
+    qCDebug(g_cat_silence) << QString("Creating <[NTHVS]-HVS-forms of “have”> item");
     M1Store::Item_lv2* l_nthvs = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[HVS]-forms of “have”",
+        "HVS-forms of “have”",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6587,13 +6873,13 @@ void M1Env::GraphInit::init_base(){
     l_nthvs->setType("TYPE_");
     l_nthvs->setType("NLTAG");
 
-    // creation of "[_SP]-whitespace"
-    qCDebug(g_cat_silence) << QString("Creating <[NT_SP]-[_SP]-whitespace> item");
+    // creation of "_SP-whitespace"
+    qCDebug(g_cat_silence) << QString("Creating <[NT_SP]-_SP-whitespace> item");
     M1Store::Item_lv2* l_ntsp = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[_SP]-whitespace",
+        "_SP-whitespace",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic

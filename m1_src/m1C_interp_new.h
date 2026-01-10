@@ -135,6 +135,8 @@ namespace M1MidPlane{
 
 class Interp : public QObject{
     friend class SlokaInterp;
+    friend class OccurInterp;
+    friend class WfWUnit;
     Q_OBJECT
 private:
     static std::map<M1Env::ItemID, std::shared_ptr<Interp>> cm_interp_map;
@@ -249,12 +251,14 @@ public:
 class WfWUnit : public Interp{
     Q_OBJECT
 public:
+    std::vector<std::shared_ptr<Interp>> m_forms_list;
+public:
     static WfWUnit* getOneIfMatch(M1Store::Item_lv2* p_myself);
 
     WfWUnit(M1Store::Item_lv2* p_myself);
     virtual QString className() {return "WfWUnit";}
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
-    // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
 };
 
 class UrlInterp : public Interp{
@@ -278,12 +282,14 @@ public:
     OccurInterp(M1Store::Item_lv2* p_myself);
     virtual QString className() {return "OccurInterp";}
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
-    // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
     virtual M1Store::Item_lv2* where_to_go(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
 };
 
 class LemmaInterp : public Interp{
     Q_OBJECT
+public:
+    QString m_pos;
 public:
     static LemmaInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
 
@@ -303,7 +309,7 @@ public:
     FormInterp(M1Store::Item_lv2* p_myself);
     virtual QString className() {return "FormInterp";}
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
-    // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
 };
 
 class TranslationBhashya : public Interp{
@@ -332,6 +338,7 @@ private:
 
     std::vector<std::shared_ptr<Interp>> m_translations_list;
     std::vector<std::shared_ptr<Interp>> m_bhashya_list;
+    std::vector<std::shared_ptr<Interp>> m_wfw_list;
 public:
     static SlokaInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
 
