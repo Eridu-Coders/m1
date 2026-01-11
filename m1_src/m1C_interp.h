@@ -116,6 +116,7 @@ public:
 public slots:
     void create_descendant();
     void handleMouseHold();
+    void dbg_interp_cache();
 signals:
     void gotoVertex(M1Store::Item_lv2* p_new_vertex, M1UI::TreeRow* p_sender);
     void emitHtml(const QString& p_html);
@@ -164,7 +165,7 @@ public:
     static void init(){cm_interp_map.clear();}
     static void invalidateAllCaches();
     static std::shared_ptr<Interp> getInterp(M1Store::Item_lv2* p_myself);
-    static QString dbgMapContents();
+    static QString dbgMapContents(bool p_html);
 
     bool isEmpty(){return m_myself == nullptr;}
     QString getHtml(const M1Store::Item_lv2* p_edge);

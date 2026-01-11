@@ -88,9 +88,9 @@ void M1UI::TreeDisplay::addRow(M1Store::Item_lv2* p_root){
     m_root = p_root;
 
     QVector<M1Store::ItemID> l_alrady_traversed;
-    qCDebug(g_cat_tree_display) << "before recur" << m_vb_layout->count() << this->widget()->children().count() << m_tree_row_list.count();
+    qCDebug(g_cat_tmp_spotlight) << "before recur" << m_vb_layout->count() << this->widget()->children().count() << m_tree_row_list.count();
     M1UI::TreeRow* l_auto_edge_row = addRowRecur(p_root, 0, l_alrady_traversed);
-    qCDebug(g_cat_tree_display) << "after recur" << m_vb_layout->count() << this->widget()->children().count() << m_tree_row_list.count();
+    qCDebug(g_cat_tmp_spotlight) << "after recur" << m_vb_layout->count() << this->widget()->children().count() << m_tree_row_list.count();
 
     m_vb_layout->addStretch();
     qCDebug(g_cat_tree_display) << "after stretch" << m_vb_layout->count() << this->widget()->children().count() << m_tree_row_list.count();

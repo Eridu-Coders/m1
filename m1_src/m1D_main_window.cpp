@@ -19,7 +19,8 @@ Q_LOGGING_CATEGORY(g_cat_main_window, "main_window")
 void loadWords(){}
 
 const int HTML_TAB_INDEX = 0;
-const int EDIT_TAB_INDEX = 2;
+const int EDIT_TAB_INDEX = 1;
+// const int EDIT_TAB_INDEX = 2;
 const int INIT_SIZE_X = 1200;
 const int INIT_SIZE_Y = 1000;
 
@@ -78,8 +79,8 @@ M1UI::MainWindow::MainWindow(QWidget *p_parent) : QMainWindow(p_parent){
     m_web_view->show();
     m_tab_widget->addTab(m_web_view, "HTML");
 
-    M1UI::TreeDisplay* l_tree_display_right = new M1UI::TreeDisplay(m_central_widget, this);
-    m_tab_widget->addTab(l_tree_display_right, "Tree");
+    // M1UI::TreeDisplay* l_tree_display_right = new M1UI::TreeDisplay(m_central_widget, this);
+    // m_tab_widget->addTab(l_tree_display_right, "Tree");
 
     m_menubar = new QMenuBar(this);
     m_menubar->setObjectName("menubar");

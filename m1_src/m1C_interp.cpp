@@ -128,13 +128,14 @@ QString M1UI::TreeRow::dbgOneLiner(){
 QString M1MidPlane::Interp::dbgOneLinerVirtual(){
     Q_ASSERT_X(m_myself != nullptr, "M1MidPlane::Interp::dbgOneLiner()", "m_myself is null");
 
-    return QString("[Class: %1] %2").arg(this->className()).arg(m_myself->dbgShort());
+    return QString("[%1] %2").arg(this->className()).arg(m_myself->dbgShort().replace(g_re_tags, ""));
 }
 
 /**
  * @brief M1UI::TreeRow::~TreeRow
  */
 M1UI::TreeRow::~TreeRow(){
+    qCDebug(g_cat_tmp_spotlight()) << QString("Use Count: %1").arg(m_target.use_count()) << "Deleting:" << this->dbgOneLiner();
     // sever link btw TreeRow and Interp (m_target) before destruction
     if(m_target != nullptr) m_target->setParent(nullptr);
 }
@@ -409,7 +410,16 @@ void M1UI::TreeRow::contextMenuEvent(QContextMenuEvent *p_event) {
     connect(l_new_descendant_action, &QAction::triggered,
             this,                    &M1UI::TreeRow::create_descendant);
 
+    QAction *l_dbg_Interp_list = l_context_menu.addAction("List Interp Cache");
+    connect(l_dbg_Interp_list, &QAction::triggered,
+            this,              &M1UI::TreeRow::dbg_interp_cache);
+
     l_context_menu.exec(p_event->globalPos());
+}
+
+void M1UI::TreeRow::dbg_interp_cache(){
+    qCDebug(g_cat_tmp_spotlight()) << "dbg_interp_cache";
+    emit emitHtml(M1MidPlane::Interp::dbgMapContents(true));
 }
 
 /**
@@ -491,9 +501,13 @@ std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_
     // qCDebug(g_cat_interp_base).noquote() << M1MidPlane::Interp::dbgMapContents();
     // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
 
+    int l_use_count_ret = 0;
+    int l_use_count_map = 0;
     auto l_it = cm_interp_map.find(p_myself->item_id());
     if(l_it != cm_interp_map.end()){
+        l_use_count_map = l_it->second.use_count();
         l_ret = l_it->second;
+        l_use_count_ret = l_ret.use_count();
         // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
         // qCDebug(g_cat_interp_base) << "after cache lookup : Exists";
     }
@@ -524,6 +538,7 @@ std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_
 
         // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
         l_ret = std::shared_ptr<M1MidPlane::Interp>(l_interp_raw);
+        l_use_count_ret = l_ret.use_count();
         // qCDebug(g_cat_interp_base) << QString("l_ret one-liner: %1").arg(l_ret->dbgOneLiner());
         // qCDebug(g_cat_interp_base) << "C";
         // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
@@ -536,6 +551,9 @@ std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_
 
     // qCDebug(g_cat_interp_base).noquote() << M1MidPlane::Interp::dbgMapContents();
 
+    qCDebug(g_cat_tmp_spotlight()).noquote() << "Found:" << (l_it == cm_interp_map.end() ? "false" : "true") <<
+        QString("Use Count: %1/%2").arg(l_use_count_map).arg(l_use_count_ret) << l_ret->dbgOneLiner();
+
     M1_FUNC_EXIT
     return l_ret;
 }
@@ -546,17 +564,32 @@ M1MidPlane::Interp::~Interp(){
 
 std::map<M1Env::ItemID, std::shared_ptr<M1MidPlane::Interp>> M1MidPlane::Interp::cm_interp_map;
 
-QString M1MidPlane::Interp::dbgMapContents(){
+QString M1MidPlane::Interp::dbgMapContents(bool p_html){
+    qCDebug(g_cat_tmp_spotlight()) << "dbgMapContents";
+
     QStringList l_ret;
-    l_ret.append(QString("cm_interp_map [%1] contents:").arg(cm_interp_map.size()));
-    for(const auto& l_pair : cm_interp_map){
-        // qCDebug(g_cat_interp_base) << "Key:" << l_pair.first << "Value:" << (l_pair.second == nullptr ? "null" : "not null") << "Use Count:" << l_pair.second.use_count();
-        l_ret.append(QString("%1: (use count: %2) %3")
+
+    QString l_row_template;
+    if(p_html){
+        l_row_template = "<tr class=\"technical\"><td>%1:</td><td>(use count: %2)</td><td>%3</td></tr>";
+        l_ret.append(QString("<p class=\"technical\">cm_interp_map [%1] contents:</p>\n<table>").arg(cm_interp_map.size()));
+    }
+    else{
+        l_row_template = "%1: (use count: %2) %3";
+        l_ret.append(QString("cm_interp_map [%1] contents:").arg(cm_interp_map.size()));
+    }
+
+    for(const auto& l_pair : cm_interp_map)
+        l_ret.append(QString(l_row_template)
                          .arg(l_pair.first, 6)
                          .arg(l_pair.second != nullptr ? QString("%1").arg(l_pair.second.use_count()) : "NA")
                          .arg(l_pair.second != nullptr ? l_pair.second->dbgOneLiner() : "WARNING: nullptr"));
+
+    if(p_html){
+        l_ret.append("</table>");
+        return cm_html_template.arg(l_ret.join("\n"));
     }
-    return l_ret.join("\n");
+    else return l_ret.join("\n");
 }
 
 QString M1MidPlane::Interp::cm_html_template =

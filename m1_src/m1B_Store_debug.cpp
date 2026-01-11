@@ -171,10 +171,10 @@ void M1Store::StorageStatic::dbgDump(){
     dbgSpecialDump();
 
     // dump items --------------------------------------------------------------
-    dbgItemsDump();
+    // dbgItemsDump();
 
     // dump vertices --------------------------------------------------------------
-    dbgVerticesDump();
+    // dbgVerticesDump();
 
     // tree dump --------------------------------------------------------------
     // Item_lv2::dbgRecurGraphStart(getSpecialItemPointer("ROOT_")->itemId());
