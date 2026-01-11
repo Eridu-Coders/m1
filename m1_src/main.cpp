@@ -7,7 +7,7 @@
 #include "m1B_tei_interface.h"
 #include "m1B_store.h"
 #include "m1B_graph_init.h"
-#include "m1C_interp_new.h"
+#include "m1C_interp.h"
 
 #include <boost/program_options.hpp>
 #include <string>

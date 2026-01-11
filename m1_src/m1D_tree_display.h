@@ -9,7 +9,7 @@
 #include <QGraphicsItem>
 
 #include "m1B_lv2_item.h"
-#include "m1C_interp_new.h"
+#include "m1C_interp.h"
 #include "m1D_main_window.h"
 
 namespace M1UI{

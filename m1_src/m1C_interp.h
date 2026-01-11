@@ -11,6 +11,22 @@
 #include <QTimer>
 #include <QTextEdit>
 
+#include <memory>
+
+namespace M1MidPlane{
+    class Interp;
+}
+
+namespace M1UI{
+
+class TreeDisplay;
+
+/*
+class InterpStaticConstructor{
+public:
+    InterpStaticConstructor();
+};
+*/
 class FocusEventsBlocker : public QObject
 {
     Q_OBJECT
@@ -28,73 +44,15 @@ protected:
     }
 };
 
-
-namespace M1MidPlane{
-    class Interp;
-}
-
-namespace M1UI{
-
-class TreeDisplay;
-
-class InterpProxyWidget : public QWidget{
-        Q_OBJECT
-private:
-    M1MidPlane::Interp* m_main_instance;
-public:
-    InterpProxyWidget(M1MidPlane::Interp* p_main_instance, QWidget* p_parent) : QWidget(p_parent){m_main_instance = p_main_instance;}
-    //~InterpProxyWidget();
-
-    virtual void paintEvent(QPaintEvent* p_event);
-    virtual void resizeEvent(QResizeEvent *p_event);
-    virtual void mouseDoubleClickEvent(QMouseEvent *p_event);
-    virtual void mousePressEvent(QMouseEvent *p_event);
-    virtual void mouseReleaseEvent(QMouseEvent *p_event);
-    virtual void focusOutEvent(QFocusEvent *p_event);
-    virtual void focusInEvent(QFocusEvent *p_event);
-    virtual void contextMenuEvent(QContextMenuEvent *p_event);
-
-    virtual void dragEnterEvent(QDragEnterEvent *p_event);
-    virtual void dragMoveEvent(QDragMoveEvent *p_event);
-    virtual void dragLeaveEvent(QDragLeaveEvent *p_event);
-    virtual void dropEvent(QDropEvent *p_event);
-};
-
-}
-
-namespace M1MidPlane{
-/*
-class InterpStaticConstructor{
-public:
-    InterpStaticConstructor();
-};
-*/
-
-class Interp : public QObject
-{
+class TreeRow : public QWidget{
     Q_OBJECT
-    friend class TranslUnit;
-    friend class FieldInterp;
-    friend class AutoInterp;
-    friend class SectionBeginEnd;
-    friend class ChunkInterp;
-    friend class UrlInterp;
-    friend class BhashyaTranslation;
-    friend class TextInterp;
-    friend class TextOccurrence;
-    friend class SentenceInterp;
-    friend class BookInterp;
-    friend class HighlightChunkInterp;
-    friend class HighlightInterp;
-    friend class SlokaInterp;
-    friend class HighlightQuotationInterp;
     // friend class InterpStaticConstructor;
 private:
     static QIcon cm_open;
     static QIcon cm_closed;
-    static QList<M1Store::Item_lv2*> cm_gratt;
+    // static QList<M1Store::Item_lv2*> cm_gratt;
+    static std::vector<TreeRow*> cm_row_list;
 
-    // M1Store::Item_lv2* m_myself;
     int m_depth;
     int m_target_height;
     int m_target_baseline;
@@ -103,34 +61,36 @@ private:
     int m_oc_x;
 
     M1UI::TreeDisplay* m_td_parent;
-    M1UI::InterpProxyWidget* m_proxy;
 
     bool m_drag_top = false;
     bool m_drag_bottom = false;
     bool m_block_emit = false;
 
+    const int HOLD_DELAY = 800;
+
     QTimer m_hold_timer;
 
-    QTextEdit* m_text_edit = nullptr;
-protected:
-    M1Store::Item_lv2* m_myself;
+    M1Store::Item_lv2* m_edge;
+    std::shared_ptr<M1MidPlane::Interp> m_target;
 
-    void paintOC(QPainter& p);
-    virtual QString getHtml();
-    virtual QString inTreeDisplayText();
-    virtual bool displayOpenClose(){ return true; }
-    virtual QIcon* edgeIcon();
-    virtual QIcon* vertexIcon();
+    QString m_html_cache;
 
+    void paintOpenClose(QPainter& p);
     void initiateDrag();
     void emitSignals();
+    void invalidateCache();
     // static InterpStaticConstructor cm_the_init;
 public:
     static void init();
-    static Interp* getInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
+    static TreeRow* getTreeRow(M1Store::Item_lv2* p_edge, M1UI::TreeDisplay* p_parent, int p_depth);
+    static void invalidateAllCaches();
+    static void clear_row_list(){cm_row_list.clear();}
 
-    Interp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_tree, int p_depth);
-    ~Interp();
+    TreeRow(M1Store::Item_lv2* p_edge, M1UI::TreeDisplay* p_tree, int p_depth);
+    ~TreeRow();
+
+    void blockFocusEvents();
+    void performPostUpdate();
 
     virtual void paintEvent(QPaintEvent* p_event);
     virtual void resizeEvent(QResizeEvent *p_event);
@@ -146,23 +106,18 @@ public:
     virtual void dragLeaveEvent(QDragLeaveEvent *p_event);
     virtual void dropEvent(QDropEvent *p_event);
 
-    virtual void setFocus(Qt::FocusReason p_reason){m_proxy->setFocus(p_reason);}
-
-    // virtual void mouseMoveEvent(QMouseEvent *p_event);
-    virtual QWidget *get_edit_widget();
-
-    void deleteProxy();
-    void invalidateProxy();
     void restore_acept_drops();
-    void blockFocusEvents();
+    M1Store::Item_lv2* where_to_go();
+    // virtual void mouseMoveEvent(QMouseEvent *p_event);
 
-    virtual QString dbgString(){return "Interp for: " + m_myself->dbgShort();}
+    // void deleteProxy();
+    // void invalidateProxy();
+    QString dbgOneLiner();
 public slots:
     void create_descendant();
     void handleMouseHold();
-    void save_text_edit();
 signals:
-    void gotoVertex(M1Store::Item_lv2* p_new_vertex, M1MidPlane::Interp* p_sender);
+    void gotoVertex(M1Store::Item_lv2* p_new_vertex, M1UI::TreeRow* p_sender);
     void emitHtml(const QString& p_html);
     void emitEdit(QWidget *p_edit_widget);
 };
@@ -171,213 +126,227 @@ class Drag : public QDrag{
 private:
     M1UI::TreeDisplay* m_td_parent;
 public:
-    Drag(Interp* p_source, M1UI::TreeDisplay* p_td_parent) : QDrag(p_source){m_td_parent = p_td_parent;}
+    Drag(TreeRow* p_source, M1UI::TreeDisplay* p_td_parent) : QDrag(p_source){m_td_parent = p_td_parent;}
     virtual ~Drag();
 };
 
-class AutoInterp : public Interp
-{
-    Q_OBJECT
-public:
-    static bool wantIt(M1Store::Item_lv2* p_myself);
+} // namespace M1MidPlane
+namespace M1MidPlane{
 
-    virtual QString getHtml();
-    AutoInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    virtual void paintEvent(QPaintEvent* p_event);
-    virtual bool displayOpenClose(){ return false; }
-    virtual QString dbgString(){return "AutoInterp for: " + m_myself->dbgShort();}
-};
-
-class FieldInterp : public Interp
-{
-    Q_OBJECT
-public:
-    static bool wantIt(M1Store::Item_lv2* p_myself);
-
-    virtual QIcon* edgeIcon();
-    virtual QIcon* vertexIcon();
-    virtual QString getHtml();
-    FieldInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    virtual QString inTreeDisplayText();
-    virtual void paintEvent(QPaintEvent* p_event);
-};
-
-class TranslUnit : public Interp
-{
-    Q_OBJECT
-public:
-    static bool wantIt(M1Store::Item_lv2* p_myself);
-
-    virtual QString getHtml();
-    TranslUnit(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    virtual QString inTreeDisplayText();
-    // virtual void paintEvent(QPaintEvent* p_event);
-};
-
-class ChunkInterp : public Interp
-{
-    Q_OBJECT
-public:
-    static bool wantIt(M1Store::Item_lv2* p_myself);
-
-    ChunkInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    virtual QString getHtml();
-    // virtual QString displayText();
-    // virtual void paintEvent(QPaintEvent* p_event);
-};
-
-class SlokaInterp : public Interp
-{
-    Q_OBJECT
-public:
-    static bool wantIt(M1Store::Item_lv2* p_myself);
-
-    SlokaInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    virtual QString getHtml();
-    // virtual QString displayText();
-    // virtual void paintEvent(QPaintEvent* p_event);
-};
-
-class UrlInterp : public Interp
-{
+class Interp : public QObject{
+    friend class SlokaInterp;
+    friend class OccurInterp;
+    friend class WfWUnit;
     Q_OBJECT
 private:
-    QString m_label;
-    QString m_url;
+    static std::map<M1Env::ItemID, std::shared_ptr<Interp>> cm_interp_map;
+
+    QTextEdit* m_text_edit = nullptr;
+    M1UI::TreeRow* m_tree_row = nullptr;
+
+    QString m_dbgOneLinerCache;
+protected:
+    M1Store::Item_lv2* m_myself  = nullptr;
+    static QString cm_html_template;
+
+    Interp();
+    Interp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "BaseInterp";}
+    void invalidateCache();
+
+    QString base_html_fragment();
+    QString base_edge_html_fragment(const M1Store::Item_lv2* p_edge);
+
+    // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
+    virtual QString dbgOneLinerVirtual();
 public:
-    static bool wantIt(M1Store::Item_lv2* p_myself);
+    static void init(){cm_interp_map.clear();}
+    static void invalidateAllCaches();
+    static std::shared_ptr<Interp> getInterp(M1Store::Item_lv2* p_myself);
+    static QString dbgMapContents();
 
-    UrlInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    virtual QString getHtml();
-    // virtual void paintEvent(QPaintEvent* p_event);
-};
+    bool isEmpty(){return m_myself == nullptr;}
+    QString getHtml(const M1Store::Item_lv2* p_edge);
+    void setParent(M1UI::TreeRow* p_tree_row){m_tree_row = p_tree_row;}
 
-class BhashyaTranslation : public Interp
-{
-    Q_OBJECT
-public:
-    static bool wantIt(M1Store::Item_lv2* p_myself);
-
-    BhashyaTranslation(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    virtual QString getHtml();
-    virtual QString inTreeDisplayText();
-    // virtual void paintEvent(QPaintEvent* p_event);
-};
-
-class TextInterp : public Interp
-{
-    Q_OBJECT
-public:
-    static bool wantIt(M1Store::Item_lv2* p_myself);
-
-    TextInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    virtual QString getHtml();
-    // virtual void paintEvent(QPaintEvent* p_event);
-};
-
-class SectionBeginEnd : public Interp
-{
-    Q_OBJECT
-public:
-    static bool wantIt(M1Store::Item_lv2* p_myself);
-    virtual QString getHtml();
-
-    SectionBeginEnd(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    virtual QString inTreeDisplayText();
-    // virtual void paintEvent(QPaintEvent* p_event);
-};
-
-class TextOccurrence : public Interp
-{
-    Q_OBJECT
-public:
-    static bool wantIt(M1Store::Item_lv2* p_myself);
-
-    virtual QString getHtml();
-    TextOccurrence(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    virtual QString inTreeDisplayText();
-    // virtual void paintEvent(QPaintEvent* p_event);
-};
-
-class TextLemma : public Interp
-{
-    Q_OBJECT
-public:
-    static bool wantIt(M1Store::Item_lv2* p_myself);
-
-    virtual QString getHtml();
-    TextLemma(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    // virtual QString displayText();
-    // virtual void paintEvent(QPaintEvent* p_event);
-};
-
-class TextWForm : public Interp
-{
-    Q_OBJECT
-public:
-    static bool wantIt(M1Store::Item_lv2* p_myself);
-
-    virtual QString getHtml();
-    TextWForm(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    // virtual QString displayText();
-    // virtual void paintEvent(QPaintEvent* p_event);
-};
-
-
-class SentenceInterp : public ChunkInterp
-{
-    Q_OBJECT
-public:
-    static bool wantIt(M1Store::Item_lv2* p_myself);
-    static QString occur_to_text(const M1Store::Item_lv2* p_occur_edge);
-
-    SentenceInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    virtual QString getHtml();
     virtual QWidget *get_edit_widget();
+    virtual bool displayOpenClose(){ return true; }
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QIcon* edgeIcon(const M1Store::Item_lv2* p_edge);
+    virtual QIcon* vertexIcon(const M1Store::Item_lv2* p_edge);
+    virtual void createDescendant(M1Store::SpecialItem* p_new_edge_type, M1Store::SpecialItem* p_new_vertex_type);
+    virtual M1Store::Item_lv2* where_to_go(const M1Store::Item_lv2* p_edge);
+
+    QString dbgOneLiner(){
+        m_dbgOneLinerCache = dbgOneLinerVirtual();
+        return m_dbgOneLinerCache;
+    }
+    ~Interp();
+public slots:
+    void save_text_edit();
 };
 
-class BookInterp : public ChunkInterp
-{
+/*
+class AutoInterp : public Interp{
     Q_OBJECT
 public:
-    static bool wantIt(M1Store::Item_lv2* p_myself);
+    static AutoInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
 
-    BookInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    virtual QString getHtml();
+    AutoInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "AutoInterp";}
+    // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
+    // virtual void paintEvent(QPaintEvent* p_event);
+    virtual bool displayOpenClose(){ return false; }
 };
+*/
 
-class HighlightChunkInterp : public Interp
-{
+class FieldInterp : public Interp{
     Q_OBJECT
 public:
-    static bool wantIt(M1Store::Item_lv2* p_myself);
+    static FieldInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
 
-    HighlightChunkInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    virtual QString inTreeDisplayText();
-    virtual QString getHtml();
+    FieldInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "FieldInterp";}
+    virtual QIcon* edgeIcon(const M1Store::Item_lv2* p_edge);
+    virtual QIcon* vertexIcon(const M1Store::Item_lv2* p_edge=nullptr);
+    virtual bool displayOpenClose(){ return false; }
+    // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    // virtual void paintEvent(QPaintEvent* p_event);
 };
 
-class HighlightInterp : public Interp
-{
+class TextInterp : public Interp{
     Q_OBJECT
 public:
-    static bool wantIt(M1Store::Item_lv2* p_myself);
+    static TextInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
 
-    HighlightInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    virtual QString inTreeDisplayText();
-    virtual QString getHtml();
+    TextInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "TextInterp";}
+    // virtual QIcon* edgeIcon(const M1Store::Item_lv2* p_edge);
+    // virtual QIcon* vertexIcon(const M1Store::Item_lv2* p_edge=nullptr);
+    // virtual bool displayOpenClose(){ return false; }
+    // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
+    // virtual void paintEvent(QPaintEvent* p_event);
 };
 
-class HighlightQuotationInterp : public Interp
-{
+class RoleInterp : public Interp{
+    Q_OBJECT
+private:
+    std::shared_ptr<Interp> m_author;
+
+//    M1Store::Item_lv2* getlUtimateTarget(const M1Store::Item_lv2* p_edge);
+public:
+    static RoleInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    RoleInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "RoleInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QIcon* vertexIcon(const M1Store::Item_lv2* p_edge=nullptr);
+    // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
+};
+
+class WfWUnit : public Interp{
     Q_OBJECT
 public:
-    static bool wantIt(M1Store::Item_lv2* p_myself);
+    std::vector<std::shared_ptr<Interp>> m_forms_list;
+public:
+    static WfWUnit* getOneIfMatch(M1Store::Item_lv2* p_myself);
 
-    HighlightQuotationInterp(M1Store::Item_lv2* p_myself, QVBoxLayout* p_vb, M1UI::TreeDisplay* p_parent, int p_depth);
-    virtual QString inTreeDisplayText();
-    virtual QString getHtml();
+    WfWUnit(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "WfWUnit";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
 };
 
-}
+class UrlInterp : public Interp{
+    Q_OBJECT
+public:
+    static UrlInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    UrlInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "UrlInterp";}
+    // virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
+};
+
+class OccurInterp : public Interp{
+    Q_OBJECT
+private:
+    std::shared_ptr<Interp> m_target;
+public:
+    static OccurInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    OccurInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "OccurInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual M1Store::Item_lv2* where_to_go(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
+};
+
+class LemmaInterp : public Interp{
+    Q_OBJECT
+public:
+    QString m_pos;
+public:
+    static LemmaInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    LemmaInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "LemmaInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    // virtual QString getHtmlVirtual(const M1Store::Item_lv2* p_edge);
+};
+
+class FormInterp : public Interp{
+    Q_OBJECT
+private:
+    std::shared_ptr<Interp> m_lemma;
+public:
+    static FormInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    FormInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "FormInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
+};
+
+class TranslationBhashya : public Interp{
+    Q_OBJECT
+private:
+    QString m_language;
+    std::shared_ptr<Interp> m_author_1 = nullptr; // RoleInterp both
+    std::shared_ptr<Interp> m_author_2 = nullptr;
+public:
+    static TranslationBhashya* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    TranslationBhashya(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "TranslationBhashya";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
+};
+
+class SlokaInterp : public Interp{
+    Q_OBJECT
+private:
+    int m_chapter_num;
+    int m_sloka_num;
+
+    QString m_sk;
+    QString m_iast;
+
+    std::vector<std::shared_ptr<Interp>> m_translations_list;
+    std::vector<std::shared_ptr<Interp>> m_bhashya_list;
+    std::vector<std::shared_ptr<Interp>> m_wfw_list;
+public:
+    static SlokaInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    SlokaInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "SlokaInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
+};
+
+} // namespace M1MidPlane
 #endif // INTERP_H
