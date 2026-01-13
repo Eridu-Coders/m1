@@ -401,6 +401,7 @@ M1MidPlane::SlokaInterp* M1MidPlane::SlokaInterp::getOneIfMatch(M1Store::Item_lv
  * @param p_myself
  */
 M1MidPlane::SlokaInterp::SlokaInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){
+    // Get chapter and Sloka numbers
     m_sloka_num = m_myself->getField(M1Env::TEXT_SLOKA_NUMBER_SIID).toInt();
     M1Store::Item_lv2* l_chapter_edge = m_myself->find_edge_generic(M1Env::BLNGS_SIID, M1Env::TEXT_CHAPTER_SIID);
     if(l_chapter_edge != nullptr)
@@ -408,27 +409,47 @@ M1MidPlane::SlokaInterp::SlokaInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::
     else
         m_chapter_num = -1;
 
+    // get Sanskrit text
     M1Store::Item_lv2* l_sk_edge = m_myself->find_edge_generic(M1Env::OWNS_SIID, M1Env::TEXT_SLOKA_LINE_SIID);
     if(l_sk_edge != nullptr)
         m_sk = l_sk_edge->getTarget_lv2()->text();
 
+    // get IAST translation text
     M1Store::Item_lv2* l_transl_edge = m_myself->find_edge_generic(M1Env::OWNS_SIID, M1Env::TEXT_SLOKA_TRANSLIT_SIID);
     if(l_transl_edge != nullptr)
         m_iast = l_transl_edge->getTarget_lv2()->text();
 
-    for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorTop(M1Env::OWNS_SIID, M1Env::TEXT_SLOKA_TRANSLATION_SIID); !l_it.beyondEnd(); l_it.next())
-        m_translations_list.push_back(getInterp(l_it.at()->getTarget_lv2()));
+    // just to be sure
+    m_initialized = false;
+}
 
-    for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorTop(M1Env::OWNS_SIID, M1Env::TEXT_SLOKA_BHASHYA_SIID); !l_it.beyondEnd(); l_it.next())
-        m_bhashya_list.push_back(getInterp(l_it.at()->getTarget_lv2())); // m_wfw_list
+/**
+ * @brief M1MidPlane::SlokaInterp::initialize
+ *
+ * Here the initialization only deals with vectors (WfW, Translations and Bhashyas)
+ *
+ * Single-value attributes are initialized in the constructor
+ */
+void M1MidPlane::SlokaInterp::initialize(){
+    if(! m_initialized){
+        for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorTop(M1Env::OWNS_SIID, M1Env::TEXT_SLOKA_TRANSLATION_SIID); !l_it.beyondEnd(); l_it.next())
+            m_translations_list.push_back(getInterp(l_it.at()->getTarget_lv2()));
 
-    for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorTop(M1Env::OWNS_SIID, M1Env::TEXT_WFW_UNIT_SIID); !l_it.beyondEnd(); l_it.next())
-        m_wfw_list.push_back(getInterp(l_it.at()->getTarget_lv2()));
+        for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorTop(M1Env::OWNS_SIID, M1Env::TEXT_SLOKA_BHASHYA_SIID); !l_it.beyondEnd(); l_it.next())
+            m_bhashya_list.push_back(getInterp(l_it.at()->getTarget_lv2())); // m_wfw_list
+
+        for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorTop(M1Env::OWNS_SIID, M1Env::TEXT_WFW_UNIT_SIID); !l_it.beyondEnd(); l_it.next())
+            m_wfw_list.push_back(getInterp(l_it.at()->getTarget_lv2()));
+    }
+    m_initialized = true;
 }
 
 /**
  * @brief M1MidPlane::SlokaInterp::inTreeDisplayText
  * @param p_edge
+ *
+ * Here, initialization is not necessary because only single-value attributes are used
+ *
  * @return
  */
 QString M1MidPlane::SlokaInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
@@ -437,9 +458,14 @@ QString M1MidPlane::SlokaInterp::inTreeDisplayText(const M1Store::Item_lv2* p_ed
 
 /**
  * @brief M1MidPlane::SlokaInterp::getHtmlVirtual
+ *
+ * Here, initialization is necessary because all attributes are used, including the vectors
+ *
  * @return
  */
 QString M1MidPlane::SlokaInterp::getHtmlVirtual(){
+    initialize();
+
     QStringList l_wfw_html_list;
     QStringList l_grammar_html_list;
     for(const std::shared_ptr<Interp>& w: m_wfw_list){

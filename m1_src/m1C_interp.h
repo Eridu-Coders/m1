@@ -117,6 +117,7 @@ public slots:
     void create_descendant();
     void handleMouseHold();
     void dbg_interp_cache();
+    void garbageCollect();
 signals:
     void gotoVertex(M1Store::Item_lv2* p_new_vertex, M1UI::TreeRow* p_sender);
     void emitHtml(const QString& p_html);
@@ -166,6 +167,7 @@ public:
     static void invalidateAllCaches();
     static std::shared_ptr<Interp> getInterp(M1Store::Item_lv2* p_myself);
     static QString dbgMapContents(bool p_html);
+    static void garbageCollect();
 
     bool isEmpty(){return m_myself == nullptr;}
     QString getHtml(const M1Store::Item_lv2* p_edge);
@@ -331,6 +333,7 @@ public:
 class SlokaInterp : public Interp{
     Q_OBJECT
 private:
+    bool m_initialized = false;
     int m_chapter_num;
     int m_sloka_num;
 
@@ -340,6 +343,8 @@ private:
     std::vector<std::shared_ptr<Interp>> m_translations_list;
     std::vector<std::shared_ptr<Interp>> m_bhashya_list;
     std::vector<std::shared_ptr<Interp>> m_wfw_list;
+
+    void initialize();
 public:
     static SlokaInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
 
