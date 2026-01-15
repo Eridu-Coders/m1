@@ -121,7 +121,7 @@ g_header = """<TEI xmlns="http://www.tei-c.org/ns/1.0">
 <titleStmt>
     <title type="main">Bhagavad-gītā</title>
     <title type="alt">श्रीमद् भगवद्गीता</title>
-    <title type="sub">Original Sanskrit text with 3 word-for-word translations, morphological analysis (INRIA), 8 sloka-by-sloka translations and 21 sloka-by-sloka commentaries</title>
+    <title type="sub">Original Sanskrit text with 3 word-for-word translations, morphological analysis (INRIA), 8 sloka-by-sloka translations and 22 sloka-by-sloka commentaries</title>
     <editor role="compiler">Nicolas A. L. Reimen (nicolas.reimen@gmail.com, WhatsApp: +91 9900192517)</editor>
     <author>
         अपौरुषेय__OTHER_AUTHORS__
@@ -144,13 +144,14 @@ g_author_normalize = { # Sri Ramanuja
     'Sri Abhinav Gupta': 'Sri Abhinavagupta'
 }
 
-g_gs_cochonneries = [ #
+g_gs_cochonneries = [ # संप्रेक्ष्य,gazing at
     ('ther</b>y', 'thereby'),
     ('twic</b>orn', 'twice born'),
     ('som</b>ody', 'somebody'),
     ('ric</b>all', 'rice-ball'),
     ('ass</b>led', 'assembled'),
     ('r</b>uke', 'rebuke'),
+    ('संप्रेक्ष्य,gazing at', 'संप्रेक्ष्य gazing at'),
     ('अर्जुन O Arjuna निर्द्वन्द्वः', 'अर्जुन O Arjuna, निर्द्वन्द्वः'),
     ('then शङ्खाः conches', 'then? शङ्खाः conches'),
     # Does not seem to work TODO: look into this
@@ -167,7 +168,7 @@ def space_clean(s):
     return re.sub(rf'[\s{string.punctuation}]+', ' ', s).strip()
 
 
-def do_deterministic_sandhi(s):
+def do_deterministic_sandhi(s): # ḥ t
     return (
         re.sub(r'[aā]-[aā]', 'ā',
         # i + i/ī
@@ -186,6 +187,12 @@ def do_deterministic_sandhi(s):
         re.sub(r'[aā]-(e|ai)', 'ai',
         # a/ā + o/au → au
         re.sub(r'[aā]-(o|au)', 'au',
+        # ḥ t → st
+        re.sub(r'ḥ-t', r'st',
+        # t + voiced → d
+        re.sub(r'([aāuūṛṝoe])t-([bdg])', r'\1d\2',
+        # t + l → l
+        re.sub(r'([aāuūṛṝoe])t-l', r'\1ll',
         # i/ī + any other vowel → y + vowel
         re.sub(r'[iī]-([aāuūṛṝoe])', r'y\1',
         # u/ū + any other vowel → v + vowel
@@ -196,14 +203,18 @@ def do_deterministic_sandhi(s):
         re.sub(r'e-([aāiīuūṛṝoe])', r'ay\1',
         # ai → āy
         re.sub(r'ay-([aāiīuūṛṝoe])', r'āy\1',
+        # an → ann
+        re.sub(r'an-([aāiīuūṛṝoe])', r'ann\1',
         # o → av
         re.sub(r'o-([aāiīuūṛṝe])', r'av\1',
         # au → āv
         re.sub(r'au-([aāiīuūṛṝoe])', r'āv\1',
         # aḥ + voiced (non a) → o
         re.sub(r'aḥ-([bgdvmnliīuūṛṝoe])', r'o\1',
+        # aḥ + a → r
+        re.sub(r'([aāiīuūṛṝoe])ḥ-([aā])', r'\1r\2',
         s
-    ))))))))))))))))))
+    )))))))))))))))))))))))
 
 def iast_cleanup(s):
     # to preserve the apostrophe for ऽ
@@ -246,7 +257,9 @@ def iast_cleanup(s):
 def simplify_iast(s):  # ans
     return (s
             .replace('ṃm', 'mm')
+            .replace('nn', 'ṃn')
             .replace('ṇ', 'n')
+            .replace('ñ', 'ṃ')
             .replace('anjñ', 'aṃjñ')
             .replace('inh', 'iṃh')
             .replace('ank', 'aṃk')
@@ -285,6 +298,7 @@ def add_candidates(p_k):
 
                         # initial consonants
                         re.sub(r'( |^)ś(.)', r'\1c\2', p_k),
+                        re.sub(r'( |^)s(.)', r'\1\2', p_k),
                         re.sub(r'( |^)ś(.)', r'\1\2', p_k),
                         re.sub(r'( |^)c(.)', r'\1\2', p_k),
                         re.sub(r'( |^)r(.)', r'\1\2', p_k),
@@ -316,7 +330,14 @@ def add_candidates(p_k):
                         re.sub(r'(.)t( |$)', r'\1d\2', p_k),
                         re.sub(r'(.)t( |$)', r'\1j\2', p_k),
                         re.sub(r'(.)t( |$)', r'\1n\2', p_k),
+                        re.sub(r'(.)t( |$)', r'\1l\2', p_k),
+                        re.sub(r'(.)ṭ( |$)', r'\1ṇ\2', p_k),
                         re.sub(r'(.)d( |$)', r'\1c\2', p_k),
+                        re.sub(r'(.)k( |$)', r'\1g\2', p_k),
+
+                        # ktiḥ ktim
+                        re.sub(r'(.)ktiḥ( |$)', r'\1kitar\2', p_k),
+                        re.sub(r'(.)ktim( |$)', r'\1kitam\2', p_k),
                         ]
     return list(set(l_list_candidate))
 
@@ -364,8 +385,10 @@ def universal_cleanup(s):
 def cleanup_add_br(s):
     return universal_cleanup(re.sub(r'\n', r'<br/>', s))
 
-def author_key(s):
-    return re.sub(f'[{string.punctuation}]+', '', universal_cleanup(s).lower()).replace(' ', '_')
+def author_key(p_author, p_language):
+    l_author_clean = re.sub(f'[{string.punctuation}]+', '', universal_cleanup(p_author).lower()).replace(' ', '_')
+    l_language_clean = re.sub(f'[{string.punctuation}]+', '', universal_cleanup(p_language).lower()).replace(' ', '_')
+    return f'{l_author_clean}-{l_language_clean}'
 
 def record_grammar(p_gr_list):
     global g_count_grammar
@@ -378,6 +401,7 @@ def record_grammar(p_gr_list):
     g_grammar_values.setdefault(l_bg, dict())
     for l_gr_item in p_gr_list[1:]:
         if ' ' in l_gr_item:
+            print('*** space in l_gr_item ***')
             print('l_gr:     ', l_gr_item, file=sys.stderr)
             print('p_gr_list:', p_gr_list, file=sys.stderr)
             sys.exit(0)
@@ -400,6 +424,7 @@ def record_grammar(p_gr_list):
             g_voice_values[l_voice] = g_voice_values.setdefault(l_voice, 0) + 1
 
         if g_count_grammar > 10000000:
+            print('*** g_count_grammar > 10000000 ***', file=sys.stderr)
             dump_grammar_values()
             sys.exit(0)
 
@@ -721,7 +746,7 @@ if __name__ == '__main__':
         l_verse_count = int(l_chap['verses_count'])
         l_chap_number = int(l_chap['chapter_number'])
 
-        if l_chap_number == 5:
+        if l_chap_number == 9:
             break
 
         # TEI chapter start (<div1>)
@@ -734,6 +759,7 @@ if __name__ == '__main__':
 
         for l_verse_number in range(1, l_verse_count + 1):
             l_verse_id = f'BG_{l_chap_number}.{l_verse_number}'
+            l_verse_tag = f'{l_chap_number}.{l_verse_number}'
 
             # ######################################### GITA SUPERSITE #################################################
             # data from Gita Supersite
@@ -813,7 +839,9 @@ if __name__ == '__main__':
             # IAST transliteration
             l_translit = universal_cleanup(l_json_verse['transliteration'])
             # Word-for-Word translation (API version)
-            l_wfw_api_string = (re.sub(r';$', '', universal_cleanup(l_json_verse['word_meanings']))
+            l_wfw_string_raw = l_json_verse['word_meanings'] # bhajante—worship;mām; dṛiḍha
+            l_wfw_api_string = (re.sub(r';$', '', universal_cleanup(l_wfw_string_raw))
+                                .replace('bhajante—worship;mām; dṛiḍha', 'bhajante—worship; mām—me; dṛiḍha')
                                 .replace('dhṛitarāśhtraḥ', 'dhṛtarāṣṭraḥ')
                                 .replace('kapi-dwajaḥ', 'kapi-dhvajaḥ')
                                 .replace('pariśhuṣhyati—is drying up vepathuḥ', 'pariśhuṣhyati—is drying up; vepathuḥ')
@@ -852,7 +880,7 @@ if __name__ == '__main__':
                             l, z = list(l_type)
                             l_language_local = 'english' if l == 'e' else 'hindi' if l == 'h' else 'sanskrit' if l == 's' else 'unknown language'
                             l_text = universal_cleanup(d[l_type])
-                            l_author_key = author_key(l_author_local)
+                            l_author_key = author_key(l_author_local, l_language_local)
                             if z == 't':
                                 l_local_translations[l_author_key] = [l_author_local, l_language_local, l_text, l_source]
                             else:
@@ -871,13 +899,13 @@ if __name__ == '__main__':
                 l_text = universal_cleanup(t['description'])
                 l_author = author_normalize(universal_cleanup(t['author_name']))
                 l_language = universal_cleanup(t['language'])
-                l_local_translations[author_key(l_author)] = [l_author, l_language, l_text, l_source]
+                l_local_translations[author_key(l_author, l_language)] = [l_author, l_language, l_text, l_source]
 
             for c in l_commentaries:
                 l_text = cleanup_add_br(c['description'])
                 l_author = author_normalize(universal_cleanup(c['author_name']))
                 l_language = universal_cleanup(c['language'])
-                l_local_commentaries[author_key(l_author)] = [l_author, l_language, l_text, l_source]
+                l_local_commentaries[author_key(l_author, l_language)] = [l_author, l_language, l_text, l_source]
 
             # ########################### merge Gita Supersite into local  #############################################
             # Adding commentaries and translations from Gita Supersite to l_local_commentaries/l_local_translations
@@ -930,7 +958,7 @@ if __name__ == '__main__':
                 if l_match_author:
                     l_author_gs = author_normalize(l_match_author.group(1).strip())
                 else:
-                    print('No Author')
+                    print('*** No Author ***')
                     sys.exit(0)
 
                 if l_is_commentary and 'translation' in l_title_gs.lower():
@@ -964,9 +992,9 @@ if __name__ == '__main__':
                         else:
                             l_wfw_gs_string = l_body_gs
 
-                    l_local_commentaries[author_key(l_author_gs)] = [l_author_gs, l_language_gs, l_body_gs, l_source]
+                    l_local_commentaries[author_key(l_author_gs, l_language_gs)] = [l_author_gs, l_language_gs, l_body_gs, l_source]
                 else:
-                    l_local_translations[author_key(l_author_gs)] = [l_author_gs, l_language_gs, l_body_gs, l_source]
+                    l_local_translations[author_key(l_author_gs, l_language_gs)] = [l_author_gs, l_language_gs, l_body_gs, l_source]
 
                 l_gs_count_item += 1
             print(f'Gita Supersite: {l_gs_count_com} commentaries and {l_gs_count_tran} translations')
@@ -1062,7 +1090,17 @@ if __name__ == '__main__':
                 l_sk = l_sk_api_online
 
             # ######################################### WfW comparison and matching ####################################
+            # filling in empty wfw translations in recognized verses
+            if l_verse_tag in ['5.24']:
+                l_wfw_api_list_new = []
+                for l_wfw in l_wfw_api_list:
+                    if len(l_wfw) == 2:
+                        l_wfw_api_list_new.append(l_wfw)
+                        # l_wfw_api_list_new.append([l_wfw[0], ''])
+                l_wfw_api_list = l_wfw_api_list_new
+
             print('====================== Online API wfw ===============================================================')
+            print(l_wfw_string_raw)
             print(l_wfw_api_string)
             for l_wfw in l_wfw_api_list:
                 print(l_wfw)
@@ -1081,9 +1119,9 @@ if __name__ == '__main__':
             try:
                 l_wfw_dict = dict([(iast_cleanup(k), ([space_clean(t.lower())], {space_clean(t.lower())})) for k, t in l_wfw_api_list])
             except ValueError as e:
-                print(e)
+                print(f'{l_verse_tag} *** ValueError ***', e, file=sys.stderr)
                 for l_item in l_wfw_api_list:
-                    print(l_item)
+                    print('*** l_wfw_api_list item:', l_item, file=sys.stderr)
                 sys.exit(0)
 
             for k, t in l_wfw_dict.items():
@@ -1404,7 +1442,6 @@ if __name__ == '__main__':
             #       l_sk_to_test = simplify_iast(l_iast_sk)
             #       print(f'{l_km:30} {l_sk_to_test} {"*" if l_km in l_sk_to_test else ""}')
 
-            l_verse_tag = f'{l_chap_number}.{l_verse_number}'
             l_mod_key_list = []
             for l_key in l_key_list:
                 # indriyasya indriyasya 3.34
@@ -1464,7 +1501,7 @@ if __name__ == '__main__':
                             l_key_found = True
 
                 l_remainder_sk = l_iast_sk_work.replace('_', '').strip()
-                if len(l_remainder_sk) > 0 and l_verse_tag not in ['1.21', '2.31', '3.36', '2.10', '1.28', '4.6']:
+                if len(l_remainder_sk) > 0 and l_verse_tag not in ['1.21', '2.31', '3.36', '2.10', '1.28', '4.6', '6.13', '6.15', '6.28', '6.42']:
                     if l_list_no == 1:
                         print('**RESTART**')
                         l_list_no += 1
@@ -1676,7 +1713,7 @@ if __name__ == '__main__':
                     if re.match('[A-Z]', t[0]):
                         l_wfw_list.append((k, t, [{'form': t.lower(), 'morph': [[[{'entry': t.lower()}], {'grammar-list': ['NPPPN', 'CSNOM-GMASC-NSING']}]]}]))
                     else:
-                        print('Non-empty l_consumable_key')
+                        print('Non-empty l_consumable_key ')
                         # sys.exit(0)
                 else: l_wfw_list.append((k, t, m))
 
@@ -1687,18 +1724,16 @@ if __name__ == '__main__':
                     print(f"    {d['form']}", file=sys.stderr)
                     print_im(d['morph'], p_depth=1, p_out=sys.stderr)
 
-            # ################################ Bhashya/translation Requalification ####################################
+            # ################################ Bhashya/translation Requalification #################################### Sri Shankaracharya
             l_new_dt = dict()
             for l_ak in l_local_translations.keys():
                 l_author, l_language, l_text, l_source = l_local_translations[l_ak]
                 if l_author == 'Sri Shankaracharya' and l_language == 'hindi': #
-                    l_local_commentaries[author_key(l_author)] = (l_author, l_language, l_text, l_source)
-                elif l_author == 'Sri Ramanujacharya' and l_language == 'english':
-                    pass
-                elif l_author == 'Sri Abhinavagupta' and l_language == 'english':
+                    l_local_commentaries[author_key(l_author, l_language)] = (l_author, l_language, l_text, l_source)
+                elif l_author in ['Sri Ramanujacharya', 'Sri Shankaracharya', 'Sri Abhinavagupta'] and l_language == 'english':
                     pass
                 else:
-                    l_new_dt[author_key(l_author)] = (l_author, l_language, l_text, l_source)
+                    l_new_dt[author_key(l_author, l_language)] = (l_author, l_language, l_text, l_source)
 
             l_local_translations = l_new_dt
 

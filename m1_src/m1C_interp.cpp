@@ -414,11 +414,21 @@ void M1UI::TreeRow::contextMenuEvent(QContextMenuEvent *p_event) {
     connect(l_dbg_Interp_list, &QAction::triggered,
             this,              &M1UI::TreeRow::dbg_interp_cache);
 
+    QAction *l_dbg_garbage_collect = l_context_menu.addAction("Garbage Collection");
+    connect(l_dbg_garbage_collect, &QAction::triggered,
+            this,              &M1UI::TreeRow::garbageCollect);
+
     l_context_menu.exec(p_event->globalPos());
 }
 
 void M1UI::TreeRow::dbg_interp_cache(){
     qCDebug(g_cat_tmp_spotlight()) << "dbg_interp_cache";
+    emit emitHtml(M1MidPlane::Interp::dbgMapContents(true));
+}
+
+void M1UI::TreeRow::garbageCollect(){
+    qCDebug(g_cat_tmp_spotlight()) << "Garbage Collection";
+    M1MidPlane::Interp::garbageCollect();
     emit emitHtml(M1MidPlane::Interp::dbgMapContents(true));
 }
 
@@ -590,6 +600,16 @@ QString M1MidPlane::Interp::dbgMapContents(bool p_html){
         return cm_html_template.arg(l_ret.join("\n"));
     }
     else return l_ret.join("\n");
+}
+
+void M1MidPlane::Interp::garbageCollect(){
+    // for (auto it = students.begin(); it != students.end(); )
+    for(auto l_it = cm_interp_map.begin(); l_it != cm_interp_map.end();)
+        if(l_it->second.use_count() == 1){
+            qCDebug(g_cat_tmp_spotlight()) << "Garbage collecting" << l_it->second->dbgOneLiner();
+            l_it = cm_interp_map.erase(l_it);
+        }
+        else ++l_it;
 }
 
 QString M1MidPlane::Interp::cm_html_template =
