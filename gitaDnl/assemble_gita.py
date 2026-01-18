@@ -189,6 +189,8 @@ def do_deterministic_sandhi(s): # ḥ t
         re.sub(r'[aā]-(o|au)', 'au',
         # ḥ t → st
         re.sub(r'ḥ-t', r'st',
+        # śa-sa → ऽśa
+        # re.sub(r'śa-sa', r'ऽśa',
         # t + voiced → d
         re.sub(r'([aāuūṛṝoe])t-([bdg])', r'\1d\2',
         # t + l → l
@@ -235,6 +237,7 @@ def iast_cleanup(s):
           .replace('jirṇāni', 'jīrṇāni')
           .replace('niśicataṃ', 'niścitaṃ')
           .replace('śribhagavān', 'śrībhagavān')
+          # .replace('tejaraṃśasambhavam', 'tejoṃऽśasaṃbhavam')
           .replace('m-j', 'ñj')
           .replace('t-a', 'da')
           .replace('ch', 'c') # to़
@@ -246,28 +249,38 @@ def iast_cleanup(s):
           .replace('śh', 'ś')
           .replace('ch', 'c')
           .replace('ṣh', 'ṣ')
+          .replace('aranś', 'oṃऽś')
+          .replace('araṃś', 'oṃऽś')
           .replace('ऽऽ', 'ऽ')
           .replace('-', '')
+          # re.sub(r'(.)aranś(.)', r'\1oṃऽś\2', p_k),
           # .replace('bhīmābhirakṣitam','bhīṣmābhirakṣitam') TODO review this (sl 1.10) abhirakṣitam? bhīmābhirakṣitam?
           )
          .replace('puruṣariṣabha', 'puruṣarṣabha')
          .replace('bharatariṣabha', 'bharatarṣabha'))  # puruṣariṣabha
 
 
-def simplify_iast(s):  # ans
+def simplify_iast(s):  # ans tś anś ऽśasa anṣ
     return (s
+            .replace('tś', 'cc')
             .replace('ṃm', 'mm')
             .replace('nn', 'ṃn')
             .replace('ṇ', 'n')
             .replace('ñ', 'ṃ')
+            # .replace('śasa', 'ऽśa')
             .replace('anjñ', 'aṃjñ')
             .replace('inh', 'iṃh')
             .replace('ank', 'aṃk')
             .replace('ans', 'aṃs')
+            .replace('amb', 'aṃb')
+            .replace('anś', 'aṃś')
+            .replace('anṣ', 'aṃṣ')
             .replace('ānt', 'āṃt')
             .replace('anj', 'añj')
             .replace('aṃj', 'añj')
             .replace('ṃ', 'm')
+            .replace('ā', 'a')
+            .replace('ū', 'u')
             )
 # श्िच
 def deva_correct(s):
@@ -289,8 +302,11 @@ def add_candidates(p_k):
                         re.sub(r'( |^)ā(.)', r'\1ऽ\2', p_k),
                         re.sub(r' ā(.)', r'ऽ\1', p_k),
                         re.sub(r'^ā(.)', r'ऽ\1', p_k),
+                        re.sub(r'( |^)ā(.)', r'\1\2', p_k),
                         re.sub(r'( |^)u(.)', r'\1o\2', p_k),
                         re.sub(r'( |^)u(.)', r'\1ū\2', p_k),
+                        re.sub(r'( |^)u(.)', r'\1\2', p_k),
+                        re.sub(r'( |^)ū(.)', r'\1\2', p_k),
                         re.sub(r'( |^)i(.)', r'\1e\2', p_k),
                         re.sub(r'( |^)ī(.)', r'\1e\2', p_k),
                         re.sub(r'( |^)i(.)', r'\1ī\2', p_k),
@@ -311,7 +327,7 @@ def add_candidates(p_k):
                         re.sub(r'(.)au( |$)', r'\1āv\2', p_k),
                         re.sub(r'(.)u( |$)', r'\1v\2', p_k),
                         re.sub(r'(.)u( |$)', r'\1\2', p_k),
-                        re.sub(r'(.)i( |$)', r'\1y\2', p_k),
+                        re.sub(r'(.)[iī]( |$)', r'\1y\2', p_k),
                         re.sub(r'(.)i( |$)', r'\1\2', p_k),
 
                         # final consonants
@@ -320,6 +336,7 @@ def add_candidates(p_k):
                         re.sub(r'(.)ḥ( |$)', r'\1r\2', p_k),
                         re.sub(r'(.)ḥ( |$)', r'\1\2', p_k),
                         re.sub(r'(.)aḥ( |$)', r'\1o\2', p_k),
+                        re.sub(r'(.)m( |$)', r'\1\2', p_k),
                         re.sub(r'(.)m( |$)', r'\1ṃ\2', p_k),
                         re.sub(r'(.)m ', r'\1ṃ ', p_k),
                         re.sub(r'(.)m$', r'\1ṃ', p_k),
@@ -334,20 +351,26 @@ def add_candidates(p_k):
                         re.sub(r'(.)ṭ( |$)', r'\1ṇ\2', p_k),
                         re.sub(r'(.)d( |$)', r'\1c\2', p_k),
                         re.sub(r'(.)k( |$)', r'\1g\2', p_k),
+                        re.sub(r'(.)k( |$)', r'\1ṃ\2', p_k),
 
-                        # ktiḥ ktim
+                        # ktiḥ ktim antr ṃ kalp aranś k
                         re.sub(r'(.)ktiḥ( |$)', r'\1kitar\2', p_k),
                         re.sub(r'(.)ktim( |$)', r'\1kitam\2', p_k),
+                        re.sub(r'(.)antr(.)', r'\1aṃtr\2', p_k),
+                        re.sub(r'(.)kalp(.)', r'\1kamp\2', p_k),
+                        re.sub(r'(.)aranś(.)', r'\1oṃऽś\2', p_k),
+                        re.sub(r'aṃśa', r'ṃऽśa', p_k),
                         ]
     return list(set(l_list_candidate))
 
 def add_candidates_alt(p_k):
-    l_list_candidate = [  #
+    l_list_candidate = [  # aṃśa
         re.sub(r'( |^)o(.)', r'\1u\2', p_k),
         re.sub(r'( |^)ṛ(.)', r'\1r\2', p_k),
         re.sub(r'( |^)ā(.)', r'\1\2', p_k),
         re.sub(r'(.)au( |$)', r'\1ā\2', p_k),
         re.sub(r'(.)m( |$)', r'\1n\2', p_k),
+        re.sub(r'(.)ā( |$)', r'\1a\2', p_k),
         re.sub(r'(.)o( |$)', r'\1a\2', p_k),
     ]
     return list(set(l_list_candidate))
@@ -733,6 +756,9 @@ def inria_sloka_words(p_chap_number, p_sloka_num, p_sloka_txt, p_is_fragment=Fal
 
 # ------------- main() -------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
+    print('sambhavam -->', iast_cleanup('sambhavam'), 'saṃbhavam') # do_deterministic_sandhi
+    print('tejaḥ-aṃśa-sambhavam -ddc->', do_deterministic_sandhi('tejaḥ-aṃśa-sambhavam'), 'tejoṃऽśasaṃbhavam')
+    print('tejaḥ-aṃśa-sambhavam -ic-> ', iast_cleanup('tejaḥ-aṃśa-sambhavam'), 'tejoṃऽśasaṃbhavam')
     # chapters block creation ==========================================================================================
     l_indent_prefix = ''
 
@@ -746,7 +772,7 @@ if __name__ == '__main__':
         l_verse_count = int(l_chap['verses_count'])
         l_chap_number = int(l_chap['chapter_number'])
 
-        if l_chap_number == 9:
+        if l_chap_number == 13:
             break
 
         # TEI chapter start (<div1>)
@@ -793,17 +819,36 @@ if __name__ == '__main__':
             l_wfw_gs_list2 = ''
             l_sk_gs = ''
             l_translit_gs = ''
+
+            # v. I (until end of Chap. 11)
+            # <div class="views-field views-field-body"                       ﻿
+            # <p align="center"><font color="#2c44bd" size="4px"><b>मूल श्लोकः</b></font></p>
+            #
+            # <p align="center"><font size="3px">मत्कर्मकृन्मत्परमो मद्भक्तः सङ्गवर्जितः।<br />
+            # <br />
+            # निर्वैरः सर्वभूतेषु यः स मामेति पाण्डव।।11.55।।</font><br />
+            # &nbsp;</p>
+
+            # v. II (starting from 12.1)
+            # <p align = 'center'><font color = '#2c44bd' size = '4px'><b>मूल श्लोकः</b></font></p><p align = 'center'><font size = '3px'>अर्जुन उवाच<br><br>एवं सततयुक्ता ये भक्तास्त्वां पर्युपासते।<br><br>येचाप्यक्षरमव्यक्तं तेषां के योगवित्तमाः।।12.1।।<br><br></font></p>
             l_match_sk = re.search(
-                r'<div class="views-field views-field-body".*?<p align="center"><font size="3px">(.*?)</font>',
-                l_html_gs, flags=re.MULTILINE | re.DOTALL)
+                r'<div class="views-field views-field-body".*?<p align="center"><font size="3px">(.*?)</font>', l_html_gs, flags=re.MULTILINE | re.DOTALL)
+
+            if not l_match_sk:
+                l_match_sk = re.search(
+                    r"<b>मूल\s*श्लोकः</b></font></p><p align\s*=\s*'center'><font\s*size\s*=\s*'3px'>(.*?)</font></p>", l_html_gs, flags=re.MULTILINE | re.DOTALL)
+
             if l_match_sk:
                 l_sk_gs = re.sub(r'\s+', ' ',
-                                 re.sub(r'(<br\s*/>)+', '<br/>',
-                                        re.sub(r'>\s+<', '><',
-                                               deva_correct(l_match_sk.group(1)).replace('।।', '॥')
+                                 re.sub(r'<br><br>', '<br/>',
+                                        re.sub(r'(<br\s*/>)+', '<br/>',
+                                               re.sub(r'>\s+<', '><',
+                                                      deva_correct(l_match_sk.group(1)).replace('।।', '॥')
+                                                      )
                                                )
                                         )
                                  ).strip()
+
                 l_translit_gs = transliterate(
                     re.sub(r'\s+', ' ',
                            re.sub(r'॥[^॥]+॥', '', l_sk_gs).replace('।', '').replace('<br/>', '')
@@ -839,9 +884,11 @@ if __name__ == '__main__':
             # IAST transliteration
             l_translit = universal_cleanup(l_json_verse['transliteration'])
             # Word-for-Word translation (API version)
-            l_wfw_string_raw = l_json_verse['word_meanings'] # bhajante—worship;mām; dṛiḍha
+            l_wfw_string_raw = l_json_verse['word_meanings'] # sanniyamya-controlling; indriya-grāmam—all the senses;
             l_wfw_api_string = (re.sub(r';$', '', universal_cleanup(l_wfw_string_raw))
                                 .replace('bhajante—worship;mām; dṛiḍha', 'bhajante—worship; mām—me; dṛiḍha')
+                                .replace('te-they; prāpnuvanti—achieve;', 'te—they; prāpnuvanti—achieve;')
+                                .replace('sanniyamya-controlling; indriya-grāmam—all the senses;', 'sanniyamya—controlling; indriya-grāmam—all the senses;')
                                 .replace('dhṛitarāśhtraḥ', 'dhṛtarāṣṭraḥ')
                                 .replace('kapi-dwajaḥ', 'kapi-dhvajaḥ')
                                 .replace('pariśhuṣhyati—is drying up vepathuḥ', 'pariśhuṣhyati—is drying up; vepathuḥ')
@@ -1100,10 +1147,10 @@ if __name__ == '__main__':
                 l_wfw_api_list = l_wfw_api_list_new
 
             print('====================== Online API wfw ===============================================================')
-            print(l_wfw_string_raw)
-            print(l_wfw_api_string)
+            print('l_wfw_string_raw:', l_wfw_string_raw)
+            print('l_wfw_api_string:', l_wfw_api_string)
             for l_wfw in l_wfw_api_list:
-                print(l_wfw)
+                print('l_wfw:', l_wfw)
             print('====================== GITA SUPERSITE wfw ===========================================================')
             print(l_wfw_gs_string)
             print(l_wfw_gs_list1)
@@ -1117,7 +1164,10 @@ if __name__ == '__main__':
 
             # Building combined WfW dict (keys = words from earch WfW) from BGS, online API and ISKCON
             try:
-                l_wfw_dict = dict([(iast_cleanup(k), ([space_clean(t.lower())], {space_clean(t.lower())})) for k, t in l_wfw_api_list])
+                if len(l_wfw_api_list) > 2:
+                    l_wfw_dict = dict([(iast_cleanup(k), ([space_clean(t.lower())], {space_clean(t.lower())})) for k, t in l_wfw_api_list])
+                else:
+                    l_wfw_dict = dict()
             except ValueError as e:
                 print(f'{l_verse_tag} *** ValueError ***', e, file=sys.stderr)
                 for l_item in l_wfw_api_list:
@@ -1186,13 +1236,17 @@ if __name__ == '__main__':
                                 l_tla, l_tsa = l_wfw_dict[a]
                                 l_tlb, l_tsb = l_wfw_dict[b]
 
-                                l_ks, l_kd = (a, b) if a == simplify_iast(a) else (b, a)
-                                l_wfw_dict[l_ks] = (l_tla + l_tlb, l_tsa.union(l_tsb))
-                                del l_wfw_dict[l_kd]
-                                print(f'FOUND EQUALITY: {a} {b} --> {l_wfw_dict[l_ks]}')
+                                # l_ks, l_kd = (a, b) if a == simplify_iast(a) else (b, a)
+                                # l_wfw_dict[l_ks] = (l_tla + l_tlb, l_tsa.union(l_tsb))
+                                # del l_wfw_dict[l_kd]
+                                # print(f'FOUND EQUALITY: {a} {b} --> {l_wfw_dict[l_ks]}')
 
-                                l_key_list.pop(0)  # a
-                                l_key_list.pop(i)  # b
+                                l_wfw_dict[a] = (l_tla + l_tlb, l_tsa.union(l_tsb))
+                                del l_wfw_dict[b]
+                                print(f'FOUND EQUALITY: {a} {b} --> {l_wfw_dict[a]}')
+
+                                # l_key_list.pop(0)  # a
+                                l_key_list.pop(i+1)  # b
                                 print(f'    l_key_list: {l_key_list}')
                                 l_found_2 = True
                                 break
@@ -1264,7 +1318,7 @@ if __name__ == '__main__':
                                     a = l_rest[i]
                                     b = l_rest[j]
                                     c = l_rest[k]
-                                    if iast_cleanup(f'{a}-{b}-{c}') == l_longest:
+                                    if simplify_iast(iast_cleanup(f'{a}-{b}-{c}')) == simplify_iast(l_longest) or simplify_iast(iast_cleanup(f'{a}-{b}-{c}')) == simplify_iast(iast_cleanup(l_longest)):
                                     # (
                                     #                                         iast_cleanup(f'{a}-{b}-{c}') == l_longest or
                                     #                                         iast_cleanup(f'{a}-{c}-{b}') == l_longest or
@@ -1286,7 +1340,8 @@ if __name__ == '__main__':
                                         if len(l_tlc) < l_max_repeats: del l_wfw_dict[c]
                                         print(f'FOUND INCLUSION: {a} {b} {c} --> {l_longest} {l_wfw_dict[l_longest]}')
 
-                                        l_key_list = [l_key_list[n] for n in range(len(l_key_list)) if n not in [0, i+1, j+1, k+1]]
+                                        # l_key_list = [l_key_list[n] for n in range(len(l_key_list)) if n not in [0, i+1, j+1, k+1]]
+                                        l_key_list = [l_key_list[n] for n in range(len(l_key_list)) if n not in [i+1, j+1, k+1]]
                                         print(f'    l_key_list: {l_key_list}')
                                         l_breakup_dict[l_longest] = [
                                             (a, l_tsa),
@@ -1501,7 +1556,7 @@ if __name__ == '__main__':
                             l_key_found = True
 
                 l_remainder_sk = l_iast_sk_work.replace('_', '').strip()
-                if len(l_remainder_sk) > 0 and l_verse_tag not in ['1.21', '2.31', '3.36', '2.10', '1.28', '4.6', '6.13', '6.15', '6.28', '6.42']:
+                if len(l_remainder_sk) > 0 and l_verse_tag not in ['1.21', '2.31', '3.36', '2.10', '1.28', '4.6', '6.13', '6.15', '6.28', '6.42', '11.4', '11.6', '11.45']:
                     if l_list_no == 1:
                         print('**RESTART**')
                         l_list_no += 1
@@ -1557,7 +1612,7 @@ if __name__ == '__main__':
                 l_form_list = sorted(l_grammar_dict.keys(), key=lambda s: f'{len(s)}-{s}', reverse=True)
                 l_mod_key_list = []
                 for l_form in l_form_list:
-                    print(f'    {l_form:20} {l_grammar_dict[l_form]}')
+                    print(f'    {l_form:20} --> {l_grammar_dict[l_form]}')
 
                 for l_form in l_form_list:
                     l_form_contracted = iast_cleanup(re.sub(r'\s+', '-', l_form))
@@ -1618,7 +1673,7 @@ if __name__ == '__main__':
                     l_remainder_sk = l_iast_sk_work.replace('_', '').strip()
                     if len(l_remainder_sk) > 0:
                         if l_list_no == 1:
-                            print('**RESTART**')
+                            print(f'**RESTART** {l_mod_key_list}')
                             l_list_no += 1
                         else:
                             print('**REMAINDER**')
