@@ -281,12 +281,39 @@ QString M1Store::TEIInterface::skipUntil(int p_indent_count, QString& p_indent, 
     p_indent += QString(" ").repeated(p_indent_count);
     while (!p_xml_reader.atEnd()) {
         QXmlStreamReader::TokenType l_tt = p_xml_reader.readNext();
+        if(p_xml_reader.hasError()){
+            qCDebug(g_cat_tmp_spotlight).noquote() << "TEI read, skipUntil" << QString("p_xml_reader.error(): %1 %2")
+                                                                                   .arg(p_xml_reader.error())
+                                                                                   .arg(p_xml_reader.errorString());
+            qCDebug(g_cat_tmp_spotlight).noquote() << "l_ret                         :" << l_ret;
+            qCDebug(g_cat_tmp_spotlight).noquote() << "cm_cur_chapter_number         :" << cm_cur_chapter_number;
+            qCDebug(g_cat_tmp_spotlight).noquote() << "cm_cur_sloka_number           :" << cm_cur_sloka_number;
+            qCDebug(g_cat_tmp_spotlight).noquote() << "l_tt                          :" << l_tt;
+            qCDebug(g_cat_tmp_spotlight).noquote() << "p_xml_reader.name()           :" << p_xml_reader.name();
+            qCDebug(g_cat_tmp_spotlight).noquote() << "p_xml_reader.lineNumber()     :" << p_xml_reader.lineNumber();
+            qCDebug(g_cat_tmp_spotlight).noquote() << "p_xml_reader.columnNumber()   :" << p_xml_reader.columnNumber();
+            qCDebug(g_cat_tmp_spotlight).noquote() << "p_xml_reader.characterOffset():" << p_xml_reader.characterOffset();
+            qCDebug(g_cat_tmp_spotlight).noquote() << "isCDATA                        " << (p_xml_reader.isCDATA() ? "true" : "false");
+            qCDebug(g_cat_tmp_spotlight).noquote() << "isCharacters                   " << (p_xml_reader.isCharacters() ? "true" : "false");
+            qCDebug(g_cat_tmp_spotlight).noquote() << "isComment                      " << (p_xml_reader.isComment() ? "true" : "false");
+            qCDebug(g_cat_tmp_spotlight).noquote() << "isEndDocument                  " << (p_xml_reader.isDTD() ? "true" : "false");
+            qCDebug(g_cat_tmp_spotlight).noquote() << "isEndDocument                  " << (p_xml_reader.isEndDocument() ? "true" : "false");
+            qCDebug(g_cat_tmp_spotlight).noquote() << "isEndElement                   " << (p_xml_reader.isEndElement() ? "true" : "false");
+            qCDebug(g_cat_tmp_spotlight).noquote() << "isEntityReference              " << (p_xml_reader.isEntityReference() ? "true" : "false");
+            qCDebug(g_cat_tmp_spotlight).noquote() << "isProcessingInstruction        " << (p_xml_reader.isProcessingInstruction() ? "true" : "false");
+            qCDebug(g_cat_tmp_spotlight).noquote() << "isStandaloneDocument           " << (p_xml_reader.isStandaloneDocument() ? "true" : "false");
+            qCDebug(g_cat_tmp_spotlight).noquote() << "isStartDocument                " << (p_xml_reader.isStartDocument() ? "true" : "false");
+            qCDebug(g_cat_tmp_spotlight).noquote() << "isStartElement                 " << (p_xml_reader.isStartElement() ? "true" : "false");
+            qCDebug(g_cat_tmp_spotlight).noquote() << "isWhitespace                   " << (p_xml_reader.isWhitespace() ? "true" : "false");
+            std::_Exit(0);
+        }
+
         QStringView l_tok_name = p_xml_reader.name();
         qCDebug(g_cat_tei).noquote() << p_indent << "Token Type: " << l_tt << p_xml_reader.name();
 
         if(l_tt == QXmlStreamReader::EndElement && l_tok_name == p_elem_close){
             p_indent.chop(p_indent_count);
-            qCDebug(g_cat_tei).noquote() << p_indent << QString("End of skip until <%1>").arg(p_elem_close);
+            qCDebug(g_cat_tei).noquote() << p_indent << QString("End of skip until <%1>: %2").arg(p_elem_close).arg(l_ret);
             break; // from while (!p_xml_reader.atEnd())
         }
         else {
@@ -751,7 +778,7 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                                                          .arg(cm_cur_chapter_number).arg(cm_cur_sloka_number).arg(l_cur_word), 0);
 
                         qCDebug(g_cat_tei).noquote() << cm_indent << "<seg/> End of wfw group";
-                        qCDebug(g_cat_tmp_spotlight).noquote() << cm_indent << QString("WfW segment: %1 Translit: %2 Translat: %3")
+                        qCDebug(g_cat_tei).noquote() << cm_indent << QString("WfW segment: %1 Translit: %2 Translat: %3")
                                                                                    .arg(l_sk_segment)
                                                                                    .arg(l_transliteration)
                                                                                    .arg(l_translation);
@@ -804,7 +831,7 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                         l_main_author = readPersName(l_xml_reader);
                         if(l_main_author.isEmpty()) throw M1Env::M1Exception("No main author", 1001);
 
-                        qCDebug(g_cat_tmp_spotlight).noquote() << cm_indent << QString("<persName> translation author : %1/%2").arg(l_main_author.name()).arg(l_main_author.role());
+                        qCDebug(g_cat_tei).noquote() << cm_indent << QString("<persName> translation author : %1/%2").arg(l_main_author.name()).arg(l_main_author.role());
                     }
                     else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "author"){
                         QString l_translation_text = skipUntil(l_indent_count, cm_indent, l_xml_reader, "div4");
@@ -816,7 +843,7 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                     }
                     else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "div3"){
                         cm_indent.chop(l_indent_count);
-                        qCDebug(g_cat_tmp_spotlight).noquote() << cm_indent << "End of translation block";
+                        qCDebug(g_cat_tei).noquote() << cm_indent << "End of translation block";
                         break; // from the inner translation while
                     }
                 } // end of translation while
@@ -835,8 +862,12 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                 bool l_is_first = true;
 
                 while (!l_xml_reader.atEnd()) {
-                    if(! m_no_read) // because readPersName() may read a token ahead
+                    if(! m_no_read){ // because readPersName() may read a token ahead
                         m_tt = l_xml_reader.readNext();
+                        Q_ASSERT_X(!l_xml_reader.hasError(),
+                                   "TEI read, Sloka comment section",
+                                   QString("l_xml_reader.error(): %1").arg(l_xml_reader.error()).toUtf8().constData());
+                    }
                     m_no_read = false;
                     QStringView l_tok_name = l_xml_reader.name();
                     qCDebug(g_cat_tei).noquote() << cm_indent << "Token Type: " << l_tt << l_xml_reader.name();
@@ -855,6 +886,9 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                         if(l_main_author.isEmpty()) throw M1Env::M1Exception("No main author", 1001);
                     }
                     else if(m_tt == QXmlStreamReader::EndElement && l_tok_name == "author"){
+                        qCDebug(g_cat_tei).noquote() << "Main Author:" << l_main_author.name() << l_main_author.role()
+                                                               << "Main Author:" << l_secondary_author.name() << l_secondary_author.role()
+                                                               << l_language << l_xml_reader.name();
                         QString l_commentary_text = skipUntil(l_indent_count, cm_indent, l_xml_reader, "div4");
                         if(l_xml_reader.hasError())
                             qCDebug(g_cat_tei).noquote() << "XML parsing ERROR" << l_xml_reader.error() << l_xml_reader.errorString();

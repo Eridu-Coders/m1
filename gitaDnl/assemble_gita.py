@@ -14,6 +14,7 @@ import devtrans
 import urllib.request
 import html
 import xml.etree.ElementTree as ET
+import copy
 
 from indic_transliteration import sanscript
 from indic_transliteration.sanscript import transliterate
@@ -319,10 +320,12 @@ def add_candidates(p_k):
                         re.sub(r'( |^)c(.)', r'\1\2', p_k),
                         re.sub(r'( |^)r(.)', r'\1\2', p_k),
                         re.sub(r'( |^)l(.)', r'\1ll\2', p_k),
+                        re.sub(r'( |^)saṃ(.)', r'\1ṇaṃ\2', p_k),
 
                         # final vowels
                         re.sub(r'(.)e( |$)', r'\1a\2', p_k),
                         re.sub(r'(.)a( |$)', r'\1\2', p_k),
+                        re.sub(r'(.)a( |$)', r'\1o\2', p_k),
                         re.sub(r'(.)ā( |$)', r'\1a\2', p_k),
                         re.sub(r'(.)au( |$)', r'\1āv\2', p_k),
                         re.sub(r'(.)u( |$)', r'\1v\2', p_k),
@@ -353,13 +356,16 @@ def add_candidates(p_k):
                         re.sub(r'(.)k( |$)', r'\1g\2', p_k),
                         re.sub(r'(.)k( |$)', r'\1ṃ\2', p_k),
 
-                        # ktiḥ ktim antr ṃ kalp aranś k
+                        # ktiḥ ktim antr ṃ kalp aranś k tribhiḥ trividham saṃnyāsam
                         re.sub(r'(.)ktiḥ( |$)', r'\1kitar\2', p_k),
                         re.sub(r'(.)ktim( |$)', r'\1kitam\2', p_k),
                         re.sub(r'(.)antr(.)', r'\1aṃtr\2', p_k),
                         re.sub(r'(.)kalp(.)', r'\1kamp\2', p_k),
                         re.sub(r'(.)aranś(.)', r'\1oṃऽś\2', p_k),
+                        re.sub(r'(.)kti(.)', r'\1kita\2', p_k),
                         re.sub(r'aṃśa', r'ṃऽśa', p_k),
+                        re.sub(r'tribhiḥ', r'itrabhir', p_k),
+                        re.sub(r'trividham', r'itravidhaṃ', p_k),
                         ]
     return list(set(l_list_candidate))
 
@@ -772,7 +778,7 @@ if __name__ == '__main__':
         l_verse_count = int(l_chap['verses_count'])
         l_chap_number = int(l_chap['chapter_number'])
 
-        if l_chap_number == 13:
+        if l_chap_number == 99:
             break
 
         # TEI chapter start (<div1>)
@@ -786,6 +792,8 @@ if __name__ == '__main__':
         for l_verse_number in range(1, l_verse_count + 1):
             l_verse_id = f'BG_{l_chap_number}.{l_verse_number}'
             l_verse_tag = f'{l_chap_number}.{l_verse_number}'
+            with open('gita_progress.txt', 'w')as l_fout:
+                l_fout.write(l_verse_tag + '\n')
 
             # ######################################### GITA SUPERSITE #################################################
             # data from Gita Supersite
@@ -843,7 +851,8 @@ if __name__ == '__main__':
                                  re.sub(r'<br><br>', '<br/>',
                                         re.sub(r'(<br\s*/>)+', '<br/>',
                                                re.sub(r'>\s+<', '><',
-                                                      deva_correct(l_match_sk.group(1)).replace('।।', '॥')
+                                                      re.sub(r'।+\s*(\d+)\s*\.\s*(\d+)\s*।+', r'॥\1.\2॥',
+                                                             deva_correct(l_match_sk.group(1)))
                                                       )
                                                )
                                         )
@@ -884,13 +893,15 @@ if __name__ == '__main__':
             # IAST transliteration
             l_translit = universal_cleanup(l_json_verse['transliteration'])
             # Word-for-Word translation (API version)
-            l_wfw_string_raw = l_json_verse['word_meanings'] # sanniyamya-controlling; indriya-grāmam—all the senses;
+            l_wfw_string_raw = l_json_verse['word_meanings'] # nigachchhati—reaches yat—which;
             l_wfw_api_string = (re.sub(r';$', '', universal_cleanup(l_wfw_string_raw))
                                 .replace('bhajante—worship;mām; dṛiḍha', 'bhajante—worship; mām—me; dṛiḍha')
                                 .replace('te-they; prāpnuvanti—achieve;', 'te—they; prāpnuvanti—achieve;')
                                 .replace('sanniyamya-controlling; indriya-grāmam—all the senses;', 'sanniyamya—controlling; indriya-grāmam—all the senses;')
+                                .replace('nigachchhati—reaches yat—which;', 'nigachchhati—reaches; yat—which;')
                                 .replace('dhṛitarāśhtraḥ', 'dhṛtarāṣṭraḥ')
                                 .replace('kapi-dwajaḥ', 'kapi-dhvajaḥ')
+                                .replace('vimohitāḥ—deluded aneka—many;', 'vimohitāḥ—deluded; aneka—many;')
                                 .replace('pariśhuṣhyati—is drying up vepathuḥ', 'pariśhuṣhyati—is drying up; vepathuḥ')
                                 .replace('parāyaṇāḥ—wholly devoted apare', 'parāyaṇāḥ—wholly devoted; apare')
                                 .replace('babhūva—became ha', 'babhūva—became; ha—certainly'))
@@ -1213,16 +1224,21 @@ if __name__ == '__main__':
                     print(f'{k:30} ({len(l_tl)}) {"/".join(list(l_ts))} {l_tl}')
 
             l_breakup_dict = dict()
-            l_key_list = sorted(list(set(l_less_then_three_dict.keys()).union(l_small_words)), key=lambda k: f'{len(k):03}-{k}', reverse=True)
-            print(f'v {l_chap_number}.{l_verse_number} len(l_key_list): {len(l_key_list)}')
-            if len(l_key_list) <= 12:
+            l_key_list_original = sorted(list(set(l_less_then_three_dict.keys()).union(l_small_words)), key=lambda k: f'{len(k):03}-{k}', reverse=True)
+            print(f'v {l_chap_number}.{l_verse_number} len(l_key_list): {len(l_key_list_original)}')
+
+            # for items deleted after inclusion
+            l_extra_dict = dict()
+
+            if len(l_key_list_original) <= 20:
             # if not (l_chap_number == 1 and len(l_key_list) > 10):
+                l_key_list = copy.deepcopy(l_key_list_original)
                 while len(l_key_list) >= 2:
                     # print(l_key_list)
                     print(f'TOP: {l_key_list}')
 
-                    l_found_2 = False
                     # first 2 keys comparisons (searching for equality)
+                    l_found = False
                     if len(l_key_list) >= 2:
                         a = l_key_list[0]
                         l_max_len = len(a)
@@ -1236,6 +1252,7 @@ if __name__ == '__main__':
                                 l_tla, l_tsa = l_wfw_dict[a]
                                 l_tlb, l_tsb = l_wfw_dict[b]
 
+                                l_found = True
                                 # l_ks, l_kd = (a, b) if a == simplify_iast(a) else (b, a)
                                 # l_wfw_dict[l_ks] = (l_tla + l_tlb, l_tsa.union(l_tsb))
                                 # del l_wfw_dict[l_kd]
@@ -1248,8 +1265,15 @@ if __name__ == '__main__':
                                 # l_key_list.pop(0)  # a
                                 l_key_list.pop(i+1)  # b
                                 print(f'    l_key_list: {l_key_list}')
-                                l_found_2 = True
                                 break
+
+                    if not l_found:
+                        print('POPPING')
+                        l_key_list.pop(0)
+
+                l_key_list = l_key_list_original
+                while len(l_key_list) >= 3:
+                    print(f'TOP: {l_key_list}')
 
                     l_found_3 = False
                     # 2 --> 1 key comparison
@@ -1280,8 +1304,15 @@ if __name__ == '__main__':
                                     l_tl_conc = [f'{u} {v}' for u, v in l_tl_zip]
                                     # print(f'l_tl_conc: {l_tl_conc}')
                                     l_wfw_dict[l_longest] = (l_tl + l_tl_conc, l_ts.union(set(l_tl_conc)))
-                                    if len(l_tla) < l_max_repeats: del l_wfw_dict[a]
-                                    if len(l_tlb) < l_max_repeats: del l_wfw_dict[b]
+
+                                    if len(l_tla) < l_max_repeats:
+                                        l_extra_dict[a] = l_wfw_dict[a]
+                                        del l_wfw_dict[a]
+
+                                    if len(l_tlb) < l_max_repeats:
+                                        l_extra_dict[b] = l_wfw_dict[b]
+                                        del l_wfw_dict[b]
+
                                     print(f'FOUND INCLUSION: {a} ({i+1}) {b} ({j+1}) --> {l_longest} {l_wfw_dict[l_longest]}')
 
                                     l_new_list = [l_key_list[n] for n in range(len(l_key_list)) if n not in [0, i+1, j+1]]
@@ -1318,7 +1349,9 @@ if __name__ == '__main__':
                                     a = l_rest[i]
                                     b = l_rest[j]
                                     c = l_rest[k]
-                                    if simplify_iast(iast_cleanup(f'{a}-{b}-{c}')) == simplify_iast(l_longest) or simplify_iast(iast_cleanup(f'{a}-{b}-{c}')) == simplify_iast(iast_cleanup(l_longest)):
+                                    if (simplify_iast(iast_cleanup(f'{a}-{b}-{c}')) == simplify_iast(l_longest) or
+                                            simplify_iast(iast_cleanup(f'{a}-{b}-{c}')) == simplify_iast(iast_cleanup(l_longest)) or
+                                            simplify_iast(iast_cleanup(f'{a} {b} {c}')) == simplify_iast(iast_cleanup(l_longest))):
                                     # (
                                     #                                         iast_cleanup(f'{a}-{b}-{c}') == l_longest or
                                     #                                         iast_cleanup(f'{a}-{c}-{b}') == l_longest or
@@ -1463,116 +1496,140 @@ if __name__ == '__main__':
 
                                                 l_found_6 = True
 
-                    if not (l_found_6 or l_found_5 or l_found_4 or l_found_3 or l_found_2):
+                    if not (l_found_6 or l_found_5 or l_found_4 or l_found_3):
                         print('POPPING')
                         l_key_list.pop(0)
 
             print('====================== Combined dict ================================================================')
-            for k in sorted(l_wfw_dict.keys()):
-                l_tl, l_ts = l_wfw_dict[k]
+            l_wfw_dict_long = dict(list(l_wfw_dict.items()) + list(l_extra_dict.items()))
+            for k in sorted(l_wfw_dict_long.keys()):
+                l_tl, l_ts = l_wfw_dict_long[k]
                 print(f'{k:30} ({len(l_tl)}) {"/".join(list(l_ts))} {l_tl}')
                 if k in l_breakup_dict.keys():
                     print(f'    {l_breakup_dict[k]}')
 
             # fitting combined dictionary keys into Sloka (in IAST format) to recover order of words (= keys)
             print('====================== Sloka Matching ===============================================================')
-            l_key_list = sorted(list(l_wfw_dict.keys()), key=lambda k: f'{len(k):03}-{k}', reverse=True)
-            print('l_key_list:', l_key_list)
-            l_iast_sk_1 = devtrans.dev2iast(
+            l_iast_sk_1 = devtrans.dev2iast( # ॐ
                 re.sub(r'\s+', ' ',
                        re.sub(r'॥[^॥]+॥', '', l_sk)
                        .replace('।', '')
                        .replace('।।', '॥')
+                       .replace('ॐ', 'oṃ')
                        .replace('<br/>', '')
                        ).strip())
-            print('l_iast_sk_1:                  ', l_iast_sk_1)
+            print('l_iast_sk_1         :', l_iast_sk_1)
             l_iast_sk = iast_cleanup(l_iast_sk_1)
-            print('l_iast_sk:                    ', l_iast_sk)
-
+            print('l_iast_sk           :', l_iast_sk)
             l_iast_sk = l_iast_sk.replace(' ', '')
-            print('l_iast_sk (no_space):         ', l_iast_sk)
+            print('l_iast_sk (no_space):', l_iast_sk)
 
             # for k in l_key_list:
             #       l_km = simplify_iast(k)
             #       l_sk_to_test = simplify_iast(l_iast_sk)
             #       print(f'{l_km:30} {l_sk_to_test} {"*" if l_km in l_sk_to_test else ""}')
 
-            l_mod_key_list = []
-            for l_key in l_key_list:
-                # indriyasya indriyasya 3.34
-                if l_verse_tag == '3.34' and l_key == 'indriyasya indriyasya':
-                    l_key = 'indriyasya'
-                    l_wfw_dict[l_key] = (['of the senses'], {'of the senses'})
-
-                l_key_contracted = iast_cleanup(re.sub(r'\s+', '-', l_key))
-                l_list_ck_1 = list(set(add_candidates(l_key) + add_candidates(l_key_contracted)))
-                l_list_ck_1 = [l_km for l_km in l_list_ck_1 if len(l_km) > 0]
-                # if l_key == 'śrotrādīni indriyāṇi': print(l_key_contracted, sorted(l_list_ck_1, key=lambda s: f'{len(s):3}-{s}', reverse=True))
-                if l_key == 'san': print(sorted(l_list_ck_1, key=lambda s: f'{len(s):3}-{s}', reverse=True))
-
-                l_list_ck_2 = []
-                for l_kc in l_list_ck_1:
-                    l_list_ck_2 += add_candidates(l_kc)
-                l_list_ck_2 = [l_km for l_km in l_list_ck_2 if len(l_km) > 0]
-
-                l_list_ck_3 = list(set(l_list_ck_2))
-                if l_key == 'san': print(sorted(l_list_ck_2, key=lambda s: f'{len(s):3}-{s}', reverse=True))
-
-                for l_km in l_list_ck_3:
-                    l_mod_key_list.append((l_key, l_km.replace(' ', '')))
-
-            l_mod_key_list_1 = sorted(l_mod_key_list, key=lambda p: f'{len(p[1]):03}-{p[1]}', reverse=True)
-            l_mod_key_list_2 = sorted(l_mod_key_list, key=lambda p: f'{999-len(p[1]):03}-{p[1]}')
-            # if l_key == 'śrotrādīni indriyāṇi': print(l_mod_key_list_1)
-            #   for l_key, l_km in l_mod_key_list:
-            #       print(f'{l_key:30} {l_km}')
-
-            l_place_dict = dict()
+            l_validated_verses = ['1.21', '2.31', '3.36', '2.10', '1.28', '4.6', '6.13', '6.15', '6.28', '6.42', '11.4', '11.6', '11.45']
             l_list_no = 1
-            for l_mod_key_list in [l_mod_key_list_1, l_mod_key_list_2]:
-                print([l_km for _, l_km in l_mod_key_list])
+            l_breaking = False
+            for l_key_list in [sorted(list(l_wfw_dict.keys()), key=lambda k: f'{len(k):03}-{k}', reverse=True),
+                               sorted(list(l_wfw_dict_long.keys()), key=lambda k: f'{len(k):03}-{k}', reverse=True)]:
+                print(f'[{l_list_no}] l_key_list:', l_key_list)
+                l_mod_key_list = []
+                for l_key in l_key_list:
+                    # indriyasya indriyasya 3.34
+                    if l_verse_tag == '3.34' and l_key == 'indriyasya indriyasya':
+                        l_key = 'indriyasya'
+                        l_wfw_dict[l_key] = (['of the senses'], {'of the senses'})
+
+                    l_key_contracted = iast_cleanup(re.sub(r'\s+', '-', l_key))
+                    l_list_ck_1 = list(set(add_candidates(l_key) + add_candidates(l_key_contracted)))
+                    l_list_ck_1 = [l_km for l_km in l_list_ck_1 if len(l_km) > 0]
+                    # if l_key == 'śrotrādīni indriyāṇi': print(l_key_contracted, sorted(l_list_ck_1, key=lambda s: f'{len(s):3}-{s}', reverse=True))
+                    if l_key == 'san': print(sorted(l_list_ck_1, key=lambda s: f'{len(s):3}-{s}', reverse=True))
+
+                    l_list_ck_2 = []
+                    for l_kc in l_list_ck_1:
+                        l_list_ck_2 += add_candidates(l_kc)
+                    l_list_ck_2 = [l_km for l_km in l_list_ck_2 if len(l_km) > 0]
+
+                    l_list_ck_3 = list(set(l_list_ck_2))
+                    if l_key == 'san': print(sorted(l_list_ck_2, key=lambda s: f'{len(s):3}-{s}', reverse=True))
+
+                    for l_km in l_list_ck_3:
+                        l_mod_key_list.append((l_key, l_km.replace(' ', '')))
+
+                l_mod_key_list_1 = sorted(l_mod_key_list, key=lambda p: f'{len(p[1]):03}-{p[1]}', reverse=True)
+                l_mod_key_list_2 = sorted(l_mod_key_list, key=lambda p: f'{999-len(p[1]):03}-{p[1]}')
+                # if l_key == 'śrotrādīni indriyāṇi': print(l_mod_key_list_1)
+                #   for l_key, l_km in l_mod_key_list:
+                #       print(f'{l_key:30} {l_km}')
+
                 l_place_dict = dict()
-                l_iast_sk_work = l_iast_sk
-                for l_key, l_km in l_mod_key_list:
-                    l_sk_to_test = ''
-                    #l_km = l_km.replace(' ', '')
-                    if l_km in l_iast_sk_work:
-                        l_sk_to_test = l_iast_sk_work
-                    elif simplify_iast(l_km) in simplify_iast(l_iast_sk_work):
-                        l_km = simplify_iast(l_km)
-                        l_sk_to_test = simplify_iast(l_iast_sk_work)
+                for l_mod_key_list in [l_mod_key_list_1, l_mod_key_list_2]:
+                    print([l_km for _, l_km in l_mod_key_list])
+                    l_place_dict = dict()
+                    l_iast_sk_work = l_iast_sk
 
-                    # if l_km == 'sampaśyan':
-                    #     print(f'{l_km:30} {simplify_iast(l_iast_sk)} <<<<<<<<')
+                    # to avoid repeatedly using long keys
+                    l_forbidden_key_list = []
 
-                    if len(l_iast_sk_work) != len(l_sk_to_test):
-                        continue
+                    for l_key, l_km in l_mod_key_list:
+                        if l_key in l_forbidden_key_list:
+                            continue
+
+                        l_sk_to_test = ''
+                        #l_km = l_km.replace(' ', '')
+                        if l_km in l_iast_sk_work:
+                            l_sk_to_test = l_iast_sk_work
+                        elif simplify_iast(l_km) in simplify_iast(l_iast_sk_work):
+                            l_km = simplify_iast(l_km)
+                            l_sk_to_test = simplify_iast(l_iast_sk_work)
+
+                        # if l_km == 'sampaśyan':
+                        #     print(f'{l_km:30} {simplify_iast(l_iast_sk)} <<<<<<<<')
+
+                        if len(l_iast_sk_work) != len(l_sk_to_test):
+                            continue
+                        else:
+                            for l_find in re.finditer(l_km, l_sk_to_test):
+                                l_place_dict.setdefault(l_key, []).append(l_find.start())
+                                l_iast_sk_work = l_iast_sk_work[0:l_find.start()] + '_' * len(l_find.group(0)) + l_iast_sk_work[l_find.end():]
+
+                                print(f'{l_key:30} {l_iast_sk_work} ({l_km})')
+                                l_key_found = True
+
+                                # a long key with exactly 3 occurrences --> not likely to legitimately appear elsewhere (see v. 17.6)
+                                if len(l_key) >= 10 and len(l_wfw_dict[l_key][0]) == 3:
+                                    l_forbidden_key_list.append(l_key)
+
+                    l_remainder_sk = l_iast_sk_work.replace('_', '').strip()
+                    if len(l_remainder_sk) > 0 and l_verse_tag not in l_validated_verses:
+                        if l_list_no <= 3:
+                            print(f'**RESTART {l_list_no}**')
+                            l_list_no += 1
+                        else:
+                            print('**REMAINDER**')
                     else:
-                        for l_find in re.finditer(l_km, l_sk_to_test):
-                            l_place_dict.setdefault(l_key, []).append(l_find.start())
-                            l_iast_sk_work = l_iast_sk_work[0:l_find.start()] + '_' * len(l_find.group(0)) + l_iast_sk_work[l_find.end():]
+                        l_breaking = True
+                        break
 
-                            print(f'{l_key:30} {l_iast_sk_work} ({l_km})')
-                            l_key_found = True
+                l_place_list = []
+                for k, v in l_place_dict.items():
+                    for p in v:
+                        l_place_list.append((k, p))
 
-                l_remainder_sk = l_iast_sk_work.replace('_', '').strip()
-                if len(l_remainder_sk) > 0 and l_verse_tag not in ['1.21', '2.31', '3.36', '2.10', '1.28', '4.6', '6.13', '6.15', '6.28', '6.42', '11.4', '11.6', '11.45']:
-                    if l_list_no == 1:
-                        print('**RESTART**')
-                        l_list_no += 1
-                    else:
-                        print('**REMAINDER**')
-                else:
+                l_place_list = sorted(l_place_list, key=lambda x: x[1])
+
+                if l_list_no >=3:
+                    l_wfw_dict = l_wfw_dict_long
+
+                for k, v in l_place_list:
+                    print(f'{k:30} {v:3} {f"B {l_breakup_dict[k]} " if k in l_breakup_dict.keys() else ""}F {l_wfw_dict[k]}')
+
+                if l_breaking:
                     break
 
-            l_place_list = []
-            for k, v in l_place_dict.items():
-                for p in v:
-                    l_place_list.append((k, p))
-
-            l_place_list = sorted(l_place_list, key=lambda x: x[1])
-            for k, v in l_place_list:
-                print(f'{k:30} {v:3} {f"B {l_breakup_dict[k]} " if k in l_breakup_dict.keys() else ""}F {l_wfw_dict[k]}')
             print('=====================================================================================================')
 
             # ######################################### INRIA Grammar from new wfw ########################################
@@ -1989,7 +2046,7 @@ if __name__ == '__main__':
                 l_author, l_language, l_text, l_source = com_tran_validate(l_local_translations[l_ak])
                 l_auth_tag = f'<persName>{l_author}<roleName>Translator</roleName></persName>'
                 l_author_set.add(l_auth_tag)
-                l_bg_chapters_xml += f'{l_indent_prefix}<div4 type="translation" source="{l_source}" xml:lang="{l_language}"><author>{l_auth_tag}</author>{l_text}</div4>\n'
+                l_bg_chapters_xml += f'{l_indent_prefix}<div4 type="translation" source="{l_source}" xml:lang="{l_language}"><author>{l_auth_tag}</author>{html.escape(l_text)}</div4>\n'
 
             # end of translations block (<div3>)
             l_bg_chapters_xml += f'{l_indent_prefix}<!-- End of translations block for {l_verse_id} -->\n'
@@ -2020,7 +2077,7 @@ if __name__ == '__main__':
                     l_role = 'Bhashya Author'
                     l_author_set.add(l_auth_tag)
 
-                l_bg_chapters_xml += f'{l_indent_prefix}<div4 type="commentary" source="{l_source}" xml:lang="{l_language}"><author>{l_auth_tag}</author>{l_text}</div4>\n'
+                l_bg_chapters_xml += f'{l_indent_prefix}<div4 type="commentary" source="{l_source}" xml:lang="{l_language}"><author>{l_auth_tag}</author>{html.escape(l_text)}</div4>\n'
 
             # end of commentaries block (<div3>)
             l_bg_chapters_xml += f'{l_indent_prefix}<!-- End of commentaries block for {l_verse_id} -->\n'
