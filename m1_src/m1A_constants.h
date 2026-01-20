@@ -206,7 +206,8 @@ Q_DECLARE_LOGGING_CATEGORY(g_cat_interp_base)           ///< Base class of the I
 Q_DECLARE_LOGGING_CATEGORY(g_cat_interp_drag)           ///< Drag/Drop in the Interp hierarchy
 Q_DECLARE_LOGGING_CATEGORY(g_cat_main_window)           ///< MainWindow widget class
 Q_DECLARE_LOGGING_CATEGORY(g_cat_main)                  ///< messages from main of complete (non-test) build (including XML loaders)
-Q_DECLARE_LOGGING_CATEGORY(g_cat_tei)                   ///< messages from tei interface
+Q_DECLARE_LOGGING_CATEGORY(g_cat_tei)                   ///< messages from TEI interface
+Q_DECLARE_LOGGING_CATEGORY(g_cat_json)                  ///< messages from JSON interface
 Q_DECLARE_LOGGING_CATEGORY(g_cat_tmp_spotlight)         ///< messages from feature under temporary scrutiny
 /**@}*/ //end of QtLogCat
 

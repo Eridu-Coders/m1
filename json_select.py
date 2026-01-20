@@ -15,6 +15,29 @@ g_notes_dict = dict()       # notes (from Shorey). Key = SHR-nnn, same as occurr
 g_section_selection = ['476c', '476d', '476e', '477a', '477b', '477c', '477d', '477e']
 # g_section_selection = ['476c', '476d', '476e']
 
+g_nlp_pos_list = [
+    ('NPIIC', 'IIC', 'in intio compositi'),
+    ('NPIIV', 'IIV', 'in intio verbi'),
+    ('NPADJ', 'ADJ', 'adjective'),
+    ('NPADP', 'ADP', 'adposition'),
+    ('NPADV', 'ADV', 'adverb'),
+    ('NPAUX', 'AUX', 'auxiliary'),
+    ('NPCNJ', 'CCONJ', 'coordinating conjunction'),
+    ('NPDET', 'DET', 'determiner'),
+    ('NPIND', 'IND', 'indeclinable'),
+    ('NPINT', 'INTJ', 'interjection'),
+    ('NPNON', 'NOUN', 'noun'),
+    ('NPNUM', 'NUM', 'numeral'),
+    ('NPPRT', 'PART', 'particle'),
+    ('NPPRN', 'PRON', 'pronoun'),
+    ('NPPPN', 'PROPN', 'proper noun'),
+    ('NPPCT', 'PUNCT', 'punctuation'),
+    ('NPSCJ', 'SCONJ', 'subordinating conjunction'),
+    ('NPSYM', 'SYM', 'symbol'),
+    ('NPVRB', 'VERB', 'verb'),
+    ('NPXXX', 'X', 'other')
+]
+g_nlp_pos_dict = dict([(b, a) for a, b, _ in g_nlp_pos_list])
 # ------------- main() -------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     with open('lemmatization/occ_restricted.json', 'r') as f:
@@ -27,6 +50,12 @@ if __name__ == '__main__':
         g_lemma_dict = json.load(f)
     with open('lemmatization/entities.json', 'r') as f:
         g_entities_dict = json.load(f)
+
+    for l_key in g_lemma_dict.keys():
+        g_lemma_dict[l_key] = {
+            "EntType": g_lemma_dict[l_key]["EntType"],
+            "Pos": g_nlp_pos_dict[g_lemma_dict[l_key]["Pos"]],
+            "Text": g_lemma_dict[l_key]["Text"]}
 
     l_shorey_occ = dict()
     l_jowett_occ = dict()

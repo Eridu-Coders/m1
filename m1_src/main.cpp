@@ -5,6 +5,7 @@
 #include "m1D_main_window.h"
 #include "m1A_env.h"
 #include "m1B_tei_interface.h"
+#include "m1B_json_interface.h"
 #include "m1B_store.h"
 #include "m1B_graph_init.h"
 #include "m1C_interp.h"
@@ -36,7 +37,7 @@ int main(int argc, char *argv[])
     l_desc.add_options()
         ("help,h", "produce help message")
         ("load-gita,g", "Load Bhagavad Gita test data")
-        ("load-plato,p", "Load The Republic of Plato test data")
+        ("load-json,j", "Load a json file")
         ("load-tei,t", "Loads a TEI file")
         ("reset,r", "Reset (empty) storage")
         // ("qmljsdebugger", po::value<std::vector<std::string>>(&l_fuck), "Fuck")
@@ -53,6 +54,7 @@ int main(int argc, char *argv[])
 
         if(l_program_options_vm.count("reset")) std::cout << "reset option detected" << std::endl;
         if(l_program_options_vm.count("load-tei")) std::cout << "load-tei option detected" << std::endl;
+        if(l_program_options_vm.count("load-json")) std::cout << "load-json option detected" << std::endl;
         // if(l_program_options_vm.count("qmljsdebugger")) std::cout << l_fuck.at(0) << std::endl;
         // printf("U\n");
     } catch ( po::error& e){
@@ -109,9 +111,20 @@ int main(int argc, char *argv[])
     M1UI::TreeRow::init();
 
     M1Store::TEIInterface::init();
-    // loadEnoch();
-    // if(l_program_options_vm.count("load-gita")) loadGita();
-    if(l_program_options_vm.count("load-plato")) M1Store::GraphInit::init_plato();
+    M1Store::JsonInterface::init();
+
+    if(l_program_options_vm.count("load-json")){
+        try{
+            std::cout << "Loading JSON file ..." << std::endl;
+            M1Store::JsonInterface::loadJson("../republic.json");
+            qCDebug(g_cat_main).noquote() << "End of JSON loading";
+            // std::_Exit(0);
+        }
+        catch(const M1Env::M1Exception& e){
+            qCDebug(g_cat_main).noquote() << "JSON load error" << e.code() << e.message();
+            return 1;
+        }
+    }
     if(l_program_options_vm.count("load-tei")){
         try{
             std::cout << "Loading TEI file ..." << std::endl;

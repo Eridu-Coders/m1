@@ -44,6 +44,8 @@ set(PROJECT_SOURCES
         m1B_lv2_iterators.h
         m1B_tei_interface.h
         m1B_tei_interface.cpp
+        m1B_json_interface.h
+        m1B_json_interface.cpp
         m1C_interp.h
         m1C_interp.cpp
         m1C_interp_subclasses.cpp

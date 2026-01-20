@@ -51,29 +51,42 @@ bool M1Store::TEIInterface::m_no_read = false;
  * @param p_sub_title
  * @param p_author_text
  */
-void M1Store::TEIInterface::create_text(const QString& p_title, const QString& p_alt_title, const QString& p_sub_title, const QString& p_author_text){
+void M1Store::TEIInterface::create_text(
+    const QString& p_title,
+    const QString& p_alt_title,
+    const QString& p_sub_title,
+    const QString& p_author_text,
+    M1Store::Item_lv2** p_text_root,
+    M1Store::Item_lv2** p_lexicon_root)
+{
+    M1Store::Item_lv2** l_text_root = p_text_root;
+    M1Store::Item_lv2** l_lexicon_root = p_lexicon_root;
+
+    if(l_text_root == nullptr) l_text_root = &cm_text_root;
+    if(l_lexicon_root == nullptr) l_lexicon_root = &cm_lexicon_root;
+
     // title(s)
-    cm_text_root = M1Store::Item_lv2::getNew(
+    (*l_text_root) = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX,
         // label
         p_title);
-    cm_text_root->setType("TEXT_");
-    if(p_alt_title.length() > 0) cm_text_root->setFieldEdge(p_alt_title, M1Env::TEXT_ALT_TITLE_SIID);
-    if(p_sub_title.length() > 0) cm_text_root->setFieldEdge(p_sub_title, M1Env::TEXT_SUB_TITLE_SIID);
+    (*l_text_root)->setType("TEXT_");
+    if(p_alt_title.length() > 0) (*l_text_root)->setFieldEdge(p_alt_title, M1Env::TEXT_ALT_TITLE_SIID);
+    if(p_sub_title.length() > 0) (*l_text_root)->setFieldEdge(p_sub_title, M1Env::TEXT_SUB_TITLE_SIID);
 
     // Author (main author role is just 'Author')
     M1Store::Item_lv2* l_author = getPersonOrg(p_author_text, "Author", OrgOrPerson::Person, ReturnEntityOrRole::Entity);
-    cm_text_root->linkTo(l_author, M1Env::TEXT_WRITTEN_BY_SIID);
+    (*l_text_root)->linkTo(l_author, M1Env::TEXT_WRITTEN_BY_SIID);
 
     // Lexicon Root
-    cm_lexicon_root = M1Store::Item_lv2::getNew(
+    (*l_lexicon_root) = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX,
         // label
         "Lexicon");
-    cm_lexicon_root->setType(M1Env::FOLDER_SIID);
-    cm_text_root->linkTo(cm_lexicon_root, M1Env::OWNS_SIID);
+    (*l_lexicon_root)->setType(M1Env::FOLDER_SIID);
+    (*l_text_root)->linkTo((*l_lexicon_root), M1Env::OWNS_SIID);
 }
 
 void M1Store::TEIInterface::addTranslationBhashya(
@@ -168,7 +181,43 @@ M1Store::Item_lv2* M1Store::TEIInterface::getPersonOrg(const QString& p_name, co
         return l_role_folder;
 }
 
+M1Store::Item_lv2* M1Store::TEIInterface::create_Lemma(
+    const QString& p_lemma_text,
+    const QString& p_pos_text,
+    const QString& p_url_dict_list,
+    M1Store::Item_lv2** p_lexicon_root)
+{
+    M1Store::Item_lv2** l_lexicon_root = p_lexicon_root;
+    if(l_lexicon_root == nullptr) l_lexicon_root = &cm_lexicon_root;
+
+    M1Store::Item_lv2* l_new_lemma = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX,
+        // label
+        p_lemma_text);
+    l_new_lemma->setType(M1Env::LEMMA_SIID);
+    (*l_lexicon_root)->linkTo(l_new_lemma, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+
+    l_new_lemma->setFieldEdge(p_pos_text, M1Env::TEXT_WFW_POS_SIID);
+
+    if(p_pos_text.length() == 5)
+        l_new_lemma->setType(M1Store::StorageStatic::getSpecialItemPointer(p_pos_text.toUtf8().constData()));
+
+    M1Store::Item_lv2* l_new_url = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX,
+        // label
+        p_url_dict_list);
+    l_new_url->setType(M1Env::TEXT_URL_LINK_SIID);
+    l_new_lemma->linkTo(l_new_url, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+
+    return l_new_lemma;
+}
+
+
 void M1Store::TEIInterface::create_Lexicon_Entry(const QString& p_lemma_text, const QString& p_pos_text, const QString& p_url_dict_list, QList<FormLexicon>& p_form_list){
+    M1Store::Item_lv2* l_new_lemma = create_Lemma(p_lemma_text, p_pos_text, p_url_dict_list);
+    /*
     M1Store::Item_lv2* l_new_lemma = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX,
@@ -189,6 +238,7 @@ void M1Store::TEIInterface::create_Lexicon_Entry(const QString& p_lemma_text, co
         p_url_dict_list);
     l_new_url->setType(M1Env::TEXT_URL_LINK_SIID);
     l_new_lemma->linkTo(l_new_url, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+    */
 
     // forms
     for(const auto &f: p_form_list){

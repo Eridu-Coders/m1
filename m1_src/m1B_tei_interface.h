@@ -76,6 +76,7 @@ public:
 };
 
 class TEIInterface{
+    friend class JsonInterface;
 private:
     static M1Store::Item_lv2* cm_text_root;
     static M1Store::Item_lv2* cm_lexicon_root;
@@ -93,7 +94,13 @@ private:
     static AuthorTEI readPersName(QXmlStreamReader& p_xml_reader);
     static void loadTeiInternal(const QString& p_file_path, bool p_validate_only=false);
 
-    static void create_text(const QString& p_title, const QString& p_alt_title, const QString& p_sub_title, const QString& p_author_text);
+    static void create_text(
+        const QString& p_title,
+        const QString& p_alt_title,
+        const QString& p_sub_title,
+        const QString& p_author_text,
+        M1Store::Item_lv2** p_text_root = nullptr,
+        M1Store::Item_lv2** p_lexicon_root = nullptr);
     static void addTranslationBhashya(
         const QString& p_translation_text,
         const QString& p_language,
@@ -102,6 +109,7 @@ private:
         const AuthorTEI& p_secondary_author,
         bool p_is_translation,
         bool p_sep_above);
+    static M1Store::Item_lv2* create_Lemma(const QString& p_lemma_text, const QString& p_pos_text, const QString& p_url_dict_list, M1Store::Item_lv2** p_lexicon_root = nullptr);
     static void create_Lexicon_Entry(const QString& p_lemma_text, const QString& p_pos_text, const QString& p_url_dict_list, QList<FormLexicon>& p_form_list);
     static void create_wfw_unit(
         const QString& p_sk_segment,
