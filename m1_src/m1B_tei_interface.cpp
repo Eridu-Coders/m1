@@ -203,14 +203,15 @@ M1Store::Item_lv2* M1Store::TEIInterface::create_Lemma(
     if(p_pos_text.length() == 5)
         l_new_lemma->setType(M1Store::StorageStatic::getSpecialItemPointer(p_pos_text.toUtf8().constData()));
 
-    M1Store::Item_lv2* l_new_url = M1Store::Item_lv2::getNew(
-        // vertex flags
-        M1Env::FULL_VERTEX,
-        // label
-        p_url_dict_list);
-    l_new_url->setType(M1Env::TEXT_URL_LINK_SIID);
-    l_new_lemma->linkTo(l_new_url, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
-
+    if(p_url_dict_list.length() > 0){
+        M1Store::Item_lv2* l_new_url = M1Store::Item_lv2::getNew(
+            // vertex flags
+            M1Env::FULL_VERTEX,
+            // label
+            p_url_dict_list);
+        l_new_url->setType(M1Env::TEXT_URL_LINK_SIID);
+        l_new_lemma->linkTo(l_new_url, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+    }
     return l_new_lemma;
 }
 

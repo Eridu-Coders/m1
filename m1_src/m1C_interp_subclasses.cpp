@@ -321,7 +321,7 @@ M1MidPlane::FormInterp::FormInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::In
 }
 
 QString M1MidPlane::FormInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
-    return QString("%1 ← %2").arg(m_myself->text()).arg(m_lemma->inTreeDisplayText(p_edge));
+    return QString("%1 ← %2").arg(m_myself->text()).arg(m_lemma != nullptr ? m_lemma->inTreeDisplayText(p_edge) : "<No Lemma>");
 }
 
 QString M1MidPlane::FormInterp::getHtmlVirtual(){

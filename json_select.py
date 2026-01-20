@@ -38,6 +38,68 @@ g_nlp_pos_list = [
     ('NPXXX', 'X', 'other')
 ]
 g_nlp_pos_dict = dict([(b, a) for a, b, _ in g_nlp_pos_list])
+
+g_nlp_tag_list = [
+    ('NTGSE', '.', 'punctuation mark, sentence closer'),
+    ('NTGCM', ',', 'punctuation mark, comma'),
+    ('NTLRB', '-LRB-', 'left round bracket'),
+    ('NTRRB', '-RRB-', 'right round bracket'),
+    ('NTOQM', '``', 'opening quotation mark'),
+    ('NTCQM', '""', 'closing quotation mark'),
+    ("NTCRM", "''", 'closing quotation mark'),
+    ('NTGCL', ':', 'punctuation mark, colon or ellipsis'),
+    ('NTDOL', '$', 'symbol, currency'),
+    ('NTSRP', '#', 'symbol, number sign'),
+    ('NTAFX', 'AFX', 'affix'),
+    ('NTGCC', 'CC', 'conjunction, coordinatinf'),
+    ('NTGCD', 'CD', 'cardinal number'),
+    ('NTGDT', 'DT', 'determiner'),
+    ('NTGEX', 'EX', 'existential there'),
+    ('NTGFW', 'FW', 'foreign word'),
+    ('NTHYP', 'HYPH', 'punctuation mark, hyphen'),
+    ('NTGIN', 'IN', 'conjunction, subordinating or preposition'),
+    ('NTGJJ', 'JJ', 'adjective (English), other noun-modifier (Chinese)'),
+    ('NTJJR', 'JJR', 'adjective, comparative'),
+    ('NTJJS', 'JJS', 'adjective, superlative'),
+    ('NTGLS', 'LS', 'list item marker'),
+    ('NTGMD', 'MD', 'verb, modal auxiliary'),
+    ('NTNIL', 'NIL', 'missing taf'),
+    ('NTGNN', 'NN', 'noun, singular or mass'),
+    ('NTNNP', 'NNP', 'noun, proper singular'),
+    ('NTNPP', 'NNPS', 'noun, proper plural'),
+    ('NTNNS', 'NNS', 'noun, plural'),
+    ('NTPDT', 'PDT', 'predeterminer'),
+    ('NTPOS', 'POS', 'possessive endinf'),
+    ('NTPRP', 'PRP', 'pronoun, personal'),
+    ('NTPR$', 'PRP$', 'pronoun, possessive'),
+    ('NTGRB', 'RB', 'adverb'),
+    ('NTRBR', 'RBR', 'adverb, comparative'),
+    ('NTRBS', 'RBS', 'adverb, superlative'),
+    ('NTGRP', 'RP', 'adverb, particle'),
+    ('NTGTO', 'TO', 'infinitival “to”'),
+    ('NTGUH', 'UH', 'interjection'),
+    ('NTGVB', 'VB', 'verb, base form'),
+    ('NTVBD', 'VBD', 'verb, past tense'),
+    ('NTVBG', 'VBG', 'verb, gerund or present participle'),
+    ('NTVBN', 'VBN', 'verb, past participle'),
+    ('NTVBP', 'VBP', 'verb, non-3rd person singular present'),
+    ('NTVBZ', 'VBZ', 'verb, 3rd person singular present'),
+    ('NTWDT', 'WDT', 'wh-determiner'),
+    ('NTGWP', 'WP', 'wh-pronoun, personal'),
+    ('NTWP$', 'WP$', 'wh-pronoun, possessive'),
+    ('NTWRB', 'WRB', 'wh-adverb'),
+    ('NTGSP', 'SP', 'space (English), sentence-final particle (Chinese)'),
+    ('NTADD', 'ADD', 'email'),
+    ('NTNFP', 'NFP', 'superfluous punctuation'),
+    ('NTGGW', 'GW', 'additional word in multi-word expression'),
+    ('NTGXX', 'XX', 'unknown'),
+    ('NTBES', 'BES', 'auxiliary “be”'),
+    ('NTHVS', 'HVS', 'forms of “have”'),
+    ('NT_SP', '_SP', 'whitespace'),
+    ('NT_SP', '_SP', 'whitespace'),
+]
+g_nlp_tag_dict = dict([(b, a) for a, b, _ in g_nlp_tag_list])
+
 # ------------- main() -------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     with open('lemmatization/occ_restricted.json', 'r') as f:
@@ -56,6 +118,12 @@ if __name__ == '__main__':
             "EntType": g_lemma_dict[l_key]["EntType"],
             "Pos": g_nlp_pos_dict[g_lemma_dict[l_key]["Pos"]],
             "Text": g_lemma_dict[l_key]["Text"]}
+
+    for l_key in g_form_dict.keys():
+        g_form_dict[l_key] = {
+            "LemmaKey": g_form_dict[l_key]["LemmaKey"],
+            "Tag": g_nlp_tag_dict[g_form_dict[l_key]["Tag"]] if g_form_dict[l_key]["Tag"] in g_nlp_tag_dict.keys() else g_nlp_pos_dict[g_form_dict[l_key]["Tag"]],
+            "Text": g_form_dict[l_key]["Text"]}
 
     l_shorey_occ = dict()
     l_jowett_occ = dict()
