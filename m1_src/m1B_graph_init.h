@@ -37,6 +37,8 @@ extern M1Env::SpecialItemID OCCUR_SIID;
 extern M1Env::SpecialItemID OCCURS_IN_SIID;
 // [WFORM] Special Vertex ID (Vertex type) of word form vertices
 extern M1Env::SpecialItemID WFORM_SIID;
+// [TXVRT] Special Vertex ID (Simple edge type) text version type: (G)round/(T)ranaslation
+extern M1Env::SpecialItemID TEXT_VER_TYPE_SIID;
 // [TXATL] Special Vertex ID (Simple edge type) alternate text title
 extern M1Env::SpecialItemID TEXT_ALT_TITLE_SIID;
 // [TXSBT] Special Vertex ID (Simple edge type) text subtitle
@@ -55,11 +57,11 @@ extern M1Env::SpecialItemID MKPRT_SIID;
 extern M1Env::SpecialItemID STPOS_SIID;
 // [HLCLR] Color of text highlight category
 extern M1Env::SpecialItemID HLCLR_SIID;
-// [TRSLT] Special Vertex ID (Simple Edge type) of Gita transliteration field
+// [TRSLW] Special Vertex ID (Simple Edge type) of Gita transliteration field
 extern M1Env::SpecialItemID TEXT_WORD_TRANSLIT_SIID;
 // [DCTRF] Special Vertex ID (Simple Edge type) of Gita dictionary ref. field
 extern M1Env::SpecialItemID TEXT_WORD_DICT_REF_SIID;
-// [TRSLT] Special Vertex ID (Simple Edge type) of Gita transliteration field
+// [TRSLF] Special Vertex ID (Simple Edge type) of Gita transliteration field
 extern M1Env::SpecialItemID TEXT_WFW_TRANSLIT_SIID;
 // [WFTRN] Special Vertex ID (Simple Edge type) WfW unit Translation field
 extern M1Env::SpecialItemID TEXT_WFW_TRANSLAT_SIID;

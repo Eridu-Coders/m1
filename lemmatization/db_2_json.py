@@ -65,7 +65,7 @@ g_sent_pos = dict()
 g_sent_pos_2 = dict()
 
 # output collections
-g_occurences = dict()       # word occurrences. Key = XXX-nnn, with XXX = 'SHR' (Shorey), 'JWT' (Jowett) or 'GRC' (Greek)
+g_occurences = dict()       # word occurrences. Key = XXX-nnn, with XXX = 'A-SHR' (Shorey), 'B-JWT' (Jowett) or 'Z-GRC' (Greek)
 g_form_dict = dict()        # word forms. Key = <form>‣POS, with POS = tag_ for Spacy (English) and upos for Stanza (Greek)
 g_lemma_dict = dict()       # lemmas. Key = <lemma>‣POS, with POS = pos_ for Spacy (English) and upos for Stanza (Greek)
 g_entities_dict = dict()    # named entities. Key = 'LOC', 'NORP' or 'PERSON'

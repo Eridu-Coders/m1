@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
             std::cout << "Loading JSON file ..." << std::endl;
             M1Store::JsonInterface::loadJson("../republic.json");
             qCDebug(g_cat_main).noquote() << "End of JSON loading";
-            // std::_Exit(0);
+            std::_Exit(0);
         }
         catch(const M1Env::M1Exception& e){
             qCDebug(g_cat_main).noquote() << "JSON load error" << e.code() << e.message();

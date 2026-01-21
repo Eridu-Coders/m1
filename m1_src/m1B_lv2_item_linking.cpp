@@ -450,6 +450,8 @@ bool M1Store::Item_lv2::edgeBelongs(Item_lv2* p_edge, bool p_edge_is_special){
 /**
  * @brief Create a new vertex linked to this item
  *
+ * \todo update create_descendant() with new parameters for edge insertion point
+ *
  * @param p_edge_type type of the edge leading to the new descendant
  * @param p_label label of the new descendant
  * @param p_vertex_type type of the new descendant vertex
@@ -474,8 +476,7 @@ M1Store::Item_lv2* M1Store::Item_lv2::create_descendant(
     Q_ASSERT_X(isFullVertex() || isFullEdge(), "Item_lv2::create_descendant()", "cannot give descendants to simple vertices or edges");
 
     // the new vertex
-    M1Store::Item_lv2* l_new_vertex =
-        getNew(M1Store::FULL_VERTEX, M1Store::ItemType(p_vertex_type));
+    M1Store::Item_lv2* l_new_vertex = getNew(M1Store::FULL_VERTEX, M1Store::ItemType(p_vertex_type));
     l_new_vertex->setText_lv1(p_label);
 
     // link this to it
@@ -484,7 +485,7 @@ M1Store::Item_lv2* M1Store::Item_lv2::create_descendant(
         this->linkTo(l_new_vertex, p_edge_type);
 
     M1_FUNC_EXIT
-        return l_new_vertex;
+    return l_new_vertex;
 }
 
 /** @}*/

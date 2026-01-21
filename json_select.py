@@ -170,6 +170,7 @@ if __name__ == '__main__':
     l_republic = {
         'Title': 'The Republic',
         'Author': 'Plato',
+        'GroundTextVersion': 'Greek',
         'Sections': g_section_selection,
         'Notes': dict([(l_note_key, g_notes_dict[l_note_key]) for l_note_key in g_notes_dict if l_note_key in l_key_set]),
         'Forms': dict([(l_form_key, g_form_dict[l_form_key]) for l_form_key in l_form_key_list]),
