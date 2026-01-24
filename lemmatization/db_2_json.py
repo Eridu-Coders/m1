@@ -63,6 +63,7 @@ g_notes_list = []
 g_dashes_remaining = []
 g_sent_pos = dict()
 g_sent_pos_2 = dict()
+g_sent_pos_3 = dict()
 
 # output collections
 g_occurences = dict()       # word occurrences. Key = XXX-nnn, with XXX = 'A-SHR' (Shorey), 'B-JWT' (Jowett) or 'Z-GRC' (Greek)
@@ -550,7 +551,7 @@ def process_cursor_list_en(p_cursor_list, p_txt_key, p_phase_ii=True):
         l_en = re.sub(r'}}\s+\{\{', r'}}{{', l_en)
 
         # obsolete English words
-        l_en = re.sub(r"(\W+)o'er(\W+)", r'\1over\2', l_en)
+        l_en = re.sub(r"(\W+)o[’']er(\W+)", r'\1over\2', l_en)
         l_en = re.sub(r"(\W+)forsooth(\W+)", r'\1indeed\2', l_en)
         l_en = re.sub(r"(\W+)fain(\W+)", r'\1gladly\2', l_en)
         l_en = re.sub(r"(\W+)[’']tis(\W+)", r'\1it is\2', l_en)
@@ -560,7 +561,6 @@ def process_cursor_list_en(p_cursor_list, p_txt_key, p_phase_ii=True):
         l_en = re.sub(r"(\W+)ere(\W+)", r'\1until\2', l_en)
         l_en = re.sub(r"(\W+)viand(\W+)", r'\1food\2', l_en)
         l_en = re.sub(r"(\W+)must\s+needs(\W+)", r'\1must\2', l_en)
-        l_en = re.sub(r"(\W+)o[’']er(\W+)", r'\1over\2', l_en)
         l_en = l_en.replace("said I.", 'I said.')
         # thither they neither look (Jowett)
         l_en = re.sub(r"thither they neither look", r"towards which they neither look", l_en)
@@ -568,7 +568,7 @@ def process_cursor_list_en(p_cursor_list, p_txt_key, p_phase_ii=True):
         # their—the rulers'—advantage
         l_en = re.sub(r"their—the rulers'—advantage", r"their (the rulers') advantage", l_en)
 
-        # spelling mistakes
+        # spelling mistakes & typos
         l_en = l_en.replace('Laden with', 'laden with')
         l_en = l_en.replace('/I', 'I')
         l_en = l_en.replace('WeIl , why', 'Why')
@@ -1188,7 +1188,7 @@ def process_cursor_list_en(p_cursor_list, p_txt_key, p_phase_ii=True):
     # print('Phase III - Grouping punctuation into tokens', file=sys.stderr)
     # group_punctuation()
 
-def group_punctuation(p_en=True):
+def group_punctuation():
     class HyphenatedWordException(Exception):
         pass
 
@@ -1205,23 +1205,27 @@ def group_punctuation(p_en=True):
         if l_tok['Pos'] == 'PUNCT' and re.search(r'\w+', l_tok_form):
             l_new_pos = ''
             l_lemma_text = None
-            if p_en:
+            if l_tok_key[:5] in ['A-SHR', 'B-JWT']: # en
                 for l_pos_choice in ['n', 'v', 'a', 'r', 's']:
                     l_lemma_text = g_nlp_en_nltk.lemmatize(l_tok_form, l_pos_choice)
                     if l_lemma_text != l_tok_form:
-                        l_new_pos = l_pos_choice
+                        l_new_pos = {'n': 'NOUN', 'v': 'VERB', 'a': 'ADJ', 'r': 'ADV', 's': 'ADJ'}[l_pos_choice]
                         break
             else: # grk
-                for l_pos_choice in ['NOUN', 'VERB', 'ADJ', 'ADV']:
-                    l_pd = stanza.Document([[{'id': 1, 'text': l_tok_form, 'upos': l_pos_choice}]])
-                    if g_nlp_gr(l_pd)[0][0]['lemma'] != l_tok_form:
-                        l_new_pos = l_pos_choice
-                        break
+                l_doc = g_nlp_gr(l_tok_form)
+                # print(l_tok_form, l_doc, l_doc.sentences[0].words[0].upos)
+                l_new_pos = l_doc.sentences[0].words[0].upos
+                print(l_tok_form, l_new_pos)
+                # for l_pos_choice in ['NOUN', 'VERB', 'ADJ', 'ADV']:
+                #     print('l_pos_choice:', l_pos_choice)
+                #     l_pd = stanza.Document([[{'id': 1, 'text': l_tok_form, 'upos': l_pos_choice}]])
+                #     l_greek_lemma_attempt = g_nlp_gr(l_pd)
+                #     print('l_greek_lemma_attempt:', l_greek_lemma_attempt)
+                #     if l_greek_lemma_attempt[0][0]['lemma'] != l_tok_form:
+                #         l_new_pos = l_pos_choice
+                #         break
 
-            if l_new_pos != '':
-                if l_new_pos not in ['NOUN', 'VERB', 'ADJ', 'ADV']:
-                    l_new_pos = {'n': 'NOUN', 'v': 'VERB', 'a': 'ADJ', 'r': 'ADV', 's': 'ADJ'}[l_new_pos]
-            else:
+            if l_new_pos == '':
                 l_pos_length = [(len(g_pos_to_lemma[l_pos_key]), l_pos_key) for l_pos_key in
                                 sorted(g_pos_to_lemma.keys()) if l_pos_key != 'PUNCT']
                 for _, l_pos_key in sorted(l_pos_length):
@@ -1258,65 +1262,247 @@ def group_punctuation(p_en=True):
             l_tok['FormKey'] = l_new_form_key
             g_anno.setdefault('PUNCT', []).append(f'Correction {l_tok_key} {l_tok_form:15} PUNCT --> {l_new_form_key}/{l_new_lemma_key}{l_new_data_added}')
 
+        def sp_key(p_txt_with_cap, p_pos, p_tag, p_secondary=False):
+            l_txt = f'{p_txt_with_cap}/{p_tag}'
+            l_txt = '_EP_' if l_txt in ['./.', ';/.', '?/.', '!/.'] else l_txt
+            return l_txt if p_pos == 'PUNCT' and not (p_secondary and l_txt in [',/,', ';/:', ':/:', '(/-LRB-']) else \
+                '<CAP>' if re.search('[A-Z]',p_txt_with_cap[:1]) else '<NCAP>'
+
         # Sentence position anomalies
-        if l_tok_key[:5] in ['A-SHR', 'B-JWT']:
-            l_sentence_pos = l_tok['SentencePos']
+        if l_tok_key[:5] in ['A-SHR', 'B-JWT']: # en
+            l_sentence_position = l_tok['SentencePos']
+            l_n_sp = l_n_tok['SentencePos'] if l_n_tok else ""
             l_context = l_tok['Context']
+            l_txt_with_cap = l_tok['Text']
+            l_tag = l_tok['Tag']
+            l_pos = l_tok['Pos']
+            l_sp_key = sp_key(l_txt_with_cap, l_pos, l_tag)
             del l_tok['Context']
-            if len(l_sentence_pos) > 0:
-                l_txt_cap = l_tok['Text']
+            if (len(l_sentence_position) > 0 and len(l_n_sp) > 0) or l_sp_key == '_EP_':
+                l_nn_sp = l_nn_tok['SentencePos'] if l_nn_tok else ""
+                l_nnn_sp = l_nnn_tok['SentencePos'] if l_nnn_tok else ""
+
+                l_n_twc = l_n_tok['Text'] if l_n_tok else ""
+                l_nn_twc = l_nn_tok['Text'] if l_nn_tok else ""
+                l_nnn_twc = l_nnn_tok['Text'] if l_nnn_tok else ""
+
                 l_pos = l_tok['Pos']
-                l_tag = l_tok['Tag']
+                l_n_pos = l_n_tok['Pos'] if l_n_tok else ""
+                l_nn_pos = l_nn_tok['Pos'] if l_nn_tok else ""
+                l_nnn_pos = l_nnn_tok['Pos'] if l_nnn_tok else ""
+
+                l_n_tag = l_n_tok['Tag'] if l_n_tok else ""
+                l_nn_tag = l_nn_tok['Tag'] if l_nn_tok else ""
+                l_nnn_tag = l_nnn_tok['Tag'] if l_nnn_tok else ""
+
+                l_sp_key = sp_key(l_txt_with_cap, l_pos, l_tag)
+                l_n_sp_key = sp_key(l_n_twc, l_n_pos, l_n_tag)
+                l_nn_sp_key = sp_key(l_nn_twc, l_nn_pos, l_nn_tag, p_secondary=True)
+                l_nnn_sp_key = sp_key(l_nnn_twc, l_nnn_pos, l_nnn_tag, p_secondary=True)
+
+                g_sent_pos_2[l_sentence_position][l_sp_key] = g_sent_pos_2.setdefault(l_sentence_position, dict()).setdefault(l_sp_key, 0) + 1
+
+                l_sp_context_1 = f'{l_sentence_position if len(l_sentence_position) > 0 else "__"} {l_n_sp if len(l_n_sp) > 0 else "__"} '\
+                                 f'{l_nn_sp if len(l_nn_sp) > 0 else "__"} {l_nnn_sp if len(l_nnn_sp) > 0 else "__"}'
+                l_sp_context_1s = f'{l_sentence_position if len(l_sentence_position) > 0 else "__"} {l_n_sp if len(l_n_sp) > 0 else "__"} '\
+                                  f'{l_nn_sp if len(l_nn_sp) > 0 else "__"}'
+                if len(l_sp_context_1) < 11:
+                    print(f'[{l_sp_context_1}]')
+                    print(l_tok)
+                    print(l_n_tok)
+                    print(l_nn_tok)
+                    print(l_nn_tok)
+                    sys.exit()
+                l_sp_context_2 = f'{l_sp_key} {l_n_sp_key} {l_nn_sp_key} {l_nnn_sp_key}'
+                l_sp_context_2s = f'{l_sp_key} {l_n_sp_key} {l_nn_sp_key}'
+                if (l_sp_context_1 not in ['SE SS SE SS',
+                                           'SE SS SE SX',
+                                           'SS SE SS __',
+                                           '__ SE SS __',
+                                           'SS SE SX SS '] and
+                        f'{l_sp_context_1s}/{l_sp_context_2s}' not in [ #
+                            'SE SS __/_EP_ <CAP> <NCAP>',
+                            'SE SS __/_EP_ <CAP> <CAP>',
+                            'SE SS __/_EP_ “/`` <CAP>',
+                            'SE SS __/_EP_ ‘/`` <CAP>',
+                            'SE SS __/”/\'\' “/`` <CAP>', # ”/'' “/`` <CAP>
+                            'SE SS __/”/\'\' ‘/`` <CAP>', # ”/'' ‘/`` <CAP>
+                            'SE SS __/’/\'\' “/`` <CAP>', # ’/'' “/`` <CAP>
+                            'SE SS __/’/\'\' ‘/`` <CAP>', # ’/'' ‘/`` <CAP>
+                            'SE SS __/”/\'\' <CAP> <CAP>', # ”/'' <CAP> <CAP>
+                            'SE SS __/”/\'\' <CAP> <NCAP>',  # ”/'' <CAP> <NCAP>
+                            'SE SS __/’/\'\' <CAP> <NCAP>',  # ’/'' <CAP> <NCAP>
+                            'SE SS __/’/\'\' <CAP> <CAP>',  # ’/'' <CAP> <NCAP>
+                            '__ SE SS/_EP_ ”/\'\' “/``',  # _EP_ ”/'' “/``
+                            '__ SE SS/_EP_ ’/\'\' <CAP>',  # _EP_ ‘/'' <CAP>
+                            '__ SE SS/_EP_ ”/\'\' “/``',  # _EP_ ”/'' “/``
+                            '__ SE SS/_EP_ ‘/\'\' ‘/``',  # _EP_ ‘/'' ‘/``
+                            'SE SS __/:/: <CAP> <NCAP>',
+                            'SE SS __/:/: <CAP> <CAP>',
+                        ]): # ”/''
+                    if f'{l_sp_context_1s}/{l_sp_context_2s}' in ['SE SS __/_EP_ <NCAP> <NCAP>',
+                                                                  'SE SS __/_EP_ <NCAP> <CAP>',
+                                                                  'SE SS __/”/\'\' <NCAP> <NCAP>',
+                                                                  'SE SS __/’/\'\' <NCAP> <NCAP>',
+                                                                  'SE SS __/”/\'\' <NCAP> <CAP>',
+                                                                  'SE SS __/’/\'\' <NCAP> <CAP>',
+                                                                  ]:
+                        # capitalize next word
+                        g_base_tokens[l_tok_index + 1][1]['Text'] = l_n_tok['Text'][:1].upper() + l_n_tok['Text'][1:]
+                    elif f'{l_sp_context_1s}/{l_sp_context_2s}' in ['SE SS __/_EP_ ”/\'\' “/``',
+                                                                    'SE SS __/_EP_ ”/\'\' ‘/``',
+                                                                    'SE SS __/_EP_ ’/\'\' “/``',
+                                                                    'SE SS __/_EP_ ’/\'\' ‘/``',
+                                                                    'SE SX SS/_EP_ ”/\'\' “/``',
+                                                                    'SE SX SS/_EP_ ”/\'\' ‘/``',
+                                                                    'SE SX SS/_EP_ ’/\'\' “/``',
+                                                                    'SE SX SS/_EP_ ’/\'\' ‘/``',
+                                                                    'SE SX SS/<NCAP> _EP_ <CAP>',
+                                                                    'SE SX SS/<NCAP> _EP_ ‘/``',
+                                                                    'SE SX SS/<NCAP> _EP_ “/``',
+                                                                    ]:
+                        # move down sentence break by one position
+                        l_sentence_position = ''
+                        l_tok['SentencePos'] = ''
+                        g_base_tokens[l_tok_index + 1][1]['SentencePos'] = 'SE'
+                        g_base_tokens[l_tok_index + 2][1]['SentencePos'] = 'SS'
+                    elif f'{l_sp_context_1s}/{l_sp_context_2s}' in ['SE SS __/<NCAP> <NCAP> <NCAP>',
+                                                                    'SE SS __/<NCAP> <CAP> <NCAP>',
+                                                                    'SE SS __/<NCAP> <NCAP> <CAP>',
+                                                                    'SE SS __/<NCAP> <CAP> <CAP>',
+                                                                    'SE SS __/<CAP> <NCAP> <NCAP>',
+                                                                    'SE SS __/<CAP> <CAP> <NCAP>',
+                                                                    'SE SS __/<CAP> <NCAP> <CAP>',
+                                                                    'SE SS __/<CAP> <CAP> <CAP>',
+                                                                    'SE SS __/,/, <NCAP> <NCAP>',
+                                                                    'SE SS __/,/, <CAP> <NCAP>',
+                                                                    'SE SS __/,/, <NCAP> <CAP>',
+                                                                    'SE SS __/,/, <CAP> <CAP>',
+                                                                    'SE SS __/;/: <NCAP> <NCAP>',
+                                                                    'SE SS __/;/: <CAP> <NCAP>',
+                                                                    'SE SS __/;/: <NCAP> <CAP>',
+                                                                    'SE SS __/;/: <CAP> <CAP>',
+                                                                    'SE SS __/<NCAP> ;/: <NCAP>',
+                                                                    'SE SS __/<CAP> ;/: <NCAP>',
+                                                                    'SE SS __/<NCAP> ;/: <CAP>',
+                                                                    'SE SS __/<CAP> ;/: <CAP>',
+                                                                    'SE SS __/<NCAP> ,/, <NCAP>',
+                                                                    'SE SS __/<CAP> ,/, <NCAP>',
+                                                                    'SE SS __/<NCAP> ,/, <CAP>',
+                                                                    'SE SS __/<CAP> ,/, <CAP>',
+                                                                    ]:
+                        # no sentence break at all
+                        l_sentence_position = ''
+                        l_tok['SentencePos'] = ''
+                        g_base_tokens[l_tok_index + 1][1]['SentencePos'] = ''
+                    elif f'{l_sp_context_1s}/{l_sp_context_2s}' in ['__ __ __/_EP_ ”/\'\' “/``',
+                                                                    '__ __ __/_EP_ ’/\'\' “/``',
+                                                                    '__ __ __/_EP_ ”/\'\' ’/``',
+                                                                    '__ __ __/_EP_ ’/\'\' ’/``',
+                                                                    '__ __ __/_EP_ ”/\'\' <NCAP>',
+                                                                    '__ __ __/_EP_ ”/\'\' <CAP>',
+                                                                    '__ __ __/_EP_ ’/\'\' <NCAP>',
+                                                                    '__ __ __/_EP_ ’/\'\' <CAP>',
+                                                                    '__ __ __/<NCAP> _EP_ <CAP>',
+                                                                    '__ __ __/<CAP> _EP_ <CAP>',
+                                                                    ]:
+                        # create sentence break at + 1
+                        g_base_tokens[l_tok_index + 1][1]['SentencePos'] = 'SE'
+                        g_base_tokens[l_tok_index + 2][1]['SentencePos'] = 'SS'
+                    elif f'{l_sp_context_1s}/{l_sp_context_2s}' in ['__ __ __/_EP_ <CAP> <NCAP>',
+                                                                    '__ __ __/_EP_ <CAP> <CAP>',]:
+                        # create sentence break
+                        l_sentence_position = 'SE'
+                        l_tok['SentencePos'] = 'SE'
+                        g_base_tokens[l_tok_index + 1][1]['SentencePos'] = 'SS'
+                    elif f'{l_sp_context_1s}/{l_sp_context_2s}' in ['__ __ __/_EP_ <NCAP> <NCAP>',
+                                                                    '__ __ __/_EP_ <NCAP> <CAP>', ]:
+                        # create sentence break + capitalize + 1
+                        l_sentence_position = 'SE'
+                        l_tok['SentencePos'] = 'SE'
+                        g_base_tokens[l_tok_index + 1][1]['SentencePos'] = 'SS'
+                        g_base_tokens[l_tok_index + 1][1]['Text'] = l_n_tok['Text'][:1].upper() + l_n_tok['Text'][1:]
+                    elif f'{l_sp_context_1}/{l_sp_context_2}' in ['SE SX SX SS/<NCAP> _EP_ ”/\'\' “/``',
+                                                                  'SE SX SX SS/<NCAP> _EP_ ’/\'\' “/``',
+                                                                  'SE SX SX SS/<NCAP> _EP_ ”/\'\' ‘/``',
+                                                                  'SE SX SX SS/<NCAP> _EP_ ’/\'\' ‘/``',
+                                                                  'SE SX SX SS/<CAP> _EP_ ”/\'\' “/``',
+                                                                  'SE SX SX SS/<CAP> _EP_ ’/\'\' “/``',
+                                                                  'SE SX SX SS/<CAP> _EP_ ”/\'\' ’/``',
+                                                                  'SE SX SX SS/<CAP> _EP_ ’/\'\' ‘/``',
+                                                                  ]:
+                        # move down sentence break by two position
+                        l_sentence_position = ''
+                        l_tok['SentencePos'] = ''
+                        g_base_tokens[l_tok_index + 1][1]['SentencePos'] = ''
+                        g_base_tokens[l_tok_index + 2][1]['SentencePos'] = 'SE'
+                        g_base_tokens[l_tok_index + 3][1]['SentencePos'] = 'SS'
+                    else: #
+                        g_sent_pos_3[l_sp_context_1][l_sp_context_2] = g_sent_pos_3.setdefault(l_sp_context_1, dict()).setdefault(l_sp_context_2, 0) + 1
 
                 # SE - SX - SS correction
-                if (l_n_tok and l_nn_tok and
-                        l_sentence_pos == 'SE' and
-                        l_n_tok['SentencePos'] == 'SX' and
-                        l_nn_tok['SentencePos'] == 'SS'):
-                    l_sentence_pos = ''
-                    l_tok['SentencePos'] = ''
-                    g_base_tokens[l_tok_index + 1][1]['SentencePos'] = 'SE'
+                # if (l_n_tok and l_nn_tok and
+                #         l_sentence_position == 'SE' and
+                #         l_n_tok['SentencePos'] == 'SX' and
+                #         l_nn_tok['SentencePos'] == 'SS' and
+                #         not (l_sp_key in ['./.', ';/.', '?/.', '!/.'] and
+                #              l_n_sp_key in ['./.', ';/.', '?/.', '!/.'])):
+                #     l_sentence_position = ''
+                #     l_tok['SentencePos'] = ''
+                #     g_base_tokens[l_tok_index + 1][1]['SentencePos'] = 'SE'
 
                 # SE - SX - SX - SS correction
-                if (l_n_tok and l_nn_tok and l_nnn_tok and
-                        l_sentence_pos == 'SE' and
-                        l_n_tok['SentencePos'] == 'SX' and
-                        l_nn_tok['SentencePos'] == 'SX' and
-                        l_nnn_tok['SentencePos'] == 'SS'):
-                    l_sentence_pos = ''
-                    l_tok['SentencePos'] = ''
-                    g_base_tokens[l_tok_index + 1][1]['SentencePos'] = ''
-                    g_base_tokens[l_tok_index + 2][1]['SentencePos'] = 'SE'
-
-                l_sp_key = f'{l_txt_cap}/{l_tag}' if l_pos == 'PUNCT' else '<CAP>' if re.search('[A-Z]', l_txt_cap[:1]) else '<NCAP>'
+                # if (l_n_tok and l_nn_tok and l_nnn_tok and
+                #         l_sentence_position == 'SE' and
+                #         l_n_tok['SentencePos'] == 'SX' and
+                #         l_nn_tok['SentencePos'] == 'SX' and
+                #         l_nnn_tok['SentencePos'] == 'SS' and
+                #         not (l_sp_key in ['./.', ';/.', '?/.', '!/.'] and
+                #              l_n_sp_key in ['./.', ';/.', '?/.', '!/.'] and
+                #              l_nn_sp_key in ['./.', ';/.', '?/.', '!/.'])):
+                #     l_sentence_position = ''
+                #     l_tok['SentencePos'] = ''
+                #     g_base_tokens[l_tok_index + 1][1]['SentencePos'] = ''
+                #     g_base_tokens[l_tok_index + 2][1]['SentencePos'] = 'SE'
 
                 # SE - SS <NCAP> correction --> capitalize next word
-                if l_n_tok and l_sentence_pos == 'SE' and l_sp_key in ['./.', '”/\'\'', '?/.', '!/.', ':/:', ';/:', ';/.', '’/\'\''] and \
-                    l_n_tok['SentencePos'] == 'SS' and not re.search('[A-Z]', l_n_tok['Text'][:1]):
-                    g_base_tokens[l_tok_index + 1][1]['Text'] = l_n_tok['Text'][:1].upper() + l_n_tok['Text'][1:]
+                # if (l_n_tok and
+                #         l_sentence_position == 'SE' and
+                #         l_n_sp == 'SS' and
+                #         l_sp_key in ['./.', ';/.', '?/.', '!/.', ':/:', ';/:', '”/\'\'', '’/\'\''] and
+                #         not l_n_sp_key == '<NCAP>'):
+                #
+                #     g_base_tokens[l_tok_index + 1][1]['Text'] = l_n_tok['Text'][:1].upper() + l_n_tok['Text'][1:]
 
                 # SE - SS but no punctuation or comma/semicolon
-                if l_n_tok and l_sentence_pos == 'SE' and l_pos != 'PUNCT' and l_n_tok['SentencePos'] == 'SS' and (l_n_tok['Pos'] != 'PUNCT' or l_n_tok['Text'] in [',', ';', ':']):
-                    l_sentence_pos = ''
-                    l_tok['SentencePos'] = ''
-                    g_base_tokens[l_tok_index + 1][1]['SentencePos'] = ''
+                # if (l_n_tok and
+                #         l_sentence_position == 'SE' and
+                #         l_n_sp == 'SS' and
+                #         (l_pos != 'PUNCT' or l_txt_with_cap in [',', ';', ':'])):
+                #     l_sentence_position = ''
+                #     l_tok['SentencePos'] = ''
+                #     g_base_tokens[l_tok_index + 1][1]['SentencePos'] = ''
 
                 # SE Comma - SS word
-                if l_n_tok and l_sentence_pos == 'SE' and l_tok['Text'] == ',' and l_n_tok['SentencePos'] == 'SS' and not re.search('[A-Z]', l_n_tok['Text'][:1]):
-                    l_sentence_pos = ''
-                    l_tok['SentencePos'] = ''
-                    g_base_tokens[l_tok_index + 1][1]['SentencePos'] = ''
+                # if (l_n_tok and
+                #         l_sentence_position == 'SE' and
+                #         l_tok['Text'] == ',' and
+                #         l_n_tok['SentencePos'] == 'SS' and
+                #         not re.search('[A-Z]', l_n_tok['Text'][:1])):
+                #     l_sentence_position = ''
+                #     l_tok['SentencePos'] = ''
+                #     g_base_tokens[l_tok_index + 1][1]['SentencePos'] = ''
 
-                g_sent_pos_2[l_sentence_pos][l_sp_key] = g_sent_pos_2.setdefault(l_sentence_pos, dict()).setdefault(l_sp_key,0) + 1
-                l_form_key = l_tok['FormKey']
-
-                l_anno_txt = f'{l_tok_key}: {l_form_key:20} [{l_pos:5}] {l_context}'
-                if l_sentence_pos == 'SX':
-                    g_anno.setdefault('SPSX', []).append(l_anno_txt)
-                if l_sentence_pos == 'SS' and l_sp_key not in ['<CAP>', '“/``', '‘/``', '(/-LRB-']:
-                    g_anno.setdefault('SPSS', []).append(l_anno_txt)
-                if l_sentence_pos == 'SE' and l_sp_key not in ['./.', '”/\'\'', '?/.', '!/.', ':/:', ';/:', ';/.', '’/\'\'', ')/-RRB-']:
-                    g_anno.setdefault('SPSE', []).append(l_anno_txt)
+                # l_form_key = l_tok['FormKey']
+                # l_anno_txt = f'{l_tok_key}: {l_form_key:20} [{l_pos:5}] {l_context}'
+                # if l_sentence_position == 'SX':
+                #     g_anno.setdefault('SPSX', []).append(l_anno_txt)
+                # if l_sentence_position == 'SS' and l_sp_key not in ['<CAP>', '“/``', '‘/``', '(/-LRB-']:
+                #     g_anno.setdefault('SPSS', []).append(l_anno_txt)
+                # if l_sentence_position == 'SE' and l_sp_key not in ['./.', '”/\'\'', '?/.', '!/.', ':/:', ';/:', ';/.', '’/\'\'', ')/-RRB-']:
+                #     g_anno.setdefault('SPSE', []).append(l_anno_txt)
+        else: # grk
+            pass
 
         # get punctuation on both side of non-punctuation token
         if l_tok['Pos'] != 'PUNCT' and l_tok['Text'] != '-':
@@ -1977,17 +2163,50 @@ def print_remaining_dashes():
         print(f"r'{l_context}'),")
     print()
 
-def print_sp_stats(p_sent_pos):
+def print_sp_context_stats():
+    print(f'================= SP Context Stats =======================')
+    for l_context_1 in sorted(g_sent_pos_3.keys()):
+        print(f'{l_context_1} -------------------------------------')
+        for l_c2, l_count in sorted(g_sent_pos_3[l_context_1].items(), key=lambda p: p[1], reverse=True):
+            print(f'{l_count:6} {l_c2}')
+
+def print_sp_stats(p_sent_pos, p_ver):
+    print(f'================= SP Stats {p_ver} =======================')
     for l_sp in p_sent_pos.keys():
         print(f'------------- {l_sp} -----------------')
         for l_sp_key in p_sent_pos[l_sp].keys():
             print(f'{l_sp_key:6}: {p_sent_pos[l_sp][l_sp_key]}')
     print()
 
+def check_sp():
+    print(f'================= SP Check =======================')
+    l_prev_sp = ''
+    l_pp_sp = ''
+    l_prev_txt = ''
+    l_pp_txt = ''
+    l_count = 0
+    for l_occ_key in sorted(g_occur_restricted.keys()):
+        l_txt = g_occur_restricted[l_occ_key]["PunctLeft"] + g_occur_restricted[l_occ_key]["Text"] + g_occur_restricted[l_occ_key]["PunctRight"]
+        l_sp = g_occur_restricted[l_occ_key]["SentencePos"]
+        l_all_sp = l_sp + l_prev_sp + l_pp_sp
+        if len(l_all_sp) > 4 and ('SESE' in l_all_sp or 'SSSS' in l_all_sp):
+            print(f'{l_count:4} {l_occ_key} {l_pp_sp:2} {l_prev_sp:2} {l_sp} {l_pp_txt} {l_prev_txt} {l_txt}')
+            l_count += 1
+        # print(f'{l_occ_key} {l_pp_sp:2} {l_prev_sp:2} {l_sp} {l_pp_txt} {l_prev_txt} {l_txt}')
+        l_pp_txt = l_prev_txt
+        l_prev_txt = l_txt
+        l_pp_sp = l_prev_sp
+        l_prev_sp = l_sp
+
 # ------------- main() -------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
-    # punctuation categories
+    # feature switches
+    l_do_english = True
+    l_perform_phase_II = True
+    l_do_greek = True
+    l_phase_iii_only = True
 
+    # punctuation categories
     g_left_set = copy.deepcopy(g_min_left_set)
     g_mid_set = copy.deepcopy(g_min_mid_set)
     g_right_set = copy.deepcopy(g_min_right_set)
@@ -2014,79 +2233,6 @@ if __name__ == '__main__':
     print('g_mid_punctuation  :', g_mid_punctuation)
     print('g_right_punctuation:', g_right_punctuation)
 
-    # establish DB connection
-    l_db_connection = psycopg2.connect(
-        host=g_dbServer,
-        database=g_dbDatabase,
-        user=g_dbUser,
-        password=g_dbPassword
-    )
-
-    l_cursor_list_shorey = None
-    l_cursor_list_jowett = None
-    l_cursor_list_greek = None
-
-    # get cursors
-    # load Shorey from DB
-    l_cursor_read = l_db_connection.cursor()
-    try:
-        l_cursor_read.execute(
-            """
-                select "ID_SEC", "N_BOOK", "ID_SECTION", "TX_SHOREY"
-                from "TB_SECTION"
-                order by "ID_SECTION" ASC;
-            """
-        )
-        l_cursor_list_shorey = list(l_cursor_read)
-    except Exception as e:
-        print('DB ERROR:', repr(e))
-        print(l_cursor_read.query)
-
-        sys.exit(0)
-    finally:
-        # release DB objects once finished
-        l_cursor_read.close()
-
-    # load Jowett from DB
-    l_cursor_read = l_db_connection.cursor()
-    try:
-        l_cursor_read.execute(
-            """
-                select "ID_SEC", "N_BOOK", "ID_SECTION", "TX_JOWETT"
-                from "TB_SECTION"
-                order by "ID_SECTION" ASC;
-            """
-        )
-        l_cursor_list_jowett = list(l_cursor_read)
-    except Exception as e:
-        print('DB ERROR:', repr(e))
-        print(l_cursor_read.query)
-
-        sys.exit(0)
-    finally:
-        # release DB objects once finished
-        l_cursor_read.close()
-
-    # load Greek text from DB
-    l_cursor_read = l_db_connection.cursor()
-    try:
-        l_cursor_read.execute(
-            """
-                select "ID_SEC", "N_BOOK", "ID_SECTION", "TX_GR"
-                from "TB_SECTION"
-                order by "ID_SECTION" ASC;
-            """
-        )
-        l_cursor_list_greek = list(l_cursor_read)
-    except Exception as e:
-        print('DB ERROR:', repr(e))
-        print(l_cursor_read.query)
-
-        sys.exit(0)
-    finally:
-        # release DB objects once finished
-        l_cursor_read.close()
-
     # Greek lemmas without diacritics (to check for Greek lemmatization errors)
     with open('./Dictionaries/lsj_lemmas.txt') as l_fin:
         g_greek_lemmas = set([remove_accents(l.rstrip()) for l in l_fin])
@@ -2094,56 +2240,153 @@ if __name__ == '__main__':
         for l in sorted(list(g_greek_lemmas)):
             l_fout.write(f'{l}\n')
 
-    l_do_english = True
-    l_perform_phase_II = True
-    l_do_greek = True
-
+    # NLP engines initialization
     # spaCy for English, Stanza (Stanford NLP) for Greek
-    if l_perform_phase_II:
+    if l_perform_phase_II or l_phase_iii_only:
         g_nlp_en = spacy.load('en_core_web_trf')
         nltk.download('wordnet')
         g_nlp_en_nltk = WordNetLemmatizer()
-
-    if l_do_english:
-        # Shorey
-        print('********** Processing Shorey', file=sys.stderr)
-        process_cursor_list_en(l_cursor_list_shorey, 'A-SHR', p_phase_ii=l_perform_phase_II)
-
-        # Jowett
-        print('********** Processing Jowett', file=sys.stderr)
-        process_cursor_list_en(l_cursor_list_jowett, 'B-JWT', p_phase_ii=l_perform_phase_II)
-
-    # Greek
-    if l_do_greek:
-        if l_perform_phase_II:
+        if l_do_greek or l_phase_iii_only:
             g_nlp_gr = stanza.Pipeline('grc')
-        print('********** Processing Ancient Greek text', file=sys.stderr)
-        process_cursor_list_gr(l_cursor_list_greek)
 
-    print('********** Dumping unrestricted JSON files', file=sys.stderr)
-    with open('base_tok.json', 'w') as f:
-        json.dump({'Base_Tok': g_base_tokens}, f, indent=4, ensure_ascii=False)
+    print('--- NLP engines initialized ---', file=sys.stderr)
+    if not l_phase_iii_only:
+        # establish DB connection
+        l_db_connection = psycopg2.connect(
+            host=g_dbServer,
+            database=g_dbDatabase,
+            user=g_dbUser,
+            password=g_dbPassword
+        )
 
-    with open('occ.json', 'w') as f:
-        json.dump(g_occurences, f, indent=4, ensure_ascii=False)
+        l_cursor_list_shorey = None
+        l_cursor_list_jowett = None
+        l_cursor_list_greek = None
 
-    with open('forms.json', 'w') as f:
-        json.dump(g_form_dict, f, indent=4, ensure_ascii=False)
+        # get cursors
+        # load Shorey from DB
+        l_cursor_read = l_db_connection.cursor()
+        try:
+            l_cursor_read.execute(
+                """
+                    select "ID_SEC", "N_BOOK", "ID_SECTION", "TX_SHOREY"
+                    from "TB_SECTION"
+                    order by "ID_SECTION" ASC;
+                """
+            )
+            l_cursor_list_shorey = list(l_cursor_read)
+        except Exception as e:
+            print('DB ERROR:', repr(e))
+            print(l_cursor_read.query)
 
-    with open('lemmas.json', 'w') as f:
-        json.dump(g_lemma_dict, f, indent=4, ensure_ascii=False)
+            sys.exit(0)
+        finally:
+            # release DB objects once finished
+            l_cursor_read.close()
 
-    g_entities_selected_dict = dict()
-    for k in sorted(g_entities_dict.keys()):
-        l_k = sorted(list(set(g_entities_dict[k].keys())))
-        g_entities_selected_dict[k] = [(f'{k}-{kn}', kn) for kn in l_k]
+        # load Jowett from DB
+        l_cursor_read = l_db_connection.cursor()
+        try:
+            l_cursor_read.execute(
+                """
+                    select "ID_SEC", "N_BOOK", "ID_SECTION", "TX_JOWETT"
+                    from "TB_SECTION"
+                    order by "ID_SECTION" ASC;
+                """
+            )
+            l_cursor_list_jowett = list(l_cursor_read)
+        except Exception as e:
+            print('DB ERROR:', repr(e))
+            print(l_cursor_read.query)
 
-    with open('entities.json', 'w') as f:
-        json.dump(g_entities_selected_dict, f, indent=4, ensure_ascii=False)
+            sys.exit(0)
+        finally:
+            # release DB objects once finished
+            l_cursor_read.close()
 
-    # Dump notes
-    with open('notes.json', 'w') as f:
-        json.dump(g_notes_dict, f, indent=4, ensure_ascii=False)
+        # load Greek text from DB
+        l_cursor_read = l_db_connection.cursor()
+        try:
+            l_cursor_read.execute(
+                """
+                    select "ID_SEC", "N_BOOK", "ID_SECTION", "TX_GR"
+                    from "TB_SECTION"
+                    order by "ID_SECTION" ASC;
+                """
+            )
+            l_cursor_list_greek = list(l_cursor_read)
+        except Exception as e:
+            print('DB ERROR:', repr(e))
+            print(l_cursor_read.query)
+
+            sys.exit(0)
+        finally:
+            # release DB objects once finished
+            l_cursor_read.close()
+
+        if l_do_english:
+            # Shorey
+            print('********** Processing Shorey', file=sys.stderr)
+            process_cursor_list_en(l_cursor_list_shorey, 'A-SHR', p_phase_ii=l_perform_phase_II)
+
+            # Jowett
+            print('********** Processing Jowett', file=sys.stderr)
+            process_cursor_list_en(l_cursor_list_jowett, 'B-JWT', p_phase_ii=l_perform_phase_II)
+
+        # Greek
+        if l_do_greek:
+            print('********** Processing Ancient Greek text', file=sys.stderr)
+            process_cursor_list_gr(l_cursor_list_greek)
+
+        print('********** Dumping unrestricted JSON files', file=sys.stderr)
+        with open('base_tok.json', 'w') as f:
+            json.dump({'Base_Tok': g_base_tokens}, f, indent=4, ensure_ascii=False)
+        print(f'Saved g_base_tokens : {len(g_base_tokens)}', file=sys.stderr)
+
+        with open('occ.json', 'w') as f:
+            json.dump(g_occurences, f, indent=4, ensure_ascii=False)
+        print(f'Saved g_occurences  : {len(g_occurences.keys())}', file=sys.stderr)
+
+        with open('forms.json', 'w') as f:
+            json.dump(g_form_dict, f, indent=4, ensure_ascii=False)
+        print(f'Saved g_form_dict   : {len(g_form_dict.keys())}', file=sys.stderr)
+        print(json.dumps(g_form_dict, ensure_ascii=False))
+
+        with open('lemmas.json', 'w') as f:
+            json.dump(g_lemma_dict, f, indent=4, ensure_ascii=False)
+        print(f'Saved g_lemma_dict  : {len(g_lemma_dict.keys())}', file=sys.stderr)
+
+        g_entities_selected_dict = dict()
+        for k in sorted(g_entities_dict.keys()):
+            l_k = sorted(list(set(g_entities_dict[k].keys())))
+            g_entities_selected_dict[k] = [(f'{k}-{kn}', kn) for kn in l_k]
+
+        with open('entities.json', 'w') as f:
+            json.dump(g_entities_selected_dict, f, indent=4, ensure_ascii=False)
+
+        # Dump notes
+        with open('notes.json', 'w') as f:
+            json.dump(g_notes_dict, f, indent=4, ensure_ascii=False)
+    else:
+        print('Phase III only --> loading from unrestricted files', file=sys.stderr)
+        with open('base_tok.json', 'r', encoding="utf-8") as f:
+            g_base_tokens = json.load(f)['Base_Tok']
+            # json.dump({'Base_Tok': g_base_tokens}, f, indent=4, ensure_ascii=False)
+        print(f'Loaded g_base_tokens : {len(g_base_tokens)}', file=sys.stderr)
+
+        with open('occ.json', 'r', encoding="utf-8") as f:
+            g_occurences = json.load(f)
+        print(f'Loaded g_occurences  : {len(g_occurences.keys())}', file=sys.stderr)
+
+        with open('forms.json', 'r', encoding="utf-8") as f:
+            g_form_dict = json.load(f)
+        print(f'Loaded g_form_dict   : {len(g_form_dict.keys())}', file=sys.stderr)
+        print(json.dumps(g_form_dict, ensure_ascii=False))
+
+        with open('lemmas.json', 'r', encoding="utf-8") as f:
+            g_lemma_dict = json.load(f)
+        print(f'Loaded g_lemma_dict  : {len(g_lemma_dict.keys())}', file=sys.stderr)
+    # end if not l_phase_iii_only:
 
     # ==================================================== Phase III ===================================================
     print('Phase III - Grouping punctuation into tokens', file=sys.stderr)
@@ -2161,10 +2404,12 @@ if __name__ == '__main__':
     # print_pos_2_lemma()
     # print_missing()
     # print_remaining_dashes()
-    print_morph_attr()
-    # print_sp_stats(g_sent_pos)
-    # print_sp_stats(g_sent_pos_2)
-    # print_anno()
+    # print_morph_attr()
+    print_sp_stats(g_sent_pos, 'I')
+    print_sp_stats(g_sent_pos_2, 'II')
+    print_sp_context_stats()
+    print_anno()
+    check_sp()
 
     # g_tokens_no_punctuation
     # with open('occ_no_punc.json', 'w') as g:
