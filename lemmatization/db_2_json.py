@@ -63,7 +63,8 @@ g_notes_list = []
 g_dashes_remaining = []
 g_sent_pos = dict()
 g_sent_pos_2 = dict()
-g_sent_pos_3 = dict()
+g_sent_pos_3_en = dict()
+g_sent_pos_3_grk = dict()
 
 # output collections
 g_occurences = dict()       # word occurrences. Key = XXX-nnn, with XXX = 'A-SHR' (Shorey), 'B-JWT' (Jowett) or 'Z-GRC' (Greek)
@@ -74,7 +75,7 @@ g_notes_dict = dict()       # notes (from Shorey). Key = SHR-nnn, same as occurr
 
 g_base_tokens = []
 
-g_occur_restricted = dict()
+g_occur_compacted = dict()
 g_form_restricted = dict()
 g_lemma_restricted = dict()
 
@@ -265,12 +266,12 @@ def add_data_restricted(p_occ_key, p_occ_dict, p_form_key, p_form_data, p_lemma_
     :param p_lemma_data:
     :return: nothing
     """
-    global g_occur_restricted
+    global g_occur_compacted
     global g_form_restricted
     global g_lemma_restricted
     # Occurrence recording
     if p_occ_key:
-        g_occur_restricted[p_occ_key] = p_occ_dict
+        g_occur_compacted[p_occ_key] = p_occ_dict
     # Form recording
     if p_form_key:
         g_form_restricted[p_form_key] = p_form_data
@@ -1192,14 +1193,19 @@ def group_punctuation():
     class HyphenatedWordException(Exception):
         pass
 
-    # first pass for punctuation fields creation in each token
-    l_occur_restricted_tmp_list = []
+    # first pass for Sentence position anomalies correction
+    l_occur_compacted_tmp_list = []
+    l_first_en = True
+    l_first_grk = True
+    l_must_ss = False
+    l_must_se = False
     for l_tok_index in range(len(g_base_tokens)):
         l_tok_key, l_tok = g_base_tokens[l_tok_index]
         l_tok_form = l_tok['Text'].lower()
         _, l_n_tok = g_base_tokens[l_tok_index + 1] if l_tok_index + 1 < len(g_base_tokens) - 1 else (None, None)
         _, l_nn_tok = g_base_tokens[l_tok_index + 2] if l_tok_index + 2 < len(g_base_tokens) - 1 else (None, None)
         _, l_nnn_tok = g_base_tokens[l_tok_index + 3] if l_tok_index + 3 < len(g_base_tokens) - 1 else (None, None)
+        _, l_nnnn_tok = g_base_tokens[l_tok_index + 4] if l_tok_index + 4 < len(g_base_tokens) - 1 else (None, None)
 
         # preprocessing of words misidentified as punctuation
         if l_tok['Pos'] == 'PUNCT' and re.search(r'\w+', l_tok_form):
@@ -1262,254 +1268,253 @@ def group_punctuation():
             l_tok['FormKey'] = l_new_form_key
             g_anno.setdefault('PUNCT', []).append(f'Correction {l_tok_key} {l_tok_form:15} PUNCT --> {l_new_form_key}/{l_new_lemma_key}{l_new_data_added}')
 
-        def sp_key(p_txt_with_cap, p_pos, p_tag, p_secondary=False):
-            l_txt = f'{p_txt_with_cap}/{p_tag}'
-            l_txt = '_EP_' if l_txt in ['./.', ';/.', '?/.', '!/.'] else l_txt
-            return l_txt if p_pos == 'PUNCT' and not (p_secondary and l_txt in [',/,', ';/:', ':/:', '(/-LRB-']) else \
-                '<CAP>' if re.search('[A-Z]',p_txt_with_cap[:1]) else '<NCAP>'
+        l_sentence_position = l_tok['SentencePos']
+        l_n_sp = l_n_tok['SentencePos'] if l_n_tok else ""
+        # l_context = l_tok['Context']
+        l_txt_with_cap = l_tok['Text']
+        l_tag = l_tok['Tag']
 
-        # Sentence position anomalies
+        l_nn_sp = l_nn_tok['SentencePos'] if l_nn_tok else ""
+        l_nnn_sp = l_nnn_tok['SentencePos'] if l_nnn_tok else ""
+        l_nnnn_sp = l_nnnn_tok['SentencePos'] if l_nnnn_tok else ""
+
+        l_n_twc = l_n_tok['Text'] if l_n_tok else ""
+        l_nn_twc = l_nn_tok['Text'] if l_nn_tok else ""
+        l_nnn_twc = l_nnn_tok['Text'] if l_nnn_tok else ""
+        l_nnnn_twc = l_nnnn_tok['Text'] if l_nnnn_tok else ""
+
+        l_pos = l_tok['Pos']
+        l_n_pos = l_n_tok['Pos'] if l_n_tok else ""
+        l_nn_pos = l_nn_tok['Pos'] if l_nn_tok else ""
+        l_nnn_pos = l_nnn_tok['Pos'] if l_nnn_tok else ""
+        l_nnnn_pos = l_nnnn_tok['Pos'] if l_nnnn_tok else ""
+
+        l_n_tag = l_n_tok['Tag'] if l_n_tok else ""
+        l_nn_tag = l_nn_tok['Tag'] if l_nn_tok else ""
+        l_nnn_tag = l_nnn_tok['Tag'] if l_nnn_tok else ""
+        l_nnnn_tag = l_nnnn_tok['Tag'] if l_nnnn_tok else ""
+
+        # if len(l_sp_context_1) < 11:
+        #     print(f'[{l_sp_context_1}]')
+        #     print(l_tok)
+        #     print(l_n_tok)
+        #     print(l_nn_tok)
+        #     print(l_nn_tok)
+        #     sys.exit()
+
         if l_tok_key[:5] in ['A-SHR', 'B-JWT']: # en
-            l_sentence_position = l_tok['SentencePos']
-            l_n_sp = l_n_tok['SentencePos'] if l_n_tok else ""
-            l_context = l_tok['Context']
-            l_txt_with_cap = l_tok['Text']
-            l_tag = l_tok['Tag']
-            l_pos = l_tok['Pos']
+            if l_first_en:
+                l_first_en = False
+                l_must_ss = True
+
+            def sp_key(p_txt_with_cap, p_pos, p_tag, p_secondary=False):
+                l_txt = f'{p_txt_with_cap}/{p_tag}'
+                l_txt = '_EP_' if l_txt in ['./.', ';/.', '?/.', '!/.'] else l_txt
+                return l_txt if p_pos == 'PUNCT' and not (
+                            p_secondary and l_txt in [',/,', ';/:', ':/:', '(/-LRB-']) else \
+                    '<CAP>' if re.search('[A-Z]', p_txt_with_cap[:1]) else '<NCAP>'
+
             l_sp_key = sp_key(l_txt_with_cap, l_pos, l_tag)
-            del l_tok['Context']
-            if (len(l_sentence_position) > 0 and len(l_n_sp) > 0) or l_sp_key == '_EP_':
-                l_nn_sp = l_nn_tok['SentencePos'] if l_nn_tok else ""
-                l_nnn_sp = l_nnn_tok['SentencePos'] if l_nnn_tok else ""
+            l_n_sp_key = sp_key(l_n_twc, l_n_pos, l_n_tag)
+            l_nn_sp_key = sp_key(l_nn_twc, l_nn_pos, l_nn_tag, p_secondary=True)
+            l_nnn_sp_key = sp_key(l_nnn_twc, l_nnn_pos, l_nnn_tag, p_secondary=True)
+            l_nnnn_sp_key = sp_key(l_nnnn_twc, l_nnnn_pos, l_nnnn_tag, p_secondary=True)
 
-                l_n_twc = l_n_tok['Text'] if l_n_tok else ""
-                l_nn_twc = l_nn_tok['Text'] if l_nn_tok else ""
-                l_nnn_twc = l_nnn_tok['Text'] if l_nnn_tok else ""
+            g_sent_pos_2[l_sentence_position][l_sp_key] = g_sent_pos_2.setdefault(l_sentence_position, dict()).setdefault( l_sp_key, 0) + 1
 
-                l_pos = l_tok['Pos']
-                l_n_pos = l_n_tok['Pos'] if l_n_tok else ""
-                l_nn_pos = l_nn_tok['Pos'] if l_nn_tok else ""
-                l_nnn_pos = l_nnn_tok['Pos'] if l_nnn_tok else ""
+            if l_sentence_position == 'SS':
+                if l_sp_key == '_EP_':
+                    l_sentence_position = 's*'
+                else:
+                    if l_must_ss:
+                        l_must_ss = False
+                        l_must_se = True
+            elif l_sentence_position == 'SX':
+                if l_must_ss:
+                    l_must_ss = True
+                    l_must_se = False
+            elif l_sentence_position == 'SE':
+                if l_sp_key in ['<CAP>', '<NCAP>', ',/,']:
+                    l_sentence_position = '*e'
+                else:
+                    if l_must_se:
+                        l_must_se = False
+                        l_must_ss = True
+            else: # neither SS, SX or SE
+                if l_must_se:
+                    l_sentence_position = '_' + l_sentence_position[1:].lower() if len(l_sentence_position) > 0 else ''
+                elif l_must_ss:
+                    l_sentence_position = 's_' if len(l_sentence_position) == 0 else l_sentence_position[1:].lower() + '_'
 
-                l_n_tag = l_n_tok['Tag'] if l_n_tok else ""
-                l_nn_tag = l_nn_tok['Tag'] if l_nn_tok else ""
-                l_nnn_tag = l_nnn_tok['Tag'] if l_nnn_tok else ""
+            l_sp_context_a_3 = f'{l_sentence_position if len(l_sentence_position) > 0 else "__"} {l_n_sp if len(l_n_sp) > 0 else "__"} ' \
+                              f'{l_nn_sp if len(l_nn_sp) > 0 else "__"}'
+            l_sp_context_a_4 = l_sp_context_a_3 + f' {l_nnn_sp if len(l_nnn_sp) > 0 else "__"}'
+            l_sp_context_a_5 = l_sp_context_a_4 + f' {l_nnnn_sp if len(l_nnnn_sp) > 0 else "__"}'
 
-                l_sp_key = sp_key(l_txt_with_cap, l_pos, l_tag)
-                l_n_sp_key = sp_key(l_n_twc, l_n_pos, l_n_tag)
-                l_nn_sp_key = sp_key(l_nn_twc, l_nn_pos, l_nn_tag, p_secondary=True)
-                l_nnn_sp_key = sp_key(l_nnn_twc, l_nnn_pos, l_nnn_tag, p_secondary=True)
+            l_sp_context_b_3 = f'{l_sp_key} {l_n_sp_key} {l_nn_sp_key}'
+            l_sp_context_b_4 = l_sp_context_b_3 + f' {l_nnn_sp_key}'
+            l_sp_context_b_5 = l_sp_context_b_4 + f' {l_nnnn_sp_key}'
 
-                g_sent_pos_2[l_sentence_position][l_sp_key] = g_sent_pos_2.setdefault(l_sentence_position, dict()).setdefault(l_sp_key, 0) + 1
+            l_sit_key_3 = f'{l_sp_context_a_3}/{l_sp_context_b_3}'
+            l_sit_key_4 = f'{l_sp_context_a_4}/{l_sp_context_b_4}'
+            l_sit_key_5 = f'{l_sp_context_a_5}/{l_sp_context_b_5}'
 
-                l_sp_context_1 = f'{l_sentence_position if len(l_sentence_position) > 0 else "__"} {l_n_sp if len(l_n_sp) > 0 else "__"} '\
-                                 f'{l_nn_sp if len(l_nn_sp) > 0 else "__"} {l_nnn_sp if len(l_nnn_sp) > 0 else "__"}'
-                l_sp_context_1s = f'{l_sentence_position if len(l_sentence_position) > 0 else "__"} {l_n_sp if len(l_n_sp) > 0 else "__"} '\
-                                  f'{l_nn_sp if len(l_nn_sp) > 0 else "__"}'
-                if len(l_sp_context_1) < 11:
-                    print(f'[{l_sp_context_1}]')
-                    print(l_tok)
-                    print(l_n_tok)
-                    print(l_nn_tok)
-                    print(l_nn_tok)
-                    sys.exit()
-                l_sp_context_2 = f'{l_sp_key} {l_n_sp_key} {l_nn_sp_key} {l_nnn_sp_key}'
-                l_sp_context_2s = f'{l_sp_key} {l_n_sp_key} {l_nn_sp_key}'
-                if (l_sp_context_1 not in ['SE SS SE SS',
-                                           'SE SS SE SX',
+            # del l_tok['Context']
+            if (len(l_sentence_position) > 0 and len(l_n_sp) > 0) or l_sp_key == '_EP_' or l_must_ss:
+                if (l_sp_context_a_4 not in [#'SE SS SE SS',
+                                           #'SE SS SE SX',
                                            'SS SE SS __',
                                            '__ SE SS __',
-                                           'SS SE SX SS '] and
-                        f'{l_sp_context_1s}/{l_sp_context_2s}' not in [ #
-                            'SE SS __/_EP_ <CAP> <NCAP>',
-                            'SE SS __/_EP_ <CAP> <CAP>',
-                            'SE SS __/_EP_ “/`` <CAP>',
-                            'SE SS __/_EP_ ‘/`` <CAP>',
-                            'SE SS __/”/\'\' “/`` <CAP>', # ”/'' “/`` <CAP>
-                            'SE SS __/”/\'\' ‘/`` <CAP>', # ”/'' ‘/`` <CAP>
-                            'SE SS __/’/\'\' “/`` <CAP>', # ’/'' “/`` <CAP>
-                            'SE SS __/’/\'\' ‘/`` <CAP>', # ’/'' ‘/`` <CAP>
-                            'SE SS __/”/\'\' <CAP> <CAP>', # ”/'' <CAP> <CAP>
-                            'SE SS __/”/\'\' <CAP> <NCAP>',  # ”/'' <CAP> <NCAP>
-                            'SE SS __/’/\'\' <CAP> <NCAP>',  # ’/'' <CAP> <NCAP>
-                            'SE SS __/’/\'\' <CAP> <CAP>',  # ’/'' <CAP> <NCAP>
-                            '__ SE SS/_EP_ ”/\'\' “/``',  # _EP_ ”/'' “/``
-                            '__ SE SS/_EP_ ’/\'\' <CAP>',  # _EP_ ‘/'' <CAP>
-                            '__ SE SS/_EP_ ”/\'\' “/``',  # _EP_ ”/'' “/``
-                            '__ SE SS/_EP_ ‘/\'\' ‘/``',  # _EP_ ‘/'' ‘/``
-                            'SE SS __/:/: <CAP> <NCAP>',
-                            'SE SS __/:/: <CAP> <CAP>',
-                        ]): # ”/''
-                    if f'{l_sp_context_1s}/{l_sp_context_2s}' in ['SE SS __/_EP_ <NCAP> <NCAP>',
-                                                                  'SE SS __/_EP_ <NCAP> <CAP>',
-                                                                  'SE SS __/”/\'\' <NCAP> <NCAP>',
-                                                                  'SE SS __/’/\'\' <NCAP> <NCAP>',
-                                                                  'SE SS __/”/\'\' <NCAP> <CAP>',
-                                                                  'SE SS __/’/\'\' <NCAP> <CAP>',
-                                                                  ]:
-                        # capitalize next word
+                                           #'SS SE SX SS'
+                ] and not (re.match(r'SE SS __/(?:_EP_|;/:|:/:|[”’]/\'\') (?:<CAP> <N?CAP>|[‘“]/`` <CAP>)', l_sit_key_3) or
+                           re.match(r'SE SS __ __/(?:_EP_|;/:|:/:|[”’]/\'\') “/`` ‘/`` <CAP>', l_sit_key_4) or
+                           re.match(r'SE SS __ SE/(?:_EP_|;/:|:/:|[”’]/\'\') <CAP> _EP_ [”’]/\'\'', l_sit_key_4) or
+                           re.match(r'__ SE SS/(?:_EP_|;/:|:/:) [”’]/\'\' <CAP>', l_sit_key_3) or
+                           re.match(r'SE SS SE SS/(?:_EP_|;/:|:/:|[”’]/\'\') <CAP> (?:_EP_|;/:|:/:) <CAP>', l_sit_key_4))): #
+                    # ---------- /\ Good cases above ---------------- \/ Bad cases below this line ---------------------------------------------------------------------
+                    if re.match(r'(?:SE|\*e) SS __/(?:_EP_|;/:|:/:|[”’]/\'\') <NCAP> <N?CAP>', l_sit_key_3):
+                        # capitalize + 1
                         g_base_tokens[l_tok_index + 1][1]['Text'] = l_n_tok['Text'][:1].upper() + l_n_tok['Text'][1:]
-                    elif f'{l_sp_context_1s}/{l_sp_context_2s}' in ['SE SS __/_EP_ ”/\'\' “/``',
-                                                                    'SE SS __/_EP_ ”/\'\' ‘/``',
-                                                                    'SE SS __/_EP_ ’/\'\' “/``',
-                                                                    'SE SS __/_EP_ ’/\'\' ‘/``',
-                                                                    'SE SX SS/_EP_ ”/\'\' “/``',
-                                                                    'SE SX SS/_EP_ ”/\'\' ‘/``',
-                                                                    'SE SX SS/_EP_ ’/\'\' “/``',
-                                                                    'SE SX SS/_EP_ ’/\'\' ‘/``',
-                                                                    'SE SX SS/<NCAP> _EP_ <CAP>',
-                                                                    'SE SX SS/<NCAP> _EP_ ‘/``',
-                                                                    'SE SX SS/<NCAP> _EP_ “/``',
-                                                                    ]:
+                    elif re.match(r'__ SE SS/(?:_EP_|;/:|:/:) [”’]/\'\' <NCAP>', l_sit_key_3):
+                        # capitalize + 2
+                        g_base_tokens[l_tok_index + 2][1]['Text'] = l_nn_tok['Text'][:1].upper() + l_nn_tok['Text'][1:]
+                    elif (   re.match(r'SE SS SE SS/(?:_EP_|;/:|:/:|[”’]/\'\') <CAP> (?:_EP_|;/:|:/:) <NCAP>', l_sit_key_4) or
+                           re.match(r'SE SS __ __/(?:_EP_|;/:|:/:|[”’]/\'\') “/`` ‘/`` <NCAP>', l_sit_key_3)):
+                        # capitalize + 3
+                        g_base_tokens[l_tok_index + 3][1]['Text'] = l_nnn_tok['Text'][:1].upper() + l_nnn_tok['Text'][1:]
+                    elif (re.match(r'(?:SE|\*e) SS __/_EP_ [”’]/\'\' (?:<CAP>|[‘“]/``)', l_sit_key_3) or
+                          re.match(r'(?:SE|\*e) SS __ __/’/\'\' ”/\'\' (?:[‘“]/`` <CAP>|<CAP> <N?CAP>|“/`` ‘/``)', l_sit_key_4) or
+                          re.match(r'(?:SE|\*e) SS __/<N?CAP> (?:_EP_|;/:|:/:) (?:<CAP>|[‘“]/``)', l_sit_key_3) or
+                          re.match(r'(?:SE|\*e) SX SS/_EP_ [”’]/\'\' (?:<CAP>|[‘“]/``)', l_sit_key_3) or
+                          re.match(r'(?:SE|\*e) SX SS/<N?CAP> (?:_EP_|;/:|:/:) (?:<CAP>|[‘“]/``)', l_sit_key_3)):
                         # move down sentence break by one position
-                        l_sentence_position = ''
+                        g_base_tokens[l_tok_index][1]['SentencePos'] = ''
                         l_tok['SentencePos'] = ''
                         g_base_tokens[l_tok_index + 1][1]['SentencePos'] = 'SE'
                         g_base_tokens[l_tok_index + 2][1]['SentencePos'] = 'SS'
-                    elif f'{l_sp_context_1s}/{l_sp_context_2s}' in ['SE SS __/<NCAP> <NCAP> <NCAP>',
-                                                                    'SE SS __/<NCAP> <CAP> <NCAP>',
-                                                                    'SE SS __/<NCAP> <NCAP> <CAP>',
-                                                                    'SE SS __/<NCAP> <CAP> <CAP>',
-                                                                    'SE SS __/<CAP> <NCAP> <NCAP>',
-                                                                    'SE SS __/<CAP> <CAP> <NCAP>',
-                                                                    'SE SS __/<CAP> <NCAP> <CAP>',
-                                                                    'SE SS __/<CAP> <CAP> <CAP>',
-                                                                    'SE SS __/,/, <NCAP> <NCAP>',
-                                                                    'SE SS __/,/, <CAP> <NCAP>',
-                                                                    'SE SS __/,/, <NCAP> <CAP>',
-                                                                    'SE SS __/,/, <CAP> <CAP>',
-                                                                    'SE SS __/;/: <NCAP> <NCAP>',
-                                                                    'SE SS __/;/: <CAP> <NCAP>',
-                                                                    'SE SS __/;/: <NCAP> <CAP>',
-                                                                    'SE SS __/;/: <CAP> <CAP>',
-                                                                    'SE SS __/<NCAP> ;/: <NCAP>',
-                                                                    'SE SS __/<CAP> ;/: <NCAP>',
-                                                                    'SE SS __/<NCAP> ;/: <CAP>',
-                                                                    'SE SS __/<CAP> ;/: <CAP>',
-                                                                    'SE SS __/<NCAP> ,/, <NCAP>',
-                                                                    'SE SS __/<CAP> ,/, <NCAP>',
-                                                                    'SE SS __/<NCAP> ,/, <CAP>',
-                                                                    'SE SS __/<CAP> ,/, <CAP>',
-                                                                    ]:
-                        # no sentence break at all
-                        l_sentence_position = ''
+                    elif re.match(r'(?:SE|\*e) SS __/(?:_EP_ [”’]/\'\'|<N?CAP> (?:_EP_|;/:|:/:)) <NCAP>',l_sit_key_3):
+                        # move down sentence break by one position & capitalize + 1
+                        g_base_tokens[l_tok_index][1]['SentencePos'] = ''
                         l_tok['SentencePos'] = ''
-                        g_base_tokens[l_tok_index + 1][1]['SentencePos'] = ''
-                    elif f'{l_sp_context_1s}/{l_sp_context_2s}' in ['__ __ __/_EP_ ”/\'\' “/``',
-                                                                    '__ __ __/_EP_ ’/\'\' “/``',
-                                                                    '__ __ __/_EP_ ”/\'\' ’/``',
-                                                                    '__ __ __/_EP_ ’/\'\' ’/``',
-                                                                    '__ __ __/_EP_ ”/\'\' <NCAP>',
-                                                                    '__ __ __/_EP_ ”/\'\' <CAP>',
-                                                                    '__ __ __/_EP_ ’/\'\' <NCAP>',
-                                                                    '__ __ __/_EP_ ’/\'\' <CAP>',
-                                                                    '__ __ __/<NCAP> _EP_ <CAP>',
-                                                                    '__ __ __/<CAP> _EP_ <CAP>',
-                                                                    ]:
-                        # create sentence break at + 1
                         g_base_tokens[l_tok_index + 1][1]['SentencePos'] = 'SE'
                         g_base_tokens[l_tok_index + 2][1]['SentencePos'] = 'SS'
-                    elif f'{l_sp_context_1s}/{l_sp_context_2s}' in ['__ __ __/_EP_ <CAP> <NCAP>',
-                                                                    '__ __ __/_EP_ <CAP> <CAP>',]:
-                        # create sentence break
-                        l_sentence_position = 'SE'
-                        l_tok['SentencePos'] = 'SE'
-                        g_base_tokens[l_tok_index + 1][1]['SentencePos'] = 'SS'
-                    elif f'{l_sp_context_1s}/{l_sp_context_2s}' in ['__ __ __/_EP_ <NCAP> <NCAP>',
-                                                                    '__ __ __/_EP_ <NCAP> <CAP>', ]:
-                        # create sentence break + capitalize + 1
-                        l_sentence_position = 'SE'
-                        l_tok['SentencePos'] = 'SE'
-                        g_base_tokens[l_tok_index + 1][1]['SentencePos'] = 'SS'
                         g_base_tokens[l_tok_index + 1][1]['Text'] = l_n_tok['Text'][:1].upper() + l_n_tok['Text'][1:]
-                    elif f'{l_sp_context_1}/{l_sp_context_2}' in ['SE SX SX SS/<NCAP> _EP_ ”/\'\' “/``',
-                                                                  'SE SX SX SS/<NCAP> _EP_ ’/\'\' “/``',
-                                                                  'SE SX SX SS/<NCAP> _EP_ ”/\'\' ‘/``',
-                                                                  'SE SX SX SS/<NCAP> _EP_ ’/\'\' ‘/``',
-                                                                  'SE SX SX SS/<CAP> _EP_ ”/\'\' “/``',
-                                                                  'SE SX SX SS/<CAP> _EP_ ’/\'\' “/``',
-                                                                  'SE SX SX SS/<CAP> _EP_ ”/\'\' ’/``',
-                                                                  'SE SX SX SS/<CAP> _EP_ ’/\'\' ‘/``',
-                                                                  ]:
-                        # move down sentence break by two position
-                        l_sentence_position = ''
+                    elif (re.match(r'(?:SE|\*e) SX SX SS/<N?CAP> _EP_ [”’]/\'\' [‘“]/``', l_sit_key_4) or
+                          re.match(r'(?:SE|\*e) SS __ __/<N?CAP> _EP_ [”’]/\'\' <CAP>', l_sit_key_4) or
+                          re.match(r'(?:SE|\*e) SS SE SX/<N?CAP> <N?CAP> _EP_ (?:[‘“]/``|<CAP)>', l_sit_key_4)):
+                        # *e SX SX SS <NCAP> _EP_ ”/'' “/``
+                        # move down sentence break by two positions
+                        g_base_tokens[l_tok_index][1]['SentencePos'] = ''
                         l_tok['SentencePos'] = ''
                         g_base_tokens[l_tok_index + 1][1]['SentencePos'] = ''
                         g_base_tokens[l_tok_index + 2][1]['SentencePos'] = 'SE'
                         g_base_tokens[l_tok_index + 3][1]['SentencePos'] = 'SS'
+                    elif (re.match(r'(?:\*e|SE) SS __/<N?CAP> (?:<N?CAP>|,/,) <N?CAP>', l_sit_key_3) or
+                          re.match(r'(?:\*e|SE) SS __/,/, <N?CAP> <N?CAP>', l_sit_key_3) or
+                          re.match(r'(?:\*e|SE) SX SS/,/, <N?CAP> <N?CAP>', l_sit_key_3)):
+                        # no sentence break at all
+                        g_base_tokens[l_tok_index][1]['SentencePos'] = ''
+                        l_tok['SentencePos'] = ''
+                        g_base_tokens[l_tok_index + 1][1]['SentencePos'] = ''
+                    elif (re.match(r'__ __ __/_EP_ [”’]/\'\' (?:<CAP>|[‘“]/``)', l_sit_key_3) or
+                          re.match(r'__ __ __/<N?CAP> _EP_ (?:<CAP>|[‘“]/``)', l_sit_key_3)):
+                        # create sentence break at + 1
+                        g_base_tokens[l_tok_index + 1][1]['SentencePos'] = 'SE'
+                        g_base_tokens[l_tok_index + 2][1]['SentencePos'] = 'SS'
+                    elif (re.match(r'__ __ __/_EP_ [”’]/\'\' <NCAP>', l_sit_key_3) or
+                          re.match(r'__ __ __/<N?CAP> _EP_ <NCAP>', l_sit_key_3)):
+                        # create sentence break at + 1 & capitalize + 2
+                        g_base_tokens[l_tok_index + 1][1]['SentencePos'] = 'SE'
+                        g_base_tokens[l_tok_index + 2][1]['SentencePos'] = 'SS'
+                        g_base_tokens[l_tok_index + 2][1]['Text'] = l_n_tok['Text'][:1].upper() + l_n_tok['Text'][1:]
+                    elif re.match(r'__ __ __/_EP_ <CAP> <N?CAP>', l_sit_key_3):
+                        # create sentence break
+                        g_base_tokens[l_tok_index][1]['SentencePos'] = 'SE'
+                        l_tok['SentencePos'] = 'SE'
+                        g_base_tokens[l_tok_index + 1][1]['SentencePos'] = 'SS'
+                    elif re.match(r'__ __ __/_EP_ <NCAP> <N?CAP>', l_sit_key_3):
+                        # create sentence break & capitalize + 1
+                        g_base_tokens[l_tok_index][1]['SentencePos'] = 'SE'
+                        l_tok['SentencePos'] = 'SE'
+                        g_base_tokens[l_tok_index + 1][1]['SentencePos'] = 'SS'
+                        g_base_tokens[l_tok_index + 2][1]['Text'] = l_n_tok['Text'][:1].upper() + l_n_tok['Text'][1:]
+                    elif re.match(r'(?:SE|\*e) SS SE SX SS/<N?CAP> <N?CAP> _EP_ [”’]/\'\' [‘“]/``', l_sit_key_5):
+                        # *e SS SE SX SS -------------------------------------
+                        #      1 <NCAP> <NCAP> _EP_ ”/'' “/``
+                        # processing *e SS SE SX SS
+                        g_base_tokens[l_tok_index][1]['SentencePos'] = ''
+                        l_tok['SentencePos'] = ''
+                        g_base_tokens[l_tok_index + 1][1]['SentencePos'] = ''
+                        g_base_tokens[l_tok_index + 2][1]['SentencePos'] = ''
+                        g_base_tokens[l_tok_index + 3][1]['SentencePos'] = 'SE'
+                        g_base_tokens[l_tok_index + 4][1]['SentencePos'] = 'SS'
+                    elif re.match(r'SE SS SE SX SS/[”’]/\'\' [‘“]/`` <CAP> -/HYPH <N?CAP>', l_sit_key_5):
+                        # SE SS SE SX SS -------------------------------------
+                        #      1 ”/'' “/`` <CAP> -/HYPH <NCAP>
+                        g_base_tokens[l_tok_index][1]['SentencePos'] = 'SE'
+                        l_tok['SentencePos'] = 'SE'
+                        g_base_tokens[l_tok_index + 1][1]['SentencePos'] = 'SS'
+                        g_base_tokens[l_tok_index + 2][1]['SentencePos'] = ''
+                        g_base_tokens[l_tok_index + 3][1]['SentencePos'] = ''
+                        g_base_tokens[l_tok_index + 4][1]['SentencePos'] = ''
                     else: #
-                        g_sent_pos_3[l_sp_context_1][l_sp_context_2] = g_sent_pos_3.setdefault(l_sp_context_1, dict()).setdefault(l_sp_context_2, 0) + 1
+                        if len(l_nnnn_sp) == 0:
+                            g_sent_pos_3_en[l_sp_context_a_4][l_sp_context_b_4] = g_sent_pos_3_en.setdefault(l_sp_context_a_4, dict()).setdefault(l_sp_context_b_4, 0) + 1
+                        else:
+                            g_sent_pos_3_en[l_sp_context_a_5][l_sp_context_b_5] = g_sent_pos_3_en.setdefault(l_sp_context_a_5, dict()).setdefault(l_sp_context_b_5, 0) + 1
+        else: # if l_tok_key[:5] in ['A-SHR', 'B-JWT'] --> grk
+            if l_first_grk:
+                l_first_grk = False
+                l_must_ss = True
 
-                # SE - SX - SS correction
-                # if (l_n_tok and l_nn_tok and
-                #         l_sentence_position == 'SE' and
-                #         l_n_tok['SentencePos'] == 'SX' and
-                #         l_nn_tok['SentencePos'] == 'SS' and
-                #         not (l_sp_key in ['./.', ';/.', '?/.', '!/.'] and
-                #              l_n_sp_key in ['./.', ';/.', '?/.', '!/.'])):
-                #     l_sentence_position = ''
-                #     l_tok['SentencePos'] = ''
-                #     g_base_tokens[l_tok_index + 1][1]['SentencePos'] = 'SE'
+            def sp_key(p_txt_with_cap, p_pos, p_tag, p_secondary=False):
+                l_txt = f'{p_txt_with_cap}/{p_tag}'
+                l_txt = '_EP_' if l_txt in ['./PUNCT', ';/PUNCT', '?/PUNCT', '!/PUNCT'] else l_txt
+                return l_txt if p_pos == 'PUNCT' and not (
+                            p_secondary and l_txt in [',/PUNCT', ';/PUNCT', ':/PUNCT', '(/-LRB-']) else \
+                    '<CAP>' if re.search('[A-Z]', p_txt_with_cap[:1]) else '<NCAP>'
 
-                # SE - SX - SX - SS correction
-                # if (l_n_tok and l_nn_tok and l_nnn_tok and
-                #         l_sentence_position == 'SE' and
-                #         l_n_tok['SentencePos'] == 'SX' and
-                #         l_nn_tok['SentencePos'] == 'SX' and
-                #         l_nnn_tok['SentencePos'] == 'SS' and
-                #         not (l_sp_key in ['./.', ';/.', '?/.', '!/.'] and
-                #              l_n_sp_key in ['./.', ';/.', '?/.', '!/.'] and
-                #              l_nn_sp_key in ['./.', ';/.', '?/.', '!/.'])):
-                #     l_sentence_position = ''
-                #     l_tok['SentencePos'] = ''
-                #     g_base_tokens[l_tok_index + 1][1]['SentencePos'] = ''
-                #     g_base_tokens[l_tok_index + 2][1]['SentencePos'] = 'SE'
+            l_sp_key = sp_key(l_txt_with_cap, l_pos, l_tag)
+            l_n_sp_key = sp_key(l_n_twc, l_n_pos, l_n_tag)
+            l_nn_sp_key = sp_key(l_nn_twc, l_nn_pos, l_nn_tag, p_secondary=True)
+            l_nnn_sp_key = sp_key(l_nnn_twc, l_nnn_pos, l_nnn_tag, p_secondary=True)
 
-                # SE - SS <NCAP> correction --> capitalize next word
-                # if (l_n_tok and
-                #         l_sentence_position == 'SE' and
-                #         l_n_sp == 'SS' and
-                #         l_sp_key in ['./.', ';/.', '?/.', '!/.', ':/:', ';/:', '”/\'\'', '’/\'\''] and
-                #         not l_n_sp_key == '<NCAP>'):
-                #
-                #     g_base_tokens[l_tok_index + 1][1]['Text'] = l_n_tok['Text'][:1].upper() + l_n_tok['Text'][1:]
+            g_sent_pos_2[l_sentence_position][l_sp_key] = g_sent_pos_2.setdefault(l_sentence_position, dict()).setdefault(l_sp_key, 0) + 1
 
-                # SE - SS but no punctuation or comma/semicolon
-                # if (l_n_tok and
-                #         l_sentence_position == 'SE' and
-                #         l_n_sp == 'SS' and
-                #         (l_pos != 'PUNCT' or l_txt_with_cap in [',', ';', ':'])):
-                #     l_sentence_position = ''
-                #     l_tok['SentencePos'] = ''
-                #     g_base_tokens[l_tok_index + 1][1]['SentencePos'] = ''
+            l_sp_context_a_4 = f'{l_sentence_position if len(l_sentence_position) > 0 else "__"} {l_n_sp if len(l_n_sp) > 0 else "__"} ' \
+                             f'{l_nn_sp if len(l_nn_sp) > 0 else "__"} {l_nnn_sp if len(l_nnn_sp) > 0 else "__"}'
+            l_sp_context_a_3 = f'{l_sentence_position if len(l_sentence_position) > 0 else "__"} {l_n_sp if len(l_n_sp) > 0 else "__"} ' \
+                              f'{l_nn_sp if len(l_nn_sp) > 0 else "__"}'
+            l_sp_context_b_4 = f'{l_sp_key} {l_n_sp_key} {l_nn_sp_key} {l_nnn_sp_key}'
+            l_sp_context_b_3 = f'{l_sp_key} {l_n_sp_key} {l_nn_sp_key}'
 
-                # SE Comma - SS word
-                # if (l_n_tok and
-                #         l_sentence_position == 'SE' and
-                #         l_tok['Text'] == ',' and
-                #         l_n_tok['SentencePos'] == 'SS' and
-                #         not re.search('[A-Z]', l_n_tok['Text'][:1])):
-                #     l_sentence_position = ''
-                #     l_tok['SentencePos'] = ''
-                #     g_base_tokens[l_tok_index + 1][1]['SentencePos'] = ''
+            if (len(l_sentence_position) > 0 and len(l_n_sp) > 0) or l_sp_key == '_EP_': #
+                if (l_sp_context_a_4 not in ['SS SE SS SE', 'SE __ __ __'] and
+                        f'{l_sp_context_a_3}|{l_sp_context_b_3}' not in ['SE SS __|_EP_ <NCAP> <NCAP>',
+                                                                       'SE SS SE|_EP_ <NCAP> _EP_',
+                                                                       'SS SE SS|<NCAP> _EP_ <NCAP>']):
+                    g_sent_pos_3_grk[l_sp_context_a_4][l_sp_context_b_4] = g_sent_pos_3_grk.setdefault(l_sp_context_a_4, dict()).setdefault(l_sp_context_b_4, 0) + 1
+    # end for l_tok_index in range(len(g_base_tokens)):
 
-                # l_form_key = l_tok['FormKey']
-                # l_anno_txt = f'{l_tok_key}: {l_form_key:20} [{l_pos:5}] {l_context}'
-                # if l_sentence_position == 'SX':
-                #     g_anno.setdefault('SPSX', []).append(l_anno_txt)
-                # if l_sentence_position == 'SS' and l_sp_key not in ['<CAP>', '“/``', '‘/``', '(/-LRB-']:
-                #     g_anno.setdefault('SPSS', []).append(l_anno_txt)
-                # if l_sentence_position == 'SE' and l_sp_key not in ['./.', '”/\'\'', '?/.', '!/.', ':/:', ';/:', ';/.', '’/\'\'', ')/-RRB-']:
-                #     g_anno.setdefault('SPSE', []).append(l_anno_txt)
-        else: # grk
-            pass
+    with open('base_tok_before_punct_removal.json', 'w') as f:
+        json.dump({'Base_Tok': g_base_tokens}, f, indent=4, ensure_ascii=False)
+    print(f'Saved g_base_tokens before punct removal: {len(g_base_tokens)}', file=sys.stderr)
 
+    # second pass for punctuation fields creation in each token
+    for l_tok_index in range(len(g_base_tokens)):
+        l_tok_key, l_tok = g_base_tokens[l_tok_index]
         # get punctuation on both side of non-punctuation token
         if l_tok['Pos'] != 'PUNCT' and l_tok['Text'] != '-':
             # try: # eliminate hyphenated word cases when a hyphen is present before or after (treated below)
-            l_new_sent_pos = l_tok['SentencePos']
+            # I: left side
+            l_mid_sent_pos = l_tok['SentencePos'] if len(l_tok['SentencePos']) > 0 else '__'
+            l_new_sent_pos_left = '__'
+            l_new_sent_pos_right = '__'
             l_punctuation_left = ''
             l_new_s_left = ''
+            l_i_left = 0
+            l_i_right = 0
+            l_sp_list = []
             if l_tok_index > 0:
                 l_fin_left = False
                 l_i_left = l_tok_index - 1
@@ -1518,16 +1523,22 @@ def group_punctuation():
 
                 while not l_fin_left:
                     l_tok_left = g_base_tokens[l_i_left][1]
+
                     if l_tok_left['Pos'] != 'PUNCT' or l_tok_left['Grammar']['PunctSide'] != 'Left':
                         l_fin_left = True
                     else:
+                        l_sp = l_tok_left['SentencePos'] if len(l_tok_left['SentencePos']) > 0 else '__'
+                        l_sp_list.append(l_sp)
                         l_punctuation_left = l_tok_left['Text'] + l_punctuation_left
-                        l_new_sent_pos = l_tok_left['SentencePos'] if len(l_tok_left['SentencePos']) > 0 else l_new_sent_pos
+                        l_new_sent_pos_left = l_sp if l_sp != '__' else l_new_sent_pos_left
                         l_new_s_left = l_tok_left['NewSection']
                         if l_i_left == 0:
                             l_fin_left = True
                         else:
                             l_i_left -= 1
+
+            l_sp_list.append(l_mid_sent_pos)
+            # II: right side
             l_punctuation_right = ''
             if l_tok_index < len(g_base_tokens) - 1:
                 l_fin_right = False
@@ -1540,15 +1551,37 @@ def group_punctuation():
                     if l_tok_right['Pos'] != 'PUNCT' or l_tok_right['Grammar']['PunctSide'] != 'Right':
                         l_fin_right = True
                     else:
+                        l_sp = l_tok_right['SentencePos'] if len(l_tok_right['SentencePos']) > 0 else '__'
+                        l_sp_list.append(l_sp)
                         l_punctuation_right = l_punctuation_right + l_tok_right['Text']
-                        l_new_sent_pos = l_tok_right['SentencePos'] if len(l_tok_right['SentencePos']) > 0 else l_new_sent_pos
+                        l_new_sent_pos_right = l_sp if l_sp != '__' else l_new_sent_pos_right
                         if l_i_right == len(g_base_tokens) - 1:
                             l_fin_right = True
                         else:
                             l_i_right += 1
+
             l_tok['PunctLeft'] = l_punctuation_left
             l_tok['PunctRight'] = l_punctuation_right
-            l_tok['SentencePos'] = l_new_sent_pos
+
+            l_sp_context_before = f'{l_new_sent_pos_left}-{l_mid_sent_pos}-{l_new_sent_pos_right}'
+
+            if l_i_left == l_tok_index - 1 and l_new_sent_pos_left == '__':
+                l_new_sent_pos_left = l_mid_sent_pos
+            if l_i_right == l_tok_index + 1 and l_new_sent_pos_right == '__':
+                l_new_sent_pos_right = l_mid_sent_pos
+
+            l_tok['SentencePosContext'] = f'{l_sp_context_before} --> {l_new_sent_pos_left}-{l_new_sent_pos_right} [{l_i_left} {l_tok_index} {l_i_right}] l_sp_list: {"-".join(l_sp_list)}'
+
+            # new sentence position
+            if f'{l_new_sent_pos_left}-{l_new_sent_pos_right}' == 'SS-SE':
+                l_tok['SentencePos'] = 'SX'
+            elif f'{l_new_sent_pos_left}-{l_new_sent_pos_right}' == 'SS-__':
+                l_tok['SentencePos'] = 'SS'
+            elif f'{l_new_sent_pos_left}-{l_new_sent_pos_right}' == '__-SE':
+                l_tok['SentencePos'] = 'SE'
+            else:
+                l_tok['SentencePos'] = l_mid_sent_pos
+
             # g_tokens_no_punctuation[l_tok_key] = l_tok
             # l_form_key = l_tok['FormKey'][0]
             # l_form = g_form_dict[l_form_key]
@@ -1556,19 +1589,27 @@ def group_punctuation():
             # l_lemma_text = g_lemma_dict[l_lemma_key]
             if len(l_new_s_left) > 0:
                 l_tok['NewSection'] = l_new_s_left
-            l_occur_restricted_tmp_list.append((l_tok_key, l_tok))
-            # g_occur_restricted_tmp[l_tok_key] = l_tok
+            l_occur_compacted_tmp_list.append((l_tok_key, l_tok))
+            # g_occur_compacted_tmp[l_tok_key] = l_tok
             # except HyphenatedWordException:
             #     pass # nothing to do - Hyphenated words treated below
         elif l_tok['Text'] == '-':
-            l_occur_restricted_tmp_list.append((l_tok_key, l_tok))
+            l_occur_compacted_tmp_list.append((l_tok_key, l_tok))
 
-    # second pass to take care of hyphenated words
+    with open('base_tok_after_punct_removal.json', 'w') as f:
+        json.dump({'Base_Tok': g_base_tokens}, f, indent=4, ensure_ascii=False)
+    print(f'Saved g_base_tokens after punct removal: {len(g_base_tokens)}', file=sys.stderr)
+
+    with open('occur_compacted_tmp_list.json', 'w') as f:
+        json.dump({'l_occur_compacted_tmp_list': l_occur_compacted_tmp_list}, f, indent=4, ensure_ascii=False)
+    print(f'Saved l_occur_compacted_tmp_list : {len(l_occur_compacted_tmp_list)}', file=sys.stderr)
+
+    # third pass to take care of hyphenated words
     l_prev_text = ''
-    for l_tok_index in range(len(l_occur_restricted_tmp_list)):
-        l_tok_key, l_tok = l_occur_restricted_tmp_list[l_tok_index]
+    for l_tok_index in range(len(l_occur_compacted_tmp_list)):
+        l_tok_key, l_tok = l_occur_compacted_tmp_list[l_tok_index]
         l_cur_text = l_tok['Text']
-        l_next_text = l_occur_restricted_tmp_list[l_tok_index + 1][1]['Text'] if l_tok_index < len(l_occur_restricted_tmp_list) -1 else ''
+        l_next_text = l_occur_compacted_tmp_list[l_tok_index + 1][1]['Text'] if l_tok_index < len(l_occur_compacted_tmp_list) -1 else ''
         if l_prev_text != '-' and l_cur_text != '-' and l_next_text != '-':
             # Non-hyphenated words (and ignore tokens adjacent to a dash)
             l_form_key = l_tok['FormKey']
@@ -1578,7 +1619,7 @@ def group_punctuation():
             add_data_restricted(l_tok_key, l_tok, l_form_key, l_form, l_lemma_key, l_lemma)
         elif l_cur_text == '-':
             # Hyphenated words (tokens adjacent to a dash are taken care of here)
-            if l_tok_index == 0 or l_tok_index == len(l_occur_restricted_tmp_list) - 1:
+            if l_tok_index == 0 or l_tok_index == len(l_occur_compacted_tmp_list) - 1:
                 print(f'Error: first or last token cannot be a hyphen [{l_tok_index}]', file=sys.stderr)
                 sys.exit(0)
 
@@ -1601,8 +1642,8 @@ def group_punctuation():
             # 1) the hyphenated word
             # 2) the left-hand half (_before below) of the hyphenated word
             # 3) the right-hand half (_after below) of the hyphenated word
-            _, l_tok_before = l_occur_restricted_tmp_list[l_tok_index-1]
-            _, l_tok_after = l_occur_restricted_tmp_list[l_tok_index+1]
+            _, l_tok_before = l_occur_compacted_tmp_list[l_tok_index-1]
+            _, l_tok_after = l_occur_compacted_tmp_list[l_tok_index+1]
             l_new_text = f"{l_tok_before['Text']}-{l_tok_after['Text']}"
             l_new_form_key = f"{l_new_text}‣{l_tok_before['Tag']}"
             l_new_tok = {
@@ -1619,7 +1660,9 @@ def group_punctuation():
                 'MarkupBefore': l_tok_before['MarkupBefore'],
                 'MarkupAfter': l_tok_after['MarkupAfter'],
                 'NoteKey': l_tok_before['NoteKey'] if len(l_tok_before['NoteKey']) > 0 else l_tok_after['NoteKey'],
-                'SentencePos': ('SS' if l_tok_before['SentencePos'] == 'SS' else ('SE' if l_tok_after['SentencePos'] == 'SE' else '')),
+                'SentencePos': ('SX' if l_tok_before['SentencePos'] == 'SS' and l_tok_after['SentencePos'] == 'SE' else
+                                'SS' if l_tok_before['SentencePos'] == 'SS' else
+                                'SE' if l_tok_after['SentencePos'] == 'SE' else ''),
                 'PunctLeft': l_tok_before['PunctLeft'],
                 'PunctRight': l_tok_after['PunctRight']
             }
@@ -2107,9 +2150,9 @@ def print_missing():
     l_notes_list = []
     l_notes_key_list = []
     l_notes_section_list = []
-    g_occur_restricted['Z-ZZZ-000000'] = {'NewSection': '', 'NoteKey': []}
-    for l_tok_key in sorted(g_occur_restricted.keys()):
-        l_tok = g_occur_restricted[l_tok_key]
+    g_occur_compacted['Z-ZZZ-000000'] = {'NewSection': '', 'NoteKey': []}
+    for l_tok_key in sorted(g_occur_compacted.keys()):
+        l_tok = g_occur_compacted[l_tok_key]
 
         l_section = l_tok['NewSection']
         l_note_key = l_tok['NoteKey']
@@ -2146,7 +2189,7 @@ def print_missing():
             l_last_section = l_section
             l_section_set.add(l_section)
 
-    del g_occur_restricted['Z-ZZZ-000000']
+    del g_occur_compacted['Z-ZZZ-000000']
 
 
 # print()
@@ -2164,11 +2207,12 @@ def print_remaining_dashes():
     print()
 
 def print_sp_context_stats():
-    print(f'================= SP Context Stats =======================')
-    for l_context_1 in sorted(g_sent_pos_3.keys()):
-        print(f'{l_context_1} -------------------------------------')
-        for l_c2, l_count in sorted(g_sent_pos_3[l_context_1].items(), key=lambda p: p[1], reverse=True):
-            print(f'{l_count:6} {l_c2}')
+    for l_lang, l_sent_pos_3 in [('en', g_sent_pos_3_en), ('grk', g_sent_pos_3_grk)]:
+        print(f'================= SP Context Stats {l_lang} =======================')
+        for l_context_1 in sorted(l_sent_pos_3.keys()):
+            print(f'{l_context_1} -------------------------------------')
+            for l_c2, l_count in sorted(l_sent_pos_3[l_context_1].items(), key=lambda p: p[1], reverse=True):
+                print(f'{l_count:6} {l_c2}')
 
 def print_sp_stats(p_sent_pos, p_ver):
     print(f'================= SP Stats {p_ver} =======================')
@@ -2185,11 +2229,11 @@ def check_sp():
     l_prev_txt = ''
     l_pp_txt = ''
     l_count = 0
-    for l_occ_key in sorted(g_occur_restricted.keys()):
-        l_txt = g_occur_restricted[l_occ_key]["PunctLeft"] + g_occur_restricted[l_occ_key]["Text"] + g_occur_restricted[l_occ_key]["PunctRight"]
-        l_sp = g_occur_restricted[l_occ_key]["SentencePos"]
+    for l_occ_key in sorted(g_occur_compacted.keys()):
+        l_txt = g_occur_compacted[l_occ_key]["PunctLeft"] + g_occur_compacted[l_occ_key]["Text"] + g_occur_compacted[l_occ_key]["PunctRight"]
+        l_sp = g_occur_compacted[l_occ_key]["SentencePos"]
         l_all_sp = l_sp + l_prev_sp + l_pp_sp
-        if len(l_all_sp) > 4 and ('SESE' in l_all_sp or 'SSSS' in l_all_sp):
+        if len(l_all_sp) > 4 and ('SESE' in l_all_sp or 'SSSS' in l_all_sp or 'SSSXSSE' in l_all_sp):
             print(f'{l_count:4} {l_occ_key} {l_pp_sp:2} {l_prev_sp:2} {l_sp} {l_pp_txt} {l_prev_txt} {l_txt}')
             l_count += 1
         # print(f'{l_occ_key} {l_pp_sp:2} {l_prev_sp:2} {l_sp} {l_pp_txt} {l_prev_txt} {l_txt}')
@@ -2204,7 +2248,7 @@ if __name__ == '__main__':
     l_do_english = True
     l_perform_phase_II = True
     l_do_greek = True
-    l_phase_iii_only = True
+    l_phase_III_only = False
 
     # punctuation categories
     g_left_set = copy.deepcopy(g_min_left_set)
@@ -2242,15 +2286,15 @@ if __name__ == '__main__':
 
     # NLP engines initialization
     # spaCy for English, Stanza (Stanford NLP) for Greek
-    if l_perform_phase_II or l_phase_iii_only:
+    if l_perform_phase_II or l_phase_III_only:
         g_nlp_en = spacy.load('en_core_web_trf')
         nltk.download('wordnet')
         g_nlp_en_nltk = WordNetLemmatizer()
-        if l_do_greek or l_phase_iii_only:
+        if l_do_greek or l_phase_III_only:
             g_nlp_gr = stanza.Pipeline('grc')
 
     print('--- NLP engines initialized ---', file=sys.stderr)
-    if not l_phase_iii_only:
+    if not l_phase_III_only:
         # establish DB connection
         l_db_connection = psycopg2.connect(
             host=g_dbServer,
@@ -2386,7 +2430,7 @@ if __name__ == '__main__':
         with open('lemmas.json', 'r', encoding="utf-8") as f:
             g_lemma_dict = json.load(f)
         print(f'Loaded g_lemma_dict  : {len(g_lemma_dict.keys())}', file=sys.stderr)
-    # end if not l_phase_iii_only:
+    # end if not l_phase_III_only:
 
     # ==================================================== Phase III ===================================================
     print('Phase III - Grouping punctuation into tokens', file=sys.stderr)
@@ -2405,8 +2449,8 @@ if __name__ == '__main__':
     # print_missing()
     # print_remaining_dashes()
     # print_morph_attr()
-    print_sp_stats(g_sent_pos, 'I')
-    print_sp_stats(g_sent_pos_2, 'II')
+    # print_sp_stats(g_sent_pos, 'I')
+    # print_sp_stats(g_sent_pos_2, 'II')
     print_sp_context_stats()
     print_anno()
     check_sp()
@@ -2416,11 +2460,14 @@ if __name__ == '__main__':
     #     json.dump(g_tokens_no_punctuation, g, indent=4, ensure_ascii=False)
 
     print('********** Dumping restricted JSON files', file=sys.stderr)
-    with open('occ_restricted.json', 'w') as f:
-        json.dump(g_occur_restricted, f, indent=4, ensure_ascii=False)
+    with open('occ_compacted.json', 'w') as f:
+        json.dump(g_occur_compacted, f, indent=4, ensure_ascii=False)
+    print(f'Saved g_occur_compacted  : {len(g_occur_compacted)}', file=sys.stderr)
 
     with open('forms_restricted.json', 'w') as f:
         json.dump(g_form_restricted, f, indent=4, ensure_ascii=False)
+    print(f'Saved g_form_restricted  : {len(g_form_restricted)}', file=sys.stderr)
 
     with open('lemmas_restricted.json', 'w') as f:
         json.dump(g_lemma_restricted, f, indent=4, ensure_ascii=False)
+    print(f'Saved g_lemma_restricted : {len(g_lemma_restricted)}', file=sys.stderr)
