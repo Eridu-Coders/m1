@@ -4,7 +4,6 @@
 __author__ = 'fi11222'
 
 import re
-import json
 
 # downloaded from https://universaldependencies.org/u/feat/index.html and formated with dnl_morph_attr.py
 g_attr_values = [

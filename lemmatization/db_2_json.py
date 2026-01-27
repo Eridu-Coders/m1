@@ -21,6 +21,12 @@ from nltk.stem import WordNetLemmatizer
 # for Ancient Greek
 import stanza
 
+import sys
+sys.path.append('..')
+
+# grammar codes from Stanza/Spacy --> m1 pentacodes
+from gram_codes_package.gram_codes_module import g_gram_to_pentacode
+
 # DB connection parameters
 g_dbServer = 'localhost'
 g_dbDatabase = 'Perseus'
@@ -65,6 +71,7 @@ g_sent_pos = dict()
 g_sent_pos_2 = dict()
 g_sent_pos_3_en = dict()
 g_sent_pos_3_grk = dict()
+g_anomalous_grammar = []
 
 # output collections
 g_occurences = dict()       # word occurrences. Key = XXX-nnn, with XXX = 'A-SHR' (Shorey), 'B-JWT' (Jowett) or 'Z-GRC' (Greek)
@@ -248,6 +255,7 @@ def morph_standardize(p_pos, p_txt, p_morph, p_suspend=False):
             l_morph_dict['PunctSide'] = 'Right'
         else:
             l_morph_dict['PunctSide'] = 'None'
+
     return l_morph_dict
 
 # dictionary recording the char indexes (within g_republic_txt) of the latest and previous occurrence of a given form.
@@ -1627,7 +1635,7 @@ def group_punctuation():
                 return p_v1 if len(p_v2) == 0 else \
                             (p_v2 if len(p_v1) == 0 else
                              (p_v2 if p_v1 == p_v2 else
-                              f'{p_v1}⧎{p_v2}'))
+                              f'{p_v1}|{p_v2}'))
 
             def merge_grammar_dicts(p_d1: dict, p_d2):
                 l_merged = dict()
@@ -1934,6 +1942,33 @@ def process_cursor_list_gr(p_cursor_list):
     # print(g'Phase III - Grouping punctuation into tokens', file=sys.stderr)
     # group_punctuation()
 
+def pentacodes_translation():
+    """
+    Transforms POS, TAG and grammar codes in g_occur_compacted, g_form_restricted and g_lemma_restricted into m1 pentacodes
+    :return: nothing
+    """
+    global g_occur_compacted
+    global g_anomalous_grammar
+
+    for l_key, l_tok in g_occur_compacted.items():
+        l_tok['Pos'] = g_gram_to_pentacode['Pos-' + l_tok['Pos']]
+        try:
+            l_tok['Tag'] = g_gram_to_pentacode['Tag-' + l_tok['Tag']]
+        except KeyError:
+            l_tok['Tag'] = g_gram_to_pentacode['Pos-' + l_tok['Tag']]
+
+        l_gram_penta_list = []
+        for l_gr_key, l_gr_val in  l_tok['Grammar'].items():
+            try:
+                l_gram_penta_list.append(g_gram_to_pentacode[f'{l_gr_key}-{l_gr_val.split("|")[-1]}'])
+            except KeyError as l_ke:
+                print('KeyError', l_ke, l_tok)
+                g_anomalous_grammar.append(f'{l_key} {l_ke}')
+
+        l_tok['PentaGrammar'] = l_gram_penta_list
+        g_occur_compacted[l_key] = l_tok
+
+        # print(g_occur_compacted[l_key])
 
 def print_lemma_2_words():
     print('================= Lemmas --> words =======================')
@@ -2242,13 +2277,18 @@ def check_sp():
         l_pp_sp = l_prev_sp
         l_prev_sp = l_sp
 
+def anomalous_grammar():
+    print('================= Anomalous Grammar Values =================')
+    for l_anno_gr in g_anomalous_grammar:
+        print(l_anno_gr)
+
 # ------------- main() -------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     # feature switches
     l_do_english = True
     l_perform_phase_II = True
     l_do_greek = True
-    l_phase_III_only = False
+    l_phase_III_only = True
 
     # punctuation categories
     g_left_set = copy.deepcopy(g_min_left_set)
@@ -2412,7 +2452,7 @@ if __name__ == '__main__':
         with open('notes.json', 'w') as f:
             json.dump(g_notes_dict, f, indent=4, ensure_ascii=False)
     else:
-        print('Phase III only --> loading from unrestricted files', file=sys.stderr)
+        print('Phase III only --> loading from uncompacted files', file=sys.stderr)
         with open('base_tok.json', 'r', encoding="utf-8") as f:
             g_base_tokens = json.load(f)['Base_Tok']
             # json.dump({'Base_Tok': g_base_tokens}, f, indent=4, ensure_ascii=False)
@@ -2433,10 +2473,11 @@ if __name__ == '__main__':
     # end if not l_phase_III_only:
 
     # ==================================================== Phase III ===================================================
-    print('Phase III - Grouping punctuation into tokens', file=sys.stderr)
+    print('Phase III - Grouping punctuation into tokens and code translation to m1 pentacodes', file=sys.stderr)
     group_punctuation()
+    pentacodes_translation()
 
-    print('********** Control tables', file=sys.stderr)
+    print('********** Control tables **********', file=sys.stderr)
     # print_lemma_2_words()
     # print_hyphens()
     # print_xpos()
@@ -2454,12 +2495,13 @@ if __name__ == '__main__':
     print_sp_context_stats()
     print_anno()
     check_sp()
+    anomalous_grammar()
 
     # g_tokens_no_punctuation
     # with open('occ_no_punc.json', 'w') as g:
     #     json.dump(g_tokens_no_punctuation, g, indent=4, ensure_ascii=False)
 
-    print('********** Dumping restricted JSON files', file=sys.stderr)
+    print('********** Dumping compacted JSON files **********', file=sys.stderr)
     with open('occ_compacted.json', 'w') as f:
         json.dump(g_occur_compacted, f, indent=4, ensure_ascii=False)
     print(f'Saved g_occur_compacted  : {len(g_occur_compacted)}', file=sys.stderr)

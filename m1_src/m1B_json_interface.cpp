@@ -108,6 +108,7 @@ void M1Store::JsonInterface::loadJson(const QString& p_file_path){
             QString l_occ_id = l_it_occ.key();
             // QString l_text = l_this_occ_object.find("Text").value().toString();
             QString l_tag = l_this_occ_object.find("Tag").value().toString();
+            QString l_pos = l_this_occ_object.find("Pos").value().toString();
             // qCDebug(g_cat_tmp_spotlight).noquote() << QString("ID: %1 --> %2 %3").arg(l_occ_id).arg(l_tag, 5).arg(l_text);
 
             /*
@@ -135,22 +136,12 @@ void M1Store::JsonInterface::loadJson(const QString& p_file_path){
                 "Tag": "VERB",
                 "Text": "φαμεν"
             */
-            QString l_sentence_pos = l_this_occ_object.find("SentencePos").value().toString();
+            QString l_sentence_position = l_this_occ_object.find("SentencePos").value().toString();
             QString l_form_key = l_this_occ_object.find("FormKey").value().toString();
             QString l_mkp_before = l_this_occ_object.find("MarkupBefore").value().toString();
             QString l_mkp_after = l_this_occ_object.find("MarkupAfter").value().toString();
             QString l_punct_left = l_this_occ_object.find("PunctLeft").value().toString();
             QString l_punct_right = l_this_occ_object.find("PunctRight").value().toString();
-
-            qCDebug(g_cat_tmp_spotlight).noquote() << QString("ID: %1 --> %2 %3 [%4 %5] %6%7%8")
-                                                          .arg(l_occ_id)
-                                                          .arg(l_tag, 5)
-                                                          .arg(l_sentence_pos, 2)
-                                                          .arg(l_punct_left, 2)
-                                                          .arg(l_punct_right, 2)
-                                                          .arg(l_mkp_before.length() > 0 ? QString(" %1").arg(l_mkp_before) : "")
-                                                          .arg(l_mkp_after.length() > 0 ? QString(" %1").arg(l_mkp_after) : "")
-                                                          .arg(l_form_key);
 
             if(int l_book_number = l_this_occ_object.find("BookNumber").value().toInt(); l_book_number != -1){
                 QString l_book_title = l_this_occ_object.find("BookTitle").value().toString();
@@ -165,12 +156,37 @@ void M1Store::JsonInterface::loadJson(const QString& p_file_path){
             }
 
             QJsonObject l_this_grammar_object = l_this_occ_object.find("Grammar").value().toObject();
+            QStringList l_gram_list;
             if(l_this_grammar_object.count() > 0)
                 for(QJsonObject::const_iterator l_it_gram = l_this_grammar_object.constBegin(); l_it_gram != l_this_grammar_object.constEnd(); ++l_it_gram){
                     QString l_gram_key = l_it_gram.key();
                     QString l_gram_val = l_it_gram.value().toString();
-                    qCDebug(g_cat_tmp_spotlight).noquote() << QString("    GR %1: %2").arg(l_gram_key, 10).arg(l_gram_val);
+                    // qCDebug(g_cat_tmp_spotlight).noquote() << QString("    GR %1: %2").arg(l_gram_key, 10).arg(l_gram_val);
+                    l_gram_list.append(QString("%1: %2").arg(l_gram_key).arg(l_gram_val));
                 }
+
+            QJsonArray l_this_grammar_pentacodes_array = l_this_occ_object.find("PentaGrammar").value().toArray();
+            // qCDebug(g_cat_tmp_spotlight).noquote() << QString("    l_this_grammar_pentacodes_array: %1").arg(l_this_grammar_pentacodes_array.count());
+            QStringList l_gram_penta_list;
+            if(l_this_grammar_pentacodes_array.count() > 0)
+                for(const auto& l_value : l_this_grammar_pentacodes_array){
+                    // qCDebug(g_cat_tmp_spotlight).noquote() << QString("    GR %1").arg(l_value.toString());
+                    l_gram_penta_list.append(l_value.toString());
+                }
+
+            qCDebug(g_cat_tmp_spotlight).noquote() << QString("ID: %1 --> %2 %3 %4 [%5 %6] %7%8%9%10%11")
+                                                          .arg(l_occ_id)
+                                                          .arg(l_pos, 5)
+                                                          .arg(l_tag, 5)
+                                                          .arg(l_sentence_position, 2)
+                                                          .arg(l_punct_left, 2)
+                                                          .arg(l_punct_right, 2)
+                                                          .arg(l_mkp_before.length() > 0 ? QString(" %1").arg(l_mkp_before) : "")
+                                                          .arg(l_mkp_after.length() > 0 ? QString(" %1").arg(l_mkp_after) : "")
+                                                          .arg(l_form_key)
+                                                          .arg(l_gram_penta_list.length() > 0 ? " (" + l_gram_penta_list.join(" / ") + ")" : "")
+                                                          .arg(l_gram_list.length() > 0 ? " {" + l_gram_list.join(" / ") + "}" : "");
+
         }
     }
 }

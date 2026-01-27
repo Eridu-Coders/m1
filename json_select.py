@@ -12,97 +12,18 @@ g_lemma_dict = dict()       # lemmas. Key = <lemma>‣POS, with POS = pos_ for S
 g_entities_dict = dict()    # named entities. Key = 'LOC', 'NORP' or 'PERSON'
 g_notes_dict = dict()       # notes (from Shorey). Key = SHR-nnn, same as occurrence key of same toke
 
-g_section_selection = ['476c', '476d', '476e', '477a', '477b', '477c', '477d', '477e']
 # g_section_selection = ['476c', '476d', '476e']
+# g_section_selection = ['476c', '476d', '476e', '477a', '477b', '477c', '477d', '477e']
+g_section_selection = ['476', '477', '478', '479']
 
-g_nlp_pos_list = [
-    ('NPIIC', 'IIC', 'in intio compositi'),
-    ('NPIIV', 'IIV', 'in intio verbi'),
-    ('NPADJ', 'ADJ', 'adjective'),
-    ('NPADP', 'ADP', 'adposition'),
-    ('NPADV', 'ADV', 'adverb'),
-    ('NPAUX', 'AUX', 'auxiliary'),
-    ('NPCNJ', 'CCONJ', 'coordinating conjunction'),
-    ('NPDET', 'DET', 'determiner'),
-    ('NPIND', 'IND', 'indeclinable'),
-    ('NPINT', 'INTJ', 'interjection'),
-    ('NPNON', 'NOUN', 'noun'),
-    ('NPNUM', 'NUM', 'numeral'),
-    ('NPPRT', 'PART', 'particle'),
-    ('NPPRN', 'PRON', 'pronoun'),
-    ('NPPPN', 'PROPN', 'proper noun'),
-    ('NPPCT', 'PUNCT', 'punctuation'),
-    ('NPSCJ', 'SCONJ', 'subordinating conjunction'),
-    ('NPSYM', 'SYM', 'symbol'),
-    ('NPVRB', 'VERB', 'verb'),
-    ('NPXXX', 'X', 'other')
-]
-g_nlp_pos_dict = dict([(b, a) for a, b, _ in g_nlp_pos_list])
-
-g_nlp_tag_list = [
-    ('NTGSE', '.', 'punctuation mark, sentence closer'),
-    ('NTGCM', ',', 'punctuation mark, comma'),
-    ('NTLRB', '-LRB-', 'left round bracket'),
-    ('NTRRB', '-RRB-', 'right round bracket'),
-    ('NTOQM', '``', 'opening quotation mark'),
-    ('NTCQM', '""', 'closing quotation mark'),
-    ("NTCRM", "''", 'closing quotation mark'),
-    ('NTGCL', ':', 'punctuation mark, colon or ellipsis'),
-    ('NTDOL', '$', 'symbol, currency'),
-    ('NTSRP', '#', 'symbol, number sign'),
-    ('NTAFX', 'AFX', 'affix'),
-    ('NTGCC', 'CC', 'conjunction, coordinatinf'),
-    ('NTGCD', 'CD', 'cardinal number'),
-    ('NTGDT', 'DT', 'determiner'),
-    ('NTGEX', 'EX', 'existential there'),
-    ('NTGFW', 'FW', 'foreign word'),
-    ('NTHYP', 'HYPH', 'punctuation mark, hyphen'),
-    ('NTGIN', 'IN', 'conjunction, subordinating or preposition'),
-    ('NTGJJ', 'JJ', 'adjective (English), other noun-modifier (Chinese)'),
-    ('NTJJR', 'JJR', 'adjective, comparative'),
-    ('NTJJS', 'JJS', 'adjective, superlative'),
-    ('NTGLS', 'LS', 'list item marker'),
-    ('NTGMD', 'MD', 'verb, modal auxiliary'),
-    ('NTNIL', 'NIL', 'missing taf'),
-    ('NTGNN', 'NN', 'noun, singular or mass'),
-    ('NTNNP', 'NNP', 'noun, proper singular'),
-    ('NTNPP', 'NNPS', 'noun, proper plural'),
-    ('NTNNS', 'NNS', 'noun, plural'),
-    ('NTPDT', 'PDT', 'predeterminer'),
-    ('NTPOS', 'POS', 'possessive endinf'),
-    ('NTPRP', 'PRP', 'pronoun, personal'),
-    ('NTPR$', 'PRP$', 'pronoun, possessive'),
-    ('NTGRB', 'RB', 'adverb'),
-    ('NTRBR', 'RBR', 'adverb, comparative'),
-    ('NTRBS', 'RBS', 'adverb, superlative'),
-    ('NTGRP', 'RP', 'adverb, particle'),
-    ('NTGTO', 'TO', 'infinitival “to”'),
-    ('NTGUH', 'UH', 'interjection'),
-    ('NTGVB', 'VB', 'verb, base form'),
-    ('NTVBD', 'VBD', 'verb, past tense'),
-    ('NTVBG', 'VBG', 'verb, gerund or present participle'),
-    ('NTVBN', 'VBN', 'verb, past participle'),
-    ('NTVBP', 'VBP', 'verb, non-3rd person singular present'),
-    ('NTVBZ', 'VBZ', 'verb, 3rd person singular present'),
-    ('NTWDT', 'WDT', 'wh-determiner'),
-    ('NTGWP', 'WP', 'wh-pronoun, personal'),
-    ('NTWP$', 'WP$', 'wh-pronoun, possessive'),
-    ('NTWRB', 'WRB', 'wh-adverb'),
-    ('NTGSP', 'SP', 'space (English), sentence-final particle (Chinese)'),
-    ('NTADD', 'ADD', 'email'),
-    ('NTNFP', 'NFP', 'superfluous punctuation'),
-    ('NTGGW', 'GW', 'additional word in multi-word expression'),
-    ('NTGXX', 'XX', 'unknown'),
-    ('NTBES', 'BES', 'auxiliary “be”'),
-    ('NTHVS', 'HVS', 'forms of “have”'),
-    ('NT_SP', '_SP', 'whitespace'),
-    ('NT_SP', '_SP', 'whitespace'),
-]
-g_nlp_tag_dict = dict([(b, a) for a, b, _ in g_nlp_tag_list])
+from gram_codes_package.gram_codes_module import g_gram_to_pentacode
 
 # ------------- main() -------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
-    with open('lemmatization/occ_restricted.json', 'r') as f:
+    for l_key, l_value in g_gram_to_pentacode.items():
+        print(f'{l_key:20}: {l_value}')
+
+    with open('lemmatization/occ_compacted.json', 'r') as f:
         g_occurences = json.load(f)
     with open('lemmatization/notes.json', 'r') as f:
         g_notes_dict = json.load(f)
@@ -116,13 +37,17 @@ if __name__ == '__main__':
     for l_key in g_lemma_dict.keys():
         g_lemma_dict[l_key] = {
             "EntType": g_lemma_dict[l_key]["EntType"],
-            "Pos": g_nlp_pos_dict[g_lemma_dict[l_key]["Pos"]],
+            "Pos": g_gram_to_pentacode['Pos-' + g_lemma_dict[l_key]["Pos"]],
             "Text": g_lemma_dict[l_key]["Text"]}
 
     for l_key in g_form_dict.keys():
+        try:
+            l_new_tag = g_gram_to_pentacode['Tag-' + g_form_dict[l_key]["Tag"]]
+        except KeyError:
+            l_new_tag = g_gram_to_pentacode['Pos-' + g_form_dict[l_key]["Tag"]]
         g_form_dict[l_key] = {
             "LemmaKey": g_form_dict[l_key]["LemmaKey"],
-            "Tag": g_nlp_tag_dict[g_form_dict[l_key]["Tag"]] if g_form_dict[l_key]["Tag"] in g_nlp_tag_dict.keys() else g_nlp_pos_dict[g_form_dict[l_key]["Tag"]],
+            "Tag": l_new_tag,
             "Text": g_form_dict[l_key]["Text"]}
 
     l_shorey_occ = dict()
@@ -143,26 +68,25 @@ if __name__ == '__main__':
         l_prefix_count[l_key_prefix] = l_prefix_count.setdefault(l_key_prefix, 0) + 1
         if l_key_prefix == 'A-SHR':
             l_shorey_cur_sec = l_occ['NewSection'] if len(l_occ['NewSection']) > 0 else l_shorey_cur_sec
-            if l_shorey_cur_sec in g_section_selection:
+            if l_shorey_cur_sec[:3] in g_section_selection:
                 l_key_set.add(l_key_occ)
                 l_form_key_list.append(l_occ['FormKey'])
                 l_lemma_key_list+= g_form_dict[l_occ['FormKey']]['LemmaKey']
                 l_shorey_occ[l_key_occ] = l_occ
         elif l_key_prefix == 'B-JWT':
             l_jowett_cur_sec = l_occ['NewSection'] if len(l_occ['NewSection']) > 0 else l_jowett_cur_sec
-            if l_jowett_cur_sec in g_section_selection:
+            if l_jowett_cur_sec[:3] in g_section_selection:
                 l_key_set.add(l_key_occ)
                 l_form_key_list.append(l_occ['FormKey'])
                 l_lemma_key_list+= g_form_dict[l_occ['FormKey']]['LemmaKey']
                 l_jowett_occ[l_key_occ] = l_occ
         elif l_key_prefix == 'Z-GRK':
             l_greek_cur_sec = l_occ['NewSection'] if len(l_occ['NewSection']) > 0 else l_greek_cur_sec
-            if l_greek_cur_sec in g_section_selection:
+            if l_greek_cur_sec[:3] in g_section_selection:
                 l_key_set.add(l_key_occ)
                 l_form_key_list.append(l_occ['FormKey'])
                 l_lemma_key_list+= g_form_dict[l_occ['FormKey']]['LemmaKey']
                 l_greek_occ[l_key_occ] = l_occ
-
 
     for l_key_prefix in sorted(l_prefix_count.keys()):
         print(l_key_prefix, f'{l_prefix_count[l_key_prefix]:7,}')
