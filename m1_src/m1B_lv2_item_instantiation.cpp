@@ -210,7 +210,7 @@ M1Store::Item_lv2* M1Store::Item_lv2::getExisting(const ItemID p_item_id){
         qCDebug(g_cat_lv2_constructors) << QString("Existing: %1").arg(l_ret->dbgShort());
     }
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 /**

@@ -14,10 +14,15 @@ Q_LOGGING_CATEGORY(g_cat_json, "tei_interface")
 
 M1Store::Item_lv2* M1Store::JsonInterface::cm_text_root = nullptr;
 M1Store::Item_lv2* M1Store::JsonInterface::cm_lexicon_root = nullptr;
-int M1Store::JsonInterface::cm_cur_chapter_number = 0;
 QString M1Store::JsonInterface::cm_indent;
 std::map<QString, M1Store::Item_lv2*> M1Store::JsonInterface::cm_lemma_map;
 std::map<QString, M1Store::Item_lv2*> M1Store::JsonInterface::cm_form_map;
+M1Store::Item_lv2* M1Store::JsonInterface::cm_cur_book = nullptr;
+M1Store::Item_lv2* M1Store::JsonInterface::cm_cur_sentence = nullptr;
+QStringList M1Store::JsonInterface::cm_form_gr_done;
+int M1Store::JsonInterface::cm_cur_sentence_number = 1;
+int M1Store::JsonInterface::cm_cur_book_number = 0;
+
 // QMap<QString, M1Store::Item_lv2*> M1Store::JsonInterface::m_form_map;
 
 void M1Store::JsonInterface::init(){
@@ -99,8 +104,9 @@ void M1Store::JsonInterface::loadJson(const QString& p_file_path){
         M1Store::Item_lv2* l_current_version = l_version_folder->create_descendant(M1Env::OWNS_SIID, l_version_name, M1Env::TXTVR_SIID);
         l_current_version->setFieldEdge(l_version_type, M1Env::TEXT_VER_TYPE_SIID);
 
-        int l_cur_book = -1;
         QString l_cur_stephanus;
+        cm_cur_book_number = 0;
+        cm_cur_sentence_number = 1;
         // occurrences
         for(QJsonObject::const_iterator l_it_occ = l_this_version_object.constBegin(); l_it_occ != l_this_version_object.constEnd(); ++l_it_occ){
             QJsonObject l_this_occ_object = l_it_occ.value().toObject();
@@ -142,6 +148,8 @@ void M1Store::JsonInterface::loadJson(const QString& p_file_path){
             QString l_mkp_after = l_this_occ_object.find("MarkupAfter").value().toString();
             QString l_punct_left = l_this_occ_object.find("PunctLeft").value().toString();
             QString l_punct_right = l_this_occ_object.find("PunctRight").value().toString();
+            QString l_note_key = l_this_occ_object.find("NoteKey").value().toString();
+            QString l_occ_text = l_this_occ_object.find("NoteKey").value().toString();
 
             if(int l_book_number = l_this_occ_object.find("BookNumber").value().toInt(); l_book_number != -1){
                 QString l_book_title = l_this_occ_object.find("BookTitle").value().toString();
@@ -149,9 +157,16 @@ void M1Store::JsonInterface::loadJson(const QString& p_file_path){
                 if(l_book_title.length() == 0) l_book_title = QString("Book %1").arg(l_book_number);
                 qCDebug(g_cat_tmp_spotlight).noquote() << QString("Stephanus Section: %1 [%2] BookTitle:").arg(l_cur_stephanus).arg(l_book_number) << l_book_title;
 
-                if(l_cur_book != l_book_number){
-                    l_cur_book = l_book_number;
-                    qCDebug(g_cat_tmp_spotlight).noquote() << "New Book";
+                if(cm_cur_book_number != l_book_number){
+                    cm_cur_book_number = l_book_number;
+                    qCDebug(g_cat_tmp_spotlight).noquote() << "New Book: " << cm_cur_book_number;
+                    cm_cur_book = M1Store::Item_lv2::getNew(
+                        // vertex flags
+                        M1Env::FULL_VERTEX,
+                        // label
+                        QString("Book %1").arg(cm_cur_book_number));
+                    cm_cur_book->setType(M1Env::TEXT_BOOK_SIID);
+                    l_current_version->linkTo(cm_cur_book, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
                 }
             }
 
@@ -174,21 +189,73 @@ void M1Store::JsonInterface::loadJson(const QString& p_file_path){
                     l_gram_penta_list.append(l_value.toString());
                 }
 
-            qCDebug(g_cat_tmp_spotlight).noquote() << QString("ID: %1 --> %2 %3 %4 [%5 %6] %7%8%9%10%11")
-                                                          .arg(l_occ_id)
-                                                          .arg(l_pos, 5)
-                                                          .arg(l_tag, 5)
-                                                          .arg(l_sentence_position, 2)
-                                                          .arg(l_punct_left, 2)
-                                                          .arg(l_punct_right, 2)
-                                                          .arg(l_mkp_before.length() > 0 ? QString(" %1").arg(l_mkp_before) : "")
-                                                          .arg(l_mkp_after.length() > 0 ? QString(" %1").arg(l_mkp_after) : "")
-                                                          .arg(l_form_key)
-                                                          .arg(l_gram_penta_list.length() > 0 ? " (" + l_gram_penta_list.join(" / ") + ")" : "")
-                                                          .arg(l_gram_list.length() > 0 ? " {" + l_gram_list.join(" / ") + "}" : "");
+            qCDebug(g_cat_tmp_spotlight).noquote() << QString("ID: %1 --> %2 %3 %4 [%5 %6] %7%8%9%10%11%12")
+                                                          .arg(l_occ_id) // 1
+                                                          .arg(l_pos, 5) // 2
+                                                          .arg(l_tag, 5) // 3
+                                                          .arg(l_sentence_position, 2) // 4
+                                                          .arg(l_punct_left, 2) // 5
+                                                          .arg(l_punct_right, 2) // 6
+                                                          .arg(l_mkp_before.length() > 0 ? QString(" %1").arg(l_mkp_before) : "") // 7
+                                                          .arg(l_mkp_after.length() > 0 ? QString(" %1").arg(l_mkp_after) : "") // 8
+                                                          .arg(l_form_key) // 9
+                                                          .arg(l_gram_penta_list.length() > 0 ? " (" + l_gram_penta_list.join(" / ") + ")" : "") // 10
+                                                          .arg(l_gram_list.length() > 0 ? " {" + l_gram_list.join(" / ") + "}" : "") // 11
+                                                          .arg(l_note_key.length() > 0 ? " " + l_note_key : ""); // 12
+
+            add_word(l_occ_text, l_occ_id, l_pos, l_tag, l_sentence_position, l_punct_left, l_punct_right, l_mkp_before, l_mkp_after, l_form_key, l_gram_penta_list, l_note_key);
 
         }
     }
+}
+
+void M1Store::JsonInterface::add_word(const QString& p_occ_text,
+              const QString& p_occ_id,
+              const QString& p_pos,
+              const QString& p_tag,
+              const QString& p_sentence_position,
+              const QString& p_punct_left,
+              const QString& p_punct_right,
+              const QString& p_mkp_before,
+              const QString& p_mkp_after,
+              const QString& p_form_key,
+              const QStringList& p_gram_penta_list,
+              const QString& p_note_key){
+
+    M1Store::Item_lv2* l_form = cm_form_map[p_form_key];
+
+    M1Store::Item_lv2* l_new_occ = cm_text_root->linkTo(l_form, M1Env::OCCUR_SIID);
+    l_new_occ->setText_lv1(p_occ_id);
+
+    if(g_re_cap_initial.match(p_occ_text).hasMatch())
+        l_new_occ->setFieldEdge("true", M1Env::CAPTL_SIID);
+    if(p_sentence_position.length() > 0) l_new_occ->setFieldEdge(p_sentence_position, M1Env::STPOS_SIID);
+    if(p_punct_left.length() > 0) l_new_occ->setFieldEdge(p_punct_left, M1Env::PCTLF_SIID);
+    if(p_punct_right.length() > 0) l_new_occ->setFieldEdge(p_punct_right, M1Env::PCTRT_SIID);
+    if(p_mkp_before.length() > 0) l_new_occ->setFieldEdge(p_mkp_before, M1Env::MKPLF_SIID);
+    if(p_mkp_after.length() > 0) l_new_occ->setFieldEdge(p_mkp_after, M1Env::MKPRT_SIID);
+
+    if(!cm_form_gr_done.contains(p_form_key)){
+        for(const auto& l_pentacode : p_gram_penta_list)
+            l_form->setType(l_pentacode.toUtf8().constData());
+        cm_form_gr_done.append(p_form_key);
+    }
+
+    // sentence position
+    if(p_sentence_position == "SS" || p_sentence_position == "SX"){
+        cm_cur_sentence = M1Store::Item_lv2::getNew(
+            // vertex flags
+            M1Env::FULL_VERTEX,
+            // label
+            QString("Sentence %1").arg(cm_cur_sentence_number));
+        cm_cur_sentence_number += 1;
+        cm_cur_sentence->setType(M1Env::TEXT_SENTENCE_SIID);
+        cm_cur_sentence->linkTo(l_new_occ, M1Env::TW_SECTION_2_OCC_BEGIN_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+        cm_cur_book->linkTo(cm_cur_sentence, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+    }
+
+    if(p_sentence_position == "SE" || p_sentence_position == "SX")
+        cm_cur_sentence->linkTo(l_new_occ, M1Env::TW_SECTION_2_OCC_END_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
 }
 
 M1Store::Item_lv2* M1Store::JsonInterface::create_form(const QString& p_form_text, const QString& p_tag_text, const QJsonArray& p_lemma_keys){

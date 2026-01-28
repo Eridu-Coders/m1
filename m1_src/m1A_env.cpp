@@ -27,6 +27,7 @@ QRegularExpression g_re_final_p(R"(\s*<\/p>\s*$)", QRegularExpression::DotMatche
 QRegularExpression g_re_initial_table(R"(^\s*<table>\s*)", QRegularExpression::DotMatchesEverythingOption);
 QRegularExpression g_re_final_table(R"(\s*<\/table>\s*$)", QRegularExpression::DotMatchesEverythingOption);
 QRegularExpression g_re_capture_gammar(R"(<div\s+class=\"+grammar\"+>(.*)<\/div>)", QRegularExpression::DotMatchesEverythingOption);
+QRegularExpression g_re_cap_initial(R"(^[A-Z])");
 
 // <div class=\"grammar\">
 /**

@@ -221,6 +221,15 @@ if __name__ == '__main__':
         l_wfw_gr_choice = re.sub(r'[^yn]', '', input('Word-for-Word Translation with grammar? (Y/N): ').lower())
         l_wfw_gr_choice = 'y' in l_wfw_gr_choice
 
+    # chapter range
+    l_chapter_start = int('0' + re.sub(r'\D', '', input('Starting Chapter [default = 1]: ')))
+    l_chapter_start = 1 if not (1 <= l_chapter_start <= 18) else l_chapter_start
+
+    l_chapter_end = int('0' + re.sub(r'\D', '', input('Ending Chapter [default = 18]: ')))
+    l_chapter_end = 18 if not (l_chapter_start <= l_chapter_end <= 18) else l_chapter_end
+
+    print(f'Chapters {l_chapter_start} to {l_chapter_end}')
+
     l_translator_choice = re.sub(r'\s+', ' ', re.sub(r'[^\d ]+', '', l_translator_choice)).strip()
     l_commentators_choice = re.sub(r'\s+', ' ', re.sub(r'[^\d ]+', '', l_commentators_choice)).strip()
 
@@ -253,6 +262,8 @@ if __name__ == '__main__':
         print(l_div1.attrib)
         if l_div1.attrib['type'] == 'chapter':
             l_chap_num = l_div1.attrib['n']
+            if not (l_chapter_start <= int(l_chap_num) <= l_chapter_end):
+                continue
 
             l_xml_output += g_chapter.format(f'Chapter {l_chap_num}')
 

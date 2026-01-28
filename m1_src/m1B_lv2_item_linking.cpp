@@ -239,7 +239,7 @@ M1Store::Item_lv2* M1Store::Item_lv2::linkTo(Item_lv2* p_target, const SpecialIt
 
     qCDebug(g_cat_lv2_members) << QString("Returning new edge: %1").arg(l_new_edge->dbgShort());
     M1_FUNC_EXIT
-        return l_new_edge;
+    return l_new_edge;
 }
 
 /**

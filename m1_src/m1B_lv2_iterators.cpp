@@ -73,16 +73,15 @@ M1Store::Item_lv2_iterator_base::Item_lv2_iterator_base(const Item_lv2_iterator_
 
 /**
  * @brief Main constuctor
- * @param p_start_edge the edge to start at
+ * @param p_start_edge the edge to start at (can be nullptr --> always beyondEnd)
  *
  * for an explanation of m_first_edge_item_id and m_on_first, see M1Store::Item_lv2_iterator_base::beyondEnd()
  */
 M1Store::Item_lv2_iterator_base::Item_lv2_iterator_base(Item_lv2* p_start_edge){
-    M1_FUNC_ENTRY(g_cat_lv2_iterators, QString("Simple lv2 iterator creation: %1").arg(p_start_edge->dbgShort()))
-    Q_ASSERT_X(p_start_edge != nullptr, "Item_lv2_iterator_base()", "p_start_edge is NULL");
+    M1_FUNC_ENTRY(g_cat_lv2_iterators, QString("Simple lv2 iterator creation: %1").arg(p_start_edge != nullptr ? p_start_edge->dbgShort() : "nullptr"))
 
     m_current_edge = p_start_edge;
-    m_first_edge_item_id = p_start_edge->item_id();
+    m_first_edge_item_id = p_start_edge != nullptr ? p_start_edge->item_id() : M1Env::G_VOID_ITEM_ID;
     m_on_first = true;
 
     M1_FUNC_EXIT
@@ -92,8 +91,8 @@ M1Store::Item_lv2_iterator_base::Item_lv2_iterator_base(Item_lv2* p_start_edge){
  * @return true if m_current_edge is a full edge (and of course not nullptr)
  */
 bool M1Store::Item_lv2_iterator_base::validEdge(){
-    return (m_current_edge != nullptr);
-    // return (m_current_edge != nullptr) && m_current_edge->isFullEdge();
+    // return (m_current_edge != nullptr);
+    return (m_current_edge != nullptr) && m_current_edge->isFullEdge();
 }
 
 /**
@@ -323,7 +322,9 @@ std::shared_ptr<M1Store::Item_lv2_iterator_base> M1Store::Item_lv2::getIteratorG
 
     std::shared_ptr<Item_lv2_iterator_base> l_ret;
     // determines what subclass to use based on what criteria are set
-    if(p_edge_type == M1Env::G_VOID_SI_ID)
+    if(p_start_edge == nullptr)
+        l_ret = std::shared_ptr<Item_lv2_iterator_base>(new Item_lv2_iterator_base());
+    else if(p_edge_type == M1Env::G_VOID_SI_ID)
         l_ret = std::shared_ptr<Item_lv2_iterator_base>(new Item_lv2_iterator_base(p_start_edge));
     else{
         if(p_target_type == M1Env::G_VOID_SI_ID)
