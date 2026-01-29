@@ -180,6 +180,7 @@ public:
     virtual QIcon* vertexIcon(const M1Store::Item_lv2* p_edge);
     virtual void createDescendant(M1Store::SpecialItem* p_new_edge_type, M1Store::SpecialItem* p_new_vertex_type);
     virtual M1Store::Item_lv2* where_to_go(const M1Store::Item_lv2* p_edge);
+    virtual QString baseText(){return QString("Base: ") + m_myself->text();}
 
     QString dbgOneLiner(){
         m_dbgOneLinerCache = dbgOneLinerVirtual();
@@ -279,6 +280,10 @@ class OccurInterp : public Interp{
     Q_OBJECT
 private:
     std::shared_ptr<Interp> m_target;
+    bool m_is_capitalized = false;
+    QString m_capitalized_fld;
+    QString m_punct_left;
+    QString m_punct_right;
 public:
     static OccurInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
 
@@ -287,6 +292,7 @@ public:
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual M1Store::Item_lv2* where_to_go(const M1Store::Item_lv2* p_edge);
     virtual QString getHtmlVirtual();
+    virtual QString baseText();
 };
 
 class LemmaInterp : public Interp{
@@ -313,6 +319,7 @@ public:
     virtual QString className() {return "FormInterp";}
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual QString getHtmlVirtual();
+    virtual QString baseText();
 };
 
 class TranslationBhashya : public Interp{
@@ -350,6 +357,30 @@ public:
 
     SlokaInterp(M1Store::Item_lv2* p_myself);
     virtual QString className() {return "SlokaInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
+};
+
+class SentenceInterp : public Interp{
+    Q_OBJECT
+private:
+    bool m_initialized = false;
+    int m_book_num;
+    int m_sentence_num;
+
+    QString m_text;
+
+    std::shared_ptr<Interp> m_word_begin = nullptr;
+    std::shared_ptr<Interp> m_word_end = nullptr;
+
+    std::vector<std::shared_ptr<Interp>> m_occ_list;
+
+    void initialize();
+public:
+    static SentenceInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    SentenceInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "SentenceInterp";}
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual QString getHtmlVirtual();
 };

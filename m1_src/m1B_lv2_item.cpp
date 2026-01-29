@@ -310,7 +310,9 @@ M1Store::Item_lv2* M1Store::Item_lv2::findFieldEdge(const SpecialItem* p_field_t
 
 /**
  * @brief Get field contents (only works on simple edge fields atm)
+ *
  * \todo make this work for simple vertex fields as well
+ *
  * @param p_field_type_si type of the field
  * @param p_field_type2_si optional second type of the field
  * @param p_all true --> concatenate all field contents of the given type(s)

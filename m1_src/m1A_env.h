@@ -17,6 +17,7 @@ extern QRegularExpression g_re_initial_table;
 extern QRegularExpression g_re_final_table;
 extern QRegularExpression g_re_capture_gammar;
 extern QRegularExpression g_re_cap_initial;
+extern QRegularExpression g_re_sent_num;
 
 /**
  * \defgroup EntryExit function Entry and Exit macros

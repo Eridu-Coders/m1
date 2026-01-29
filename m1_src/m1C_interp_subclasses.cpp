@@ -251,14 +251,33 @@ M1MidPlane::OccurInterp* M1MidPlane::OccurInterp::getOneIfMatch(M1Store::Item_lv
     if(p_myself->isFullEdge() && p_myself->isOfType(M1Env::OCCUR_SIID))
         l_ret = new OccurInterp(p_myself);
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
+class Toto{
+public:
+    int a;
+    Toto(){a=354;}
+
+    QString the_value(){return QString("a: %1").arg(a);}
+};
+
+class Tuto : public Toto{};
+
 M1MidPlane::OccurInterp::OccurInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){
+    Toto l_toto;
+    Tuto l_tuto;
+
     m_target = Interp::getInterp(p_myself->getTarget_lv2());
+    m_is_capitalized = p_myself->getField(M1Env::CAPTL_SIID) == "true";
+    m_capitalized_fld = p_myself->getField(M1Env::CAPTL_SIID);
+    m_punct_left = p_myself->getField(M1Env::PCTLF_SIID);
+    m_punct_right = p_myself->getField(M1Env::PCTRT_SIID);
 }
 QString M1MidPlane::OccurInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
-    return QString("Occurrence of: %1").arg(m_target->inTreeDisplayText(m_myself));
+    QString l_text = m_target->inTreeDisplayText(m_myself);
+    if(m_is_capitalized) l_text = l_text[0].toUpper() + l_text.right(l_text.length() - 1);
+    return QString("Occurrence of: %1").arg(l_text);
 }
 
 M1Store::Item_lv2* M1UI::TreeRow::where_to_go(){
@@ -272,7 +291,17 @@ M1Store::Item_lv2* M1MidPlane::OccurInterp::where_to_go(const M1Store::Item_lv2*
 }
 
 QString M1MidPlane::OccurInterp::getHtmlVirtual(){
-    return QString("<p>Occurrence of:</p>%1").arg(m_target->getHtmlVirtual());
+    QString l_members_html = QString("<p class=\"technical\">m_punct_left: %1</p>\n").arg(m_punct_left) +
+                             QString("<p class=\"technical\">m_myself->getField(M1Env::PCTLF_SIID): %1</p>\n").arg(m_myself->getField(M1Env::PCTLF_SIID)) +
+                             QString("<p class=\"technical\">m_myself->getTarget_lv2()->getField(M1Env::PCTLF_SIID): %1</p>\n").arg(m_myself->getTarget_lv2()->getField(M1Env::PCTLF_SIID)) +
+                             QString("<p class=\"technical\">m_punct_right: %1</p>\n").arg(m_punct_right) +
+                             QString("<p class=\"technical\">m_myself->text(): %1</p>\n").arg(m_myself->text());
+    return QString("%1<p>Occurrence of:</p>%2\n").arg(l_members_html).arg(m_target->getHtmlVirtual());
+}
+QString M1MidPlane::OccurInterp::baseText(){
+    QString l_text = m_target->baseText();
+    if(m_is_capitalized) l_text = l_text[0].toUpper() + l_text.right(l_text.length() - 1);
+    return m_punct_left + QString("ID: %1 IC: %2 %3 OI: ").arg(m_myself->text()).arg(m_is_capitalized ? "True" : "False").arg(m_capitalized_fld) + l_text + m_punct_right;
 }
 /** --------------------------------------------------------------- LemmaInterp ---------------------------------
  * @brief M1MidPlane::LemmaInterp::getOneIfMatch
@@ -331,6 +360,10 @@ QString M1MidPlane::FormInterp::getHtmlVirtual(){
         l_grammar_values.append(l_it.at()->getTarget_lv2()->text());
 
     return QString("<p class=\"grammar\">%1: %2</p>").arg(this->inTreeDisplayText(nullptr)).arg(l_grammar_values.join(", "));
+}
+
+QString M1MidPlane::FormInterp::baseText(){
+    return m_myself->text();
 }
 /** --------------------------------------------------------------- TranslationBhashya ---------------------------------
  * @brief M1MidPlane::TranslationBhashya::getOneIfMatch
@@ -393,7 +426,7 @@ M1MidPlane::SlokaInterp* M1MidPlane::SlokaInterp::getOneIfMatch(M1Store::Item_lv
     if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::SLOKA_SIID))
         l_ret = new SlokaInterp(p_myself);
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 /**
@@ -500,4 +533,46 @@ QString M1MidPlane::SlokaInterp::getHtmlVirtual(){
         .arg(l_translation_html_list.join("\n"))    // 6
         .arg(l_bhashya_html_list.join("\n"))        // 7
         .arg(l_grammar_html_list.join("\n"));       // 8
+}
+
+/** --------------------------------------------------------------- SentenceInterp ---------------------------------
+ * @brief M1MidPlane::SentenceInterp::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
+M1MidPlane::SentenceInterp* M1MidPlane::SentenceInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be an TranslationBhashya? %1").arg(p_myself->dbgShort()))
+    M1MidPlane::SentenceInterp* l_ret = nullptr;
+    if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::TEXT_SENTENCE_SIID))
+        l_ret = new SentenceInterp(p_myself);
+    M1_FUNC_EXIT
+    return l_ret;
+}
+
+//     int m_book_num;
+// int m_sentence_num;
+
+// QString m_text;
+// QString m_word_begin;
+// QString m_word_end;
+
+void M1MidPlane::SentenceInterp::initialize(){}
+
+M1MidPlane::SentenceInterp::SentenceInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){
+    M1Store::Item_lv2* l_begin_edge = m_myself->find_edge_generic(M1Env::TW_SECTION_2_OCC_BEGIN_SIID, M1Env::OCCUR_SIID);
+    if(l_begin_edge)
+        m_word_begin = getInterp(l_begin_edge->getTarget_lv2());
+
+    M1Store::Item_lv2* l_end_edge = m_myself->find_edge_generic(M1Env::TW_SECTION_2_OCC_END_SIID, M1Env::OCCUR_SIID);
+    if(l_end_edge)
+        m_word_end = getInterp(l_end_edge->getTarget_lv2());
+
+    if(g_re_sent_num.match(m_myself->text()).hasMatch())
+        m_sentence_num = g_re_sent_num.match(m_myself->text()).captured(0).toUInt();
+}
+QString M1MidPlane::SentenceInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
+    return QString("S%1: %2 ... %3").arg(m_sentence_num).arg(m_word_begin->baseText()).arg(m_word_end->baseText());
+}
+QString M1MidPlane::SentenceInterp::getHtmlVirtual(){
+    return QString(QString("m_word_begin: %1").arg(m_word_begin->baseText()));
 }

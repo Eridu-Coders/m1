@@ -149,7 +149,7 @@ void M1Store::JsonInterface::loadJson(const QString& p_file_path){
             QString l_punct_left = l_this_occ_object.find("PunctLeft").value().toString();
             QString l_punct_right = l_this_occ_object.find("PunctRight").value().toString();
             QString l_note_key = l_this_occ_object.find("NoteKey").value().toString();
-            QString l_occ_text = l_this_occ_object.find("NoteKey").value().toString();
+            QString l_occ_text = l_this_occ_object.find("Text").value().toString();
 
             if(int l_book_number = l_this_occ_object.find("BookNumber").value().toInt(); l_book_number != -1){
                 QString l_book_title = l_this_occ_object.find("BookTitle").value().toString();
@@ -198,7 +198,7 @@ void M1Store::JsonInterface::loadJson(const QString& p_file_path){
                                                           .arg(l_punct_right, 2) // 6
                                                           .arg(l_mkp_before.length() > 0 ? QString(" %1").arg(l_mkp_before) : "") // 7
                                                           .arg(l_mkp_after.length() > 0 ? QString(" %1").arg(l_mkp_after) : "") // 8
-                                                          .arg(l_form_key) // 9
+                                                          .arg(l_occ_text + "-" + l_form_key) // 9
                                                           .arg(l_gram_penta_list.length() > 0 ? " (" + l_gram_penta_list.join(" / ") + ")" : "") // 10
                                                           .arg(l_gram_list.length() > 0 ? " {" + l_gram_list.join(" / ") + "}" : "") // 11
                                                           .arg(l_note_key.length() > 0 ? " " + l_note_key : ""); // 12
@@ -227,8 +227,10 @@ void M1Store::JsonInterface::add_word(const QString& p_occ_text,
     M1Store::Item_lv2* l_new_occ = cm_text_root->linkTo(l_form, M1Env::OCCUR_SIID);
     l_new_occ->setText_lv1(p_occ_id);
 
-    if(g_re_cap_initial.match(p_occ_text).hasMatch())
+    if(g_re_cap_initial.match(p_occ_text).hasMatch()){
+        qCDebug(g_cat_tmp_spotlight).noquote() << "Capitalized";
         l_new_occ->setFieldEdge("true", M1Env::CAPTL_SIID);
+    }
     if(p_sentence_position.length() > 0) l_new_occ->setFieldEdge(p_sentence_position, M1Env::STPOS_SIID);
     if(p_punct_left.length() > 0) l_new_occ->setFieldEdge(p_punct_left, M1Env::PCTLF_SIID);
     if(p_punct_right.length() > 0) l_new_occ->setFieldEdge(p_punct_right, M1Env::PCTRT_SIID);
@@ -254,8 +256,10 @@ void M1Store::JsonInterface::add_word(const QString& p_occ_text,
         cm_cur_book->linkTo(cm_cur_sentence, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
     }
 
-    if(p_sentence_position == "SE" || p_sentence_position == "SX")
+    if(p_sentence_position == "SE" || p_sentence_position == "SX"){
         cm_cur_sentence->linkTo(l_new_occ, M1Env::TW_SECTION_2_OCC_END_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+        qCDebug(g_cat_tmp_spotlight).noquote() << "End Sentence";
+    }
 }
 
 M1Store::Item_lv2* M1Store::JsonInterface::create_form(const QString& p_form_text, const QString& p_tag_text, const QJsonArray& p_lemma_keys){

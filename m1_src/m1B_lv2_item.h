@@ -212,6 +212,9 @@ class Item_lv2 : public Item_lv1 {
         QString dbgShort(int p_depth = 0);
         QString dbgHalfRight();
         QString dbgHalfLeft();
+        QString dbgShortHelper(){return "Hello";}
+        int dbgint(){return 395;}
+
 };
 
 } // end namespace M1Store

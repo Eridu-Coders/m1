@@ -529,7 +529,7 @@ std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_
             // qCDebug(g_cat_interp_base) << QString("A l_interp_raw: %1").arg(l_interp_raw == nullptr ? "null" : "instanciated");
 
             //if((l_interp_raw = AutoInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            // else if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break; SlokaInterp
+            // else if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break; SlokaInterp SentenceInterp
             if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = TextInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = RoleInterp::getOneIfMatch(p_myself)) != nullptr) break;
@@ -540,6 +540,7 @@ std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_
             else if((l_interp_raw = LemmaInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = TranslationBhashya::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = SlokaInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = SentenceInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else l_interp_raw = new Interp(p_myself);
         }
         // qCDebug(g_cat_interp_base) << QString("B l_interp_raw: %1").arg(l_interp_raw == nullptr ? "null" : "instanciated");
