@@ -98,6 +98,7 @@ class EnvStatic{
 
         static void setSilentMode(bool p_set);
         static void setNormalFilter(const QString& p_filter);
+        static void setTmpDebug(bool p_on);
 };
 
 template <typename T>

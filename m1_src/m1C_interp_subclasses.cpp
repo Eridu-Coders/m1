@@ -254,23 +254,25 @@ M1MidPlane::OccurInterp* M1MidPlane::OccurInterp::getOneIfMatch(M1Store::Item_lv
     return l_ret;
 }
 
-class Toto{
-public:
-    int a;
-    Toto(){a=354;}
+// class Toto{
+// public:
+//     int a;
+//     Toto(){a=354;}
 
-    QString the_value(){return QString("a: %1").arg(a);}
-};
+//     QString the_value(){return QString("a: %1").arg(a);}
+// };
 
-class Tuto : public Toto{};
+// class Tuto : public Toto{};
 
 M1MidPlane::OccurInterp::OccurInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){
-    Toto l_toto;
-    Tuto l_tuto;
+    // Toto l_toto;
+    // Tuto l_tuto;
 
     m_target = Interp::getInterp(p_myself->getTarget_lv2());
     m_is_capitalized = p_myself->getField(M1Env::CAPTL_SIID) == "true";
+    // M1Env::EnvStatic::setTmpDebug(true);
     m_capitalized_fld = p_myself->getField(M1Env::CAPTL_SIID);
+    // M1Env::EnvStatic::setTmpDebug(false);
     m_punct_left = p_myself->getField(M1Env::PCTLF_SIID);
     m_punct_right = p_myself->getField(M1Env::PCTRT_SIID);
 }
@@ -291,17 +293,21 @@ M1Store::Item_lv2* M1MidPlane::OccurInterp::where_to_go(const M1Store::Item_lv2*
 }
 
 QString M1MidPlane::OccurInterp::getHtmlVirtual(){
+    /*
     QString l_members_html = QString("<p class=\"technical\">m_punct_left: %1</p>\n").arg(m_punct_left) +
                              QString("<p class=\"technical\">m_myself->getField(M1Env::PCTLF_SIID): %1</p>\n").arg(m_myself->getField(M1Env::PCTLF_SIID)) +
                              QString("<p class=\"technical\">m_myself->getTarget_lv2()->getField(M1Env::PCTLF_SIID): %1</p>\n").arg(m_myself->getTarget_lv2()->getField(M1Env::PCTLF_SIID)) +
                              QString("<p class=\"technical\">m_punct_right: %1</p>\n").arg(m_punct_right) +
                              QString("<p class=\"technical\">m_myself->text(): %1</p>\n").arg(m_myself->text());
     return QString("%1<p>Occurrence of:</p>%2\n").arg(l_members_html).arg(m_target->getHtmlVirtual());
+    */
+    return QString("<p>Occurrence of:</p>%1\n").arg(m_target->getHtmlVirtual());
 }
 QString M1MidPlane::OccurInterp::baseText(){
     QString l_text = m_target->baseText();
     if(m_is_capitalized) l_text = l_text[0].toUpper() + l_text.right(l_text.length() - 1);
-    return m_punct_left + QString("ID: %1 IC: %2 %3 OI: ").arg(m_myself->text()).arg(m_is_capitalized ? "True" : "False").arg(m_capitalized_fld) + l_text + m_punct_right;
+    // return m_punct_left + QString("ID: %1 IC: %2 %3 OI: ").arg(m_myself->text()).arg(m_is_capitalized ? "True" : "False").arg(m_capitalized_fld) + l_text + m_punct_right;
+    return m_punct_left + l_text + m_punct_right;
 }
 /** --------------------------------------------------------------- LemmaInterp ---------------------------------
  * @brief M1MidPlane::LemmaInterp::getOneIfMatch
@@ -561,18 +567,18 @@ void M1MidPlane::SentenceInterp::initialize(){}
 M1MidPlane::SentenceInterp::SentenceInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){
     M1Store::Item_lv2* l_begin_edge = m_myself->find_edge_generic(M1Env::TW_SECTION_2_OCC_BEGIN_SIID, M1Env::OCCUR_SIID);
     if(l_begin_edge)
-        m_word_begin = getInterp(l_begin_edge->getTarget_lv2());
+        m_word_begin_occ = getInterp(l_begin_edge->getTarget_lv2());
 
     M1Store::Item_lv2* l_end_edge = m_myself->find_edge_generic(M1Env::TW_SECTION_2_OCC_END_SIID, M1Env::OCCUR_SIID);
     if(l_end_edge)
-        m_word_end = getInterp(l_end_edge->getTarget_lv2());
+        m_word_end_occ = getInterp(l_end_edge->getTarget_lv2());
 
     if(g_re_sent_num.match(m_myself->text()).hasMatch())
         m_sentence_num = g_re_sent_num.match(m_myself->text()).captured(0).toUInt();
 }
 QString M1MidPlane::SentenceInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
-    return QString("S%1: %2 ... %3").arg(m_sentence_num).arg(m_word_begin->baseText()).arg(m_word_end->baseText());
+    return QString("S%1: %2 ... %3").arg(m_sentence_num).arg(m_word_begin_occ->baseText()).arg(m_word_end_occ->baseText());
 }
 QString M1MidPlane::SentenceInterp::getHtmlVirtual(){
-    return QString(QString("m_word_begin: %1").arg(m_word_begin->baseText()));
+    return QString(QString("m_word_begin: %1").arg(m_word_begin_occ->baseText()));
 }

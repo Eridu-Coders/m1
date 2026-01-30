@@ -92,7 +92,10 @@ M1Store::Item_lv2_iterator_base::Item_lv2_iterator_base(Item_lv2* p_start_edge){
  */
 bool M1Store::Item_lv2_iterator_base::validEdge(){
     // return (m_current_edge != nullptr);
-    return (m_current_edge != nullptr) && m_current_edge->isFullEdge();
+    qCDebug(g_cat_tmp_debug) << "m_current_edge != nullptr:" << (m_current_edge != nullptr ? "true" : "false");
+    qCDebug(g_cat_tmp_debug) << "m_current_edge->isFullEdge():" << m_current_edge->isFullEdge();
+    // return (m_current_edge != nullptr) && m_current_edge->isFullEdge();
+    return m_current_edge != nullptr;
 }
 
 /**
@@ -104,7 +107,7 @@ bool M1Store::Item_lv2_iterator_base::validEdge(){
  */
 void M1Store::Item_lv2_iterator_base::init(){
     if(!validEdge()) next_private(true);
-    if(!isBase()) qCDebug(g_cat_lv2_type_iterators) << QString("Constructor BBBBB m_current_edge: %1").arg(m_current_edge != nullptr ? m_current_edge->dbgShort() : "nullptr");
+    if(!isBaseClass()) qCDebug(g_cat_lv2_type_iterators) << QString("Constructor BBBBB m_current_edge: %1").arg(m_current_edge != nullptr ? m_current_edge->dbgShort() : "nullptr");
 }
 
 /**
@@ -120,25 +123,28 @@ void M1Store::Item_lv2_iterator_base::next(){
 void M1Store::Item_lv2_iterator_base::next_private(bool p_stay_first){
     M1_FUNC_ENTRY(g_cat_lv2_iterators, QString("move to next edge"))
 
+    qCDebug(g_cat_tmp_debug) << "next_private() beyondEnd() START:" << (beyondEnd() ? "true" : "false");
     if(m_current_edge != nullptr && !beyondEnd())
         // move forward by one item
         do {
             m_on_first = false;
+            qCDebug(g_cat_tmp_debug) << "m_current_edge->get_next_lv2():" << m_current_edge->get_next_lv2()->dbgShort();
             m_current_edge = m_current_edge->get_next_lv2();
-            if(!isBase()) qCDebug(g_cat_lv2_type_iterators) << QString("NEXT p_stay_first: %1 - m_current_edge: %2")
+            if(!isBaseClass()) qCDebug(g_cat_lv2_type_iterators) << QString("NEXT p_stay_first: %1 - m_current_edge: %2")
                                                          .arg(p_stay_first)
                                                          .arg(m_current_edge->dbgShort());
             // this continues until a valid edge is found or the end is reached
         } while(!validEdge() && !beyondEnd());
     else
         // nothing to do
-        if(!isBase()) qCDebug(g_cat_lv2_type_iterators) << QString("NONEXT p_stay_first: %1 - m_current_edge: %2")
+        if(!isBaseClass()) qCDebug(g_cat_lv2_type_iterators) << QString("NONEXT p_stay_first: %1 - m_current_edge: %2")
                                                  .arg(p_stay_first)
                                                  .arg(m_current_edge != nullptr ? m_current_edge->dbgShort() : "nullptr");
 
     // see M1Store::Item_lv2_iterator_base::init() for an explanantion of this
     // this happens only if the end has not been reached
     if(!beyondEnd()) m_on_first = p_stay_first;
+    qCDebug(g_cat_tmp_debug) << "next_private() beyondEnd() END:" << (beyondEnd() ? "true" : "false");
 
     M1_FUNC_EXIT
 }
@@ -154,6 +160,8 @@ void M1Store::Item_lv2_iterator_base::next_private(bool p_stay_first){
 bool M1Store::Item_lv2_iterator_base::beyondEnd() const{
     M1_FUNC_ENTRY(g_cat_lv2_iterators, QString("m_current_edge: %1").arg(m_current_edge ? m_current_edge->dbgShort() : "nullptr"))
 
+    qCDebug(g_cat_tmp_debug) << "m_on_first:" << (m_on_first ? "true" : "false");
+    qCDebug(g_cat_tmp_debug) << "m_current_edge->item_id() == m_first_edge_item_id:" << (m_current_edge->item_id() == m_first_edge_item_id ? "true" : "false");
     bool l_ret = true;
     if(m_current_edge != nullptr ){
         l_ret = !m_on_first && (m_current_edge->item_id() == m_first_edge_item_id);
@@ -290,8 +298,7 @@ M1Store::Item_lv2_iterator_et_type::Item_lv2_iterator_et_type(Item_lv2* p_start_
  */
 bool M1Store::Item_lv2_iterator_et_type::validEdge(){
     qCDebug(g_cat_lv2_type_iterators) << this->dbgShort();
-    return Item_lv2_iterator_edge_type::validEdge() &&
-           m_current_edge->getTarget_lv2()->isOfType(m_target_type);
+    return Item_lv2_iterator_edge_type::validEdge() && m_current_edge->getTarget_lv2()->isOfType(m_target_type);
 }
 
 /**

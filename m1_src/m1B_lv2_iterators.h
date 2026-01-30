@@ -51,9 +51,9 @@ private:
 protected:
     virtual bool validEdge();
 
-    virtual bool isBase(){return true;}
-    virtual bool isEdgeType(){return false;}
-    virtual bool isETType(){return false;}
+    virtual bool isBaseClass(){return true;}
+    virtual bool isEdgeTypeSubclass(){return false;}
+    virtual bool isETTypeSubclass(){return false;}
 public:
     bool isNull();
 
@@ -82,9 +82,9 @@ private:
 protected:
     virtual bool validEdge() override;
 
-    virtual bool isBase() override {return false;}
-    virtual bool isEdgeType() override {return true;}
-    virtual bool isETType() override {return false;}
+    virtual bool isBaseClass() override {return false;}
+    virtual bool isEdgeTypeSubclass() override {return true;}
+    virtual bool isETTypeSubclass() override {return false;}
 public:
     virtual QString dbgShort() override;
 };
@@ -105,9 +105,9 @@ private:
 protected:
     virtual bool validEdge() override;
 
-    virtual bool isBase() override {return false;}
-    virtual bool isEdgeType() override {return false;}
-    virtual bool isETType() override {return true;}
+    virtual bool isBaseClass() override {return false;}
+    virtual bool isEdgeTypeSubclass() override {return false;}
+    virtual bool isETTypeSubclass() override {return true;}
 public:
     virtual QString dbgShort() override;
 };

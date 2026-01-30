@@ -326,12 +326,14 @@ QString M1Store::Item_lv2::getField(const SpecialItem* p_field_type_si, const Sp
                       .arg(p_all ? "concatenated values of fields" : "value of field"))
 
     QString l_ret;
-    for(Item_lv2_iterator it = this->getIteratorTop(); !it.beyondEnd(); it.next())
-        if(it.at()->isOfType(p_field_type_si) && (p_field_type2_si == nullptr || it.at()->isOfType(p_field_type2_si))){
+    for(Item_lv2_iterator l_it = this->getIteratorTop(); !l_it.beyondEnd(); l_it.next()){
+        qCDebug(g_cat_tmp_debug) << "it.at():" << l_it.at()->dbgShort();
+        qCDebug(g_cat_tmp_debug) << "it.at()->isOfType(p_field_type_si):" << (l_it.at()->isOfType(p_field_type_si) ? "true" : "false");
+        if(l_it.at()->isOfType(p_field_type_si) && (p_field_type2_si == nullptr || l_it.at()->isOfType(p_field_type2_si))){
             QString l_payload;
 
-            if(it.at()->isFullEdge()) l_payload = it.at()->getTarget_lv2()->text();
-            else l_payload = it.at()->text();
+            if(l_it.at()->isFullEdge()) l_payload = l_it.at()->getTarget_lv2()->text();
+            else l_payload = l_it.at()->text();
 
             if(p_all)
                 if(l_ret.length() == 0)
@@ -343,8 +345,9 @@ QString M1Store::Item_lv2::getField(const SpecialItem* p_field_type_si, const Sp
                 break;
             }
         }
+    }
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 /**

@@ -197,6 +197,19 @@ void M1Env::EnvStatic::setNormalFilter(const QString& p_filter){
     setSilentMode(false);
 }
 
+void M1Env::EnvStatic::setTmpDebug(bool p_on){
+    // "tmp.debug=false\n"
+    qCDebug(g_cat_tmp_debug) << "p_on START:" << (p_on ? "true" : "false");
+    QString l_filter = cm_normal_filter;
+    if(p_on)
+        l_filter += "tmp_debug=true\n";
+    else
+        l_filter += "tmp_debug=false\n";
+    qCDebug(g_cat_tmp_debug).noquote() << "l_filter:" << l_filter;
+    QLoggingCategory::setFilterRules(l_filter);
+    qCDebug(g_cat_tmp_debug) << "p_on END:" << (p_on ? "true" : "false");
+}
+
 void M1Env::EnvStatic::setSilentMode(bool p_set){
     if(p_set)
         // set debug categories to just allow g_cat_silence (= "dump")

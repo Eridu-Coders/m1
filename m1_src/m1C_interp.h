@@ -370,8 +370,8 @@ private:
 
     QString m_text;
 
-    std::shared_ptr<Interp> m_word_begin = nullptr;
-    std::shared_ptr<Interp> m_word_end = nullptr;
+    std::shared_ptr<Interp> m_word_begin_occ = nullptr;
+    std::shared_ptr<Interp> m_word_end_occ = nullptr;
 
     std::vector<std::shared_ptr<Interp>> m_occ_list;
 

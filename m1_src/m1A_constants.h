@@ -209,6 +209,7 @@ Q_DECLARE_LOGGING_CATEGORY(g_cat_main)                  ///< messages from main 
 Q_DECLARE_LOGGING_CATEGORY(g_cat_tei)                   ///< messages from TEI interface
 Q_DECLARE_LOGGING_CATEGORY(g_cat_json)                  ///< messages from JSON interface
 Q_DECLARE_LOGGING_CATEGORY(g_cat_tmp_spotlight)         ///< messages from feature under temporary scrutiny
+Q_DECLARE_LOGGING_CATEGORY(g_cat_tmp_debug)             ///< messages to be triggered temporarily
 /**@}*/ //end of QtLogCat
 
 /**@}*/ //end of DebugLog

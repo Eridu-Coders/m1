@@ -17,7 +17,8 @@
 namespace po = boost::program_options;
 
 Q_LOGGING_CATEGORY(g_cat_main, "m1_main")
-Q_LOGGING_CATEGORY(g_cat_tmp_spotlight, "tmp")
+Q_LOGGING_CATEGORY(g_cat_tmp_spotlight, "tmp.spotlight")
+Q_LOGGING_CATEGORY(g_cat_tmp_debug, "tmp_debug")
 
 // cloc count
 // cloc --by-file-by-lang --exclude-content="M1Env::GraphInit::init_base()" --include-lang=C++,"C/C++ Header",Python --fullpath --not-match-d='^build.*|.*stringcase.*' *
@@ -105,7 +106,8 @@ int main(int argc, char *argv[])
                                         "main_window=false\n"
                                         "tei_interface=false\n"
                                         "tree_row=false\n"
-                                        "qt.*.debug=false");
+                                        "qt.*.debug=false\n");
+    M1Env::EnvStatic::setTmpDebug(false);
 
     M1MidPlane::Interp::init();
     M1UI::TreeRow::init();
