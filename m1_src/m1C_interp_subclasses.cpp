@@ -309,6 +309,13 @@ QString M1MidPlane::OccurInterp::baseText(){
     // return m_punct_left + QString("ID: %1 IC: %2 %3 OI: ").arg(m_myself->text()).arg(m_is_capitalized ? "True" : "False").arg(m_capitalized_fld) + l_text + m_punct_right;
     return m_punct_left + l_text + m_punct_right;
 }
+QString M1MidPlane::OccurInterp::baseTextPlus(){
+    QString l_section = m_myself->getField(M1Env::STEPHANUS_SIID);
+    if(l_section.length() > 0)
+        return QString("<span style=\"color: maroon;\">%1</span> %2").arg(l_section).arg(baseText());
+    else
+        return baseText();
+}
 /** --------------------------------------------------------------- LemmaInterp ---------------------------------
  * @brief M1MidPlane::LemmaInterp::getOneIfMatch
  * @param p_myself
@@ -562,8 +569,6 @@ M1MidPlane::SentenceInterp* M1MidPlane::SentenceInterp::getOneIfMatch(M1Store::I
 // QString m_word_begin;
 // QString m_word_end;
 
-void M1MidPlane::SentenceInterp::initialize(){}
-
 M1MidPlane::SentenceInterp::SentenceInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){
     M1Store::Item_lv2* l_begin_edge = m_myself->find_edge_generic(M1Env::TW_SECTION_2_OCC_BEGIN_SIID, M1Env::OCCUR_SIID);
     if(l_begin_edge)
@@ -576,9 +581,33 @@ M1MidPlane::SentenceInterp::SentenceInterp(M1Store::Item_lv2* p_myself) : M1MidP
     if(g_re_sent_num.match(m_myself->text()).hasMatch())
         m_sentence_num = g_re_sent_num.match(m_myself->text()).captured(0).toUInt();
 }
+
+/**
+ * @brief M1MidPlane::SentenceInterp::initialize
+ */
+void M1MidPlane::SentenceInterp::initialize(){
+    if(m_word_begin_occ != nullptr){
+        m_occ_list.push_back(m_word_begin_occ);
+        M1Store::Item_lv2* l_cur_occ_edge = m_word_begin_occ->myself();
+        qCDebug(g_cat_tmp_spotlight).noquote() << "Strart" << l_cur_occ_edge->dbgShort();
+        do{
+            l_cur_occ_edge = l_cur_occ_edge->get_next_lv2();
+            m_occ_list.push_back(getInterp(l_cur_occ_edge));
+            qCDebug(g_cat_tmp_spotlight).noquote() << "Cur" << l_cur_occ_edge->dbgShort();
+            qCDebug(g_cat_tmp_spotlight).noquote() << "End" << m_word_end_occ->myself()->dbgShort();
+
+        }while(l_cur_occ_edge != m_word_end_occ->myself());
+        // m_occ_list.push_back(m_word_end_occ);
+    }
+}
+
 QString M1MidPlane::SentenceInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
     return QString("S%1: %2 ... %3").arg(m_sentence_num).arg(m_word_begin_occ->baseText()).arg(m_word_end_occ->baseText());
 }
 QString M1MidPlane::SentenceInterp::getHtmlVirtual(){
-    return QString(QString("m_word_begin: %1").arg(m_word_begin_occ->baseText()));
+    // return QString(QString("m_word_begin: %1").arg(m_word_begin_occ->baseText()));
+    initialize();
+    QStringList l_word_list;
+    for(const auto& l_occ_interp : m_occ_list) l_word_list.append(l_occ_interp->baseTextPlus());
+    return QString("<p>%1</p>\n").arg(l_word_list.join(" "));
 }

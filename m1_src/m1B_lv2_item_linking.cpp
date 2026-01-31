@@ -145,10 +145,14 @@ void M1Store::Item_lv2::installFullEdge_2(Item_lv2* p_new_edge, const SpecialIte
             // determine DEFAULT edge above based on p_where
             M1Store::Item_lv2* l_edge_above;
 
-            if(p_where == InsertionPoint::at_top || p_where == InsertionPoint::at_bottom || p_where == InsertionPoint::special_override){
+            if(p_where == InsertionPoint::at_top ||
+                p_where == InsertionPoint::at_bottom ||
+                p_where == InsertionPoint::special_override ||
+                p_where == InsertionPoint::at_bottom_force_special){
+
                 l_edge_above = this->getExisting(l_first_edge_id)->get_previous_lv2();
-                // by default, if the edge will be placed in the special edge ring, the edge is inserted at top
-                l_at_top = (p_where == InsertionPoint::at_top || l_edge_is_special);
+                // by default, if the edge will be placed in the special edge ring, the edge is inserted at top (unless at_bottom_force_special)
+                l_at_top = (p_where == InsertionPoint::at_top || (l_edge_is_special && p_where != InsertionPoint::at_bottom_force_special));
             }
             else if(p_where == InsertionPoint::below_auto){
                 Q_ASSERT_X(this->isFullVertex(), // must be a full VERTEX to have an AUTO edge

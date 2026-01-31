@@ -104,7 +104,6 @@ void M1Store::JsonInterface::loadJson(const QString& p_file_path){
         M1Store::Item_lv2* l_current_version = l_version_folder->create_descendant(M1Env::OWNS_SIID, l_version_name, M1Env::TXTVR_SIID);
         l_current_version->setFieldEdge(l_version_type, M1Env::TEXT_VER_TYPE_SIID);
 
-        QString l_cur_stephanus;
         cm_cur_book_number = 0;
         cm_cur_sentence_number = 1;
         // occurrences
@@ -150,10 +149,10 @@ void M1Store::JsonInterface::loadJson(const QString& p_file_path){
             QString l_punct_right = l_this_occ_object.find("PunctRight").value().toString();
             QString l_note_key = l_this_occ_object.find("NoteKey").value().toString();
             QString l_occ_text = l_this_occ_object.find("Text").value().toString();
+            QString l_cur_stephanus = l_this_occ_object.find("NewSection").value().toString();
 
             if(int l_book_number = l_this_occ_object.find("BookNumber").value().toInt(); l_book_number != -1){
                 QString l_book_title = l_this_occ_object.find("BookTitle").value().toString();
-                l_cur_stephanus = l_this_occ_object.find("NewSection").value().toString();
                 if(l_book_title.length() == 0) l_book_title = QString("Book %1").arg(l_book_number);
                 qCDebug(g_cat_tmp_spotlight).noquote() << QString("Stephanus Section: %1 [%2] BookTitle:").arg(l_cur_stephanus).arg(l_book_number) << l_book_title;
 
@@ -203,7 +202,8 @@ void M1Store::JsonInterface::loadJson(const QString& p_file_path){
                                                           .arg(l_gram_list.length() > 0 ? " {" + l_gram_list.join(" / ") + "}" : "") // 11
                                                           .arg(l_note_key.length() > 0 ? " " + l_note_key : ""); // 12
 
-            add_word(l_occ_text, l_occ_id, l_pos, l_tag, l_sentence_position, l_punct_left, l_punct_right, l_mkp_before, l_mkp_after, l_form_key, l_gram_penta_list, l_note_key);
+            add_word(l_occ_text, l_occ_id, l_cur_stephanus, l_pos, l_tag, l_sentence_position,
+                     l_punct_left, l_punct_right, l_mkp_before, l_mkp_after, l_form_key, l_gram_penta_list, l_note_key);
 
         }
     }
@@ -211,6 +211,7 @@ void M1Store::JsonInterface::loadJson(const QString& p_file_path){
 
 void M1Store::JsonInterface::add_word(const QString& p_occ_text,
               const QString& p_occ_id,
+              const QString& p_new_stephanus_section,
               const QString& p_pos,
               const QString& p_tag,
               const QString& p_sentence_position,
@@ -224,7 +225,7 @@ void M1Store::JsonInterface::add_word(const QString& p_occ_text,
 
     M1Store::Item_lv2* l_form = cm_form_map[p_form_key];
 
-    M1Store::Item_lv2* l_new_occ = cm_text_root->linkTo(l_form, M1Env::OCCUR_SIID);
+    M1Store::Item_lv2* l_new_occ = cm_text_root->linkTo(l_form, M1Env::OCCUR_SIID, InsertionPoint::at_bottom_force_special, InsertionPoint::at_top);
     l_new_occ->setText_lv1(p_occ_id);
 
     if(g_re_cap_initial.match(p_occ_text).hasMatch()){
@@ -236,6 +237,7 @@ void M1Store::JsonInterface::add_word(const QString& p_occ_text,
     if(p_punct_right.length() > 0) l_new_occ->setFieldEdge(p_punct_right, M1Env::PCTRT_SIID);
     if(p_mkp_before.length() > 0) l_new_occ->setFieldEdge(p_mkp_before, M1Env::MKPLF_SIID);
     if(p_mkp_after.length() > 0) l_new_occ->setFieldEdge(p_mkp_after, M1Env::MKPRT_SIID);
+    if(p_new_stephanus_section.length() > 0) l_new_occ->setFieldEdge(p_new_stephanus_section, M1Env::STEPHANUS_SIID);
 
     if(!cm_form_gr_done.contains(p_form_key)){
         for(const auto& l_pentacode : p_gram_penta_list)

@@ -21,6 +21,7 @@ class Item_lv2_iterator;
 enum class InsertionPoint{
     at_top = 1,
     at_bottom,
+    at_bottom_force_special, // for edges which must go at the bottom of the special edge ring (normally, special edges are inserted at the top of this ring)
     below_auto,
     below_specified,
     special_override,

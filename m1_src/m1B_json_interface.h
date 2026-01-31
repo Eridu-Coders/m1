@@ -25,6 +25,7 @@ private:
     static M1Store::Item_lv2* create_form(const QString& p_form_text, const QString& p_tag_text, const QJsonArray& p_lemma_keys);
     static void add_word(const QString& p_occ_text,
                          const QString& p_occ_id,
+                         const QString& p_new_stephanus_section,
                          const QString& p_pos,
                          const QString& p_tag,
                          const QString& p_sentence_position,

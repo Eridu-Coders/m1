@@ -181,12 +181,15 @@ public:
     virtual void createDescendant(M1Store::SpecialItem* p_new_edge_type, M1Store::SpecialItem* p_new_vertex_type);
     virtual M1Store::Item_lv2* where_to_go(const M1Store::Item_lv2* p_edge);
     virtual QString baseText(){return QString("Base: ") + m_myself->text();}
+    virtual QString baseTextPlus(){return baseText();}
 
     QString dbgOneLiner(){
         m_dbgOneLinerCache = dbgOneLinerVirtual();
         return m_dbgOneLinerCache;
     }
     ~Interp();
+
+    M1Store::Item_lv2* myself(){return m_myself;}
 public slots:
     void save_text_edit();
 };
@@ -293,6 +296,7 @@ public:
     virtual M1Store::Item_lv2* where_to_go(const M1Store::Item_lv2* p_edge);
     virtual QString getHtmlVirtual();
     virtual QString baseText();
+    virtual QString baseTextPlus();
 };
 
 class LemmaInterp : public Interp{
