@@ -9,6 +9,10 @@
 
 #include "m1B_lv2_item.h"
 
+namespace M1MidPlane{
+    class Interp;
+}
+
 namespace M1UI{
 
 class PassageEditor;
@@ -54,9 +58,9 @@ public:
 
 class WordItem: public BasePassageItem{
 private:
-    M1Store::Item_lv2* m_occ;
+    std::shared_ptr<M1MidPlane::Interp> m_occ;
 public:
-    WordItem(const int p_id, M1Store::Item_lv2* p_occ, PassageEditor *p_parent = nullptr);
+    WordItem(const int p_id, std::shared_ptr<M1MidPlane::Interp> p_occ, PassageEditor *p_parent = nullptr);
     virtual QString highlight(M1Store::Item_lv2* p_chunk, M1Store::Item_lv2* p_category, M1Store::Item_lv2* p_color);
 };
 
@@ -82,7 +86,8 @@ private:
     int m_to_sel = -1;
     int m_margin_pe = 5;
     int m_spacing = 10;
-    M1Store::Item_lv2* m_current_start = nullptr;
+    // M1Store::Item_lv2* m_current_start = nullptr;
+    const std::vector<std::shared_ptr<M1MidPlane::Interp>>& m_occur_list;
     PassagesPanel* m_panel;
 
     void populate();
@@ -96,7 +101,7 @@ protected:
     virtual bool sceneEvent(QEvent *p_event) override;
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *p_event) override;
 public:
-    PassageEditor(M1Store::Item_lv2* p_occur_start, const QString& p_id, QGraphicsItem *p_parent=nullptr);
+    PassageEditor(std::vector<std::shared_ptr<M1MidPlane::Interp>>& p_occur_list, const QString& p_id, QGraphicsItem *p_parent=nullptr);
     void unselect_all();
     int spacing(){return m_spacing;}
     QString& id(){return m_id;}

@@ -1,10 +1,12 @@
 #include "m1A_constants.h"
-#include "m1B_graph_init.h"
+#include "m1A_env.h"
 #include "m1B_lv2_iterators.h"
 #include "m1D_passages_panel.h"
 #include "m1C_interp.h"
+#include "m1B_graph_init.h"
 
 #include <QResizeEvent>
+#include <QRegularExpression>
 #include <QGraphicsSceneDragDropEvent>
 #include <QMimeData>
 #include <QDrag>
@@ -122,19 +124,19 @@ QString M1UI::BasePassageItem::highlight(M1Store::Item_lv2* p_chunk, M1Store::It
 QString M1UI::WordItem::highlight(M1Store::Item_lv2* p_chunk, M1Store::Item_lv2* p_category, M1Store::Item_lv2* p_color){
     QString l_ret = BasePassageItem::highlight(p_chunk, p_category, p_color);
 
-    p_chunk->linkTo(this->m_occ, M1Store::OWNS_SIID);
-    this->m_occ->linkTo(p_color, M1Store::HLCLR_SIID);
+    p_chunk->linkTo(this->m_occ->myself(), M1Store::OWNS_SIID);
+    this->m_occ->myself()->linkTo(p_color, M1Store::HLCLR_SIID);
 
     return l_ret;
 }
 
-M1UI::WordItem::WordItem(const int p_id, M1Store::Item_lv2* p_occ, PassageEditor *p_parent): BasePassageItem(p_id, p_parent){
+M1UI::WordItem::WordItem(const int p_id, std::shared_ptr<M1MidPlane::Interp> p_occ, PassageEditor *p_parent): BasePassageItem(p_id, p_parent){
     m_occ = p_occ;
 
-    if(M1Store::Item_lv2* l_color_edge = m_occ->getFieldEdge(M1Store::HLCLR_SIID))
+    if(M1Store::Item_lv2* l_color_edge = m_occ->myself()->getFieldEdge(M1Store::HLCLR_SIID))
         m_color = l_color_edge->getTarget_lv2()->text();
 
-    QString l_text = M1MidPlane::SentenceInterp::occur_to_text(m_occ);
+    QString l_text = m_occ->baseText();
     this->setFont(cm_base_font);
     this->setText(l_text);
 
@@ -142,7 +144,7 @@ M1UI::WordItem::WordItem(const int p_id, M1Store::Item_lv2* p_occ, PassageEditor
     M1Store::Item_lv2* l_pos_edge = nullptr;
     M1Store::Item_lv2* l_tag_edge = nullptr;
     QString l_grammar_attr;
-    for(M1Store::Item_lv2_iterator it = m_occ->getIteratorSpecial(); !it.beyondEnd(); it.next()){
+    for(M1Store::Item_lv2_iterator it = m_occ->myself()->getIteratorSpecial(); !it.beyondEnd(); it.next()){
         if(it.at()->isOfType(M1Env::ISA_SIID) && it.at()->getTarget_lv2()->isOfType(M1Env::NLPOS_SIID)) l_pos_edge = it.at();
         else
         if(it.at()->isOfType(M1Env::ISA_SIID) && it.at()->getTarget_lv2()->isOfType(M1Env::NLTAG_SIID)) l_tag_edge = it.at();
@@ -159,7 +161,7 @@ M1UI::WordItem::WordItem(const int p_id, M1Store::Item_lv2* p_occ, PassageEditor
     QString l_pos_txt = l_pos_edge != nullptr ? QString("<p style=\"white-space:pre;margin:0;padding:0;\"><b>POS</b>: %1</p>").arg(l_pos_edge->getTarget_lv2()->text()) : "";
     QString l_tag_txt = l_tag_edge != nullptr ? QString("<p style=\"white-space:pre;margin:0;padding:0;\"><b>TAG</b>: %1</p>").arg(l_tag_edge->getTarget_lv2()->text()) : "";
 
-    M1Store::Item_lv2* l_lemma_edge = m_occ->getTarget_lv2()->find_edge_generic(M1Env::BLNGS_SIID, M1Env::LEMMA_SIID);
+    M1Store::Item_lv2* l_lemma_edge = m_occ->myself()->getTarget_lv2()->find_edge_generic(M1Env::BLNGS_SIID, M1Env::LEMMA_SIID);
     QString l_lemma_txt = l_lemma_edge != nullptr ? QString("<p style=\"white-space:pre;margin:0;padding:0;\"><b>Lemma</b>: %1</p>").arg(l_lemma_edge->getTarget_lv2()->text()) : "";
 
     qCDebug(g_cat_passages_panel) << QString("Find fields END") << l_text;
@@ -181,6 +183,7 @@ M1UI::StephanusItem::StephanusItem(const int p_id, const QString& p_stephanus_nu
 // PassageEditor ---------------------------------------------------------------------------------------------------------------------------------------
 void M1UI::PassageEditor::move_forward(int p_steps){
     qCDebug(g_cat_passages_panel) << QString("move_forward()") << m_id << p_steps;
+    /*
     if(m_current_start->next_item_id() != M1Env::G_VOID_ITEM_ID){
         for (M1UI::BasePassageItem *l_item : std::as_const(m_item_list)) delete l_item;
         m_item_list.clear();
@@ -190,9 +193,11 @@ void M1UI::PassageEditor::move_forward(int p_steps){
         }
         populate();
     }
+    */
 }
 void M1UI::PassageEditor::move_backwards(int p_steps){
     qCDebug(g_cat_passages_panel) << QString("move_backwards()") << m_id << p_steps;
+    /*
     if(m_current_start->previous_item_id() != M1Env::G_VOID_ITEM_ID){
         for (M1UI::BasePassageItem *l_item : std::as_const(m_item_list)) delete l_item;
         m_item_list.clear();
@@ -202,10 +207,26 @@ void M1UI::PassageEditor::move_backwards(int p_steps){
         }
         populate();
     }
+    */
 }
 void M1UI::PassageEditor::populate(){
-    qCDebug(g_cat_passages_panel) << QString("populate()") << m_id << m_current_start->text();
+    qCDebug(g_cat_passages_panel) << QString("populate()") << m_id << m_occur_list.size();
 
+    int l_id = 0;
+    for(const std::shared_ptr<M1MidPlane::Interp> l_occ_interp: m_occur_list){
+        QString l_text_plus = l_occ_interp->baseTextPlus();
+        if(g_re_stephanus.match(l_text_plus).hasMatch()){
+            QString l_steph_code = g_re_stephanus.match(l_text_plus).captured(1);
+            M1UI::StephanusItem* l_steph_number_item = new M1UI::StephanusItem(l_id++, l_steph_code, this);
+            m_item_list.append(l_steph_number_item);
+            qCDebug(g_cat_passages_panel) << QString("StephanusItem added") << m_id;
+        }
+        M1UI::WordItem* l_item = new M1UI::WordItem(l_id++, l_occ_interp, this);
+        m_item_list.append(l_item);
+        qCDebug(g_cat_passages_panel) << QString("WordItem added") << m_id;
+    }
+
+    /*
     if(m_current_start != nullptr){
         int l_id = 0;
         M1Store::Item_lv2* l_cur_occur = m_current_start;
@@ -230,6 +251,7 @@ void M1UI::PassageEditor::populate(){
             qCDebug(g_cat_passages_panel) << QString("Loop end") << m_id;
         }
     }
+    */
 }
 QRectF M1UI::PassageEditor::do_layout(const QRectF& p_rect){
     qCDebug(g_cat_passages_panel) << QString("do_layout p_rect:") << m_id << p_rect;
@@ -269,10 +291,13 @@ QRectF M1UI::PassageEditor::do_layout(const QRectF& p_rect){
     return l_outer_geometry;
 }
 
-M1UI::PassageEditor::PassageEditor(M1Store::Item_lv2* p_occur_start, const QString& p_id, QGraphicsItem *p_parent): QGraphicsObject(p_parent){
-    qCDebug(g_cat_passages_panel) << QString("PassageEditor") << p_id << p_occur_start->text();
+M1UI::PassageEditor::PassageEditor(std::vector<std::shared_ptr<M1MidPlane::Interp>>& p_occur_list,
+                                   const QString& p_id,
+                                   QGraphicsItem *p_parent): QGraphicsObject(p_parent), m_occur_list(p_occur_list){
+
+    qCDebug(g_cat_tmp_spotlight) << QString("PassageEditor") << p_id << p_occur_list.size();
     m_id = p_id;
-    m_current_start = p_occur_start;
+    // m_current_start = p_occur_start;
     m_panel = static_cast<PassagesPanel*>(p_parent);
 
     populate();
@@ -341,6 +366,7 @@ void M1UI::PassageEditor::select_from_to(const int p_from, const int p_to){
     }
 }
 QString M1UI::PassageEditor::bake_highlight(M1Store::Item_lv2* p_highlight_vertex, M1Store::Item_lv2* p_category, M1Store::Item_lv2* p_color){
+    /*
     qCDebug(g_cat_passages_panel).noquote() << QString("bake_highlight") << m_id << p_category->text() << p_color->text() << m_current_start->dbgShort();
     M1Store::Item_lv2* l_version = m_current_start->find_edge_generic(M1Env::ISA_SIID, M1Env::TXTVR_SIID, true)->getTarget_lv2();
     qCDebug(g_cat_passages_panel).noquote() << QString("version") << l_version->text() << m_from_sel << m_to_sel;
@@ -357,6 +383,8 @@ QString M1UI::PassageEditor::bake_highlight(M1Store::Item_lv2* p_highlight_verte
     this->unselect_all();
 
     return M1Store::StorageStatic::maxLengthChop(l_word_list.join(" "), 36);
+    */
+    return "";
 }
 
 // PassagesPanel ---------------------------------------------------------------------------------------------------------------------------------------

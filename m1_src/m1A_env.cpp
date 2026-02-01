@@ -29,8 +29,8 @@ QRegularExpression g_re_final_table(R"(\s*<\/table>\s*$)", QRegularExpression::D
 QRegularExpression g_re_capture_gammar(R"(<div\s+class=\"+grammar\"+>(.*)<\/div>)", QRegularExpression::DotMatchesEverythingOption);
 QRegularExpression g_re_cap_initial(R"(^[A-Z])");
 QRegularExpression g_re_sent_num(R"(\d+$)");
+QRegularExpression g_re_stephanus(R"((\d+[a-e])<\/span>)");
 
-// <div class=\"grammar\">
 /**
  * @brief M1Store::M1Env::myMessageHandler message handler callback for Qt debug infra
  * @param p_type Qt log level (Debug/Warning/Critical/Fatal)

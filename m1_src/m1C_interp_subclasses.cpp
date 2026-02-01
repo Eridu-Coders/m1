@@ -27,7 +27,7 @@ M1MidPlane::FieldInterp* M1MidPlane::FieldInterp::getOneIfMatch(M1Store::Item_lv
     if(p_myself->isSimpleEdge() || p_myself->isSimpleVertex())
         l_ret = new FieldInterp(p_myself);
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 /**
@@ -615,125 +615,6 @@ QString M1MidPlane::SentenceInterp::getHtmlVirtual(){
     return QString("<p>%1</p>\n").arg(l_word_list.join(" "));
 }
 
-/*
-QWidget *M1MidPlane::SentenceInterp::get_edit_widget(){
-    initialize();
-
-    // find previous Stephanus Number
-    M1Store::Item_lv2* l_current_edge = m_myself->find_edge_generic(M1Env::OWNS_SIID, M1Env::OCCUR_SIID)->getTarget_lv2();
-    qCDebug(g_cat_interp_base) << QString("l_current_edge") << l_current_edge->dbgShort();
-    M1Store::Item_lv2* l_section;
-    while(true){
-        qCDebug(g_cat_interp_base) << QString("l_current_edge") << l_current_edge->dbgShort();
-        qCDebug(g_cat_interp_base) << QString("   previous") << l_current_edge->get_previous_lv2()->dbgShort();
-        qCDebug(g_cat_interp_base) << QString("   next    ") << l_current_edge->get_next_lv2()->dbgShort();
-        l_section = l_current_edge->find_edge_generic(M1Env::BLNGS_SIID, M1Env::STEPHANUS_SIID);
-        if(l_section != nullptr){
-            l_section = l_section->getTarget_lv2();
-            break;
-        }
-        if(l_current_edge->previous_item_id() == M1Store::G_VOID_ITEM_ID) break;
-        l_current_edge = l_current_edge->get_previous_lv2();
-        // l_current_edge = l_current_edge->getNext_lv2();
-    }
-
-    qCDebug(g_cat_interp_base) << QString("Previous section") << l_section->dbgShort();
-    M1Store::Item_lv2* l_greek_start = nullptr;
-    M1Store::Item_lv2* l_jowett_start = nullptr;
-    M1Store::Item_lv2* l_shorey_start = nullptr;
-    for(M1Store::Item_lv2_iterator it = l_section->getIteratorTop(); !it.beyondEnd(); it.next())
-        if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::OCCUR_SIID)){
-            qCDebug(g_cat_interp_base) << QString("section occur") << it.at()->getTarget_lv2()->dbgShort();
-            if(it.at()->getTarget_lv2()->isOfType("RVGRK")) l_greek_start = it.at()->getTarget_lv2();
-            if(it.at()->getTarget_lv2()->isOfType("RVJWT")) l_jowett_start = it.at()->getTarget_lv2();
-            if(it.at()->getTarget_lv2()->isOfType("RVSHR")) l_shorey_start = it.at()->getTarget_lv2();
-        }
-    qCDebug(g_cat_interp_base) << QString("greek  start") << l_greek_start->dbgShort();
-    qCDebug(g_cat_interp_base) << QString("jowett start") << l_jowett_start->dbgShort();
-    qCDebug(g_cat_interp_base) << QString("shorey start") << l_shorey_start->dbgShort();
-
-    // Set up UI
-    QWidget* l_panel_widget = new QWidget();
-    QVBoxLayout* l_panel_layout = new QVBoxLayout();
-    l_panel_widget->setLayout(l_panel_layout);
-
-    QWidget* l_button_bar = new QWidget(l_panel_widget);
-    l_panel_layout->addWidget(l_button_bar);
-    QHBoxLayout* l_bar_layout = new QHBoxLayout();
-    l_button_bar->setLayout(l_bar_layout);
-
-    QPushButton* l_btn0 = new QPushButton("< 10", l_button_bar);
-    QPushButton* l_btn1 = new QPushButton("< 1", l_button_bar);
-    QPushButton* l_btn2 = new QPushButton("> 1", l_button_bar);
-    QPushButton* l_btn3 = new QPushButton("> 10", l_button_bar);
-    QPushButton* l_btn4 = new QPushButton("Highlight", l_button_bar);
-    l_btn4->setEnabled(false);
-
-    QComboBox* l_cat_combo = new QComboBox(l_button_bar);
-    // fill categories combo box
-    M1Store::Item_lv2* l_republic = l_greek_start->getOrigin_lv2();
-    M1Store::Item_lv2* l_cat_folder = l_republic->find_edge_generic(M1Env::OWNS_SIID, M1Env::TEXT_HIGHLIGHT_CAT_FLDR_SIID)->getTarget_lv2();
-    qCDebug(g_cat_interp_base) << QString("l_cat_folder") << l_cat_folder->dbgShort();
-
-    QList<M1Store::Item_lv2*> l_cat_list;
-    for(M1Store::Item_lv2_iterator it = l_cat_folder->getIteratorTop(); !it.beyondEnd(); it.next())
-        if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_HIGHLIGHT_CAT_SIID)){
-            M1Store::Item_lv2* l_cat = it.at()->getTarget_lv2();
-            l_cat_list.append(l_cat);
-            QString l_color = l_cat->getField(M1Env::HLCLR_SIID);
-            qCDebug(g_cat_interp_base) << QString("Cat: ") << it.at()->dbgShort();
-            qCDebug(g_cat_interp_base) << QString("l_color: ") << l_color;
-            QPixmap l_color_pixmap(16, 16);
-            l_color_pixmap.fill(QColor(l_color));
-            l_cat_combo->addItem(QIcon(l_color_pixmap), l_cat->text());
-        }
-
-    l_bar_layout->addWidget(l_btn0);
-    l_bar_layout->addWidget(l_btn1);
-    l_bar_layout->addWidget(l_btn2);
-    l_bar_layout->addWidget(l_btn3);
-    l_bar_layout->addWidget(l_btn4);
-    l_bar_layout->addWidget(l_cat_combo);
-    l_bar_layout->addStretch(1);
-
-    M1UI::Scene* l_scene = new M1UI::Scene();
-    l_scene->setBackgroundBrush(Qt::white);
-
-    M1UI::PassagesPanel* l_passages_panel = new M1UI::PassagesPanel(
-        l_republic->find_edge_generic(M1Env::OWNS_SIID, M1Env::TEXT_HIGHLIGHT_FLDR_SIID)->getTarget_lv2(),
-        l_cat_list
-        );
-    l_scene->addItem(l_passages_panel);
-
-    l_passages_panel->add_passage_editor(new M1UI::PassageEditor(l_jowett_start, "A", l_passages_panel));
-    l_passages_panel->add_passage_editor(new M1UI::PassageEditor(l_shorey_start, "B", l_passages_panel));
-    l_passages_panel->add_passage_editor(new M1UI::PassageEditor(l_greek_start, "C", l_passages_panel));
-
-    QObject::connect(l_btn0, &QPushButton::clicked,
-                     l_passages_panel, &M1UI::PassagesPanel::move_backwards_ten);
-    QObject::connect(l_btn1, &QPushButton::clicked,
-                     l_passages_panel, &M1UI::PassagesPanel::move_backwards_one);
-    QObject::connect(l_btn2, &QPushButton::clicked,
-                     l_passages_panel, &M1UI::PassagesPanel::move_forward_one);
-    QObject::connect(l_btn3, &QPushButton::clicked,
-                     l_passages_panel, &M1UI::PassagesPanel::move_forward_ten);
-    QObject::connect(l_btn4, &QPushButton::clicked,
-                     l_passages_panel, &M1UI::PassagesPanel::highlight);
-
-    QObject::connect(l_cat_combo, &QComboBox::activated,
-                     l_passages_panel, &M1UI::PassagesPanel::cat_select);
-
-    // activate_highlight_button
-    QObject::connect(l_passages_panel, &M1UI::PassagesPanel::activate_highlight_button,
-                     l_btn4, &QPushButton::setEnabled);
-
-    M1UI::View* l_view = new M1UI::View(l_scene);
-    l_view->set_panel(l_passages_panel);
-    l_panel_layout->addWidget(l_view);
-
-    return l_panel_widget;
-}
-*/
 /** --------------------------------------------------------------- SectionInterp ---------------------------------
  * @brief M1MidPlane::SectionInterp::getOneIfMatch
  * @param p_myself
@@ -754,7 +635,7 @@ QString M1MidPlane::SectionInterp::inTreeDisplayText(const M1Store::Item_lv2* p_
 }
 
 void M1MidPlane::SectionInterp::initialize(){
-    qCDebug(g_cat_tmp_spotlight).noquote() << "initialize()";
+    qCDebug(g_cat_tmp_spotlight).noquote() << "initialize()" << m_myself->dbgShort();
     if(!m_initialized){
         // perform same task for all versions
         for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorAuto(M1Env::OWNS_SIID, M1Env::OCCUR_SIID); !l_it.beyondEnd(); l_it.next() ){
@@ -852,4 +733,126 @@ QString M1MidPlane::SectionInterp::getHtmlVirtual(){
         l_html += QString("<p><b>%1</b>: %2</p>\n").arg(l_key).arg(l_strings_map[l_key].join(" "));
 
     return l_html;
+}
+
+QWidget *M1MidPlane::SectionInterp::get_edit_widget(){
+    qCDebug(g_cat_tmp_spotlight).noquote() << QString("SectionInterp get_edit_widget()") << m_myself->dbgShort();
+    initialize();
+    /*
+    // find previous Stephanus Number
+    M1Store::Item_lv2* l_current_edge = m_myself->find_edge_generic(M1Env::OWNS_SIID, M1Env::OCCUR_SIID)->getTarget_lv2();
+    qCDebug(g_cat_interp_base) << QString("l_current_edge") << l_current_edge->dbgShort();
+    M1Store::Item_lv2* l_section;
+    while(true){
+        qCDebug(g_cat_interp_base) << QString("l_current_edge") << l_current_edge->dbgShort();
+        qCDebug(g_cat_interp_base) << QString("   previous") << l_current_edge->get_previous_lv2()->dbgShort();
+        qCDebug(g_cat_interp_base) << QString("   next    ") << l_current_edge->get_next_lv2()->dbgShort();
+        l_section = l_current_edge->find_edge_generic(M1Env::BLNGS_SIID, M1Env::STEPHANUS_SIID);
+        if(l_section != nullptr){
+            l_section = l_section->getTarget_lv2();
+            break;
+        }
+        if(l_current_edge->previous_item_id() == M1Store::G_VOID_ITEM_ID) break;
+        l_current_edge = l_current_edge->get_previous_lv2();
+        // l_current_edge = l_current_edge->getNext_lv2();
+    }
+
+    qCDebug(g_cat_interp_base) << QString("Previous section") << l_section->dbgShort();
+    M1Store::Item_lv2* l_greek_start = nullptr;
+    M1Store::Item_lv2* l_jowett_start = nullptr;
+    M1Store::Item_lv2* l_shorey_start = nullptr;
+    for(M1Store::Item_lv2_iterator it = l_section->getIteratorTop(); !it.beyondEnd(); it.next())
+        if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::OCCUR_SIID)){
+            qCDebug(g_cat_interp_base) << QString("section occur") << it.at()->getTarget_lv2()->dbgShort();
+            if(it.at()->getTarget_lv2()->isOfType("RVGRK")) l_greek_start = it.at()->getTarget_lv2();
+            if(it.at()->getTarget_lv2()->isOfType("RVJWT")) l_jowett_start = it.at()->getTarget_lv2();
+            if(it.at()->getTarget_lv2()->isOfType("RVSHR")) l_shorey_start = it.at()->getTarget_lv2();
+        }
+    qCDebug(g_cat_interp_base) << QString("greek  start") << l_greek_start->dbgShort();
+    qCDebug(g_cat_interp_base) << QString("jowett start") << l_jowett_start->dbgShort();
+    qCDebug(g_cat_interp_base) << QString("shorey start") << l_shorey_start->dbgShort();
+    */
+
+    // Set up UI
+    QWidget* l_panel_widget = new QWidget();
+    QVBoxLayout* l_panel_layout = new QVBoxLayout();
+    l_panel_widget->setLayout(l_panel_layout);
+
+    QWidget* l_button_bar = new QWidget(l_panel_widget);
+    l_panel_layout->addWidget(l_button_bar);
+    QHBoxLayout* l_bar_layout = new QHBoxLayout();
+    l_button_bar->setLayout(l_bar_layout);
+
+    QPushButton* l_btn0 = new QPushButton("< 10", l_button_bar);
+    QPushButton* l_btn1 = new QPushButton("< 1", l_button_bar);
+    QPushButton* l_btn2 = new QPushButton("> 1", l_button_bar);
+    QPushButton* l_btn3 = new QPushButton("> 10", l_button_bar);
+    QPushButton* l_btn4 = new QPushButton("Highlight", l_button_bar);
+    l_btn4->setEnabled(false);
+
+    QComboBox* l_cat_combo = new QComboBox(l_button_bar);
+    // fill categories combo box
+    M1Store::Item_lv2* l_republic = m_occ_map["Greek"][0]->myself()->getOrigin_lv2();
+    qCDebug(g_cat_tmp_spotlight) << QString("l_republic") << l_republic->dbgShort();
+    M1Store::Item_lv2* l_cat_folder = l_republic->find_edge_generic(M1Env::OWNS_SIID, M1Env::TEXT_HIGHLIGHT_CAT_FLDR_SIID)->getTarget_lv2();
+    qCDebug(g_cat_tmp_spotlight) << QString("l_cat_folder") << l_cat_folder->dbgShort();
+
+    // get list of categories
+    QList<M1Store::Item_lv2*> l_cat_list;
+    for(M1Store::Item_lv2_iterator it = l_cat_folder->getIteratorTop(); !it.beyondEnd(); it.next())
+        if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_HIGHLIGHT_CAT_SIID)){
+            M1Store::Item_lv2* l_cat = it.at()->getTarget_lv2();
+            l_cat_list.append(l_cat);
+            QString l_color = l_cat->getField(M1Env::HLCLR_SIID);
+            qCDebug(g_cat_interp_base) << QString("Cat: ") << it.at()->dbgShort();
+            qCDebug(g_cat_interp_base) << QString("l_color: ") << l_color;
+            QPixmap l_color_pixmap(16, 16);
+            l_color_pixmap.fill(QColor(l_color));
+            l_cat_combo->addItem(QIcon(l_color_pixmap), l_cat->text());
+        }
+
+    l_bar_layout->addWidget(l_btn0);
+    l_bar_layout->addWidget(l_btn1);
+    l_bar_layout->addWidget(l_btn2);
+    l_bar_layout->addWidget(l_btn3);
+    l_bar_layout->addWidget(l_btn4);
+    l_bar_layout->addWidget(l_cat_combo);
+    l_bar_layout->addStretch(1);
+
+    M1UI::Scene* l_scene = new M1UI::Scene();
+    l_scene->setBackgroundBrush(Qt::white);
+
+    M1UI::PassagesPanel* l_passages_panel = new M1UI::PassagesPanel(
+        l_republic->find_edge_generic(M1Env::OWNS_SIID, M1Env::TEXT_HIGHLIGHT_FLDR_SIID)->getTarget_lv2(),
+        l_cat_list
+        );
+    l_scene->addItem(l_passages_panel);
+
+    l_passages_panel->add_passage_editor(new M1UI::PassageEditor(m_occ_map["Shorey"], "A", l_passages_panel));
+    l_passages_panel->add_passage_editor(new M1UI::PassageEditor(m_occ_map["Jowett"], "B", l_passages_panel));
+    l_passages_panel->add_passage_editor(new M1UI::PassageEditor(m_occ_map["Greek"], "C", l_passages_panel));
+
+    QObject::connect(l_btn0, &QPushButton::clicked,
+                     l_passages_panel, &M1UI::PassagesPanel::move_backwards_ten);
+    QObject::connect(l_btn1, &QPushButton::clicked,
+                     l_passages_panel, &M1UI::PassagesPanel::move_backwards_one);
+    QObject::connect(l_btn2, &QPushButton::clicked,
+                     l_passages_panel, &M1UI::PassagesPanel::move_forward_one);
+    QObject::connect(l_btn3, &QPushButton::clicked,
+                     l_passages_panel, &M1UI::PassagesPanel::move_forward_ten);
+    QObject::connect(l_btn4, &QPushButton::clicked,
+                     l_passages_panel, &M1UI::PassagesPanel::highlight);
+
+    QObject::connect(l_cat_combo, &QComboBox::activated,
+                     l_passages_panel, &M1UI::PassagesPanel::cat_select);
+
+    // activate_highlight_button
+    QObject::connect(l_passages_panel, &M1UI::PassagesPanel::activate_highlight_button,
+                     l_btn4, &QPushButton::setEnabled);
+
+    M1UI::View* l_view = new M1UI::View(l_scene);
+    l_view->set_panel(l_passages_panel);
+    l_panel_layout->addWidget(l_view);
+
+    return l_panel_widget;
 }

@@ -17,6 +17,8 @@ M1Store::Item_lv2* M1Store::JsonInterface::cm_lexicon_root = nullptr;
 M1Store::Item_lv2* M1Store::JsonInterface::cm_cur_book = nullptr;
 M1Store::Item_lv2* M1Store::JsonInterface::cm_cur_sentence = nullptr;
 M1Store::Item_lv2* M1Store::JsonInterface::cm_section_folder = nullptr;
+M1Store::Item_lv2* M1Store::JsonInterface::cm_hilights_categories_fldr = nullptr;
+M1Store::Item_lv2* M1Store::JsonInterface::cm_notes_folder = nullptr;
 
 std::map<QString, M1Store::Item_lv2*> M1Store::JsonInterface::cm_lemma_map;
 std::map<QString, M1Store::Item_lv2*> M1Store::JsonInterface::cm_form_map;
@@ -93,8 +95,69 @@ void M1Store::JsonInterface::loadJson(const QString& p_file_path){
 
     }
 
+
+    // Notes
+    cm_notes_folder = cm_text_root->create_descendant(M1Env::OWNS_SIID, "Notes", M1Env::FOLDER_SIID);
+
     // Section folder
     cm_section_folder = cm_text_root->create_descendant(M1Env::OWNS_SIID, "Stephanus Sections", M1Env::FOLDER_SIID);
+
+    // TEXT_HIGHLIGHT_CAT_FLDR_SIID
+    // cm_hilights_categories_fldr = cm_text_root->create_descendant(M1Env::OWNS_SIID, "Highlight Categories", M1Env::TEXT_HIGHLIGHT_CAT_FLDR_SIID);
+    // creation of Republic highlight categories node
+    cm_hilights_categories_fldr = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX,
+        // label
+        "Highlight categories");
+    cm_hilights_categories_fldr->setType(M1Env::FOLDER_SIID);
+    cm_hilights_categories_fldr->setType(M1Env::TEXT_HIGHLIGHT_CAT_FLDR_SIID);
+    cm_text_root->linkTo(cm_hilights_categories_fldr, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+
+    // TEXT_HIGHLIGHT_FLDR_SIID
+    // cm_text_root->create_descendant(M1Env::OWNS_SIID, "Highlights", M1Env::TEXT_HIGHLIGHT_FLDR_SIID);
+    M1Store::Item_lv2* l_hilights_categories = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX,
+        // label
+        "Highlights");
+    l_hilights_categories->setType(M1Env::FOLDER_SIID);
+    l_hilights_categories->setType(M1Env::TEXT_HIGHLIGHT_FLDR_SIID);
+    cm_text_root->linkTo(l_hilights_categories, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+
+    // creation of example highlights categories
+    qCDebug(g_cat_silence) << QString("Creating example Republic highlight categories");
+    M1Store::Item_lv2* l_republic_highlight_cat_1 = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Category 1",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "RCTG1",
+        // icon path
+        nullptr);
+    l_republic_highlight_cat_1->setType(M1Env::TYPE_NODE_SIID);
+    l_republic_highlight_cat_1->setType(M1Env::TEXT_HIGHLIGHT_CAT_SIID);
+    l_republic_highlight_cat_1->setFieldVertex("#f78a38", M1Env::HLCLR_SIID);
+    cm_hilights_categories_fldr->linkTo(l_republic_highlight_cat_1, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+
+    M1Store::Item_lv2* l_republic_highlight_cat_2 = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Category 2",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "RCTG2",
+        // icon path
+        nullptr);
+    l_republic_highlight_cat_2->setType(M1Env::TYPE_NODE_SIID);
+    l_republic_highlight_cat_2->setType(M1Env::TEXT_HIGHLIGHT_CAT_SIID);
+    l_republic_highlight_cat_2->setFieldVertex("#3883f7", M1Env::HLCLR_SIID);
+    cm_hilights_categories_fldr->linkTo(l_republic_highlight_cat_2, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
 
     // Versions
     M1Store::Item_lv2* l_version_folder = cm_text_root->create_descendant(M1Env::OWNS_SIID, "Versions", M1Env::FOLDER_SIID);

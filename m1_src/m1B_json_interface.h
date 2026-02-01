@@ -15,6 +15,8 @@ private:
     static M1Store::Item_lv2* cm_cur_book;
     static M1Store::Item_lv2* cm_cur_sentence;
     static M1Store::Item_lv2* cm_section_folder;
+    static M1Store::Item_lv2* cm_hilights_categories_fldr;
+    static M1Store::Item_lv2* cm_notes_folder;
     static QString cm_indent;
     // static QMap<QString, M1Store::Item_lv2*> m_form_map;
     static std::map<QString, M1Store::Item_lv2*> cm_lemma_map;

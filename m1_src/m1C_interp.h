@@ -406,6 +406,7 @@ public:
     virtual QString className() {return "SectionInterp";}
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual QString getHtmlVirtual();
+    virtual QWidget* get_edit_widget();
 };
 } // namespace M1MidPlane
 #endif // INTERP_H
