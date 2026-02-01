@@ -71,14 +71,14 @@ extern M1Env::SpecialItemID TEXT_WFW_POS_SIID;
 extern M1Env::SpecialItemID TEXT_WFW_GRM_SIID;
 // [URLNK] Special Vertex ID (Vertex type) Url link
 extern M1Env::SpecialItemID TEXT_URL_LINK_SIID;
-// [HS2OB] Special Vertex ID (Edge type) begin section + reciprocal
-extern M1Env::SpecialItemID TW_SECTION_2_OCC_BEGIN_SIID;
-// [OC2HB] Special Vertex ID (Edge type) begin section + reciprocal (reciprocal of HS2OB above))
-extern M1Env::SpecialItemID TW_REV_SECTION_2_OCC_BEGIN_SIID;
-// [HS2OE] Special Vertex ID (Edge type) end section + reciprocal
-extern M1Env::SpecialItemID TW_SECTION_2_OCC_END_SIID;
-// [OC2HE] Special Vertex ID (Edge type) end section + reciprocal (reciprocal of HS2OE above))
-extern M1Env::SpecialItemID TW_REV_SECTION_2_OCC_END_SIID;
+// [C2OBG] Special Vertex ID (Edge type) begin chunk + reciprocal
+extern M1Env::SpecialItemID TW_CHUNK_2_OCC_BEGIN_SIID;
+// [O2CBG] Special Vertex ID (Edge type) begin chunk + reciprocal (reciprocal of C2OBG above))
+extern M1Env::SpecialItemID TW_OCC_2_CHUNK_BEGIN_SIID;
+// [C2OEN] Special Vertex ID (Edge type) end chunk + reciprocal
+extern M1Env::SpecialItemID TW_CHUNK_2_OCC_END_SIID;
+// [O2CEN] Special Vertex ID (Edge type) end chunk + reciprocal (reciprocal of C2OEN above))
+extern M1Env::SpecialItemID TW_OCC_2_CHUNK_END_SIID;
 
 // [ROOT_] Special Vertex ID of "Global graph root"
 extern M1Env::SpecialItemID ROOT_SIID;

@@ -71,14 +71,14 @@ M1Env::SpecialItemID M1Env::TEXT_WFW_POS_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_WFW_GRM_SIID = G_NONEX_SI_ID;
 // [URLNK] Special Vertex ID (Vertex type) Url link
 M1Env::SpecialItemID M1Env::TEXT_URL_LINK_SIID = G_NONEX_SI_ID;
-// [HS2OB] Special Vertex ID (Edge type) begin section + reciprocal
-M1Env::SpecialItemID M1Env::TW_SECTION_2_OCC_BEGIN_SIID = G_NONEX_SI_ID;
-// [OC2HB] Special Vertex ID (Edge type) begin section + reciprocal (reciprocal of HS2OB above))
-M1Env::SpecialItemID M1Env::TW_REV_SECTION_2_OCC_BEGIN_SIID = G_NONEX_SI_ID;
-// [HS2OE] Special Vertex ID (Edge type) end section + reciprocal
-M1Env::SpecialItemID M1Env::TW_SECTION_2_OCC_END_SIID = G_NONEX_SI_ID;
-// [OC2HE] Special Vertex ID (Edge type) end section + reciprocal (reciprocal of HS2OE above))
-M1Env::SpecialItemID M1Env::TW_REV_SECTION_2_OCC_END_SIID = G_NONEX_SI_ID;
+// [C2OBG] Special Vertex ID (Edge type) begin chunk + reciprocal
+M1Env::SpecialItemID M1Env::TW_CHUNK_2_OCC_BEGIN_SIID = G_NONEX_SI_ID;
+// [O2CBG] Special Vertex ID (Edge type) begin chunk + reciprocal (reciprocal of C2OBG above))
+M1Env::SpecialItemID M1Env::TW_OCC_2_CHUNK_BEGIN_SIID = G_NONEX_SI_ID;
+// [C2OEN] Special Vertex ID (Edge type) end chunk + reciprocal
+M1Env::SpecialItemID M1Env::TW_CHUNK_2_OCC_END_SIID = G_NONEX_SI_ID;
+// [O2CEN] Special Vertex ID (Edge type) end chunk + reciprocal (reciprocal of C2OEN above))
+M1Env::SpecialItemID M1Env::TW_OCC_2_CHUNK_END_SIID = G_NONEX_SI_ID;
 
 M1Env::SpecialItemID M1Env::ROOT_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::HOME_SIID = G_NONEX_SI_ID;
@@ -268,10 +268,10 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::TEXT_WFW_POS_SIID = M1Store::StorageStatic::getSpecialID("WFPOS");
     M1Env::TEXT_WFW_GRM_SIID = M1Store::StorageStatic::getSpecialID("WFGRM");
     M1Env::TEXT_URL_LINK_SIID = M1Store::StorageStatic::getSpecialID("URLNK");
-    M1Env::TW_SECTION_2_OCC_BEGIN_SIID = M1Store::StorageStatic::getSpecialID("HS2OB");
-    M1Env::TW_REV_SECTION_2_OCC_BEGIN_SIID = M1Store::StorageStatic::getSpecialID("OC2HB");
-    M1Env::TW_SECTION_2_OCC_END_SIID = M1Store::StorageStatic::getSpecialID("HS2OE");
-    M1Env::TW_REV_SECTION_2_OCC_END_SIID = M1Store::StorageStatic::getSpecialID("OC2HE");
+    M1Env::TW_CHUNK_2_OCC_BEGIN_SIID = M1Store::StorageStatic::getSpecialID("C2OBG");
+    M1Env::TW_OCC_2_CHUNK_BEGIN_SIID = M1Store::StorageStatic::getSpecialID("O2CBG");
+    M1Env::TW_CHUNK_2_OCC_END_SIID = M1Store::StorageStatic::getSpecialID("C2OEN");
+    M1Env::TW_OCC_2_CHUNK_END_SIID = M1Store::StorageStatic::getSpecialID("O2CEN");
     M1Env::ROOT_SIID = M1Store::StorageStatic::getSpecialID("ROOT_");
     M1Env::HOME_SIID = M1Store::StorageStatic::getSpecialID("HOME_");
     M1Env::TYPE_NODE_SIID = M1Store::StorageStatic::getSpecialID("TYPE_");
@@ -490,8 +490,8 @@ void M1Env::GraphInit::dbg_dump_pseudo_constants(){
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_POS_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WFPOS"), 4, 16, QChar('0')).arg("WFPOS");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_GRM_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WFGRM"), 4, 16, QChar('0')).arg("WFGRM");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_URL_LINK_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("URLNK"), 4, 16, QChar('0')).arg("URLNK");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TW_SECTION_2_OCC_BEGIN_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("HS2OB"), 4, 16, QChar('0')).arg("HS2OB");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TW_SECTION_2_OCC_END_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("HS2OE"), 4, 16, QChar('0')).arg("HS2OE");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TW_CHUNK_2_OCC_BEGIN_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("C2OBG"), 4, 16, QChar('0')).arg("C2OBG");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TW_CHUNK_2_OCC_END_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("C2OEN"), 4, 16, QChar('0')).arg("C2OEN");
 }
 
 void M1Env::GraphInit::init_base(){
@@ -567,15 +567,15 @@ void M1Env::GraphInit::init_base(){
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "WFGRM", nullptr);
     // Special Vertex ID (Vertex type) Url link
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "URLNK", M1Env::TEXT_URL_LINK_ICON_PATH);
-    // Special Vertex ID (Edge type) begin section + reciprocal
+    // Special Vertex ID (Edge type) begin chunk + reciprocal
     M1Store::StorageStatic::getNewSpecialWithReciprocal(SI_IS_TYPE,
-        "HS2OB", M1Env::TW_SECTION_2_OCC_BEGIN_ICON_PATH,
-        "OC2HB", M1Env::TW_SECTION_2_OCC_BEGIN_ICON_PATH,
+        "C2OBG", M1Env::TW_SECTION_2_OCC_BEGIN_ICON_PATH,
+        "O2CBG", M1Env::TW_SECTION_2_OCC_BEGIN_ICON_PATH,
         SI_IS_TYPE);
-    // Special Vertex ID (Edge type) end section + reciprocal
+    // Special Vertex ID (Edge type) end chunk + reciprocal
     M1Store::StorageStatic::getNewSpecialWithReciprocal(SI_IS_TYPE,
-        "HS2OE", M1Env::TW_SECTION_2_OCC_END_ICON_PATH,
-        "OC2HE", M1Env::TW_SECTION_2_OCC_END_ICON_PATH,
+        "C2OEN", M1Env::TW_SECTION_2_OCC_END_ICON_PATH,
+        "O2CEN", M1Env::TW_SECTION_2_OCC_END_ICON_PATH,
         SI_IS_TYPE);
 
     // creation of "Global graph root"

@@ -382,12 +382,30 @@ private:
     void initialize();
 public:
     static SentenceInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+    static QString occur_to_text(const M1Store::Item_lv2* p_edge){ return "";}
 
     SentenceInterp(M1Store::Item_lv2* p_myself);
     virtual QString className() {return "SentenceInterp";}
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual QString getHtmlVirtual();
+    // virtual QWidget* get_edit_widget();
 };
 
+class SectionInterp : public Interp{
+    Q_OBJECT
+private:
+    bool m_initialized = false;
+    // text version --> list of occ
+    std::map<QString, std::vector<std::shared_ptr<Interp>>> m_occ_map;
+
+    void initialize();
+public:
+    static SectionInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    SectionInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "SectionInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
+};
 } // namespace M1MidPlane
 #endif // INTERP_H

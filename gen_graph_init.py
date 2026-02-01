@@ -433,11 +433,11 @@ g_special_vertices = [
     ['WFGRM', 'SI_IS_TYPE',                                None,                        'TEXT_WFW_GRM_SIID', None, 'Special Vertex ID (Simple Edge type) WfW form Grammatical analysis'],
     ['URLNK', 'SI_IS_TYPE',                                'TEXT_URL_LINK_ICON_PATH',   'TEXT_URL_LINK_SIID', None,  'Special Vertex ID (Vertex type) Url link'],
     # --------------------------- HS2OB / OC2HB ---------------------------
-    ['HS2OB', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_BEGIN_ICON_PATH', 'TW_SECTION_2_OCC_BEGIN_SIID',
-    ('OC2HB', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_BEGIN_ICON_PATH', 'TW_REV_SECTION_2_OCC_BEGIN_SIID'),  'Special Vertex ID (Edge type) begin section + reciprocal'],
+    ['C2OBG', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_BEGIN_ICON_PATH', 'TW_CHUNK_2_OCC_BEGIN_SIID',
+    ('O2CBG', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_BEGIN_ICON_PATH', 'TW_OCC_2_CHUNK_BEGIN_SIID'),  'Special Vertex ID (Edge type) begin chunk + reciprocal'],
     # --------------------------- HS2OE / OC2HE ---------------------------
-    ['HS2OE', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_END_ICON_PATH', 'TW_SECTION_2_OCC_END_SIID',
-    ('OC2HE', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_END_ICON_PATH', 'TW_REV_SECTION_2_OCC_END_SIID'),'Special Vertex ID (Edge type) end section + reciprocal'],
+    ['C2OEN', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_END_ICON_PATH', 'TW_CHUNK_2_OCC_END_SIID',
+    ('O2CEN', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_END_ICON_PATH', 'TW_OCC_2_CHUNK_END_SIID'),'Special Vertex ID (Edge type) end chunk + reciprocal'],
 ]
 
 g_vertices = [

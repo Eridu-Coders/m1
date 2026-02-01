@@ -2,6 +2,7 @@
 #include "m1A_env.h"
 #include "m1B_graph_init.h"
 #include "m1B_lv2_iterators.h"
+#include "m1D_passages_panel.h"
 
 #include <QPainter>
 #include <QResizeEvent>
@@ -570,11 +571,11 @@ M1MidPlane::SentenceInterp* M1MidPlane::SentenceInterp::getOneIfMatch(M1Store::I
 // QString m_word_end;
 
 M1MidPlane::SentenceInterp::SentenceInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){
-    M1Store::Item_lv2* l_begin_edge = m_myself->find_edge_generic(M1Env::TW_SECTION_2_OCC_BEGIN_SIID, M1Env::OCCUR_SIID);
+    M1Store::Item_lv2* l_begin_edge = m_myself->find_edge_generic(M1Env::TW_CHUNK_2_OCC_BEGIN_SIID, M1Env::OCCUR_SIID);
     if(l_begin_edge)
         m_word_begin_occ = getInterp(l_begin_edge->getTarget_lv2());
 
-    M1Store::Item_lv2* l_end_edge = m_myself->find_edge_generic(M1Env::TW_SECTION_2_OCC_END_SIID, M1Env::OCCUR_SIID);
+    M1Store::Item_lv2* l_end_edge = m_myself->find_edge_generic(M1Env::TW_CHUNK_2_OCC_END_SIID, M1Env::OCCUR_SIID);
     if(l_end_edge)
         m_word_end_occ = getInterp(l_end_edge->getTarget_lv2());
 
@@ -586,7 +587,7 @@ M1MidPlane::SentenceInterp::SentenceInterp(M1Store::Item_lv2* p_myself) : M1MidP
  * @brief M1MidPlane::SentenceInterp::initialize
  */
 void M1MidPlane::SentenceInterp::initialize(){
-    if(m_word_begin_occ != nullptr){
+    if(m_word_begin_occ != nullptr && !m_initialized){
         m_occ_list.push_back(m_word_begin_occ);
         M1Store::Item_lv2* l_cur_occ_edge = m_word_begin_occ->myself();
         qCDebug(g_cat_tmp_spotlight).noquote() << "Strart" << l_cur_occ_edge->dbgShort();
@@ -598,6 +599,7 @@ void M1MidPlane::SentenceInterp::initialize(){
 
         }while(l_cur_occ_edge != m_word_end_occ->myself());
         // m_occ_list.push_back(m_word_end_occ);
+        m_initialized = true;
     }
 }
 
@@ -607,7 +609,247 @@ QString M1MidPlane::SentenceInterp::inTreeDisplayText(const M1Store::Item_lv2* p
 QString M1MidPlane::SentenceInterp::getHtmlVirtual(){
     // return QString(QString("m_word_begin: %1").arg(m_word_begin_occ->baseText()));
     initialize();
+
     QStringList l_word_list;
     for(const auto& l_occ_interp : m_occ_list) l_word_list.append(l_occ_interp->baseTextPlus());
     return QString("<p>%1</p>\n").arg(l_word_list.join(" "));
+}
+
+/*
+QWidget *M1MidPlane::SentenceInterp::get_edit_widget(){
+    initialize();
+
+    // find previous Stephanus Number
+    M1Store::Item_lv2* l_current_edge = m_myself->find_edge_generic(M1Env::OWNS_SIID, M1Env::OCCUR_SIID)->getTarget_lv2();
+    qCDebug(g_cat_interp_base) << QString("l_current_edge") << l_current_edge->dbgShort();
+    M1Store::Item_lv2* l_section;
+    while(true){
+        qCDebug(g_cat_interp_base) << QString("l_current_edge") << l_current_edge->dbgShort();
+        qCDebug(g_cat_interp_base) << QString("   previous") << l_current_edge->get_previous_lv2()->dbgShort();
+        qCDebug(g_cat_interp_base) << QString("   next    ") << l_current_edge->get_next_lv2()->dbgShort();
+        l_section = l_current_edge->find_edge_generic(M1Env::BLNGS_SIID, M1Env::STEPHANUS_SIID);
+        if(l_section != nullptr){
+            l_section = l_section->getTarget_lv2();
+            break;
+        }
+        if(l_current_edge->previous_item_id() == M1Store::G_VOID_ITEM_ID) break;
+        l_current_edge = l_current_edge->get_previous_lv2();
+        // l_current_edge = l_current_edge->getNext_lv2();
+    }
+
+    qCDebug(g_cat_interp_base) << QString("Previous section") << l_section->dbgShort();
+    M1Store::Item_lv2* l_greek_start = nullptr;
+    M1Store::Item_lv2* l_jowett_start = nullptr;
+    M1Store::Item_lv2* l_shorey_start = nullptr;
+    for(M1Store::Item_lv2_iterator it = l_section->getIteratorTop(); !it.beyondEnd(); it.next())
+        if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::OCCUR_SIID)){
+            qCDebug(g_cat_interp_base) << QString("section occur") << it.at()->getTarget_lv2()->dbgShort();
+            if(it.at()->getTarget_lv2()->isOfType("RVGRK")) l_greek_start = it.at()->getTarget_lv2();
+            if(it.at()->getTarget_lv2()->isOfType("RVJWT")) l_jowett_start = it.at()->getTarget_lv2();
+            if(it.at()->getTarget_lv2()->isOfType("RVSHR")) l_shorey_start = it.at()->getTarget_lv2();
+        }
+    qCDebug(g_cat_interp_base) << QString("greek  start") << l_greek_start->dbgShort();
+    qCDebug(g_cat_interp_base) << QString("jowett start") << l_jowett_start->dbgShort();
+    qCDebug(g_cat_interp_base) << QString("shorey start") << l_shorey_start->dbgShort();
+
+    // Set up UI
+    QWidget* l_panel_widget = new QWidget();
+    QVBoxLayout* l_panel_layout = new QVBoxLayout();
+    l_panel_widget->setLayout(l_panel_layout);
+
+    QWidget* l_button_bar = new QWidget(l_panel_widget);
+    l_panel_layout->addWidget(l_button_bar);
+    QHBoxLayout* l_bar_layout = new QHBoxLayout();
+    l_button_bar->setLayout(l_bar_layout);
+
+    QPushButton* l_btn0 = new QPushButton("< 10", l_button_bar);
+    QPushButton* l_btn1 = new QPushButton("< 1", l_button_bar);
+    QPushButton* l_btn2 = new QPushButton("> 1", l_button_bar);
+    QPushButton* l_btn3 = new QPushButton("> 10", l_button_bar);
+    QPushButton* l_btn4 = new QPushButton("Highlight", l_button_bar);
+    l_btn4->setEnabled(false);
+
+    QComboBox* l_cat_combo = new QComboBox(l_button_bar);
+    // fill categories combo box
+    M1Store::Item_lv2* l_republic = l_greek_start->getOrigin_lv2();
+    M1Store::Item_lv2* l_cat_folder = l_republic->find_edge_generic(M1Env::OWNS_SIID, M1Env::TEXT_HIGHLIGHT_CAT_FLDR_SIID)->getTarget_lv2();
+    qCDebug(g_cat_interp_base) << QString("l_cat_folder") << l_cat_folder->dbgShort();
+
+    QList<M1Store::Item_lv2*> l_cat_list;
+    for(M1Store::Item_lv2_iterator it = l_cat_folder->getIteratorTop(); !it.beyondEnd(); it.next())
+        if(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_HIGHLIGHT_CAT_SIID)){
+            M1Store::Item_lv2* l_cat = it.at()->getTarget_lv2();
+            l_cat_list.append(l_cat);
+            QString l_color = l_cat->getField(M1Env::HLCLR_SIID);
+            qCDebug(g_cat_interp_base) << QString("Cat: ") << it.at()->dbgShort();
+            qCDebug(g_cat_interp_base) << QString("l_color: ") << l_color;
+            QPixmap l_color_pixmap(16, 16);
+            l_color_pixmap.fill(QColor(l_color));
+            l_cat_combo->addItem(QIcon(l_color_pixmap), l_cat->text());
+        }
+
+    l_bar_layout->addWidget(l_btn0);
+    l_bar_layout->addWidget(l_btn1);
+    l_bar_layout->addWidget(l_btn2);
+    l_bar_layout->addWidget(l_btn3);
+    l_bar_layout->addWidget(l_btn4);
+    l_bar_layout->addWidget(l_cat_combo);
+    l_bar_layout->addStretch(1);
+
+    M1UI::Scene* l_scene = new M1UI::Scene();
+    l_scene->setBackgroundBrush(Qt::white);
+
+    M1UI::PassagesPanel* l_passages_panel = new M1UI::PassagesPanel(
+        l_republic->find_edge_generic(M1Env::OWNS_SIID, M1Env::TEXT_HIGHLIGHT_FLDR_SIID)->getTarget_lv2(),
+        l_cat_list
+        );
+    l_scene->addItem(l_passages_panel);
+
+    l_passages_panel->add_passage_editor(new M1UI::PassageEditor(l_jowett_start, "A", l_passages_panel));
+    l_passages_panel->add_passage_editor(new M1UI::PassageEditor(l_shorey_start, "B", l_passages_panel));
+    l_passages_panel->add_passage_editor(new M1UI::PassageEditor(l_greek_start, "C", l_passages_panel));
+
+    QObject::connect(l_btn0, &QPushButton::clicked,
+                     l_passages_panel, &M1UI::PassagesPanel::move_backwards_ten);
+    QObject::connect(l_btn1, &QPushButton::clicked,
+                     l_passages_panel, &M1UI::PassagesPanel::move_backwards_one);
+    QObject::connect(l_btn2, &QPushButton::clicked,
+                     l_passages_panel, &M1UI::PassagesPanel::move_forward_one);
+    QObject::connect(l_btn3, &QPushButton::clicked,
+                     l_passages_panel, &M1UI::PassagesPanel::move_forward_ten);
+    QObject::connect(l_btn4, &QPushButton::clicked,
+                     l_passages_panel, &M1UI::PassagesPanel::highlight);
+
+    QObject::connect(l_cat_combo, &QComboBox::activated,
+                     l_passages_panel, &M1UI::PassagesPanel::cat_select);
+
+    // activate_highlight_button
+    QObject::connect(l_passages_panel, &M1UI::PassagesPanel::activate_highlight_button,
+                     l_btn4, &QPushButton::setEnabled);
+
+    M1UI::View* l_view = new M1UI::View(l_scene);
+    l_view->set_panel(l_passages_panel);
+    l_panel_layout->addWidget(l_view);
+
+    return l_panel_widget;
+}
+*/
+/** --------------------------------------------------------------- SectionInterp ---------------------------------
+ * @brief M1MidPlane::SectionInterp::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
+M1MidPlane::SectionInterp* M1MidPlane::SectionInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be an TranslationBhashya? %1").arg(p_myself->dbgShort()))
+    M1MidPlane::SectionInterp* l_ret = nullptr;
+    if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::STEPHANUS_SIID))
+        l_ret = new SectionInterp(p_myself);
+    M1_FUNC_EXIT
+    return l_ret;
+}
+
+M1MidPlane::SectionInterp::SectionInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){}
+QString M1MidPlane::SectionInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
+    return m_myself->text();
+}
+
+void M1MidPlane::SectionInterp::initialize(){
+    qCDebug(g_cat_tmp_spotlight).noquote() << "initialize()";
+    if(!m_initialized){
+        // perform same task for all versions
+        for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorAuto(M1Env::OWNS_SIID, M1Env::OCCUR_SIID); !l_it.beyondEnd(); l_it.next() ){
+            // qCDebug(g_cat_tmp_spotlight).noquote() << "l_it" << l_it.at()->dbgShort();
+            M1Store::Item_lv2* l_current_edge = l_it.at()->getTarget_lv2();
+
+            qCDebug(g_cat_tmp_spotlight) << "START l_current_edge:" << l_current_edge->dbgShort();
+            // position l_current_edge on previous sentence start
+            // M1Store::Item_lv2* l_start_sentence_occ = nullptr;
+            while(true){
+                qCDebug(g_cat_interp_base) << QString("l_current_edge") << l_current_edge->dbgShort();
+                qCDebug(g_cat_interp_base) << QString("   previous") << l_current_edge->get_previous_lv2()->dbgShort();
+                qCDebug(g_cat_interp_base) << QString("   next    ") << l_current_edge->get_next_lv2()->dbgShort();
+                if(l_current_edge->getField(M1Env::STPOS_SIID) == "SS" || l_current_edge->getField(M1Env::STPOS_SIID) == "SX"){
+                    // l_start_sentence_occ = l_current_edge;
+                    break;
+                }
+                if(l_current_edge->previous_item_id() == M1Store::G_VOID_ITEM_ID) break;
+                l_current_edge = l_current_edge->get_previous_lv2();
+            }
+            // version ?
+            M1Store::Item_lv2* l_edge_2_sentence = l_current_edge->find_edge_generic(M1Env::TW_OCC_2_CHUNK_BEGIN_SIID, M1Env::TEXT_SENTENCE_SIID);
+            M1Store::Item_lv2* l_edge_2_book = l_edge_2_sentence->getTarget_lv2()->find_edge_generic(M1Env::BLNGS_SIID, M1Env::TEXT_BOOK_SIID);
+            M1Store::Item_lv2* l_edge_2_version = l_edge_2_book->getTarget_lv2()->find_edge_generic(M1Env::BLNGS_SIID, M1Env::TXTVR_SIID);
+            QString l_version = l_edge_2_version->getTarget_lv2()->text();
+
+            qCDebug(g_cat_tmp_spotlight) << QString("[%1] l_current_edge:").arg(l_version) << l_current_edge->dbgShort();
+
+            // find end of section
+            int l_sections_encountered = 0;
+            while(l_sections_encountered < 2){ // 2 sections must be encountered (this one plus the next)
+                if(l_current_edge->getField(M1Env::STEPHANUS_SIID).length() > 0) l_sections_encountered += 1;
+                if(l_sections_encountered < 2){ // section end excluded
+                    std::shared_ptr<Interp> l_occ_interp = getInterp(l_current_edge);
+                    m_occ_map[l_version].push_back(l_occ_interp);
+                    qCDebug(g_cat_tmp_spotlight) << "Add occ" << m_occ_map[l_version].size() << l_occ_interp->baseText();
+                    l_current_edge = l_current_edge->get_next_lv2();
+                }
+            }
+
+            // find end of sentence
+            while(true){
+                qCDebug(g_cat_interp_base) << QString("l_current_edge") << l_current_edge->dbgShort();
+                qCDebug(g_cat_interp_base) << QString("   previous") << l_current_edge->get_previous_lv2()->dbgShort();
+                qCDebug(g_cat_interp_base) << QString("   next    ") << l_current_edge->get_next_lv2()->dbgShort();
+                if(l_current_edge->getField(M1Env::STPOS_SIID) == "SS" || l_current_edge->getField(M1Env::STPOS_SIID) == "SX"){
+                    // l_start_sentence_occ = l_current_edge;
+                    break;
+                }
+                std::shared_ptr<Interp> l_occ_interp = getInterp(l_current_edge);
+                m_occ_map[l_version].push_back(l_occ_interp);
+                if(l_current_edge->next_item_id() == M1Store::G_VOID_ITEM_ID) break;
+                l_current_edge = l_current_edge->get_next_lv2();
+            }
+        }
+
+        /*
+        // find previous sentence end
+        M1Store::Item_lv2* l_current_edge = m_myself->find_edge_generic(M1Env::OWNS_SIID, M1Env::OCCUR_SIID)->getTarget_lv2();
+        qCDebug(g_cat_interp_base) << QString("l_current_edge") << l_current_edge->dbgShort();
+        M1Store::Item_lv2* l_section;
+        while(true){
+            qCDebug(g_cat_interp_base) << QString("l_current_edge") << l_current_edge->dbgShort();
+            qCDebug(g_cat_interp_base) << QString("   previous") << l_current_edge->get_previous_lv2()->dbgShort();
+            qCDebug(g_cat_interp_base) << QString("   next    ") << l_current_edge->get_next_lv2()->dbgShort();
+            l_section = l_current_edge->find_edge_generic(M1Env::BLNGS_SIID, M1Env::STEPHANUS_SIID);
+            if(l_section != nullptr){
+                l_section = l_section->getTarget_lv2();
+                break;
+            }
+            if(l_current_edge->previous_item_id() == M1Store::G_VOID_ITEM_ID) break;
+            l_current_edge = l_current_edge->get_previous_lv2();
+            // l_current_edge = l_current_edge->getNext_lv2();
+        }
+        */
+        m_initialized = true;
+    }
+}
+
+QString M1MidPlane::SectionInterp::getHtmlVirtual(){
+    initialize();
+
+    QMap<QString, QStringList> l_strings_map;
+
+    for(const auto& l_item : m_occ_map){
+        QString l_version = l_item.first;
+        std::vector<std::shared_ptr<Interp>> l_interp_list = l_item.second;
+
+        for(const auto& l_occ_interp : l_interp_list)
+            l_strings_map[l_version].append(l_occ_interp->baseTextPlus());
+    }
+
+    QString l_html;
+    for(const QString& l_key : l_strings_map.keys())
+        l_html += QString("<p><b>%1</b>: %2</p>\n").arg(l_key).arg(l_strings_map[l_key].join(" "));
+
+    return l_html;
 }

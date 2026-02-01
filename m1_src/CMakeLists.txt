@@ -53,6 +53,8 @@ set(PROJECT_SOURCES
         m1D_main_window.cpp
         m1D_tree_display.h
         m1D_tree_display.cpp
+        m1D_passages_panel.h
+        m1D_passages_panel.cpp
 )
 
 # m1D_passages_panel.h

@@ -14,10 +14,12 @@ private:
     static M1Store::Item_lv2* cm_lexicon_root;
     static M1Store::Item_lv2* cm_cur_book;
     static M1Store::Item_lv2* cm_cur_sentence;
+    static M1Store::Item_lv2* cm_section_folder;
     static QString cm_indent;
     // static QMap<QString, M1Store::Item_lv2*> m_form_map;
     static std::map<QString, M1Store::Item_lv2*> cm_lemma_map;
     static std::map<QString, M1Store::Item_lv2*> cm_form_map;
+    static std::map<QString, M1Store::Item_lv2*> cm_section_map;
     static QStringList cm_form_gr_done;
     static int cm_cur_sentence_number;
     static int cm_cur_book_number;

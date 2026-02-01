@@ -14,20 +14,25 @@ Q_LOGGING_CATEGORY(g_cat_json, "tei_interface")
 
 M1Store::Item_lv2* M1Store::JsonInterface::cm_text_root = nullptr;
 M1Store::Item_lv2* M1Store::JsonInterface::cm_lexicon_root = nullptr;
-QString M1Store::JsonInterface::cm_indent;
-std::map<QString, M1Store::Item_lv2*> M1Store::JsonInterface::cm_lemma_map;
-std::map<QString, M1Store::Item_lv2*> M1Store::JsonInterface::cm_form_map;
 M1Store::Item_lv2* M1Store::JsonInterface::cm_cur_book = nullptr;
 M1Store::Item_lv2* M1Store::JsonInterface::cm_cur_sentence = nullptr;
+M1Store::Item_lv2* M1Store::JsonInterface::cm_section_folder = nullptr;
+
+std::map<QString, M1Store::Item_lv2*> M1Store::JsonInterface::cm_lemma_map;
+std::map<QString, M1Store::Item_lv2*> M1Store::JsonInterface::cm_form_map;
+std::map<QString, M1Store::Item_lv2*> M1Store::JsonInterface::cm_section_map;
 QStringList M1Store::JsonInterface::cm_form_gr_done;
 int M1Store::JsonInterface::cm_cur_sentence_number = 1;
 int M1Store::JsonInterface::cm_cur_book_number = 0;
+
+QString M1Store::JsonInterface::cm_indent;
 
 // QMap<QString, M1Store::Item_lv2*> M1Store::JsonInterface::m_form_map;
 
 void M1Store::JsonInterface::init(){
     qCDebug(g_cat_tmp_spotlight).noquote() << "M1Store::JsonInterface::init";
 }
+
 void M1Store::JsonInterface::loadJson(const QString& p_file_path){
     qCDebug(g_cat_tmp_spotlight).noquote() << QString("Loading JSON file: [%1]").arg(p_file_path);
 
@@ -87,6 +92,9 @@ void M1Store::JsonInterface::loadJson(const QString& p_file_path){
         cm_form_map[l_it.key()] = M1Store::JsonInterface::create_form(l_text, l_tag, l_lemma_key_array);
 
     }
+
+    // Section folder
+    cm_section_folder = cm_text_root->create_descendant(M1Env::OWNS_SIID, "Stephanus Sections", M1Env::FOLDER_SIID);
 
     // Versions
     M1Store::Item_lv2* l_version_folder = cm_text_root->create_descendant(M1Env::OWNS_SIID, "Versions", M1Env::FOLDER_SIID);
@@ -237,7 +245,26 @@ void M1Store::JsonInterface::add_word(const QString& p_occ_text,
     if(p_punct_right.length() > 0) l_new_occ->setFieldEdge(p_punct_right, M1Env::PCTRT_SIID);
     if(p_mkp_before.length() > 0) l_new_occ->setFieldEdge(p_mkp_before, M1Env::MKPLF_SIID);
     if(p_mkp_after.length() > 0) l_new_occ->setFieldEdge(p_mkp_after, M1Env::MKPRT_SIID);
-    if(p_new_stephanus_section.length() > 0) l_new_occ->setFieldEdge(p_new_stephanus_section, M1Env::STEPHANUS_SIID);
+    if(p_new_stephanus_section.length() > 0){
+        l_new_occ->setFieldEdge(p_new_stephanus_section, M1Env::STEPHANUS_SIID);
+
+        M1Store::Item_lv2* l_new_section;
+        auto l_it = cm_section_map.find(p_new_stephanus_section);
+        if(l_it != cm_section_map.end()) l_new_section = l_it->second;
+        else{
+            l_new_section = M1Store::Item_lv2::getNew(
+                // vertex flags
+                M1Env::FULL_VERTEX,
+                // label
+                p_new_stephanus_section);
+            l_new_section->setType(M1Env::STEPHANUS_SIID);
+            cm_section_map[p_new_stephanus_section] = l_new_section;
+            cm_section_folder->linkTo(l_new_section, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+        }
+
+        cm_cur_book->linkTo(l_new_section, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+        l_new_section->linkTo(l_new_occ, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+    }
 
     if(!cm_form_gr_done.contains(p_form_key)){
         for(const auto& l_pentacode : p_gram_penta_list)
@@ -254,12 +281,12 @@ void M1Store::JsonInterface::add_word(const QString& p_occ_text,
             QString("Sentence %1").arg(cm_cur_sentence_number));
         cm_cur_sentence_number += 1;
         cm_cur_sentence->setType(M1Env::TEXT_SENTENCE_SIID);
-        cm_cur_sentence->linkTo(l_new_occ, M1Env::TW_SECTION_2_OCC_BEGIN_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+        cm_cur_sentence->linkTo(l_new_occ, M1Env::TW_CHUNK_2_OCC_BEGIN_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
         cm_cur_book->linkTo(cm_cur_sentence, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
     }
 
     if(p_sentence_position == "SE" || p_sentence_position == "SX"){
-        cm_cur_sentence->linkTo(l_new_occ, M1Env::TW_SECTION_2_OCC_END_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+        cm_cur_sentence->linkTo(l_new_occ, M1Env::TW_CHUNK_2_OCC_END_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
         qCDebug(g_cat_tmp_spotlight).noquote() << "End Sentence";
     }
 }

@@ -529,7 +529,7 @@ std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_
             // qCDebug(g_cat_interp_base) << QString("A l_interp_raw: %1").arg(l_interp_raw == nullptr ? "null" : "instanciated");
 
             //if((l_interp_raw = AutoInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            // else if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break; SlokaInterp SentenceInterp
+            // else if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break; SectionInterp
             if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = TextInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = RoleInterp::getOneIfMatch(p_myself)) != nullptr) break;
@@ -541,6 +541,7 @@ std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_
             else if((l_interp_raw = TranslationBhashya::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = SlokaInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = SentenceInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = SectionInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else l_interp_raw = new Interp(p_myself);
         }
         // qCDebug(g_cat_interp_base) << QString("B l_interp_raw: %1").arg(l_interp_raw == nullptr ? "null" : "instanciated");
@@ -562,7 +563,7 @@ std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_
 
     // qCDebug(g_cat_interp_base).noquote() << M1MidPlane::Interp::dbgMapContents();
 
-    qCDebug(g_cat_tmp_spotlight()).noquote() << "Found:" << (l_it == cm_interp_map.end() ? "false" : "true") <<
+    qCDebug(g_cat_interp_base()).noquote() << "Found:" << (l_it == cm_interp_map.end() ? "false" : "true") <<
         QString("Use Count: %1/%2").arg(l_use_count_map).arg(l_use_count_ret) << l_ret->dbgOneLiner();
 
     M1_FUNC_EXIT

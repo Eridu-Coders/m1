@@ -1,8 +1,8 @@
 #include "m1A_constants.h"
 #include "m1B_graph_init.h"
 #include "m1B_lv2_iterators.h"
-#include "m1C_interp_new.h"
 #include "m1D_passages_panel.h"
+#include "m1C_interp.h"
 
 #include <QResizeEvent>
 #include <QGraphicsSceneDragDropEvent>
@@ -149,7 +149,7 @@ M1UI::WordItem::WordItem(const int p_id, M1Store::Item_lv2* p_occ, PassageEditor
 
         for (const M1Env::SpecialItemID& l_ssid_class : M1Env::GraphInit::cm_gram_attr_list) {
            if(it.at()->isOfType(M1Env::ISA_SIID) && it.at()->getTarget_lv2()->isOfType(l_ssid_class)){
-                M1Store::Item_lv2* l_class_edge = it.at()->getTarget_lv2()->find_edge(M1Env::ISA_SIID, M1Env::GRAMMAR_ATTR_SIID, true);
+                M1Store::Item_lv2* l_class_edge = it.at()->getTarget_lv2()->find_edge_generic(M1Env::ISA_SIID, M1Env::GRAMMAR_ATTR_SIID, true);
                 QString l_grammar_class = l_class_edge != nullptr ? QString("%1").arg(l_class_edge->getTarget_lv2()->text()) : "";
                 l_grammar_attr += QString("<p style=\"white-space:pre;margin:0;padding:0;\"><b>%1</b>: %2</p>").arg(l_grammar_class).arg(it.at()->getTarget_lv2()->text());
             }
@@ -159,7 +159,7 @@ M1UI::WordItem::WordItem(const int p_id, M1Store::Item_lv2* p_occ, PassageEditor
     QString l_pos_txt = l_pos_edge != nullptr ? QString("<p style=\"white-space:pre;margin:0;padding:0;\"><b>POS</b>: %1</p>").arg(l_pos_edge->getTarget_lv2()->text()) : "";
     QString l_tag_txt = l_tag_edge != nullptr ? QString("<p style=\"white-space:pre;margin:0;padding:0;\"><b>TAG</b>: %1</p>").arg(l_tag_edge->getTarget_lv2()->text()) : "";
 
-    M1Store::Item_lv2* l_lemma_edge = m_occ->getTarget_lv2()->find_edge(M1Env::BLNGS_SIID, M1Env::LEMMA_SIID);
+    M1Store::Item_lv2* l_lemma_edge = m_occ->getTarget_lv2()->find_edge_generic(M1Env::BLNGS_SIID, M1Env::LEMMA_SIID);
     QString l_lemma_txt = l_lemma_edge != nullptr ? QString("<p style=\"white-space:pre;margin:0;padding:0;\"><b>Lemma</b>: %1</p>").arg(l_lemma_edge->getTarget_lv2()->text()) : "";
 
     qCDebug(g_cat_passages_panel) << QString("Find fields END") << l_text;
@@ -214,7 +214,7 @@ void M1UI::PassageEditor::populate(){
             if(l_cur_occur->isFullEdge() && l_cur_occur->isOfType(M1Env::OCCUR_SIID)){
                 QString l_text = M1MidPlane::SentenceInterp::occur_to_text(l_cur_occur);
                 qCDebug(g_cat_passages_panel) << QString("Adding word") << m_id << l_text;
-                if(M1Store::Item_lv2* l_section = l_cur_occur->find_edge(M1Env::BLNGS_SIID, M1Env::STEPHANUS_SIID); l_section != nullptr){
+                if(M1Store::Item_lv2* l_section = l_cur_occur->find_edge_generic(M1Env::BLNGS_SIID, M1Env::STEPHANUS_SIID); l_section != nullptr){
                     qCDebug(g_cat_passages_panel) << QString("Is Stephanus") << m_id;
                     // StephanusItem
                     M1UI::StephanusItem* l_steph_number_item = new M1UI::StephanusItem(l_id++, l_section->getTarget_lv2()->text(), this);
@@ -342,7 +342,7 @@ void M1UI::PassageEditor::select_from_to(const int p_from, const int p_to){
 }
 QString M1UI::PassageEditor::bake_highlight(M1Store::Item_lv2* p_highlight_vertex, M1Store::Item_lv2* p_category, M1Store::Item_lv2* p_color){
     qCDebug(g_cat_passages_panel).noquote() << QString("bake_highlight") << m_id << p_category->text() << p_color->text() << m_current_start->dbgShort();
-    M1Store::Item_lv2* l_version = m_current_start->find_edge(M1Env::ISA_SIID, M1Env::TXTVR_SIID, true)->getTarget_lv2();
+    M1Store::Item_lv2* l_version = m_current_start->find_edge_generic(M1Env::ISA_SIID, M1Env::TXTVR_SIID, true)->getTarget_lv2();
     qCDebug(g_cat_passages_panel).noquote() << QString("version") << l_version->text() << m_from_sel << m_to_sel;
 
     M1Store::Item_lv2* l_highlight_chunk = p_highlight_vertex->create_descendant(
