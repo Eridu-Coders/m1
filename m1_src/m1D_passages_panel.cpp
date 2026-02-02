@@ -124,7 +124,7 @@ QString M1UI::BasePassageItem::highlight(M1Store::Item_lv2* p_chunk, M1Store::It
 QString M1UI::WordItem::highlight(M1Store::Item_lv2* p_chunk, M1Store::Item_lv2* p_category, M1Store::Item_lv2* p_color){
     QString l_ret = BasePassageItem::highlight(p_chunk, p_category, p_color);
 
-    p_chunk->linkTo(this->m_occ->myself(), M1Store::OWNS_SIID);
+    p_chunk->linkTo(this->m_occ->myself(), M1Store::OWNS_SIID, M1Store::InsertionPoint::at_bottom, M1Store::InsertionPoint::at_top);
     this->m_occ->myself()->linkTo(p_color, M1Store::HLCLR_SIID);
 
     return l_ret;
@@ -209,6 +209,33 @@ void M1UI::PassageEditor::move_backwards(int p_steps){
     }
     */
 }
+QString M1UI::PassageEditor::bake_highlight(M1Store::Item_lv2* p_highlight_vertex, M1Store::Item_lv2* p_category, M1Store::Item_lv2* p_color){
+    qCDebug(g_cat_tmp_spotlight).noquote() << QString("PassageEditor Id:") << m_id << m_version_vertex->text() << p_category->dbgShort();
+
+    M1Store::Item_lv2* l_highlight_chunk = p_highlight_vertex->create_descendant(
+        M1Store::OWNS_SIID,
+        QString(m_version_vertex->text()) + " Chunk",
+        M1Store::TEXT_HIGHLIGHT_CHUNK_SIID);
+    l_highlight_chunk->setType(m_version_vertex->specialItemId());
+
+    QStringList l_word_list;
+    if(m_from_sel >= 0)
+        for(int i = m_from_sel; i <= m_to_sel; i++) l_word_list.append(m_item_list.at(i)->highlight(l_highlight_chunk, p_category, p_color));
+    this->unselect_all();
+    /*
+    qCDebug(g_cat_passages_panel).noquote() << QString("bake_highlight") << m_id << p_category->text() << p_color->text() << m_current_start->dbgShort();
+    qCDebug(g_cat_passages_panel).noquote() << QString("version") << l_version->text() << m_from_sel << m_to_sel;
+
+
+    QStringList l_word_list;
+    if(m_from_sel >= 0)
+        for(int i = m_from_sel; i <= m_to_sel; i++) l_word_list.append(m_item_list.at(i)->highlight(l_highlight_chunk, p_category, p_color));
+    this->unselect_all();
+
+    return M1Store::StorageStatic::maxLengthChop(l_word_list.join(" "), 36);
+    */
+    return M1Store::StorageStatic::maxLengthChop(l_word_list.join(" "), 36);
+}
 void M1UI::PassageEditor::populate(){
     qCDebug(g_cat_passages_panel) << QString("populate()") << m_id << m_occur_list.size();
 
@@ -225,34 +252,8 @@ void M1UI::PassageEditor::populate(){
         m_item_list.append(l_item);
         qCDebug(g_cat_passages_panel) << QString("WordItem added") << m_id;
     }
-
-    /*
-    if(m_current_start != nullptr){
-        int l_id = 0;
-        M1Store::Item_lv2* l_cur_occur = m_current_start;
-        for(int l_count_words = 0; l_count_words < 100 && l_cur_occur->next_item_id() != M1Env::G_VOID_ITEM_ID; l_count_words++){
-            qCDebug(g_cat_passages_panel) << QString("Current edge") << m_id << l_cur_occur->dbgShort();
-            if(l_cur_occur->isFullEdge() && l_cur_occur->isOfType(M1Env::OCCUR_SIID)){
-                QString l_text = M1MidPlane::SentenceInterp::occur_to_text(l_cur_occur);
-                qCDebug(g_cat_passages_panel) << QString("Adding word") << m_id << l_text;
-                if(M1Store::Item_lv2* l_section = l_cur_occur->find_edge_generic(M1Env::BLNGS_SIID, M1Env::STEPHANUS_SIID); l_section != nullptr){
-                    qCDebug(g_cat_passages_panel) << QString("Is Stephanus") << m_id;
-                    // StephanusItem
-                    M1UI::StephanusItem* l_steph_number_item = new M1UI::StephanusItem(l_id++, l_section->getTarget_lv2()->text(), this);
-                    m_item_list.append(l_steph_number_item);
-                }
-                qCDebug(g_cat_passages_panel) << QString("Adding WordItem ...") << m_id;
-                M1UI::WordItem* l_item = new M1UI::WordItem(l_id++, l_cur_occur, this);
-                m_item_list.append(l_item);
-                qCDebug(g_cat_passages_panel) << QString("WordItem added") << m_id;
-            }
-
-            l_cur_occur = l_cur_occur->get_next_lv2();
-            qCDebug(g_cat_passages_panel) << QString("Loop end") << m_id;
-        }
-    }
-    */
 }
+
 QRectF M1UI::PassageEditor::do_layout(const QRectF& p_rect){
     qCDebug(g_cat_passages_panel) << QString("do_layout p_rect:") << m_id << p_rect;
     int l_init_x = m_margin_pe;
@@ -291,7 +292,7 @@ QRectF M1UI::PassageEditor::do_layout(const QRectF& p_rect){
     return l_outer_geometry;
 }
 
-M1UI::PassageEditor::PassageEditor(std::vector<std::shared_ptr<M1MidPlane::Interp>>& p_occur_list,
+M1UI::PassageEditor::PassageEditor(const QString& p_version_name, std::vector<std::shared_ptr<M1MidPlane::Interp>>& p_occur_list,
                                    const QString& p_id,
                                    QGraphicsItem *p_parent): QGraphicsObject(p_parent), m_occur_list(p_occur_list){
 
@@ -299,20 +300,26 @@ M1UI::PassageEditor::PassageEditor(std::vector<std::shared_ptr<M1MidPlane::Inter
     m_id = p_id;
     // m_current_start = p_occur_start;
     m_panel = static_cast<PassagesPanel*>(p_parent);
-
+    M1Store::Item_lv2* l_edge_2_sentence = p_occur_list[0]->myself()->find_edge_generic(M1Env::TW_OCC_2_CHUNK_BEGIN_SIID, M1Env::TEXT_SENTENCE_SIID);
+    M1Store::Item_lv2* l_edge_2_book = l_edge_2_sentence->getTarget_lv2()->find_edge_generic(M1Env::BLNGS_SIID, M1Env::TEXT_BOOK_SIID);
+    M1Store::Item_lv2* l_edge_2_version = l_edge_2_book->getTarget_lv2()->find_edge_generic(M1Env::BLNGS_SIID, M1Env::TXTVR_SIID);
+    m_version_vertex = l_edge_2_version->getTarget_lv2();
     populate();
 
     qCDebug(g_cat_passages_panel) << QString("Count:") << m_id << m_item_list.count();
 }
+
 QRectF M1UI::PassageEditor::boundingRect() const{
     QRectF l_br(QPoint(0, 0), m_editor_size);
     //qCDebug(g_cat_passages_panel) << QString("PassageEditor boundingRect()") << m_id << l_br.topLeft() << l_br.bottomRight();
     return l_br;
 }
+
 void M1UI::PassageEditor::mousePressEvent(QGraphicsSceneMouseEvent *p_event){
     qCDebug(g_cat_passages_panel) << QString("mouse press") << m_id << p_event;
     if(p_event->button() == Qt::LeftButton) unselect_all();
 }
+
 void M1UI::PassageEditor::unselect_all(){
     for(int i=0; i<m_item_list.count(); i++)
         m_item_list.at(i)->reset_selection_flags();
@@ -364,27 +371,6 @@ void M1UI::PassageEditor::select_from_to(const int p_from, const int p_to){
 
         m_panel->selection_changed();
     }
-}
-QString M1UI::PassageEditor::bake_highlight(M1Store::Item_lv2* p_highlight_vertex, M1Store::Item_lv2* p_category, M1Store::Item_lv2* p_color){
-    /*
-    qCDebug(g_cat_passages_panel).noquote() << QString("bake_highlight") << m_id << p_category->text() << p_color->text() << m_current_start->dbgShort();
-    M1Store::Item_lv2* l_version = m_current_start->find_edge_generic(M1Env::ISA_SIID, M1Env::TXTVR_SIID, true)->getTarget_lv2();
-    qCDebug(g_cat_passages_panel).noquote() << QString("version") << l_version->text() << m_from_sel << m_to_sel;
-
-    M1Store::Item_lv2* l_highlight_chunk = p_highlight_vertex->create_descendant(
-        M1Store::OWNS_SIID,
-        QString(l_version->text()) + " Chunk",
-        M1Store::TEXT_HIGHLIGHT_CHUNK_SIID);
-    l_highlight_chunk->setType(l_version->specialItemId());
-
-    QStringList l_word_list;
-    if(m_from_sel >= 0)
-        for(int i = m_from_sel; i <= m_to_sel; i++) l_word_list.append(m_item_list.at(i)->highlight(l_highlight_chunk, p_category, p_color));
-    this->unselect_all();
-
-    return M1Store::StorageStatic::maxLengthChop(l_word_list.join(" "), 36);
-    */
-    return "";
 }
 
 // PassagesPanel ---------------------------------------------------------------------------------------------------------------------------------------
@@ -466,12 +452,12 @@ void M1UI::PassagesPanel::cat_select(int p_index){
 }
 // highlight
 void M1UI::PassagesPanel::highlight(){
-    qCDebug(g_cat_passages_panel) << QString("highlight()") << m_cat_list[m_current_cat]->text() << m_highlight_folder->dbgShort();
+    qCDebug(g_cat_tmp_spotlight()) << QString("highlight()") << m_cat_list[m_current_cat]->text() << m_highlight_folder->dbgShort();
 
     M1Store::Item_lv2* l_highlight_vertex = m_highlight_folder->create_descendant(M1Env::OWNS_SIID, "", M1Env::TEXT_HIGHLIGHT_SIID);
 
     M1Store::Item_lv2* l_category = m_cat_list[m_current_cat];
-    qCDebug(g_cat_passages_panel) << QString("l_category") << l_category->specialItemId();
+    qCDebug(g_cat_tmp_spotlight) << QString("l_category") << l_category->specialItemId() << l_category->dbgShort();
     l_highlight_vertex->setType(l_category->specialItemId());
     M1Store::Item_lv2* l_color = l_category->getFieldEdge(M1Store::HLCLR_SIID)->getTarget_lv2();
 

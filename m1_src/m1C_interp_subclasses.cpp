@@ -783,10 +783,10 @@ QWidget *M1MidPlane::SectionInterp::get_edit_widget(){
     QHBoxLayout* l_bar_layout = new QHBoxLayout();
     l_button_bar->setLayout(l_bar_layout);
 
-    QPushButton* l_btn0 = new QPushButton("< 10", l_button_bar);
-    QPushButton* l_btn1 = new QPushButton("< 1", l_button_bar);
-    QPushButton* l_btn2 = new QPushButton("> 1", l_button_bar);
-    QPushButton* l_btn3 = new QPushButton("> 10", l_button_bar);
+    // QPushButton* l_btn0 = new QPushButton("< 10", l_button_bar);
+    // QPushButton* l_btn1 = new QPushButton("< 1", l_button_bar);
+    // QPushButton* l_btn2 = new QPushButton("> 1", l_button_bar);
+    // QPushButton* l_btn3 = new QPushButton("> 10", l_button_bar);
     QPushButton* l_btn4 = new QPushButton("Highlight", l_button_bar);
     l_btn4->setEnabled(false);
 
@@ -811,10 +811,10 @@ QWidget *M1MidPlane::SectionInterp::get_edit_widget(){
             l_cat_combo->addItem(QIcon(l_color_pixmap), l_cat->text());
         }
 
-    l_bar_layout->addWidget(l_btn0);
-    l_bar_layout->addWidget(l_btn1);
-    l_bar_layout->addWidget(l_btn2);
-    l_bar_layout->addWidget(l_btn3);
+    // l_bar_layout->addWidget(l_btn0);
+    // l_bar_layout->addWidget(l_btn1);
+    // l_bar_layout->addWidget(l_btn2);
+    // l_bar_layout->addWidget(l_btn3);
     l_bar_layout->addWidget(l_btn4);
     l_bar_layout->addWidget(l_cat_combo);
     l_bar_layout->addStretch(1);
@@ -828,18 +828,18 @@ QWidget *M1MidPlane::SectionInterp::get_edit_widget(){
         );
     l_scene->addItem(l_passages_panel);
 
-    l_passages_panel->add_passage_editor(new M1UI::PassageEditor(m_occ_map["Shorey"], "A", l_passages_panel));
-    l_passages_panel->add_passage_editor(new M1UI::PassageEditor(m_occ_map["Jowett"], "B", l_passages_panel));
-    l_passages_panel->add_passage_editor(new M1UI::PassageEditor(m_occ_map["Greek"], "C", l_passages_panel));
+    l_passages_panel->add_passage_editor(new M1UI::PassageEditor("Shorey", m_occ_map["Shorey"], "A", l_passages_panel));
+    l_passages_panel->add_passage_editor(new M1UI::PassageEditor("Jowett", m_occ_map["Jowett"], "B", l_passages_panel));
+    l_passages_panel->add_passage_editor(new M1UI::PassageEditor("Greek", m_occ_map["Greek"], "C", l_passages_panel));
 
-    QObject::connect(l_btn0, &QPushButton::clicked,
-                     l_passages_panel, &M1UI::PassagesPanel::move_backwards_ten);
-    QObject::connect(l_btn1, &QPushButton::clicked,
-                     l_passages_panel, &M1UI::PassagesPanel::move_backwards_one);
-    QObject::connect(l_btn2, &QPushButton::clicked,
-                     l_passages_panel, &M1UI::PassagesPanel::move_forward_one);
-    QObject::connect(l_btn3, &QPushButton::clicked,
-                     l_passages_panel, &M1UI::PassagesPanel::move_forward_ten);
+    // QObject::connect(l_btn0, &QPushButton::clicked,
+    //                  l_passages_panel, &M1UI::PassagesPanel::move_backwards_ten);
+    // QObject::connect(l_btn1, &QPushButton::clicked,
+    //                  l_passages_panel, &M1UI::PassagesPanel::move_backwards_one);
+    // QObject::connect(l_btn2, &QPushButton::clicked,
+    //                  l_passages_panel, &M1UI::PassagesPanel::move_forward_one);
+    // QObject::connect(l_btn3, &QPushButton::clicked,
+    //                  l_passages_panel, &M1UI::PassagesPanel::move_forward_ten);
     QObject::connect(l_btn4, &QPushButton::clicked,
                      l_passages_panel, &M1UI::PassagesPanel::highlight);
 
