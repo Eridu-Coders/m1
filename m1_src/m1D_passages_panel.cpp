@@ -214,7 +214,7 @@ QString M1UI::PassageEditor::bake_highlight(M1Store::Item_lv2* p_highlight_verte
 
     M1Store::Item_lv2* l_highlight_chunk = p_highlight_vertex->create_descendant(
         M1Store::OWNS_SIID,
-        QString(m_version_vertex->text()) + " Chunk",
+        QString(m_version_vertex->text()),
         M1Store::TEXT_HIGHLIGHT_CHUNK_SIID);
     l_highlight_chunk->setType(m_version_vertex->specialItemId());
 

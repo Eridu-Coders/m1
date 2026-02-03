@@ -856,3 +856,101 @@ QWidget *M1MidPlane::SectionInterp::get_edit_widget(){
 
     return l_panel_widget;
 }
+
+/** --------------------------------------------------------------- ChunkInterp ---------------------------------
+ * @brief M1MidPlane::ChunkInterp::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
+M1MidPlane::ChunkInterp* M1MidPlane::ChunkInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be an TranslationBhashya? %1").arg(p_myself->dbgShort()))
+    M1MidPlane::ChunkInterp* l_ret = nullptr;
+    if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::TEXT_HIGHLIGHT_CHUNK_SIID))
+        l_ret = new ChunkInterp(p_myself);
+    M1_FUNC_EXIT
+    return l_ret;
+}
+
+M1MidPlane::ChunkInterp::ChunkInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){}
+
+void M1MidPlane::ChunkInterp::initialize(){
+    if(! m_initialized){
+        for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorAuto(M1Env::OWNS_SIID, M1Env::OCCUR_SIID); !l_it.beyondEnd(); l_it.next() )
+            m_occ_list.push_back(getInterp(l_it.at()->getTarget_lv2()));
+        m_initialized = true;
+    }
+}
+QString M1MidPlane::ChunkInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
+    initialize();
+    QStringList l_word_list;
+    for(const auto& l_occ_interp : m_occ_list) l_word_list.append(l_occ_interp->baseText());
+    return QString("Passage in [%1]: %2").arg(m_myself->text()).arg(M1Store::StorageStatic::maxLengthChop(l_word_list.join(" "), 100));
+}
+QString M1MidPlane::ChunkInterp::getHtmlVirtual(){
+    initialize();
+    QStringList l_word_list;
+    for(const auto& l_occ_interp : m_occ_list) l_word_list.append(l_occ_interp->baseTextPlus());
+    return QString("%1").arg(l_word_list.join(" "));
+}
+
+/** --------------------------------------------------------------- HighlightInterp ---------------------------------
+ * @brief M1MidPlane::HighlightInterp::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
+M1MidPlane::HighlightInterp* M1MidPlane::HighlightInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be an TranslationBhashya? %1").arg(p_myself->dbgShort()))
+    M1MidPlane::HighlightInterp* l_ret = nullptr;
+    if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::TEXT_HIGHLIGHT_SIID))
+        l_ret = new HighlightInterp(p_myself);
+    M1_FUNC_EXIT
+    return l_ret;
+}
+
+M1MidPlane::HighlightInterp::HighlightInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){
+    M1Store::Item_lv2* l_cat_edge = m_myself->find_edge_generic(M1Env::ISA_SIID, M1Env::TEXT_HIGHLIGHT_CAT_SIID, true);
+    if(l_cat_edge != nullptr)
+        m_category = getInterp(l_cat_edge->getTarget_lv2());
+}
+QString M1MidPlane::HighlightInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
+    return m_myself->text();
+}
+void M1MidPlane::HighlightInterp::initialize(){
+    if(! m_initialized){
+        for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorAuto(M1Env::OWNS_SIID, M1Env::TEXT_HIGHLIGHT_CHUNK_SIID); !l_it.beyondEnd(); l_it.next() )
+            m_chunk_list.push_back(getInterp(l_it.at()->getTarget_lv2()));
+        m_initialized = true;
+    }
+}
+QString M1MidPlane::HighlightInterp::getHtmlVirtual(){
+    initialize();
+    QStringList l_word_list;
+    for(const auto& l_chunk_interp : m_chunk_list)
+        l_word_list.append(QString("<p><b>%1</b>: %2</p>\n")
+                               .arg(l_chunk_interp->myself()->text())
+                               .arg(l_chunk_interp->getHtmlVirtual()));
+    return QString("<p>%1 highlight:</p>\n%2").arg(m_category->getHtmlVirtual()).arg(l_word_list.join("\n"));
+}
+
+/** --------------------------------------------------------------- HighlightCategory ---------------------------------
+ * @brief M1MidPlane::HighlightCategory::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
+M1MidPlane::HighlightCategory* M1MidPlane::HighlightCategory::getOneIfMatch(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be an TranslationBhashya? %1").arg(p_myself->dbgShort()))
+    M1MidPlane::HighlightCategory* l_ret = nullptr;
+    if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::TEXT_HIGHLIGHT_CAT_SIID))
+        l_ret = new HighlightCategory(p_myself);
+    M1_FUNC_EXIT
+    return l_ret;
+}
+
+M1MidPlane::HighlightCategory::HighlightCategory(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){
+    if(M1Store::Item_lv2* l_color_edge = m_myself->getFieldEdge(M1Store::HLCLR_SIID))
+        m_color = l_color_edge->getTarget_lv2()->text();
+}
+
+QString M1MidPlane::HighlightCategory::getHtmlVirtual(){
+    return QString("<span style=\"background-color: %1\">%2</span>").arg(m_color).arg(m_myself->text());
+}

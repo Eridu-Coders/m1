@@ -52,6 +52,7 @@ private:
     static QIcon cm_closed;
     // static QList<M1Store::Item_lv2*> cm_gratt;
     static std::vector<TreeRow*> cm_row_list;
+    const int HOLD_DELAY = 800;
 
     int m_depth;
     int m_target_height;
@@ -60,13 +61,11 @@ private:
     int m_icon_size;
     int m_oc_x;
 
-    M1UI::TreeDisplay* m_td_parent;
+    M1UI::TreeDisplay* m_td_parent = nullptr;;
 
     bool m_drag_top = false;
     bool m_drag_bottom = false;
     bool m_block_emit = false;
-
-    const int HOLD_DELAY = 800;
 
     QTimer m_hold_timer;
 
@@ -87,10 +86,16 @@ public:
     static void clear_row_list(){cm_row_list.clear();}
 
     TreeRow(M1Store::Item_lv2* p_edge, M1UI::TreeDisplay* p_tree, int p_depth);
-    ~TreeRow();
+    virtual ~TreeRow();
+    TreeRow();
+    TreeRow(const TreeRow& p_to_copy);
+    TreeRow& operator=(const TreeRow p_to_copy);
+    TreeRow& operator=(const TreeRow& p_to_copy);
+    void copyFrom(const TreeRow& p_to_copy);
 
     void blockFocusEvents();
     void performPostUpdate();
+    void deParentTarget();
 
     virtual void paintEvent(QPaintEvent* p_event);
     virtual void resizeEvent(QResizeEvent *p_event);
@@ -112,12 +117,9 @@ public:
 
     // void deleteProxy();
     // void invalidateProxy();
-    QString dbgOneLiner();
+    QString dbgOneLiner() const;
 public slots:
-    void create_descendant();
     void handleMouseHold();
-    void dbg_interp_cache();
-    void garbageCollect();
 signals:
     void gotoVertex(M1Store::Item_lv2* p_new_vertex, M1UI::TreeRow* p_sender);
     void emitHtml(const QString& p_html);
@@ -139,6 +141,7 @@ class Interp : public QObject{
     friend class SlokaInterp;
     friend class OccurInterp;
     friend class WfWUnit;
+    friend class HighlightInterp;
     Q_OBJECT
 private:
     static std::map<M1Env::ItemID, std::shared_ptr<Interp>> cm_interp_map;
@@ -407,6 +410,52 @@ public:
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual QString getHtmlVirtual();
     virtual QWidget* get_edit_widget();
+};
+
+class ChunkInterp : public Interp{
+    Q_OBJECT
+private:
+    bool m_initialized = false;
+    std::vector<std::shared_ptr<Interp>> m_occ_list;
+
+    void initialize();
+public:
+    static ChunkInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    ChunkInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "ChunkInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
+};
+
+class HighlightInterp : public Interp{
+    Q_OBJECT
+private:
+    bool m_initialized = false;
+    std::shared_ptr<Interp> m_category;
+    std::vector<std::shared_ptr<Interp>> m_chunk_list;
+
+    void initialize();
+public:
+    static HighlightInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    HighlightInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "HighlightInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
+};
+
+class HighlightCategory : public Interp{
+    Q_OBJECT
+private:
+    QString m_color;
+public:
+    static HighlightCategory* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    HighlightCategory(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "HighlightCategory";}
+    // virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
 };
 } // namespace M1MidPlane
 #endif // INTERP_H

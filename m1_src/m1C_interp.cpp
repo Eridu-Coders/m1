@@ -110,11 +110,73 @@ M1UI::TreeRow::TreeRow(M1Store::Item_lv2* p_edge, M1UI::TreeDisplay* p_tree, int
     M1_FUNC_EXIT
 }
 
+void M1UI::TreeRow::copyFrom(const M1UI::TreeRow& p_to_copy){
+    m_depth = p_to_copy.m_depth;
+    m_target_height = p_to_copy.m_target_height;
+    m_target_baseline = p_to_copy.m_target_baseline;
+    m_target_padding = p_to_copy.m_target_padding;
+    m_icon_size = p_to_copy.m_icon_size;
+    m_oc_x = p_to_copy.m_oc_x;
+
+    m_td_parent = p_to_copy.m_td_parent;
+
+    m_drag_top = p_to_copy.m_drag_top;
+    m_drag_bottom = p_to_copy.m_drag_bottom;
+    m_block_emit = p_to_copy.m_block_emit;
+
+    // m_hold_timer ;
+
+    m_edge = p_to_copy.m_edge;
+    m_html_cache = p_to_copy.m_html_cache;
+    m_target = p_to_copy.m_target;
+}
+
+M1UI::TreeRow::TreeRow(const M1UI::TreeRow& p_to_copy){
+    qCDebug(g_cat_tmp_spotlight()) << QString("Copy Constructor - Use Count: %1").arg(p_to_copy.m_target.use_count()) << this->dbgOneLiner();
+    copyFrom(p_to_copy);
+}
+
+M1UI::TreeRow& M1UI::TreeRow::operator=(M1UI::TreeRow p_to_copy){
+    qCDebug(g_cat_tmp_spotlight()) << QString("Assignment - No Ref - Use Count: %1").arg(p_to_copy.m_target.use_count()) << this->dbgOneLiner();
+    copyFrom(p_to_copy);
+    return *this;
+}
+M1UI::TreeRow& M1UI::TreeRow::operator=(const M1UI::TreeRow& p_to_copy){
+    qCDebug(g_cat_tmp_spotlight()) << QString("Assignment - With Ref - Use Count: %1").arg(p_to_copy.m_target.use_count()) << this->dbgOneLiner();
+    copyFrom(p_to_copy);
+    return *this;
+}
+M1UI::TreeRow::TreeRow(){
+    qCDebug(g_cat_tmp_spotlight()) << "Empty TreeRow Constructed";
+}
+
+/**
+ * @brief M1UI::TreeRow::~TreeRow
+ */
+M1UI::TreeRow::~TreeRow(){
+    if(m_target == nullptr)
+        qCDebug(g_cat_tmp_spotlight()) << "Warning: m_target NULL";
+    else
+        qCDebug(g_cat_tmp_spotlight()) << QString("Deleting - Use Count: %1").arg(m_target.use_count()) << this->dbgOneLiner();
+    // sever link btw TreeRow and Interp (m_target) before destruction
+    // if(m_target != nullptr){
+    //     m_target->setParent(nullptr);
+    //     m_target = nullptr;
+    // }
+}
+void M1UI::TreeRow::deParentTarget(){
+    if(m_target != nullptr){
+        m_target->setParent(nullptr);
+        m_target = nullptr;
+    }
+    else qCDebug(g_cat_tmp_spotlight()) << "Warning: m_target NULL";
+}
+
 /**
  * @brief M1UI::TreeRow::dbgOneLiner
  * @return
  */
-QString M1UI::TreeRow::dbgOneLiner(){
+QString M1UI::TreeRow::dbgOneLiner() const{
     Q_ASSERT_X(m_edge != nullptr, "M1UI::TreeRow::dbgOneLiner()", "m_edge is null");
     Q_ASSERT_X(m_target != nullptr, "M1UI::TreeRow::dbgOneLiner()", "m_target is null");
 
@@ -129,15 +191,6 @@ QString M1MidPlane::Interp::dbgOneLinerVirtual(){
     Q_ASSERT_X(m_myself != nullptr, "M1MidPlane::Interp::dbgOneLiner()", "m_myself is null");
 
     return QString("[%1] %2").arg(this->className()).arg(m_myself->dbgShort().replace(g_re_tags, ""));
-}
-
-/**
- * @brief M1UI::TreeRow::~TreeRow
- */
-M1UI::TreeRow::~TreeRow(){
-    qCDebug(g_cat_tmp_spotlight()) << QString("Use Count: %1").arg(m_target.use_count()) << "Deleting:" << this->dbgOneLiner();
-    // sever link btw TreeRow and Interp (m_target) before destruction
-    if(m_target != nullptr) m_target->setParent(nullptr);
 }
 
 /**
@@ -405,31 +458,21 @@ void M1UI::TreeRow::contextMenuEvent(QContextMenuEvent *p_event) {
     qCDebug(g_cat_tree_row) << QString("Context menu request") << this->dbgOneLiner();
     m_hold_timer.stop();
 
-    QMenu l_context_menu(this);
+    m_td_parent->setTargetForMenuActions(this->m_target);
+    QMenu l_context_menu(m_td_parent);
     QAction *l_new_descendant_action = l_context_menu.addAction("Create New Descendant");
     connect(l_new_descendant_action, &QAction::triggered,
-            this,                    &M1UI::TreeRow::create_descendant);
+            m_td_parent,             &M1UI::TreeDisplay::create_descendant);
 
     QAction *l_dbg_Interp_list = l_context_menu.addAction("List Interp Cache");
     connect(l_dbg_Interp_list, &QAction::triggered,
-            this,              &M1UI::TreeRow::dbg_interp_cache);
+            m_td_parent,       &M1UI::TreeDisplay::dbg_interp_cache);
 
     QAction *l_dbg_garbage_collect = l_context_menu.addAction("Garbage Collection");
     connect(l_dbg_garbage_collect, &QAction::triggered,
-            this,              &M1UI::TreeRow::garbageCollect);
+            m_td_parent,           &M1UI::TreeDisplay::garbageCollect);
 
     l_context_menu.exec(p_event->globalPos());
-}
-
-void M1UI::TreeRow::dbg_interp_cache(){
-    qCDebug(g_cat_tmp_spotlight()) << "dbg_interp_cache";
-    emit emitHtml(M1MidPlane::Interp::dbgMapContents(true));
-}
-
-void M1UI::TreeRow::garbageCollect(){
-    qCDebug(g_cat_tmp_spotlight()) << "Garbage Collection";
-    M1MidPlane::Interp::garbageCollect();
-    emit emitHtml(M1MidPlane::Interp::dbgMapContents(true));
 }
 
 /**
@@ -486,6 +529,7 @@ void M1UI::TreeRow::handleMouseHold(){
 /**
  * @brief M1UI::TreeRow::create_descendant
  */
+/*
 void M1UI::TreeRow::create_descendant(){
     M1Store::SpecialItem* l_new_edge_type = m_td_parent->newEdgeType();
     M1Store::SpecialItem* l_new_vertex_type = m_td_parent->newVertexType();
@@ -496,7 +540,7 @@ void M1UI::TreeRow::create_descendant(){
 
     m_target->createDescendant(l_new_edge_type, l_new_vertex_type);
     m_td_parent->gotoVertex(nullptr, this);
-}
+}*/
 
 /** --------------------------------------------------------------- Interp Root Class ---------------------------------
  * @brief M1MidPlane::Interp::getInterp
@@ -529,7 +573,7 @@ std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_
             // qCDebug(g_cat_interp_base) << QString("A l_interp_raw: %1").arg(l_interp_raw == nullptr ? "null" : "instanciated");
 
             //if((l_interp_raw = AutoInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            // else if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break; SectionInterp
+            // else if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break; HighlightCategory
             if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = TextInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = RoleInterp::getOneIfMatch(p_myself)) != nullptr) break;
@@ -542,6 +586,9 @@ std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_
             else if((l_interp_raw = SlokaInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = SentenceInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = SectionInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = ChunkInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = HighlightInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = HighlightCategory::getOneIfMatch(p_myself)) != nullptr) break;
             else l_interp_raw = new Interp(p_myself);
         }
         // qCDebug(g_cat_interp_base) << QString("B l_interp_raw: %1").arg(l_interp_raw == nullptr ? "null" : "instanciated");

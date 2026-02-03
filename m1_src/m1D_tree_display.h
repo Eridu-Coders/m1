@@ -38,6 +38,7 @@ namespace M1UI{
 
         // M1UI::TreeRow* m_old_tree_row = nullptr;
         M1UI::TreeRow* m_being_dragged = nullptr;
+        std::shared_ptr<M1MidPlane::Interp> m_target_for_menu_actions;
     public:
         explicit TreeDisplay(QWidget *p_parent, MainWindow *p_main_window);
 
@@ -45,17 +46,21 @@ namespace M1UI{
         M1Store::SpecialItem* newEdgeType();
         M1Store::SpecialItem* newVertexType();
         void setBeingDragged(M1UI::TreeRow* p_being_dragged){m_being_dragged = p_being_dragged;}
+        void setTargetForMenuActions(std::shared_ptr<M1MidPlane::Interp> p_target_for_menu_actions){m_target_for_menu_actions = p_target_for_menu_actions;}
         void restoreAcceptDrop();
 
         QVBoxLayout* tree_vb_layout(){return m_vb_layout;}
         QWidget* scroll_area_widget(){return m_scroll_area_widget;}
         // virtual void mouseMoveEvent(QMouseEvent *p_event);
     public slots:
-        void gotoVertex(M1Store::Item_lv2* p_new_vertex, M1UI::TreeRow* p_sender);
+        void gotoVertex(M1Store::Item_lv2* p_new_vertex);
         void htmlReceive(const QString& p_html);
         void edgeTypeSelected(int p_index);
         void vertexTypeSelected(int p_index);
         void goHome();
+        void create_descendant();
+        void dbg_interp_cache();
+        void garbageCollect();
     signals:
         void emitHtml(const QString& p_html);
     };

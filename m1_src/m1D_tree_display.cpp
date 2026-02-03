@@ -187,7 +187,7 @@ M1UI::TreeRow* M1UI::TreeDisplay::addRowRecur(
  */
 void M1UI::TreeDisplay::goHome(){
     M1_FUNC_ENTRY(g_cat_tree_display, QString("go Home"))
-    gotoVertex(M1Store::Item_lv2::getExisting(M1Env::HOME_SIID), nullptr);
+    gotoVertex(M1Store::Item_lv2::getExisting(M1Env::HOME_SIID));
     M1_FUNC_EXIT
 }
 
@@ -196,7 +196,7 @@ void M1UI::TreeDisplay::goHome(){
  * @param p_new_vertex
  * @param p_sender
  */
-void M1UI::TreeDisplay::gotoVertex(M1Store::Item_lv2* p_new_vertex, M1UI::TreeRow* p_sender){
+void M1UI::TreeDisplay::gotoVertex(M1Store::Item_lv2* p_new_vertex){
     M1_FUNC_ENTRY(g_cat_tree_display, QString("gotoVertex %1").arg(p_new_vertex == nullptr ? m_root->dbgShort() : p_new_vertex->dbgShort()))
 
     m_being_dragged = nullptr;
@@ -206,12 +206,17 @@ void M1UI::TreeDisplay::gotoVertex(M1Store::Item_lv2* p_new_vertex, M1UI::TreeRo
     this->installEventFilter(l_filter);
     // blocks update / repaint events
     this->setUpdatesEnabled(false);
-    qCDebug(g_cat_tree_display) << QString("before m_scroll_area_widget delete: L: %1 W: %2 M: %3")
+    qCDebug(g_cat_tmp_spotlight) << QString("before m_scroll_area_widget delete: L: %1 W: %2 M: %3")
                                        .arg(m_vb_layout->count())
                                        .arg(m_scroll_area_widget->children().count())
                                        .arg(m_tree_row_list.count());
 
     QWidget *l_widget_to_delete = this->takeWidget();
+    // Or for a specific type:
+    for(M1UI::TreeRow* l_row: m_tree_row_list){
+        qCDebug(g_cat_tmp_spotlight) << "Child Deparenting:" << l_row->dbgOneLiner();
+        l_row->deParentTarget();
+    }
     if (l_widget_to_delete) delete l_widget_to_delete;
 
     // both have been deleted by the operation above so are set to nullptr for safety's sake
@@ -312,6 +317,31 @@ M1Store::SpecialItem* M1UI::TreeDisplay::newEdgeType(){
 M1Store::SpecialItem* M1UI::TreeDisplay::newVertexType(){
     qCDebug(g_cat_tree_display) << "Current Vertex type : " << m_new_vertex_type->mnemonic();
     return m_new_vertex_type;
+}
+
+/**
+ * @brief M1UI::TreeRow::create_descendant
+ */
+void M1UI::TreeDisplay::create_descendant(){
+    M1Store::SpecialItem* l_new_edge_type = newEdgeType();
+    M1Store::SpecialItem* l_new_vertex_type = newVertexType();
+    qCDebug(g_cat_tree_row) << QString("Create New Descendant") <<
+        "Edge Type:" << l_new_edge_type->mnemonic() <<
+        "Vertex Type:" << l_new_vertex_type->mnemonic() <<
+        m_target_for_menu_actions->dbgOneLiner();
+
+    m_target_for_menu_actions->createDescendant(l_new_edge_type, l_new_vertex_type);
+    gotoVertex(nullptr);
+}
+void M1UI::TreeDisplay::dbg_interp_cache(){
+    qCDebug(g_cat_tmp_spotlight()) << "dbg_interp_cache";
+    emit emitHtml(M1MidPlane::Interp::dbgMapContents(true));
+}
+
+void M1UI::TreeDisplay::garbageCollect(){
+    qCDebug(g_cat_tmp_spotlight()) << "Garbage Collection";
+    M1MidPlane::Interp::garbageCollect();
+    emit emitHtml(M1MidPlane::Interp::dbgMapContents(true));
 }
 // ------------------------------------------ Tests --------------------------------------------------------------
 /*
