@@ -460,9 +460,15 @@ void M1UI::TreeRow::contextMenuEvent(QContextMenuEvent *p_event) {
 
     m_td_parent->setTargetForMenuActions(this->m_target);
     QMenu l_context_menu(m_td_parent);
-    QAction *l_new_descendant_action = l_context_menu.addAction("Create New Descendant");
-    connect(l_new_descendant_action, &QAction::triggered,
-            m_td_parent,             &M1UI::TreeDisplay::create_descendant);
+    QMenu* l_sub = l_context_menu.addMenu("Create New Descendant");
+
+    QAction *l_nd_auto = l_sub->addAction("Below Auto");
+    QAction *l_nd_bottom = l_sub->addAction("At Bottom");
+
+    connect(l_nd_auto,   &QAction::triggered,
+            m_td_parent, &M1UI::TreeDisplay::create_descendant_auto);
+    connect(l_nd_bottom, &QAction::triggered,
+            m_td_parent, &M1UI::TreeDisplay::create_descendant_bottom);
 
     QAction *l_dbg_Interp_list = l_context_menu.addAction("List Interp Cache");
     connect(l_dbg_Interp_list, &QAction::triggered,
@@ -888,11 +894,15 @@ QWidget *M1MidPlane::Interp::get_edit_widget(){
  * @brief M1MidPlane::Interp::save_text_edit
  */
 void M1MidPlane::Interp::save_text_edit(){
-    qCDebug(g_cat_interp_base) << "Saving text edit field: " << m_text_edit->toPlainText();
+    qCDebug(g_cat_tmp_spotlight()) << "Saving text edit field START: " << m_text_edit->toPlainText();
+    /*
     if(m_myself->isSimpleEdge())
         m_myself->setText_lv1(m_text_edit->toPlainText());
     else
         m_myself->getTarget_lv2()->setText_lv1(m_text_edit->toPlainText());
+    */
+    m_myself->setText_lv1(m_text_edit->toPlainText());
+    qCDebug(g_cat_tmp_spotlight()) << "Saving text edit field END: " << m_myself->text();
 
     m_tree_row->performPostUpdate();
 }
@@ -902,12 +912,11 @@ void M1MidPlane::Interp::save_text_edit(){
  * @param p_new_edge_type
  * @param p_new_vertex_type
  */
-void M1MidPlane::Interp::createDescendant(M1Store::SpecialItem* p_new_edge_type, M1Store::SpecialItem* p_new_vertex_type){
+void M1MidPlane::Interp::createDescendant(M1Store::SpecialItem* p_new_edge_type, M1Store::SpecialItem* p_new_vertex_type, M1Store::InsertionPoint p_where){
     m_myself->create_descendant(
         p_new_edge_type->specialId(),
         "New",
-        p_new_vertex_type->specialId()
-        );
+        p_new_vertex_type->specialId(), p_where);
 }
 
 /** --------------------------------------------------------------- AutoInterp ---------------------------------

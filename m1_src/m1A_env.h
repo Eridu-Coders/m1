@@ -19,6 +19,9 @@ extern QRegularExpression g_re_capture_gammar;
 extern QRegularExpression g_re_cap_initial;
 extern QRegularExpression g_re_sent_num;
 extern QRegularExpression g_re_stephanus;
+extern QRegularExpression g_re_no_base;
+extern QRegularExpression g_re_extract_vt;
+extern QRegularExpression g_re_html_tags;
 
 /**
  * \defgroup EntryExit function Entry and Exit macros

@@ -452,9 +452,45 @@ bool M1Store::Item_lv2::edgeBelongs(Item_lv2* p_edge, bool p_edge_is_special){
 }
 
 /**
+ * @brief M1Store::Item_lv2::create_descendant
+ * @param p_edge_type
+ * @param p_label
+ * @param p_vertex_type
+ * @param p_where
+ * @return
+ */
+M1Store::Item_lv2* M1Store::Item_lv2::create_descendant(
+    const SpecialItemID p_edge_type,
+    const QString& p_label,
+    const SpecialItemID p_vertex_type,
+    const M1Store::InsertionPoint p_where){
+
+    M1_FUNC_ENTRY(g_cat_lv2_members,
+                  QString("new descendant: %1 --{%2}--> [%3] %4")
+                      .arg(this->dbgShort())
+                      .arg(M1Store::StorageStatic::getSpecialItemPointer(p_edge_type)->mnemonic())
+                      .arg(M1Store::StorageStatic::getSpecialItemPointer(p_vertex_type)->mnemonic())
+                      .arg(p_label)
+                  )
+    // cannot give descendants to anything but full vertices or edge
+    Q_ASSERT_X(isFullVertex() || isFullEdge(), "Item_lv2::create_descendant()", "cannot give descendants to simple vertices or edges");
+
+    // the new vertex
+    M1Store::Item_lv2* l_new_vertex = getNew(M1Store::FULL_VERTEX, M1Store::ItemType(p_vertex_type));
+    l_new_vertex->setText_lv1(p_label);
+
+    // link this to it
+    // unless it is an ITO from this vertex down to the new one and this is the type vertex corresponding to p_vertex_type
+    if( !((p_edge_type == M1Env::ITO_SIID) && (this->specialItemId() == p_vertex_type)) )
+        this->linkTo(l_new_vertex, p_edge_type, p_where, M1Store::InsertionPoint::at_top);
+
+    M1_FUNC_EXIT
+    return l_new_vertex;
+}
+/**
  * @brief Create a new vertex linked to this item
  *
- * \todo update create_descendant() with new parameters for edge insertion point
+ * \todo finish create_descendant() with new parameters for edge insertion point
  *
  * @param p_edge_type type of the edge leading to the new descendant
  * @param p_label label of the new descendant

@@ -84,23 +84,62 @@ QString M1MidPlane::TextInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edg
  * @return
  */
 QString M1MidPlane::TextInterp::getHtmlVirtual(){
+    initialize();
     QString l_html;
     // title
-    l_html += QString("<h2>%1</h2>").arg(m_myself->text());
+    l_html += QString("<h2>%1</h2>\n").arg(m_myself->text());
 
     // author
     M1Store::Item_lv2* l_author_edge = m_myself->find_edge_edge_type(M1Env::TEXT_WRITTEN_BY_SIID);
-    if(l_author_edge != nullptr) l_html += QString("<h3>by: %1</h2>").arg(l_author_edge->getTarget_lv2()->text());
+    if(l_author_edge != nullptr) l_html += QString("<h3>by: %1</h2>\n").arg(l_author_edge->getTarget_lv2()->text());
 
     // alternate and subtitle
     QString l_alt_title = m_myself->getField(M1Env::TEXT_ALT_TITLE_SIID);
     QString l_sub_title = m_myself->getField(M1Env::TEXT_SUB_TITLE_SIID);
-    if(l_alt_title.length() > 0) l_html += QString("<h2>Otherwise known as: %1</h2>").arg(l_alt_title);
-    if(l_sub_title.length() > 0) l_html += QString("<h3>%1</h3>").arg(l_sub_title);
+    if(l_alt_title.length() > 0) l_html += QString("<h2>Otherwise known as: %1</h2>\n").arg(l_alt_title);
+    if(l_sub_title.length() > 0) l_html += QString("<h3>%1</h3>\n").arg(l_sub_title);
 
-    return l_html;
+    QStringList l_chunk_strings;
+    for(const auto& l_interp: m_chunk_list){
+        QString l_base_text = l_interp->baseText();
+        if(l_base_text.contains("✹")){
+            QStringList l_ver_chunks;
+            QString l_ground_text;
+            for(const QString& l_version_text : l_base_text.split("✹")){
+                QString l_bt_bare = l_version_text;
+                l_bt_bare.replace(g_re_html_tags, "");
+                QString l_version;
+                QString l_text;
+                if(g_re_extract_vt.match(l_bt_bare).hasMatch()){
+                    l_version = g_re_extract_vt.match(l_bt_bare).captured(1);
+                    l_text = g_re_extract_vt.match(l_bt_bare).captured(2);
+                }
+                if(l_version == "Greek")
+                    l_ground_text = QString("<span style=\"font-style: italic;\">%1</span>").arg(l_text);
+                else
+                    l_ver_chunks.append(QString("[%1] %2").arg(l_version).arg(l_text));
+            }
+            l_chunk_strings.append(
+                QString("<span class=\"tooltip\" style=\"font-style: italic; font-family: 'Noto Serif', 'Times New Roman', serif;\">%1").arg(l_ground_text) +
+                QString("<span class=\"tooltiptext\" style=\"font-style: italic; font-family: 'Noto Sans', 'Arial', sans-serif;\">%1</span>").arg(l_ver_chunks.join(" / ")) + "</span>");
+        }
+        else
+            l_chunk_strings.append(QString("%1").arg(l_interp->baseText().replace(g_re_no_base, "")));
+    }
+
+    return l_html + "<p>" + l_chunk_strings.join(" ") + "</p>";
 }
 
+void M1MidPlane::TextInterp::initialize(){
+    if(!m_initialized){
+        for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorAuto(); !l_it.beyondEnd(); l_it.next())
+            if(!l_it.at()->isFullEdge()) continue;
+            else if((l_it.at()->isOfType(M1Env::OWNS_SIID) && l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_CHUNK_SIID)) ||
+                     (l_it.at()->isOfType(M1Env::TEXT_HIGHLIGHT_QUOTE_SIID) && l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_HIGHLIGHT_SIID)))
+                m_chunk_list.push_back(getInterp(l_it.at()->getTarget_lv2()));
+        m_initialized = true;
+    }
+}
 /** --------------------------------------------------------------- RoleInterp ---------------------------------
  * @brief M1MidPlane::RoleInterp::getOneIfMatch
  * @param p_myself
@@ -931,7 +970,15 @@ QString M1MidPlane::HighlightInterp::getHtmlVirtual(){
                                .arg(l_chunk_interp->getHtmlVirtual()));
     return QString("<p>%1 highlight:</p>\n%2").arg(m_category->getHtmlVirtual()).arg(l_word_list.join("\n"));
 }
-
+QString M1MidPlane::HighlightInterp::baseText(){
+    initialize();
+    QStringList l_word_list;
+    for(const auto& l_chunk_interp : m_chunk_list)
+        l_word_list.append(QString("[%1]%2")
+                               .arg(l_chunk_interp->myself()->text())
+                               .arg(l_chunk_interp->getHtmlVirtual()));
+    return QString("%1").arg(l_word_list.join("✹"));
+}
 /** --------------------------------------------------------------- HighlightCategory ---------------------------------
  * @brief M1MidPlane::HighlightCategory::getOneIfMatch
  * @param p_myself

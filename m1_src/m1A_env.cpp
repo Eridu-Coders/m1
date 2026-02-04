@@ -30,6 +30,9 @@ QRegularExpression g_re_capture_gammar(R"(<div\s+class=\"+grammar\"+>(.*)<\/div>
 QRegularExpression g_re_cap_initial(R"(^[A-Z])");
 QRegularExpression g_re_sent_num(R"(\d+$)");
 QRegularExpression g_re_stephanus(R"((\d+[a-e])<\/span>)");
+QRegularExpression g_re_no_base(R"(^Base:\s+)");
+QRegularExpression g_re_extract_vt(R"(^\[([^]]+)\]\d*[a-e]?\s*(.*)$)");
+QRegularExpression g_re_html_tags(R"(<[^>]+>)");
 
 /**
  * @brief M1Store::M1Env::myMessageHandler message handler callback for Qt debug infra

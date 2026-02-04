@@ -181,7 +181,7 @@ public:
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual QIcon* edgeIcon(const M1Store::Item_lv2* p_edge);
     virtual QIcon* vertexIcon(const M1Store::Item_lv2* p_edge);
-    virtual void createDescendant(M1Store::SpecialItem* p_new_edge_type, M1Store::SpecialItem* p_new_vertex_type);
+    virtual void createDescendant(M1Store::SpecialItem* p_new_edge_type, M1Store::SpecialItem* p_new_vertex_type, M1Store::InsertionPoint p_where);
     virtual M1Store::Item_lv2* where_to_go(const M1Store::Item_lv2* p_edge);
     virtual QString baseText(){return QString("Base: ") + m_myself->text();}
     virtual QString baseTextPlus(){return baseText();}
@@ -228,6 +228,11 @@ public:
 
 class TextInterp : public Interp{
     Q_OBJECT
+private:
+    std::vector<std::shared_ptr<Interp>> m_chunk_list;
+    bool m_initialized = false;
+
+    void initialize();
 public:
     static TextInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
 
@@ -443,6 +448,7 @@ public:
     virtual QString className() {return "HighlightInterp";}
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual QString getHtmlVirtual();
+    virtual QString baseText();
 };
 
 class HighlightCategory : public Interp{

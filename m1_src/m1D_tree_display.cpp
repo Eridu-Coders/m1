@@ -319,10 +319,12 @@ M1Store::SpecialItem* M1UI::TreeDisplay::newVertexType(){
     return m_new_vertex_type;
 }
 
+void M1UI::TreeDisplay::create_descendant_auto(){create_descendant(M1Store::InsertionPoint::below_auto);}
+void M1UI::TreeDisplay::create_descendant_bottom(){create_descendant(M1Store::InsertionPoint::at_bottom);}
 /**
  * @brief M1UI::TreeRow::create_descendant
  */
-void M1UI::TreeDisplay::create_descendant(){
+void M1UI::TreeDisplay::create_descendant(M1Store::InsertionPoint p_where){
     M1Store::SpecialItem* l_new_edge_type = newEdgeType();
     M1Store::SpecialItem* l_new_vertex_type = newVertexType();
     qCDebug(g_cat_tree_row) << QString("Create New Descendant") <<
@@ -330,7 +332,7 @@ void M1UI::TreeDisplay::create_descendant(){
         "Vertex Type:" << l_new_vertex_type->mnemonic() <<
         m_target_for_menu_actions->dbgOneLiner();
 
-    m_target_for_menu_actions->createDescendant(l_new_edge_type, l_new_vertex_type);
+    m_target_for_menu_actions->createDescendant(l_new_edge_type, l_new_vertex_type, p_where);
     gotoVertex(nullptr);
 }
 void M1UI::TreeDisplay::dbg_interp_cache(){

@@ -40,7 +40,6 @@ QMap<QString, M1Store::Item_lv2*> M1Store::TEIInterface::m_form_map;
 QXmlStreamReader::TokenType M1Store::TEIInterface::m_tt;
 bool M1Store::TEIInterface::m_no_read = false;
 
-
 /**
  * @brief M1Store::TEIInterface::create_text
  *

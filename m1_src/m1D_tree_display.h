@@ -39,6 +39,8 @@ namespace M1UI{
         // M1UI::TreeRow* m_old_tree_row = nullptr;
         M1UI::TreeRow* m_being_dragged = nullptr;
         std::shared_ptr<M1MidPlane::Interp> m_target_for_menu_actions;
+
+        void create_descendant(M1Store::InsertionPoint p_where);
     public:
         explicit TreeDisplay(QWidget *p_parent, MainWindow *p_main_window);
 
@@ -58,7 +60,8 @@ namespace M1UI{
         void edgeTypeSelected(int p_index);
         void vertexTypeSelected(int p_index);
         void goHome();
-        void create_descendant();
+        void create_descendant_auto();
+        void create_descendant_bottom();
         void dbg_interp_cache();
         void garbageCollect();
     signals:

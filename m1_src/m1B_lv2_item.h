@@ -177,6 +177,11 @@ class Item_lv2 : public Item_lv1 {
             const QString& p_label,
             const SpecialItemID p_vertex_type,
             Item_lv2* p_edge_above = nullptr, const bool p_at_top = false);
+        Item_lv2* create_descendant(
+            const SpecialItemID p_edge_type,
+            const QString& p_label,
+            const SpecialItemID p_vertex_type,
+            const M1Store::InsertionPoint p_where);
 
         // prevents other types from being implicitly converted
         template <class T>
