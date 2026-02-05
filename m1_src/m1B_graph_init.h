@@ -100,6 +100,8 @@ extern M1Env::SpecialItemID TEXT_SIID;
 extern M1Env::SpecialItemID MSG_TYPE_SIID;
 // [ME___] Special Vertex ID of "Me"
 extern M1Env::SpecialItemID ME_SIID;
+// [DSTBN] Special Vertex ID of "Dustbin"
+extern M1Env::SpecialItemID DUSTBIN_SIID;
 // [EMAIL] Special Vertex ID of "Email Inbox"
 extern M1Env::SpecialItemID EMAIL_TYPE_SIID;
 // [WHTSP] Special Vertex ID of "Whatsapp Inbox"
@@ -130,6 +132,8 @@ extern M1Env::SpecialItemID TXTVR_SIID;
 extern M1Env::SpecialItemID TXTNT_SIID;
 // [TXTCK] Special Vertex ID of "Text Chunk (type)"
 extern M1Env::SpecialItemID TEXT_CHUNK_SIID;
+// [TXTPR] Special Vertex ID of "Text Paragraph (type)"
+extern M1Env::SpecialItemID TEXT_PARA_SIID;
 // [TXTBK] Special Vertex ID of "Book (type)"
 extern M1Env::SpecialItemID TEXT_BOOK_SIID;
 // [TXTCH] Special Vertex ID of "Chapter (type)"

@@ -165,7 +165,9 @@ namespace M1Env{
     static const char* HL_QUOTE_ICON_PATH = "../m1_src/Icons/Quote.svg";                        ///<
     static const char* SLOKA_FOLDER_ICON_PATH = "../m1_src/Icons/SlokaFolder.svg";              ///<
     static const char* TEXT_WFW_FORM_ICON_PATH = "../m1_src/Icons/word-form.svg";               ///<
-/**@}*/ //end of IconPaths
+    static const char* TEXT_PARA_ICON_PATH = "../m1_src/Icons/Paragraph.svg";                   ///<
+    static const char* DUSTBIN_ICON_PATH = "../m1_src/Icons/Dustbin.svg";                       ///<
+/**@}*/ //end of IconPaths TEXT_PARA_ICON_PATH
 
     static const bool SKIP_HEAVY_CHECKING = true; ///< true --> skip time-consuming Q_ASSERT in setType() and linkTo()
 } // end of M1Env namespace

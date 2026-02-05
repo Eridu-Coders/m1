@@ -90,6 +90,7 @@ M1Env::SpecialItemID M1Env::ROLE_FLDR_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::MSG_TYPE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::ME_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::DUSTBIN_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::EMAIL_TYPE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::WHTSP_TYPE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::DSCRD_TYPE_SIID = G_NONEX_SI_ID;
@@ -105,6 +106,7 @@ M1Env::SpecialItemID M1Env::STEPHANUS_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TXTVR_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TXTNT_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_CHUNK_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::TEXT_PARA_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_BOOK_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_CHAPTER_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_SENTENCE_SIID = G_NONEX_SI_ID;
@@ -282,6 +284,7 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::TEXT_SIID = M1Store::StorageStatic::getSpecialID("TEXT_");
     M1Env::MSG_TYPE_SIID = M1Store::StorageStatic::getSpecialID("_MSG_");
     M1Env::ME_SIID = M1Store::StorageStatic::getSpecialID("ME___");
+    M1Env::DUSTBIN_SIID = M1Store::StorageStatic::getSpecialID("DSTBN");
     M1Env::EMAIL_TYPE_SIID = M1Store::StorageStatic::getSpecialID("EMAIL");
     M1Env::WHTSP_TYPE_SIID = M1Store::StorageStatic::getSpecialID("WHTSP");
     M1Env::DSCRD_TYPE_SIID = M1Store::StorageStatic::getSpecialID("DSCRD");
@@ -297,6 +300,7 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::TXTVR_SIID = M1Store::StorageStatic::getSpecialID("TXTVR");
     M1Env::TXTNT_SIID = M1Store::StorageStatic::getSpecialID("TXTNT");
     M1Env::TEXT_CHUNK_SIID = M1Store::StorageStatic::getSpecialID("TXTCK");
+    M1Env::TEXT_PARA_SIID = M1Store::StorageStatic::getSpecialID("TXTPR");
     M1Env::TEXT_BOOK_SIID = M1Store::StorageStatic::getSpecialID("TXTBK");
     M1Env::TEXT_CHAPTER_SIID = M1Store::StorageStatic::getSpecialID("TXTCH");
     M1Env::TEXT_SENTENCE_SIID = M1Store::StorageStatic::getSpecialID("TXSNT");
@@ -736,6 +740,22 @@ void M1Env::GraphInit::init_base(){
     l_me->setType("PERSN");
     l_me->linkTo(l_home, "BLNGS", nullptr, true);
 
+    // creation of "Dustbin"
+    qCDebug(g_cat_silence) << QString("Creating <[DSTBN]-Dustbin> item");
+    M1Store::Item_lv2* l_dstbn = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Dustbin",
+        // Special Item flag
+        0,
+        // mnemonic
+        "DSTBN",
+        // icon path
+        nullptr);
+    l_dstbn->setType("FOLDR");
+    l_dstbn->linkTo(l_home, "BLNGS", nullptr, true);
+
     // creation of "Email Inbox"
     qCDebug(g_cat_silence) << QString("Creating <[EMAIL]-Email Inbox> item");
     M1Store::Item_lv2* l_email = M1Store::Item_lv2::getNew(
@@ -974,6 +994,21 @@ void M1Env::GraphInit::init_base(){
         // icon path
         M1Env::TEXT_CHUNK_ICON_PATH);
     l_txtck->setType("TYPE_");
+
+    // creation of "Text Paragraph (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[TXTPR]-Text Paragraph (type)> item");
+    M1Store::Item_lv2* l_txtpr = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Text Paragraph (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE | M1Env::SI_IS_SELECTABLE,
+        // mnemonic
+        "TXTPR",
+        // icon path
+        M1Env::TEXT_PARA_ICON_PATH);
+    l_txtpr->setType("TYPE_");
 
     // creation of "Book (type)"
     qCDebug(g_cat_silence) << QString("Creating <[TXTBK]-Book (type)> item");

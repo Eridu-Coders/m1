@@ -99,44 +99,19 @@ QString M1MidPlane::TextInterp::getHtmlVirtual(){
     if(l_alt_title.length() > 0) l_html += QString("<h2>Otherwise known as: %1</h2>\n").arg(l_alt_title);
     if(l_sub_title.length() > 0) l_html += QString("<h3>%1</h3>\n").arg(l_sub_title);
 
-    QStringList l_chunk_strings;
-    for(const auto& l_interp: m_chunk_list){
-        QString l_base_text = l_interp->baseText();
-        if(l_base_text.contains("✹")){
-            QStringList l_ver_chunks;
-            QString l_ground_text;
-            for(const QString& l_version_text : l_base_text.split("✹")){
-                QString l_bt_bare = l_version_text;
-                l_bt_bare.replace(g_re_html_tags, "");
-                QString l_version;
-                QString l_text;
-                if(g_re_extract_vt.match(l_bt_bare).hasMatch()){
-                    l_version = g_re_extract_vt.match(l_bt_bare).captured(1);
-                    l_text = g_re_extract_vt.match(l_bt_bare).captured(2);
-                }
-                if(l_version == "Greek")
-                    l_ground_text = QString("<span style=\"font-style: italic;\">%1</span>").arg(l_text);
-                else
-                    l_ver_chunks.append(QString("[%1] %2").arg(l_version).arg(l_text));
-            }
-            l_chunk_strings.append(
-                QString("<span class=\"tooltip\" style=\"font-style: italic; font-family: 'Noto Serif', 'Times New Roman', serif;\">%1").arg(l_ground_text) +
-                QString("<span class=\"tooltiptext\" style=\"font-style: italic; font-family: 'Noto Sans', 'Arial', sans-serif;\">%1</span>").arg(l_ver_chunks.join(" / ")) + "</span>");
-        }
-        else
-            l_chunk_strings.append(QString("%1").arg(l_interp->baseText().replace(g_re_no_base, "")));
-    }
+    QStringList l_para_strings;
+    for(const auto& l_interp: m_para_list)
+        l_para_strings.append(l_interp->baseText());
 
-    return l_html + "<p>" + l_chunk_strings.join(" ") + "</p>";
+    return l_html + "<p>" + l_para_strings.join(" ") + "</p>";
 }
 
 void M1MidPlane::TextInterp::initialize(){
     if(!m_initialized){
         for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorAuto(); !l_it.beyondEnd(); l_it.next())
             if(!l_it.at()->isFullEdge()) continue;
-            else if((l_it.at()->isOfType(M1Env::OWNS_SIID) && l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_CHUNK_SIID)) ||
-                     (l_it.at()->isOfType(M1Env::TEXT_HIGHLIGHT_QUOTE_SIID) && l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_HIGHLIGHT_SIID)))
-                m_chunk_list.push_back(getInterp(l_it.at()->getTarget_lv2()));
+            else if((l_it.at()->isOfType(M1Env::OWNS_SIID) && l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_PARA_SIID)))
+                m_para_list.push_back(getInterp(l_it.at()->getTarget_lv2()));
         m_initialized = true;
     }
 }
@@ -938,7 +913,7 @@ QString M1MidPlane::ChunkInterp::getHtmlVirtual(){
  * @return
  */
 M1MidPlane::HighlightInterp* M1MidPlane::HighlightInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
-    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be an TranslationBhashya? %1").arg(p_myself->dbgShort()))
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be an HighlightInterp? %1").arg(p_myself->dbgShort()))
     M1MidPlane::HighlightInterp* l_ret = nullptr;
     if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::TEXT_HIGHLIGHT_SIID))
         l_ret = new HighlightInterp(p_myself);
@@ -985,7 +960,7 @@ QString M1MidPlane::HighlightInterp::baseText(){
  * @return
  */
 M1MidPlane::HighlightCategory* M1MidPlane::HighlightCategory::getOneIfMatch(M1Store::Item_lv2* p_myself){
-    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be an TranslationBhashya? %1").arg(p_myself->dbgShort()))
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be an HighlightCategory? %1").arg(p_myself->dbgShort()))
     M1MidPlane::HighlightCategory* l_ret = nullptr;
     if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::TEXT_HIGHLIGHT_CAT_SIID))
         l_ret = new HighlightCategory(p_myself);
@@ -1000,4 +975,112 @@ M1MidPlane::HighlightCategory::HighlightCategory(M1Store::Item_lv2* p_myself) : 
 
 QString M1MidPlane::HighlightCategory::getHtmlVirtual(){
     return QString("<span style=\"background-color: %1\">%2</span>").arg(m_color).arg(m_myself->text());
+}
+
+/** --------------------------------------------------------------- ParagraphInterp ---------------------------------
+ * @brief M1MidPlane::ParagraphInterp::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
+M1MidPlane::ParagraphInterp* M1MidPlane::ParagraphInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be a ParagraphInterp? %1").arg(p_myself->dbgShort()))
+    M1MidPlane::ParagraphInterp* l_ret = nullptr;
+    if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::TEXT_PARA_SIID))
+        l_ret = new ParagraphInterp(p_myself);
+    M1_FUNC_EXIT
+    return l_ret;
+}
+
+M1MidPlane::ParagraphInterp::ParagraphInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){}
+QString M1MidPlane::ParagraphInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
+    return m_myself->text();
+}
+
+void M1MidPlane::ParagraphInterp::initialize(){
+    if(!m_initialized){
+        for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorAuto(); !l_it.beyondEnd(); l_it.next())
+            if(!l_it.at()->isFullEdge()) continue;
+            else if((l_it.at()->isOfType(M1Env::OWNS_SIID) && l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_CHUNK_SIID)) ||
+                     (l_it.at()->isOfType(M1Env::TEXT_HIGHLIGHT_QUOTE_SIID) && l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_HIGHLIGHT_SIID)))
+                m_chunk_list.push_back(getInterp(l_it.at()->getTarget_lv2()));
+        m_initialized = true;
+    }
+}
+
+QString M1MidPlane::ParagraphInterp::getHtmlVirtual(){
+    return this->baseText();
+}
+
+QString M1MidPlane::ParagraphInterp::baseText(){
+    initialize();
+    QStringList l_chunk_strings;
+    for(const auto& l_interp: m_chunk_list){
+        QString l_base_text = l_interp->baseText();
+        if(l_base_text.contains("✹")){
+            QStringList l_ver_chunks;
+            QString l_ground_text;
+            for(const QString& l_version_text : l_base_text.split("✹")){
+                QString l_bt_bare = l_version_text;
+                l_bt_bare.replace(g_re_html_tags, "");
+                QString l_version;
+                QString l_text;
+                if(g_re_extract_vt.match(l_bt_bare).hasMatch()){
+                    l_version = g_re_extract_vt.match(l_bt_bare).captured(1);
+                    l_text = g_re_extract_vt.match(l_bt_bare).captured(2);
+                }
+                if(l_version == "Greek")
+                    l_ground_text = QString("<span style=\"font-style: italic;\">%1</span>").arg(l_text);
+                else
+                    l_ver_chunks.append(QString("[%1] %2").arg(l_version).arg(l_text));
+            }
+            l_chunk_strings.append(
+                QString("<span class=\"tooltip\" style=\"font-style: italic; font-family: 'Noto Serif', 'Times New Roman', serif;\">%1").arg(l_ground_text) +
+                QString("<span class=\"tooltiptext\" style=\"font-style: italic; font-family: 'Noto Sans', 'Arial', sans-serif;\">%1</span>").arg(l_ver_chunks.join(" / ")) + "</span>");
+        }
+        else
+            l_chunk_strings.append(QString("%1").arg(l_interp->baseText().replace(g_re_no_base, "")));
+    }
+
+    return "<p>" + l_chunk_strings.join(" ") + "</p>";
+}
+
+/** --------------------------------------------------------------- DustbinInterp ---------------------------------
+ * @brief M1MidPlane::DustbinInterp::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
+M1MidPlane::DustbinInterp* M1MidPlane::DustbinInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be a DustbinInterp? %1").arg(p_myself->dbgShort()))
+    M1MidPlane::DustbinInterp* l_ret = nullptr;
+    if(p_myself->isFullVertex() && p_myself->specialItemId() == M1Env::DUSTBIN_SIID)
+        l_ret = new DustbinInterp(p_myself);
+    M1_FUNC_EXIT
+    return l_ret;
+}
+
+/**
+ * @brief M1MidPlane::DustbinInterp::cm_dustbin_icon
+ * @return
+ */
+QIcon M1MidPlane::DustbinInterp::cm_dustbin_icon(M1Env::DUSTBIN_ICON_PATH);
+
+/**
+ * @brief M1MidPlane::DustbinInterp::DustbinInterp
+ * @param p_myself
+ */
+M1MidPlane::DustbinInterp::DustbinInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){}
+
+/**
+ * @brief M1MidPlane::DustbinInterp::inTreeDisplayText
+ * @param p_edge
+ * @return
+ */
+QString M1MidPlane::DustbinInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
+    int l_in_can_count = 0;
+    for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorAuto(); !l_it.beyondEnd(); l_it.next())
+        if(l_it.at()->isOfType(M1Env::AUTO_SIID) || l_it.at()->isOfType(M1Env::BLNGS_SIID))
+            continue;
+        else
+            l_in_can_count += 1;
+    return QString("[%1] Dustbin").arg(l_in_can_count);
 }

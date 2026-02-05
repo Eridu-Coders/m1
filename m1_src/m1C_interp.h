@@ -226,10 +226,24 @@ public:
     // virtual void paintEvent(QPaintEvent* p_event);
 };
 
+class DustbinInterp : public Interp{
+    Q_OBJECT
+private:
+    static QIcon cm_dustbin_icon;
+public:
+    static DustbinInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    DustbinInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "DustbinInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QIcon* vertexIcon(const M1Store::Item_lv2* p_edge=nullptr){return &cm_dustbin_icon;}
+    // virtual QString getHtmlVirtual();
+    // virtual QString baseText();
+};
 class TextInterp : public Interp{
     Q_OBJECT
 private:
-    std::vector<std::shared_ptr<Interp>> m_chunk_list;
+    std::vector<std::shared_ptr<Interp>> m_para_list;
     bool m_initialized = false;
 
     void initialize();
@@ -431,6 +445,23 @@ public:
     virtual QString className() {return "ChunkInterp";}
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual QString getHtmlVirtual();
+};
+
+class ParagraphInterp : public Interp{
+    Q_OBJECT
+private:
+    bool m_initialized = false;
+    std::vector<std::shared_ptr<Interp>> m_chunk_list;
+
+    void initialize();
+public:
+    static ParagraphInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    ParagraphInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "ParagraphInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
+    virtual QString baseText();
 };
 
 class HighlightInterp : public Interp{
