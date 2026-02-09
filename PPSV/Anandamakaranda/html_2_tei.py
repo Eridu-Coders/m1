@@ -10,6 +10,7 @@ import difflib
 import devtrans
 
 g_parallel = dict()
+g_parallel_bhashya = dict()
 
 # for brahmasūtrabhāṣyam
 # def anandamak(p_file):
@@ -89,36 +90,49 @@ def anandamak(p_file):
                     print('    Verse:', l_verse_id_0, '-->', l_verse_id, l_verse_text)
                     for l_div_bhashya_collection in l_div_verse.findall('div'):
                         if l_div_bhashya_collection.attrib['class'] == 'bhashya-collection':
-                             for l_div_bhashya in l_div_bhashya_collection.findall('div'):
-                                 if l_div_bhashya.attrib['class'].strip() == 'bhashya':
-                                     l_text = l_div_bhashya.text.strip() if l_div_bhashya.text else ''
-                                     print('    Bhashya', l_div_bhashya.attrib['id'], l_text)
-                                     l_bhashya_text_list = [l_text] if len(l_text) > 0 else []
-                                     l_p_count = 0
-                                     for l_it in l_div_bhashya.iter():
-                                         l_b_text = l_it.text.strip() if l_it.text else ''
-                                         l_b_tail = l_it.tail.strip() if l_it.tail else ''
-                                         print(f"        {l_it.tag:5} {l_b_text}❉{l_b_tail}")
-                                         if l_it.tag != 'div':
-                                             if l_it.tag == 'p':
-                                                 if len(l_b_text) > 0:
-                                                     if l_p_count > 0:
-                                                         l_bhashya_text_list.append('<br/>' + l_b_text)
-                                                     else:
-                                                         l_bhashya_text_list.append(l_b_text)
-                                                 l_p_count += 1
-                                             else:
-                                                l_bhashya_text_list.append(f'<{l_it.tag}>{l_b_text}</{l_it.tag}>')
+                            l_bhashya_line_list = []
+                            for l_div_bhashya in l_div_bhashya_collection.findall('div'):
+                                if l_div_bhashya.attrib['class'].strip() == 'bhashya':
+                                    l_text = l_div_bhashya.text.strip() if l_div_bhashya.text else ''
+                                    print('    Bhashya', l_div_bhashya.attrib['id'], l_text)
 
-                                             if len(l_b_tail) > 0:
-                                                 l_bhashya_text_list.append(l_b_tail)
+                                    l_bhashya_frag_list = []
+                                    if len(l_text) > 0:
+                                        l_bhashya_frag_list.append(l_text)
 
-                                     l_full_bhashya_text = ' '.join(l_bhashya_text_list)
-                                     l_full_bhashya_text = l_full_bhashya_text.replace('<br></br>', '<br/>')
-                                     l_full_bhashya_text = l_full_bhashya_text.replace(' ॥</em>', '</em> ॥')
-                                     l_full_bhashya_text = re.sub(r'(\S)-\s<em>', r'\1-<em>', l_full_bhashya_text)
-                                     l_full_bhashya_text = re.sub(r'\s*<br/>\s*', r'<br/>', l_full_bhashya_text)
-                                     print('        -->', l_full_bhashya_text)
+                                    l_p_count = 0
+                                    for l_it in l_div_bhashya.iter():
+                                        l_b_text = l_it.text.strip() if l_it.text else ''
+                                        l_b_tail = l_it.tail.strip() if l_it.tail else ''
+                                        print(f"        {l_it.tag:5} {l_b_text}❉{l_b_tail}")
+                                        if l_it.tag != 'div':
+                                            if l_it.tag == 'p':
+                                                if len(l_b_text) > 0:
+                                                    if l_p_count > 0:
+                                                        l_bhashya_frag_list.append('<br/>' + l_b_text)
+                                                    else:
+                                                        l_bhashya_frag_list.append(l_b_text)
+                                                l_p_count += 1
+                                            else:
+                                                l_bhashya_frag_list.append(f'<{l_it.tag}>{l_b_text}</{l_it.tag}>')
+                                            if len(l_b_tail) > 0:
+                                                l_bhashya_frag_list.append(l_b_tail)
+
+                                    l_bhashya_line_list.append(' '.join(l_bhashya_frag_list))
+
+                            def equalize_space_comma(s):
+                                return re.sub(r",\s*(\d)", r", \1", s)
+
+                            l_full_bhashya_text = ' '.join(l_bhashya_line_list)
+                            l_full_bhashya_text = l_full_bhashya_text.replace('<br></br>', '<br/>')
+                            l_full_bhashya_text = l_full_bhashya_text.replace(' ॥</em>', '</em> ॥')
+                            l_full_bhashya_text = re.sub(r'(\S)-\s+<em>', r'\1-<em>', l_full_bhashya_text)
+                            l_full_bhashya_text = re.sub(r'\s*<br/>\s*', r'<br/>', l_full_bhashya_text)
+                            l_full_bhashya_text = re.sub(r'॥\s*(\d+)\s*॥', r'॥ \1 ॥', l_full_bhashya_text)
+                            l_full_bhashya_text = re.sub(r'(\S)\s*॥\s*(\d+)</em>\s*॥', r'\1</em> ॥ \2 ॥', l_full_bhashya_text)
+                            l_full_bhashya_text = re.sub(r'॥\s*(\d+(?:,\s*\d+)+)\s*॥', lambda m: f'॥ {equalize_space_comma(m.group(1))} ॥', l_full_bhashya_text)
+                            print('        -->', l_full_bhashya_text)
+                            g_parallel_bhashya.setdefault(l_verse_id, dict())['Anandamak'] = l_full_bhashya_text
 
 def find_note(p_element):
     l_note = p_element.find("span[@class='pathantara']")
@@ -128,10 +142,12 @@ def find_note(p_element):
     else:
         return None
 
-g_sethuila_note = dict()
+g_sethuila_mula_note = dict()
+g_sethuila_sarvamula_note = dict()
 
 def sethuila(p_file):
-    global g_sethuila_note
+    global g_sethuila_mula_note
+    global g_sethuila_sarvamula_note
     with (open(p_file, 'r') as l_fin):
         l_txt = l_fin.read()
         print('Sethuila:', p_file, len(l_txt))
@@ -147,12 +163,21 @@ def sethuila(p_file):
             print(f'XML parse ERROR: {e.code} {e.msg} in [{l_txt[:100]}]')
 
         l_uvaca_prefix = ''
+        l_verse_id = '0_0'
+        l_bhashya_list = []
         for l_div_outer in l_tree.findall('div'):
             print(l_div_outer.attrib['class'])
             if l_div_outer.attrib['class'] == 'content':
                 for l_div_inner in l_div_outer.findall('div'):
                     print('    <div>', l_div_inner.attrib['class'], end=' ')
                     if l_div_inner.attrib['class'] == 'Mula':
+                        if len(l_bhashya_list) > 0:
+                            l_existing_dict = g_parallel_bhashya.setdefault(l_verse_id, dict())
+                            # l_bhashya_text_list = [(t, re.sub(r'(\S)\s*\.\.\s*(\d+)\s*\.\.', r'\1 ॥ \2 ॥', l_text), n) for t, l_text, n in l_bhashya_list]
+                            # l_existing_dict['Sethuila'] = l_bhashya_text_list
+                            l_existing_dict['Sethuila'] = l_bhashya_list
+                        l_bhashya_list = []
+
                         # for l_it in l_div_inner.iter():
                         #     print(f'<{l_it.tag}>', l_it.text, end='')
                         l_uvaca = l_div_inner.find("span[@class='inline iast']")
@@ -181,7 +206,7 @@ def sethuila(p_file):
                             l_verse_id = l_match.group(1).replace('/', '_')
 
                         if len(l_notes_list) > 0 and l_notes_list != [None, None]:
-                            g_sethuila_note[l_verse_id] = l_notes_list
+                            g_sethuila_mula_note[l_verse_id] = l_notes_list
 
                         # l_verse_id = re.match(r'^.*\[oṃ].*\[oṃ]\.\.\s+(\d+/\d+/\d+)\.\.', l_verse_text).group(1).replace('/', '_')
                         print(l_verse_id, l_verse_text, end=' ')
@@ -198,13 +223,31 @@ def sethuila(p_file):
                             print('       ', l_span_1.attrib['class'], end=': ')
                             # padya iast
                             if l_span_1.attrib['class'] in ['padya iast', 'inline iast']:
-                                print(l_span_1.text.strip(), end=' ')
-                                l_note = l_span_1.find("span[@class='pathantara']")
-                                if l_note:
-                                    l_note_ref = l_note.find("a[@class='pathantara-ref iast']").attrib['href']
-                                    print('Note:', l_note_ref, l_note.attrib['data-note'])
+                                l_bhashya_fragment = l_span_1.text.strip()
+                                l_bhashya_fragment = re.sub(r'(\S)\s*\.\.\s*(\d+)\s*\.\.', r'\1 ॥ \2 ॥', l_bhashya_fragment)
+                                l_bhashya_fragment = re.sub(r'(\S)\s*\.\.', r'\1 ॥', l_bhashya_fragment)
+                                print(l_bhashya_fragment, end=' ')
+                                # l_bhashya_list.append(f'[iast] {l_bhashya_fragment}')
+                                # l_bhashya_list.append(('[iast]', l_bhashya_fragment))
+
+                                l_note_elem = find_note(l_span_1)
+                                l_note_ref = None
+                                if l_note_elem is not None:
+                                    l_note_ref = l_note_elem[0]
+                                    g_sethuila_sarvamula_note.setdefault(l_verse_id, []).append(l_note_elem)
+                                    print(f'Note: {l_note_elem}')
                                 else:
                                     print()
+
+                                l_bhashya_list.append(('[iast]', l_bhashya_fragment, [l_note_ref]))
+
+                                # l_note = l_span_1.find("span[@class='pathantara']")
+                                # if l_note:
+                                #     l_note_ref = l_note.find("a[@class='pathantara-ref iast']").attrib['href']
+                                #     print('Note:', l_note_ref, l_note.attrib['data-note'])
+                                # else:
+                                #     print()
+
                             # padya
                             elif l_span_1.attrib['class'] in ['padya', 'inline']:
                                 l_span_2 = l_span_1.find("span[@class='pramana iast']")
@@ -212,14 +255,35 @@ def sethuila(p_file):
                                 if l_span_2 is None:
                                     l_span_2 = l_span_1.find("span[@class='pratika iast']")
                                 # print(l_span_2)
+
                                 l_frag_text = l_span_2.text
+                                l_frag_text = re.sub(r'(\S)\s*\.\.\s*(\d+)\s*\.\.', r'\1 ॥ \2 ॥', l_frag_text)
+                                l_frag_text = re.sub(r'(\S)\s*\.\.', r'\1 ॥', l_frag_text)
                                 print(l_frag_text, end=' ')
-                                l_note = l_span_1.find("span[@class='pathantara']")
-                                if l_note:
-                                    l_note_ref = l_note.find("a[@class='pathantara-ref iast']").attrib['href']
-                                    print('Note:', l_note_ref, l_note.attrib['data-note'])
+
+                                l_note_elem = find_note(l_span_1)
+                                l_note_ref_1 = None
+                                if l_note_elem is not None:
+                                    l_note_ref_1 = l_note_elem[0]
+                                    g_sethuila_sarvamula_note.setdefault(l_verse_id, []).append(l_note_elem)
+                                    print(f'Note 1: {l_note_elem}')
+
+                                l_note_elem = find_note(l_span_2)
+                                l_note_ref_2 = None
+                                if l_note_elem is not None:
+                                    l_note_ref_2 = l_note_elem[0]
+                                    g_sethuila_sarvamula_note.setdefault(l_verse_id, []).append(l_note_elem)
+                                    print(f'Note 2: {l_note_elem}')
                                 else:
                                     print()
+
+                                l_bhashya_list.append(('[none]', l_frag_text, [l_note_ref_1, l_note_ref_2]))
+                                # l_note = l_span_1.find("span[@class='pathantara']")
+                                # if l_note:
+                                #     l_note_ref = l_note.find("a[@class='pathantara-ref iast']").attrib['href']
+                                #     print('Note:', l_note_ref, l_note.attrib['data-note'])
+                                # else:
+                                #     print()
                             else:
                                 print()
                     elif l_div_inner.attrib['class'] == 'Heading3':
@@ -242,7 +306,7 @@ def standardize_iast(s):
 def internal_sandhi(s): # amp
     return (re.sub(r'[āa][āa]', 'ā',
                    re.sub(r'(.[aāiīuūoe])[mn]([pbtdkgm])', r'\1ṃ\2',
-                          re.sub(r'([aāiīuūoe])nny', r'\1ṃny', s)))
+                          re.sub(r'(.[aāiīuūoe])nny', r'\1ṃny', s)))
             .replace('ty', 'dy').replace('ḥs', 'ss').replace('ṃj', 'ñj').replace('ṃc', 'ñc'))
 
 g_tei_changes = {
@@ -267,9 +331,10 @@ g_tei_changes = {
     , '4_22': [('kṛtvāpi', 'kṛtvā\'pi')]
     , '4_28': [('yogayajñāstathāpare', 'yogayajñāstathā\'pare')]
     , '4_29': [('prāṇa prāṇe\'pānaṃ', 'prāṇaṃ prāṇe\'pānaṃ')]
+    # , '5_8': [('spṛśañjidhrannaśnan', 'spṛśañcidhrannaśnan')]
 }
 
-g_html_changes = {
+g_html_changes = { #
     '1_18': [('śaṃkhaṃ', 'śaṃkhāṃ')],
     '1_20': [('śastrasampāte', 'śastrasaṃpāte')],
     '1_23': [('^sañjaya uvāca ', '')],
@@ -315,7 +380,16 @@ g_html_changes = {
     '4_34': [('paripraśrena', 'paripraśnena'), ('jñāninastatvadarśinaḥ', 'jñāninastattvadarśinaḥ')],
     '4_38': [('kālenā\'tmani', 'kālenātmani')],
     '4_39': [('śraddhāvāllaṃbhate', 'śraddhāvāṃllabhate'), ('śraddhāvālm̐labhate', 'śraddhāvāṃllabhate'), ('jñānaṃ matparaḥ', 'jñānaṃ tatparaḥ')],
-    '5_8': [('paśyan śṛṇvan', 'paśyañśṛṇvan'), ('spṛśan jighran aśnan', 'spṛśañcidhrannaśnan'), ('svapan śvasan', 'svapañśvasan')],
+    '5_8': [('paśyan śṛṇvan', 'paśyañśṛṇvan'), ('spṛśan jighran aśnan', 'spṛśañcidhrannaśnan'), ('svapan śvasan', 'svapañśvasan'), ('spṛśañcidhrannaśnan', 'spṛśañjighrannaśnan')],
+    '5_9': [('gṛhṇan unmiṣan', 'gṛhṇannunmiṣan')],
+    '5_12': [('nibaddhyate', 'nibadhyate')],
+    '5_13': [('saṃnyasyā\'ste', 'saṃnyasyāste')],
+    '5_15': [('nā\'datte', 'nādatte'), ('ajñānenā\'vṛtaṃ', 'ajñānenāvṛtaṃ')],
+    '5_17': [('tadbuddhayastadātmānaḥ tanniṣṭhāstatparāyaṇāḥ', 'tadbuddhayastadātmānastanniṣṭhāstatparāyaṇāḥ')],
+    '5_21': [('bāhmasparśeṣvasaktātmā', 'bāhyasparśeṣvasaktātmā')],
+    '5_24': [('ntarārāmastathā\'ntarjyotireva', 'ntarārāmastathāntarjyotireva')],
+    '5_25': [('brahmanirbā\(vā\)ṇam', 'brahmanirvāṇam'), ('chinnadvaidhā\(?\'\'\)?yatātmānaḥ', 'chinnadvaidhā yatātmānaḥ')],
+    '5_28': [('buddhiḥ munirmokṣa', 'buddhirmunirmokṣa')],
 }
 # yatayaśśaṃsitavratāḥ yajñād
 def display_dif(p_base, p_other):
@@ -379,12 +453,15 @@ def load_gita_tei():
 def parallel_dump():
     load_gita_tei()
 
-    g_sethuila_note['2_63'] = ('#note-pathantara-9990', '‘vinaśyati’')
-    g_sethuila_note['4_16'] = ('#note-pathantara-9991', '‘tat te\'karma’')
-    g_sethuila_note['4_20'] = ('#note-pathantara-9992', '‘nityatṛpto\'nirāśrayaḥ’')
-    g_sethuila_note['4_33'] = ('#note-pathantara-9993', '‘karmā\'khilaṃ’')
-    for l_bs_vn, d in g_parallel.items():
-        print(f'{l_bs_vn} {g_sethuila_note[l_bs_vn] if l_bs_vn in g_sethuila_note else ""}')
+    g_sethuila_mula_note['2_63'] = [('#note-pathantara-9990', '‘vinaśyati’')]
+    g_sethuila_mula_note['4_16'] = [('#note-pathantara-9991', '‘tat te\'karma’')]
+    g_sethuila_mula_note['4_20'] = [('#note-pathantara-9992', '‘nityatṛpto\'nirāśrayaḥ’')]
+    g_sethuila_mula_note['4_33'] = [('#note-pathantara-9993', '‘karmā\'khilaṃ’')]
+    g_sethuila_mula_note['5_8'] = [('#note-pathantara-9993', '‘spṛśañcidhrannaśnan’')]
+    g_sethuila_mula_note['5_25'] = [('#note-pathantara-9994', '‘brahmanirbāṇamṛṣayaḥ’'),
+                                    ('#note-pathantara-9996', '‘chinnadvaidhā''yatātmānaḥ’')]
+    for l_bs_vn, d in g_parallel.items(): # chinnadvaidhā''yatātmānaḥ
+        print(f'{l_bs_vn} {g_sethuila_mula_note[l_bs_vn] if l_bs_vn in g_sethuila_mula_note else ""}')
         l_comp = []
         for k, v in d.items():
             try:
@@ -449,12 +526,73 @@ if __name__ == '__main__':
 
     parallel_dump()
 
-    for k in g_tei_changes.keys():
-        l_original = g_gita_tei_file_bc[k]
-        print(f'{k:5}', l_original)
-        for l_v1, l_v2 in g_tei_changes[k]:
-            l_original = l_original.replace(l_v1, l_v2)
-            print(f'      {l_original} ({l_v1} --> {l_v2}')
+    for k in g_sethuila_mula_note.keys():
+        print(f'{k:5} {g_sethuila_mula_note[k]}')
+
+    for k, v in g_sethuila_sarvamula_note.items():
+        print(f'{k:5} {v}')
+
+    with open('bhasyha_compare.html', 'w') as l_fout:
+        l_fout.write("""<html>
+<head>
+    <style>
+        table, td, th{
+            border: 1px solid black;
+            border-collapse: collapse;
+            vertical_align: top;
+            padding: .5em .5em .5em 1em; 
+        }
+    </style>
+</head>
+    <body>
+    <table>
+    <tr><th>Sloka</th><th>Anandamakaranda</th><th>Sethuila</th></tr>
+        """)
+        for k, k_o in sorted([(re.sub(r'^(\d)_', r'0\1_', re.sub(r'_(\d)$', r'_0\1', l_k)), l_k) for l_k in g_parallel_bhashya.keys()]):
+            l_fout.write(f'<tr><td>{k_o:5}</td>\n')
+            l_anandamak_found = False
+            l_note = ''
+            l_anandamak_text = ''
+            for l_source_key, v in g_parallel_bhashya[k_o].items():
+                l_empty_cell = ''
+                if l_source_key == 'Anandamak':
+                    l_anandamak_found = True
+                    l_anandamak_text_1 = internal_sandhi(standardize_iast(re.sub(r'\W', r' ', re.sub(r'<[^>]+>', r'', v))))
+                    l_anandamak_text = re.sub(r'\s*', '', l_anandamak_text_1)
+                    l_v_display = v # + ' / ' + l_anandamak_text_1
+                    l_source_key = 'Anandamakaranda'
+                else:
+                    def format_ref(p_ref):
+                        return f'[{p_ref.replace("#note-pathantara-", "")}]'
+
+                    l_v_display_list = [(t, l_text.split(' '), n) for t, l_text, n in v]
+                    l_v_display_list = [(t,
+                                         ' '.join(
+                                             [f'<span style="color: green;"><b>{l_tf}</b></span>'
+                                              if internal_sandhi(standardize_iast(re.sub(r'\s+', '', re.sub(r'\W', '', l_tf)))) in l_anandamak_text else l_tf
+                                              for l_tf in l_text]
+                                         ),
+                                         f'<b>{" ".join([format_ref(l_ref) for l_ref in n if l_ref is not None])}</b>') for t, l_text, n in l_v_display_list]
+                    l_v_display = ' '.join([f'{t}: {l_text} {l_n}' for t, l_text, l_n in l_v_display_list])
+
+                    if k_o in g_sethuila_sarvamula_note.keys():
+                        l_note = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{format_ref(l_ref)}: {devtrans.dev2iast(l_note_text)}" for l_ref, l_note_text in g_sethuila_sarvamula_note[k_o]])}'
+
+                    if not l_anandamak_found:
+                        l_empty_cell = '<td></td>'
+                l_fout.write(f'{l_empty_cell}<td><b>{l_source_key}</b> {l_v_display}{l_note}</td>\n')
+            l_fout.write('</tr>\n')
+        l_fout.write("""</table>
+        </body>
+            </html>
+        """)
+
+    # for k in g_tei_changes.keys():
+    #     l_original = g_gita_tei_file_bc[k]
+    #     print(f'{k:5}', l_original)
+    #     for l_v1, l_v2 in g_tei_changes[k]:
+    #         l_original = l_original.replace(l_v1, l_v2)
+    #         print(f'      {l_original} ({l_v1} --> {l_v2}')
 
 
 # if l_bs_vn == '1_1_29':
