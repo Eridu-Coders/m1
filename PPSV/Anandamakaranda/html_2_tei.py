@@ -6,8 +6,9 @@ __author__ = 'fi11222'
 import sys
 import xml.etree.ElementTree as ET
 import re
-import difflib
+import cydifflib as difflib
 import devtrans
+import diff_match_patch as dmp
 
 g_parallel = dict()
 g_parallel_bhashya = dict()
@@ -239,7 +240,7 @@ def sethuila(p_file):
                                 else:
                                     print()
 
-                                l_bhashya_list.append(('[iast]', l_bhashya_fragment, [l_note_ref]))
+                                l_bhashya_list.append(('{iast}', l_bhashya_fragment, [l_note_ref]))
 
                                 # l_note = l_span_1.find("span[@class='pathantara']")
                                 # if l_note:
@@ -277,7 +278,7 @@ def sethuila(p_file):
                                 else:
                                     print()
 
-                                l_bhashya_list.append(('[none]', l_frag_text, [l_note_ref_1, l_note_ref_2]))
+                                l_bhashya_list.append(('{-}', l_frag_text, [l_note_ref_1, l_note_ref_2]))
                                 # l_note = l_span_1.find("span[@class='pathantara']")
                                 # if l_note:
                                 #     l_note_ref = l_note.find("a[@class='pathantara-ref iast']").attrib['href']
@@ -296,18 +297,111 @@ def sethuila(p_file):
                     else:
                         print()
 
+def list_candidates(p_k):
+    l_list_candidate = [p_k,
+                        # Initial vowels
+                        re.sub(r' cet', r'cait', p_k),
+                        re.sub(r'( |^)e(.)', r'\1i\2', p_k),
+                        re.sub(r'( |^)a(.)', r'\1ā\2', p_k),
+                        re.sub(r'( |^)a(.)', r'\1\2', p_k),
+                        re.sub(r'( |^)a(.)', r'\1ऽ\2', p_k),
+                        re.sub(r' a(.)', r'ऽ\1', p_k),
+                        re.sub(r'^a(.)', r'ऽ\1', p_k),
+                        re.sub(r'( |^)ā(.)', r'\1ऽ\2', p_k),
+                        re.sub(r' ā(.)', r'ऽ\1', p_k),
+                        re.sub(r'^ā(.)', r'ऽ\1', p_k),
+                        re.sub(r'( |^)ā(.)', r'\1\2', p_k),
+                        re.sub(r'( |^)u(.)', r'\1o\2', p_k),
+                        re.sub(r'( |^)u(.)', r'\1ū\2', p_k),
+                        re.sub(r'( |^)u(.)', r'\1\2', p_k),
+                        re.sub(r'( |^)ū(.)', r'\1\2', p_k),
+                        re.sub(r'( |^)i(.)', r'\1e\2', p_k),
+                        re.sub(r'( |^)ī(.)', r'\1e\2', p_k),
+                        re.sub(r'( |^)i(.)', r'\1ī\2', p_k),
+                        re.sub(r'( |^)ī(.)', r'\1ī\2', p_k),
+
+                        # initial consonants
+                        re.sub(r'( |^)ś(.)', r'\1c\2', p_k),
+                        re.sub(r'( |^)s(.)', r'\1\2', p_k),
+                        re.sub(r'( |^)ś(.)', r'\1\2', p_k),
+                        re.sub(r'( |^)c(.)', r'\1\2', p_k),
+                        re.sub(r'( |^)r(.)', r'\1\2', p_k),
+                        re.sub(r'( |^)l(.)', r'\1ll\2', p_k),
+                        re.sub(r'( |^)saṃ(.)', r'\1ṇaṃ\2', p_k),
+
+                        # final vowels
+                        re.sub(r'(.)e( |$)', r'\1a\2', p_k),
+                        re.sub(r'(.)a( |$)', r'\1\2', p_k),
+                        re.sub(r'(.)a( |$)', r'\1o\2', p_k),
+                        re.sub(r'(.)ā( |$)', r'\1a\2', p_k),
+                        re.sub(r'(.)au( |$)', r'\1āv\2', p_k),
+                        re.sub(r'(.)u( |$)', r'\1v\2', p_k),
+                        re.sub(r'(.)u( |$)', r'\1\2', p_k),
+                        re.sub(r'(.)[iī]( |$)', r'\1y\2', p_k),
+                        re.sub(r'(.)i( |$)', r'\1\2', p_k),
+
+                        # final consonants
+                        re.sub(r'(.)ḥ( |$)', r'\1ś\2', p_k),
+                        re.sub(r'(.)ḥ( |$)', r'\1s\2', p_k),
+                        re.sub(r'(.)ḥ( |$)', r'\1r\2', p_k),
+                        re.sub(r'(.)ḥ( |$)', r'\1\2', p_k),
+                        re.sub(r'(.)aḥ( |$)', r'\1o\2', p_k),
+                        re.sub(r'(.)m( |$)', r'\1\2', p_k),
+                        re.sub(r'(.)m( |$)', r'\1ṃ\2', p_k),
+                        re.sub(r'(.)m ', r'\1ṃ ', p_k),
+                        re.sub(r'(.)m$', r'\1ṃ', p_k),
+                        re.sub(r'(.)n( |$)', r'\1ṃ\2', p_k),
+                        re.sub(r'(.)n( |$)', r'\1ṃs\2', p_k),
+                        re.sub(r'(.)n( |$)', r'\1ṃś\2', p_k),
+                        re.sub(r'(.)ṃ( |$)', r'\1ñ\2', p_k),
+                        # re.sub(r'(.)n( |$)', r'\1nn\2', p_k),
+                        re.sub(r'(.)t( |$)', r'\1d\2', p_k),
+                        re.sub(r'(.)t( |$)', r'\1j\2', p_k),
+                        re.sub(r'(.)t( |$)', r'\1n\2', p_k),
+                        re.sub(r'(.)t( |$)', r'\1l\2', p_k),
+                        re.sub(r'(.)ṭ( |$)', r'\1ṇ\2', p_k),
+                        re.sub(r'(.)d( |$)', r'\1c\2', p_k),
+                        re.sub(r'(.)k( |$)', r'\1g\2', p_k),
+                        re.sub(r'(.)k( |$)', r'\1ṃ\2', p_k),
+
+                        # ktiḥ ktim antr ṃ kalp aranś k tribhiḥ trividham saṃnyāsam
+                        re.sub(r'(.)ktiḥ( |$)', r'\1kitar\2', p_k),
+                        re.sub(r'(.)ktim( |$)', r'\1kitam\2', p_k),
+                        re.sub(r'(.)antr(.)', r'\1aṃtr\2', p_k),
+                        re.sub(r'(.)kalp(.)', r'\1kamp\2', p_k),
+                        re.sub(r'(.)aranś(.)', r'\1oṃऽś\2', p_k),
+                        re.sub(r'(.)kti(.)', r'\1kita\2', p_k),
+                        re.sub(r'aṃśa', r'ṃऽśa', p_k),
+                        re.sub(r'tribhiḥ', r'itrabhir', p_k),
+                        re.sub(r'trividham', r'itravidhaṃ', p_k),
+                        ]
+    return list(set(l_list_candidate))
 def standardize_iast(s):
     return (s.replace('ṁ', 'ṃ')
              .replace('ṅ', 'ṃ')
              .replace(':', 'ḥ')
              .replace('o़\'', 'o\'')
-             .replace('ṛ़', 'ṝ')) # to apply to original text/files ़
+             .replace('ṛ़', 'ṝ') # to apply to original text/files ़
+             .replace('\u200d', ''))
 
 def internal_sandhi(s): # amp
-    return (re.sub(r'[āa][āa]', 'ā',
-                   re.sub(r'(.[aāiīuūoe])[mn]([pbtdkgm])', r'\1ṃ\2',
-                          re.sub(r'(.[aāiīuūoe])nny', r'\1ṃny', s)))
-            .replace('ty', 'dy').replace('ḥs', 'ss').replace('ṃj', 'ñj').replace('ṃc', 'ñc'))
+    return (re.sub(r'[āa]\u200b?[āa]', 'ā',
+                   re.sub(r"[āa]['\u200b]i", 'e',
+                          re.sub(r'(.[aāiīuūoe])\u200b?[mn]\u200b?([pbtdkgm])', r'\1ṃ\2',
+                                 re.sub(r'(.[aāiīuūoe])nny', r'\1ṃny',
+                                        re.sub(r't\u200b?([bdg])', r'd\1',
+                                               re.sub(r'[īi]\u200b?[īi]', 'ī',
+                                                      re.sub(r'[uū]\u200b?[uū]', 'ū',  s)))))))
+            .replace('t\u200by', 'dy')
+            .replace('ḥ\u200bs', 'ss')
+            .replace('ṃ\u200bj', 'ñj')
+            .replace('ṃ\u200bc', 'ñc')
+            .replace('d\u200bn', 'nn')
+            .replace('ḥs', 'ss')
+            .replace('ṃj', 'ñj')
+            .replace('ṃc', 'ñc')
+            .replace('dn', 'nn')
+            )
 
 g_tei_changes = {
     # '2_1': [('kṛpayā\'viṣṭam', 'kṛpayāviṣṭam')]
@@ -532,7 +626,7 @@ if __name__ == '__main__':
     for k, v in g_sethuila_sarvamula_note.items():
         print(f'{k:5} {v}')
 
-    with open('bhasyha_compare.html', 'w') as l_fout:
+    with (open('bhasyha_compare.html', 'w') as l_fout):
         l_fout.write("""<html>
 <head>
     <style>
@@ -549,38 +643,210 @@ if __name__ == '__main__':
     <tr><th>Sloka</th><th>Anandamakaranda</th><th>Sethuila</th></tr>
         """)
         for k, k_o in sorted([(re.sub(r'^(\d)_', r'0\1_', re.sub(r'_(\d)$', r'_0\1', l_k)), l_k) for l_k in g_parallel_bhashya.keys()]):
+            if k_o == '3_2':
+                break
+            print(k_o, file=sys.stderr)
+
             l_fout.write(f'<tr><td>{k_o:5}</td>\n')
             l_anandamak_found = False
             l_note = ''
-            l_anandamak_text = ''
+            l_extra_text = ''
+            l_anandamak_text_0 = ''
             for l_source_key, v in g_parallel_bhashya[k_o].items():
                 l_empty_cell = ''
                 if l_source_key == 'Anandamak':
                     l_anandamak_found = True
-                    l_anandamak_text_1 = internal_sandhi(standardize_iast(re.sub(r'\W', r' ', re.sub(r'<[^>]+>', r'', v))))
-                    l_anandamak_text = re.sub(r'\s*', '', l_anandamak_text_1)
+                    l_anandamak_text_2 = v
+                    l_anandamak_text_1 = re.sub(r'[=॥।“”‘’–.,;:?!\-)(\[\]]', r' ',
+                                                re.sub(r'<[^>]+>', r'',
+                                                       re.sub(r'\d+', r'',
+                                                              re.sub(r'(\w)’(\w)', r"\1'\2", l_anandamak_text_2))))
+                    # l_anandamak_text_0 = standardize_iast(re.sub(r'\s*', '\u200b', l_anandamak_text_1))
+                    l_anandamak_text_0 = standardize_iast(re.sub(r'\s+', '\u200b', l_anandamak_text_1))
                     l_v_display = v # + ' / ' + l_anandamak_text_1
                     l_source_key = 'Anandamakaranda'
                 else:
+                    l_v_display_list = [(t, l_text.split(' '), n) for t, l_text, n in v]
+                    if not l_anandamak_found:
+                        l_empty_cell = '<td></td>'
+                    else:
+                        # l_extra_text += f'<br/><b>Anandamak raw</b>\n: {l_anandamak_text_2}\n'
+                        # l_extra_text += f'<br/><b>Anandamak inter</b>\n: {l_anandamak_text_1}\n'
+                        l_word_list = []
+                        l_word_array = [l_tri[1] for l_tri in l_v_display_list]
+                        for l_word_id_outer in range(len(l_v_display_list)):
+                            l_inner_word_list = l_v_display_list[l_word_id_outer][1]
+                            for l_word_id_inner in range(len(l_inner_word_list)):
+                                l_word_list.append((l_word_id_outer, l_word_id_inner, l_inner_word_list[l_word_id_inner]))
+
+                        print(f'{k:5}', l_word_list)
+
+                        l_word_list_expanded = []
+                        for l_id_outer, l_id_inner, l_word_cmp in l_word_list:
+                            if not l_word_cmp == '॥' and not re.match(r'\d+', l_word_cmp):
+                                l_word_cmp = re.sub(r'[=॥।“”‘’–.,;:?!\-)(\[\]]', '', re.sub(r'(\w)’(\w)', r"\1'\2", l_word_cmp))
+                                for l_word_candidate in list_candidates(internal_sandhi(standardize_iast(l_word_cmp))):
+                                    l_word_list_expanded.append((l_id_outer, l_id_inner, l_word_candidate))
+                        l_word_list_expanded = sorted(l_word_list_expanded, key=lambda t: f'{len(t[2]):03}-{t[2]}', reverse=True)
+
+                        # print('     ', l_word_list_expanded)
+                        # for l_anandamak_text in [internal_sandhi(l_anandamak_text_0).replace('\u200b', '')]:
+                        for l_anandamak_text in [internal_sandhi(l_anandamak_text_0)]:
+                            l_extra_text += f'<br/><b>Anandamak comp</b>\n: {l_anandamak_text}\n'
+                            print(l_anandamak_text)
+                            l_anandamak_text = l_anandamak_text.replace('\u200b', '')
+                            l_anandamak_text_consume = l_anandamak_text
+                            if len(l_anandamak_text_consume) > 0:
+                                for _, _, l_word_cmp in l_word_list_expanded:
+                                    print(f'     ', l_word_cmp)
+                                print('     ', l_anandamak_text_consume)
+                                l_forbidden_id = []
+                                for l_id_outer, l_id_inner, l_word_candidate in l_word_list_expanded:
+                                    if f'{l_id_outer}-{l_id_inner}' in l_forbidden_id:
+                                        continue
+
+                                    try :
+                                        l_match = re.search(l_word_candidate, l_anandamak_text_consume)
+                                    except re.error:
+                                        print(l_word_candidate, '\n'.join([l_txt for _, l_txt, _ in v]), l_anandamak_text_consume, file=sys.stderr)
+                                        sys.exit(0)
+
+                                    if l_match:
+                                        l_anandamak_text_consume = \
+                                            l_anandamak_text_consume[0:l_match.start()] + \
+                                            ('_' * (l_match.end() - l_match.start())) + \
+                                            l_anandamak_text_consume[l_match.end():]
+                                        l_word_array[l_id_outer][l_id_inner] = f'<span style="color: green;">{l_word_array[l_id_outer][l_id_inner]}</span>'
+                                        l_forbidden_id.append(f'{l_id_outer}-{l_id_inner}')
+                                        print('     ', l_anandamak_text_consume, l_word_candidate, l_id_outer, l_id_inner)
+
+                            for l_outer_id in range(len(l_v_display_list)):
+                                print(f'     {l_outer_id:3} {l_word_array[l_outer_id]}')
+
+                            # l_v_display_list = [(t,
+                            #                      ' '.join(
+                            #                          [f'<span style="color: green;"><b>{l_tf}</b></span>'
+                            #                           if internal_sandhi(standardize_iast(re.sub(r'\s+', '', re.sub(r'\W', '', l_tf)))) in l_anandamak_text else l_tf
+                            #                           for l_tf in l_text]
+                            #                      ),
+                            #                      f'<b>{" ".join([format_ref(l_ref) for l_ref in n if l_ref is not None])}</b>') for t, l_text, n in l_v_display_list]
+                            l_v_display_list_new = []
+                            l_dmp = dmp.diff_match_patch()
+                            for l_id_outer in range(len(l_v_display_list)):
+                                t, _, n = l_v_display_list[l_id_outer]
+                                l_nw_word_array = []
+                                l_cur_found = 0
+                                for w in l_word_array[l_id_outer]:
+                                    l_word_cmp = internal_sandhi(re.sub(r'[॥।“”‘’–.,;:?!\-)(\[\]]', '', w))
+                                    if len(l_word_cmp) > 0 and 'green' not in l_word_cmp and '॥' not in l_word_cmp and not re.match(r'\d+', l_word_cmp):
+                                        # if l_word_cmp == 'īśvarānityatvasyāprastutatvād':
+                                        #     for c in list(l_word_cmp):
+                                        #         print(f'{c} {ord(c)}')
+                                        #     print()
+                                        #     for l_id_anandamak in range(16, 16+len(l_word_cmp)):
+                                        #         c = l_anandamak_text[l_id_anandamak]
+                                        #         print(f'{c} {ord(c)}')
+
+                                        l_blocks_display = ''
+                                        l_common_len = 0
+                                        for l_i_change in range(len(l_word_cmp)):
+                                            l_w_mod = l_word_cmp
+                                            for  z, l_w_mod_1 in [('e', l_w_mod[0:l_i_change] + '.' + l_w_mod[l_i_change:]),      # expansion
+                                                                  ('i', l_w_mod[0:l_i_change] + '.' + l_w_mod[l_i_change + 1:]),  # iso
+                                                                  ('c', l_w_mod[0:l_i_change] + '-' + l_w_mod[l_i_change + 1:])]: # contraction
+
+                                                # kenacidapauruṣeyamityuktamuktavākyasamam
+                                                if l_word_cmp == 'īśvarānityatvasyāprastutatvād':
+                                                     print(l_w_mod_1)
+
+                                                l_w_mod_x = (l_w_mod_1
+                                                                .replace('(', r'\(')
+                                                                .replace(')', r'\)')
+                                                                .replace('-', r''))
+                                                try:
+                                                    l_match = re.search(l_w_mod_x, l_anandamak_text[l_cur_found:])
+                                                    if l_match:
+                                                        l_cur_found += l_match.start()
+                                                        print('Hillbilly 1:', ' ' * len(l_word_cmp), l_w_mod_1)
+                                                        l_w_mod_display = l_w_mod_1.replace('.', '-')
+                                                        l_common_len = len(l_w_mod_display.replace('-', ''))
+                                                        l_blocks_display = '{' + f'{z} ' + l_w_mod_display + '}'
+                                                        break
+                                                except re.error as e:
+                                                    print(e, l_w_mod_1, file=sys.stderr)
+                                                    sys.exit(0)
+
+                                        if l_common_len == 0:
+                                            l_is_breaking = False
+                                            for l_i_change in range(1, len(l_word_cmp)):
+                                                if l_is_breaking: break
+                                                for l_j_change in range(0, l_i_change):
+                                                    l_w_mod_1 = l_word_cmp
+                                                    for z, l_w_mod_3 in [('ee', l_w_mod_1[0:l_j_change] + '.' + l_w_mod_1[l_j_change    :l_i_change] + '.' + l_w_mod_1[l_i_change:]),      # expansion
+                                                                         ('ei', l_w_mod_1[0:l_j_change] + '.' + l_w_mod_1[l_j_change    :l_i_change] + '.' + l_w_mod_1[l_i_change + 1:]),  # exp + iso
+                                                                         ('ie', l_w_mod_1[0:l_j_change] + '.' + l_w_mod_1[l_j_change + 1:l_i_change] + '.' + l_w_mod_1[l_i_change:]),      # iso + exp
+                                                                         ('ec', l_w_mod_1[0:l_j_change] + '.' + l_w_mod_1[l_j_change    :l_i_change] + '-' + l_w_mod_1[l_i_change + 1:]),  # exp + contraction
+                                                                         ('ce', l_w_mod_1[0:l_j_change] + '-' + l_w_mod_1[l_j_change + 1:l_i_change] + '.' + l_w_mod_1[l_i_change:]),      # contraction + exp
+                                                                         ('ii', l_w_mod_1[0:l_j_change] + '.' + l_w_mod_1[l_j_change + 1:l_i_change] + '.' + l_w_mod_1[l_i_change + 1:]),  # full iso
+                                                                         ('ci', l_w_mod_1[0:l_j_change] + '-' + l_w_mod_1[l_j_change + 1:l_i_change] + '.' + l_w_mod_1[l_i_change + 1:]),  # contraction + iso
+                                                                         ('ic', l_w_mod_1[0:l_j_change] + '.' + l_w_mod_1[l_j_change + 1:l_i_change] + '-' + l_w_mod_1[l_i_change + 1:]),  # iso + contraction
+                                                                         ('cc', l_w_mod_1[0:l_j_change] + '-' + l_w_mod_1[l_j_change + 1:l_i_change] + '-' + l_w_mod_1[l_i_change + 1:])   # full contraction
+                                                                      ]:
+
+                                                        # kenacidapauruṣeyamityuktamuktavākyasamam
+                                                        # if l_word_cmp == 'kenacidapauruṣeyamityuktamuktavākyasamam':
+                                                        #     print(l_w_mod_3)
+
+                                                        l_w_mod_x = (l_w_mod_3
+                                                                .replace('(', r'\(')
+                                                                .replace(')', r'\)')
+                                                                .replace('-', r''))
+                                                        l_match = re.search(l_w_mod_x, l_anandamak_text[l_cur_found:])
+                                                        if l_match:
+                                                            l_cur_found += l_match.start()
+                                                            print('Hillbilly 2:', ' ' * len(l_word_cmp), l_w_mod_3)
+                                                            l_w_mod_display = l_w_mod_3.replace('.', '-')
+                                                            l_common_len = len(l_w_mod_display.replace('-', ''))
+                                                            l_blocks_display = '{' + f'{z} ' + l_w_mod_display + '}'
+                                                            l_is_breaking = True
+                                                            break
+
+                                        if l_common_len == 0:
+                                            l_diffs = l_dmp.diff_main(l_word_cmp, l_anandamak_text[l_cur_found:])
+                                            l_sm = difflib.SequenceMatcher(None, l_word_cmp, l_anandamak_text[l_cur_found:],
+                                                                           autojunk=False)
+                                            # l_dmp.diff_cleanupSemantic(l_diffs)
+                                            l_dmp_list = [l_seg for l_op, l_seg in l_diffs if l_op == 0]
+                                            print('dmp        :', l_word_cmp, l_dmp_list, l_diffs)
+                                            print('difflib    :', ' ' * len(l_word_cmp), '_'.join(list(l_word_cmp)), list(l_sm.get_matching_blocks()))
+
+                                            # l_common_len = sum([len(s) for s in l_dmp_list])
+                                            l_common_len = sum([n for _, _, n in l_sm.get_matching_blocks()])
+
+                                            #l_blocks_display = '{' + ' '.join([f'{len(s)}-{s}' for s in l_dmp_list]) + '}'
+                                            l_blocks_display = '{' + ' '.join([f"{a}/{n}-{w[a:a + n]}" for a, _, n in l_sm.get_matching_blocks() if n > 0]) + '}'
+
+                                        l_my_ratio = float(l_common_len)/float(len(l_word_cmp))
+                                        w = '<span style="color: ' + \
+                                            ('DarkGreen' if l_my_ratio > .85 else 'maroon' if l_my_ratio > .7 else 'red') + \
+                                            f';"><b>{w}</b></span> ({l_word_cmp}) {l_my_ratio:.4} {l_blocks_display}'
+
+                                    l_nw_word_array.append(w)
+
+                                l_v_display_list_new.append((t,
+                                                         ' '.join(l_nw_word_array),
+                                                         f'<b>{" ".join([format_ref(l_ref) for l_ref in n if l_ref is not None])}</b>'))
+
+                        l_v_display_list = l_v_display_list_new
+
                     def format_ref(p_ref):
                         return f'[{p_ref.replace("#note-pathantara-", "")}]'
 
-                    l_v_display_list = [(t, l_text.split(' '), n) for t, l_text, n in v]
-                    l_v_display_list = [(t,
-                                         ' '.join(
-                                             [f'<span style="color: green;"><b>{l_tf}</b></span>'
-                                              if internal_sandhi(standardize_iast(re.sub(r'\s+', '', re.sub(r'\W', '', l_tf)))) in l_anandamak_text else l_tf
-                                              for l_tf in l_text]
-                                         ),
-                                         f'<b>{" ".join([format_ref(l_ref) for l_ref in n if l_ref is not None])}</b>') for t, l_text, n in l_v_display_list]
                     l_v_display = ' '.join([f'{t}: {l_text} {l_n}' for t, l_text, l_n in l_v_display_list])
-
                     if k_o in g_sethuila_sarvamula_note.keys():
                         l_note = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{format_ref(l_ref)}: {devtrans.dev2iast(l_note_text)}" for l_ref, l_note_text in g_sethuila_sarvamula_note[k_o]])}'
 
-                    if not l_anandamak_found:
-                        l_empty_cell = '<td></td>'
-                l_fout.write(f'{l_empty_cell}<td><b>{l_source_key}</b> {l_v_display}{l_note}</td>\n')
+                l_fout.write(f'{l_empty_cell}<td><b>{l_source_key}</b> {l_v_display}{l_note}{l_extra_text}</td>\n')
             l_fout.write('</tr>\n')
         l_fout.write("""</table>
         </body>

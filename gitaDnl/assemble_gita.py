@@ -169,7 +169,7 @@ def space_clean(s):
     return re.sub(rf'[\s{string.punctuation}]+', ' ', s).strip()
 
 
-def do_deterministic_sandhi(s): # ḥ t
+def do_deterministic_external_sandhi(s): # ḥ t
     return (
         re.sub(r'[aā]-[aā]', 'ā',
         # i + i/ī
@@ -223,7 +223,7 @@ def iast_cleanup(s):
     # to preserve the apostrophe for ऽ
     l_punct = ''.join(list(set(list(string.punctuation)).difference({'\'', ')', '(', ']', '['})))
     return \
-        ((do_deterministic_sandhi(
+        ((do_deterministic_external_sandhi(
             re.sub(rf'\s+', ' ',
                    # re.sub(rf'\s*[{string.punctuation}]+\s*', '-', s)).strip())
                    re.sub(r'\s*[.+}{%$=>\\|#*`,"_;&<\-/:@!~?^]+\s*', '-', s.replace('\'', 'ऽ'))).strip())
@@ -290,7 +290,7 @@ def deva_correct(s):
             .replace(':', 'ः'))
 
 
-def add_candidates(p_k):
+def list_candidates(p_k):
     l_list_candidate = [p_k,
                         # Initial vowels
                         re.sub(r' cet', r'cait', p_k),
@@ -369,7 +369,7 @@ def add_candidates(p_k):
                         ]
     return list(set(l_list_candidate))
 
-def add_candidates_alt(p_k):
+def add_candidates_extra(p_k):
     l_list_candidate = [  # aṃśa
         re.sub(r'( |^)o(.)', r'\1u\2', p_k),
         re.sub(r'( |^)ṛ(.)', r'\1r\2', p_k),
@@ -762,8 +762,8 @@ def inria_sloka_words(p_chap_number, p_sloka_num, p_sloka_txt, p_is_fragment=Fal
 
 # ------------- main() -------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
-    print('sambhavam -->', iast_cleanup('sambhavam'), 'saṃbhavam') # do_deterministic_sandhi
-    print('tejaḥ-aṃśa-sambhavam -ddc->', do_deterministic_sandhi('tejaḥ-aṃśa-sambhavam'), 'tejoṃऽśasaṃbhavam')
+    print('sambhavam -->', iast_cleanup('sambhavam'), 'saṃbhavam') # do_deterministic_external_sandhi
+    print('tejaḥ-aṃśa-sambhavam -ddc->', do_deterministic_external_sandhi('tejaḥ-aṃśa-sambhavam'), 'tejoṃऽśasaṃbhavam')
     print('tejaḥ-aṃśa-sambhavam -ic-> ', iast_cleanup('tejaḥ-aṃśa-sambhavam'), 'tejoṃऽśasaṃbhavam')
     # chapters block creation ==========================================================================================
     l_indent_prefix = ''
@@ -1543,14 +1543,14 @@ if __name__ == '__main__':
                         l_wfw_dict[l_key] = (['of the senses'], {'of the senses'})
 
                     l_key_contracted = iast_cleanup(re.sub(r'\s+', '-', l_key))
-                    l_list_ck_1 = list(set(add_candidates(l_key) + add_candidates(l_key_contracted)))
+                    l_list_ck_1 = list(set(list_candidates(l_key) + list_candidates(l_key_contracted)))
                     l_list_ck_1 = [l_km for l_km in l_list_ck_1 if len(l_km) > 0]
                     # if l_key == 'śrotrādīni indriyāṇi': print(l_key_contracted, sorted(l_list_ck_1, key=lambda s: f'{len(s):3}-{s}', reverse=True))
                     if l_key == 'san': print(sorted(l_list_ck_1, key=lambda s: f'{len(s):3}-{s}', reverse=True))
 
                     l_list_ck_2 = []
                     for l_kc in l_list_ck_1:
-                        l_list_ck_2 += add_candidates(l_kc)
+                        l_list_ck_2 += list_candidates(l_kc)
                     l_list_ck_2 = [l_km for l_km in l_list_ck_2 if len(l_km) > 0]
 
                     l_list_ck_3 = list(set(l_list_ck_2))
@@ -1673,9 +1673,9 @@ if __name__ == '__main__':
 
                 for l_form in l_form_list:
                     l_form_contracted = iast_cleanup(re.sub(r'\s+', '-', l_form))
-                    l_list_ck_1 = list(set(add_candidates(l_form) +
-                                           add_candidates(l_form_contracted) +
-                                           add_candidates_alt(l_form)
+                    l_list_ck_1 = list(set(list_candidates(l_form) +
+                                           list_candidates(l_form_contracted) +
+                                           add_candidates_extra(l_form)
                                            )
                                        )
                     # if l_sk_word == 'atha u': print(l_form_contracted, sorted(l_list_ck_1, key=lambda s: f'{len(s):3}-{s}', reverse=True))
@@ -1683,7 +1683,7 @@ if __name__ == '__main__':
 
                     l_list_ck_2 = []
                     for l_kc in l_list_ck_1:
-                        l_list_ck_2 += (add_candidates(l_kc) + add_candidates_alt(l_kc))
+                        l_list_ck_2 += (list_candidates(l_kc) + add_candidates_extra(l_kc))
                     l_list_ck_2 = [l_km for l_km in l_list_ck_2 if len(l_km) > 0]
 
                     l_list_ck_3 = list(set(l_list_ck_2))
