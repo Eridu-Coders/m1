@@ -9,6 +9,7 @@ import re
 import cydifflib as difflib
 import devtrans
 import diff_match_patch as dmp
+import copy
 
 g_parallel = dict()
 g_parallel_bhashya = dict()
@@ -361,10 +362,10 @@ def list_candidates(p_k):
                         re.sub(r'(.)t( |$)', r'\1l\2', p_k),
                         re.sub(r'(.)ṭ( |$)', r'\1ṇ\2', p_k),
                         re.sub(r'(.)d( |$)', r'\1c\2', p_k),
-                        re.sub(r'(.)k( |$)', r'\1g\2', p_k),
-                        re.sub(r'(.)k( |$)', r'\1ṃ\2', p_k),
+                        re.sub(r'(.)l_verse_k( |$)', r'\1g\2', p_k),
+                        re.sub(r'(.)l_verse_k( |$)', r'\1ṃ\2', p_k),
 
-                        # ktiḥ ktim antr ṃ kalp aranś k tribhiḥ trividham saṃnyāsam
+                        # ktiḥ ktim antr ṃ kalp aranś l_verse_k tribhiḥ trividham saṃnyāsam
                         re.sub(r'(.)ktiḥ( |$)', r'\1kitar\2', p_k),
                         re.sub(r'(.)ktim( |$)', r'\1kitam\2', p_k),
                         re.sub(r'(.)antr(.)', r'\1aṃtr\2', p_k),
@@ -375,33 +376,46 @@ def list_candidates(p_k):
                         re.sub(r'tribhiḥ', r'itrabhir', p_k),
                         re.sub(r'trividham', r'itravidhaṃ', p_k),
                         ]
-    return list(set(l_list_candidate))
-def standardize_iast(s):
+    l_list_candidate = [(f'{len(p_k):04}-{"ӡ"*len(l_cand) if l_cand == p_k else l_cand}', l_cand) for l_cand in list(set(l_list_candidate))]
+    return l_list_candidate
+def standardize_iast(s): # ātmalm̐labhante
     return (s.replace('ṁ', 'ṃ')
              .replace('ṅ', 'ṃ')
+             .replace('lm̐l', 'ṃl')
              .replace(':', 'ḥ')
              .replace('o़\'', 'o\'')
              .replace('ṛ़', 'ṝ') # to apply to original text/files ़
              .replace('\u200d', ''))
 
-def internal_sandhi(s): # amp
-    return (re.sub(r'[āa]\u200b?[āa]', 'ā',
-                   re.sub(r"[āa]['\u200b]i", 'e',
-                          re.sub(r'(.[aāiīuūoe])\u200b?[mn]\u200b?([pbtdkgm])', r'\1ṃ\2',
-                                 re.sub(r'(.[aāiīuūoe])nny', r'\1ṃny',
-                                        re.sub(r't\u200b?([bdg])', r'd\1',
-                                               re.sub(r'[īi]\u200b?[īi]', 'ī',
-                                                      re.sub(r'[uū]\u200b?[uū]', 'ū',  s)))))))
-            .replace('t\u200by', 'dy')
-            .replace('ḥ\u200bs', 'ss')
-            .replace('ṃ\u200bj', 'ñj')
-            .replace('ṃ\u200bc', 'ñc')
-            .replace('d\u200bn', 'nn')
-            .replace('ḥs', 'ss')
-            .replace('ṃj', 'ñj')
-            .replace('ṃc', 'ñc')
-            .replace('dn', 'nn')
-            )
+def internal_sandhi(s): # ⌿
+    return (
+        re.sub(r'[āa][āa]', 'ā', 
+        re.sub(r'[īi][īi]', 'ī', 
+        re.sub(r'[uū][uū]', 'ū', 
+        # re.sub(r"[āa]'?i", 'e',
+        re.sub(r'(.[aāiīuūoe])nny', r'\1ṃny', 
+               s))))
+        .replace('ḥs', 'ss')
+        .replace('ṃj', 'ñj')
+        .replace('ṃc', 'ñc')
+        .replace('dn', 'nn')
+    )
+def external_sandhi(s): # taddhi agnyāderapi
+    return re.sub('(\w)⌿(\w)', r'\1\2',
+        re.sub(r'[āa]⌿[āa]', 'ā',
+        re.sub(r'[īi]⌿[īi]', 'ī',
+        re.sub(r'(.)[īi]⌿([āauū])', r'\1y\2',
+        re.sub(r'[uū]⌿[uū]', 'ū',
+        re.sub(r"[āa]⌿i", 'e',
+        re.sub(r'(.[aāiīuūoe])[mn]⌿([pbtdkgm])', r'\1ṃ\2',
+        re.sub(r'(.)t⌿([bdgaāiīuūoey])', r'\1d\2',
+               s)))))))
+        .replace('ḥ⌿s', 'ss')
+        .replace('ḥ⌿t', 'st')
+        .replace('ṃ⌿j', 'ñj')
+        .replace('ṃ⌿c', 'ñc')
+        .replace('d⌿n', 'nn')
+    )
 
 g_tei_changes = {
     # '2_1': [('kṛpayā\'viṣṭam', 'kṛpayāviṣṭam')]
@@ -584,8 +598,8 @@ def parallel_dump():
                             v = re.sub(l_vt1, l_vt2, v)
                             #print (l_vt1, l_vt2, v)
 
-                # print(k, v, re.match(r'^oṃ\s+(.*?)\s+oṃ', v), re.search(r'\[oṃ]\s+(.*?)\s+\[oṃ]', v))
-                # l_comp.append(re.match(r'^oṃ\s+(.*?)\s+oṃ', v).group(1) if k == 'Anandamak' else re.search(r'\[oṃ]\s+(.*?)\s+\[oṃ]', v).group(1))
+                # print(l_verse_k, v, re.match(r'^oṃ\s+(.*?)\s+oṃ', v), re.search(r'\[oṃ]\s+(.*?)\s+\[oṃ]', v))
+                # l_comp.append(re.match(r'^oṃ\s+(.*?)\s+oṃ', v).group(1) if l_verse_k == 'Anandamak' else re.search(r'\[oṃ]\s+(.*?)\s+\[oṃ]', v).group(1))
 
                 l_v_comp = re.sub(r'॥\d+॥', '', re.sub(r'\s+', '', v))
                 l_v_comp = internal_sandhi(l_v_comp)
@@ -611,23 +625,7 @@ def parallel_dump():
             # sys.exit(0)
             return
 
-# ------------- main() -------------------------------------------------------------------------------------------------
-if __name__ == '__main__':
-    # anandamak('brahmasūtrabhāṣyam.html')
-    # sethuila('brahmasūtrabhāṣyam_s.html')
-    anandamak('śrīmadbhagavadgītābhāṣyam.html')
-    sethuila('śrīmadbhagavadgītābhāṣyam_s.html')
-
-    parallel_dump()
-
-    for k in g_sethuila_mula_note.keys():
-        print(f'{k:5} {g_sethuila_mula_note[k]}')
-
-    for k, v in g_sethuila_sarvamula_note.items():
-        print(f'{k:5} {v}')
-
-    with (open('bhasyha_compare.html', 'w') as l_fout):
-        l_fout.write("""<html>
+g_html_header = """<html>
 <head>
     <style>
         table, td, th{
@@ -641,222 +639,312 @@ if __name__ == '__main__':
     <body>
     <table>
     <tr><th>Sloka</th><th>Anandamakaranda</th><th>Sethuila</th></tr>
-        """)
-        for k, k_o in sorted([(re.sub(r'^(\d)_', r'0\1_', re.sub(r'_(\d)$', r'_0\1', l_k)), l_k) for l_k in g_parallel_bhashya.keys()]):
-            if k_o == '3_2':
-                break
-            print(k_o, file=sys.stderr)
+"""
+# ------------- main() -------------------------------------------------------------------------------------------------
+if __name__ == '__main__':
+    # anandamak('brahmasūtrabhāṣyam.html')
+    # sethuila('brahmasūtrabhāṣyam_s.html')
+    anandamak('śrīmadbhagavadgītābhāṣyam.html')
+    sethuila('śrīmadbhagavadgītābhāṣyam_s.html')
 
-            l_fout.write(f'<tr><td>{k_o:5}</td>\n')
-            l_anandamak_found = False
+    parallel_dump()
+
+    for l_verse_k in g_sethuila_mula_note.keys():
+        print(f'{l_verse_k:5} {g_sethuila_mula_note[l_verse_k]}')
+
+    for l_verse_k, v in g_sethuila_sarvamula_note.items():
+        print(f'{l_verse_k:5} {v}')
+
+    l_fout_sk = open('bhasyha_compare_sk.html', 'w')
+
+    with open('bhasyha_compare.html', 'w') as l_fout:
+        l_fout.write(g_html_header)
+        l_fout_sk.write(g_html_header)
+        for l_verse_k, l_underscore_k in sorted([(re.sub(r'^(\d)_', r'0\1_', re.sub(r'_(\d)$', r'_0\1', l_k)), l_k) for l_k in g_parallel_bhashya.keys()]):
+            # if l_underscore_k == '3_2':
+            if l_underscore_k == '2_45':
+                break # 2_41 2_18
+            print(f'{l_underscore_k}                    ', file=sys.stderr)
+
+            l_fout.write(f'<tr><td>{l_underscore_k:5}</td>\n')
+            l_mula = devtrans.iast2dev(g_gita_tei_file[l_underscore_k]) + f" ॥ {l_underscore_k.replace('_', '.')} ॥" if l_underscore_k != "0_0" else "Introduction"
+            l_fout_sk.write(f'<tr><td rowspan="2">{l_underscore_k}</td><td style="text-align: center; background-color: #ccc;" colspan="2">{l_mula}</td></tr>\n<tr>')
+            l_amak_found = False
             l_note = ''
+            l_note_sk = ''
             l_extra_text = ''
-            l_anandamak_text_0 = ''
-            for l_source_key, v in g_parallel_bhashya[k_o].items():
+            l_amak_text_0 = ''
+            # in the case of Anandamak, v contains a single string
+            # in the case of Sethuila, it contains a list of chunks with their class and notes 
+            for l_source_key, v in g_parallel_bhashya[l_underscore_k].items():
                 l_empty_cell = ''
                 if l_source_key == 'Anandamak':
-                    l_anandamak_found = True
-                    l_anandamak_text_2 = v
-                    l_anandamak_text_1 = re.sub(r'[=॥।“”‘’–.,;:?!\-)(\[\]]', r' ',
+                    l_amak_found = True
+                    l_amak_text_2 = v
+                    l_amak_text_1 = re.sub(r'[=॥।“”‘’–.,;:?!\-)(\[\]]', r' ',
+                                            re.sub(r'<[^>]+>', r'',
+                                                   re.sub(r'\d+', r'',
+                                                          re.sub(r'(\w)’(\w)', r"\1'\2", l_amak_text_2))))
+                    # l_amak_text_0 = standardize_iast(re.sub(r'\s*', '\u200b', l_amak_text_1))
+                    l_amak_text_0 = standardize_iast(re.sub(r'\s+', '\u200b', l_amak_text_1))
+
+                    l_amak_text_x = re.sub(r'[“”‘’,;:\-]', r' ',
                                                 re.sub(r'<[^>]+>', r'',
-                                                       re.sub(r'\d+', r'',
-                                                              re.sub(r'(\w)’(\w)', r"\1'\2", l_anandamak_text_2))))
-                    # l_anandamak_text_0 = standardize_iast(re.sub(r'\s*', '\u200b', l_anandamak_text_1))
-                    l_anandamak_text_0 = standardize_iast(re.sub(r'\s+', '\u200b', l_anandamak_text_1))
-                    l_v_display = v # + ' / ' + l_anandamak_text_1
+                                                       re.sub(r'॥\s*\d+\s*॥', r'',
+                                                              re.sub(r'(\w)’(\w)', r"\1'\2", l_amak_text_2))))
+                    l_amak_text_x_1 = re.sub(r'[=॥।–.?!)(\[\]]', '⌅', l_amak_text_x + '⌬')
+                    l_amak_text_x_2 = re.sub(r'\s+', '⌿', l_amak_text_x_1)
+                    l_amak_text_x_3 = re.sub(r'⌿*(?:⌿*⌅)+⌿*', '⌅', l_amak_text_x_2)
+                    l_amak_text_x_4 = re.sub(r'⌅⌬|⌿⌬', '', l_amak_text_x_3)
+                    l_amak_chunk_list = [standardize_iast(s.replace('\'', 'ऽ')) for s in l_amak_text_x_4.split('⌅')]
+                    # l_amak_text_x_p = l_amak_text_x.replace("⌅", "⌅&#x200B;")
+                    # l_v_display = v + f'\n<br/><b>l_amak_chunk_list</b>: <br/>[{l_amak_text_x_1}]<br/>[{l_amak_text_x_2}]<br/>[{l_amak_text_x_3}]<br/>[{l_amak_text_x_4}] <br/>{l_amak_chunk_list}'
+                    # l_v_display = v + f'\n<br/><b>l_amak_chunk_list</b>:<br/>{l_amak_chunk_list}'
+                    l_v_display = standardize_iast(v)
+                    l_v_display_sk = devtrans.iast2dev(re.sub(r'<[^>]+>', '', l_v_display))
                     l_source_key = 'Anandamakaranda'
+                    l_v_display_2 = ''
                 else:
                     l_v_display_list = [(t, l_text.split(' '), n) for t, l_text, n in v]
-                    if not l_anandamak_found:
-                        l_empty_cell = '<td></td>'
-                    else:
-                        # l_extra_text += f'<br/><b>Anandamak raw</b>\n: {l_anandamak_text_2}\n'
-                        # l_extra_text += f'<br/><b>Anandamak inter</b>\n: {l_anandamak_text_1}\n'
-                        l_word_list = []
-                        l_word_array = [l_tri[1] for l_tri in l_v_display_list]
-                        for l_word_id_outer in range(len(l_v_display_list)):
-                            l_inner_word_list = l_v_display_list[l_word_id_outer][1]
-                            for l_word_id_inner in range(len(l_inner_word_list)):
-                                l_word_list.append((l_word_id_outer, l_word_id_inner, l_inner_word_list[l_word_id_inner]))
-
-                        print(f'{k:5}', l_word_list)
-
-                        l_word_list_expanded = []
-                        for l_id_outer, l_id_inner, l_word_cmp in l_word_list:
-                            if not l_word_cmp == '॥' and not re.match(r'\d+', l_word_cmp):
-                                l_word_cmp = re.sub(r'[=॥।“”‘’–.,;:?!\-)(\[\]]', '', re.sub(r'(\w)’(\w)', r"\1'\2", l_word_cmp))
-                                for l_word_candidate in list_candidates(internal_sandhi(standardize_iast(l_word_cmp))):
-                                    l_word_list_expanded.append((l_id_outer, l_id_inner, l_word_candidate))
-                        l_word_list_expanded = sorted(l_word_list_expanded, key=lambda t: f'{len(t[2]):03}-{t[2]}', reverse=True)
-
-                        # print('     ', l_word_list_expanded)
-                        # for l_anandamak_text in [internal_sandhi(l_anandamak_text_0).replace('\u200b', '')]:
-                        for l_anandamak_text in [internal_sandhi(l_anandamak_text_0)]:
-                            l_extra_text += f'<br/><b>Anandamak comp</b>\n: {l_anandamak_text}\n'
-                            print(l_anandamak_text)
-                            l_anandamak_text = l_anandamak_text.replace('\u200b', '')
-                            l_anandamak_text_consume = l_anandamak_text
-                            if len(l_anandamak_text_consume) > 0:
-                                for _, _, l_word_cmp in l_word_list_expanded:
-                                    print(f'     ', l_word_cmp)
-                                print('     ', l_anandamak_text_consume)
-                                l_forbidden_id = []
-                                for l_id_outer, l_id_inner, l_word_candidate in l_word_list_expanded:
-                                    if f'{l_id_outer}-{l_id_inner}' in l_forbidden_id:
-                                        continue
-
-                                    try :
-                                        l_match = re.search(l_word_candidate, l_anandamak_text_consume)
-                                    except re.error:
-                                        print(l_word_candidate, '\n'.join([l_txt for _, l_txt, _ in v]), l_anandamak_text_consume, file=sys.stderr)
-                                        sys.exit(0)
-
-                                    if l_match:
-                                        l_anandamak_text_consume = \
-                                            l_anandamak_text_consume[0:l_match.start()] + \
-                                            ('_' * (l_match.end() - l_match.start())) + \
-                                            l_anandamak_text_consume[l_match.end():]
-                                        l_word_array[l_id_outer][l_id_inner] = f'<span style="color: green;">{l_word_array[l_id_outer][l_id_inner]}</span>'
-                                        l_forbidden_id.append(f'{l_id_outer}-{l_id_inner}')
-                                        print('     ', l_anandamak_text_consume, l_word_candidate, l_id_outer, l_id_inner)
-
-                            for l_outer_id in range(len(l_v_display_list)):
-                                print(f'     {l_outer_id:3} {l_word_array[l_outer_id]}')
-
-                            # l_v_display_list = [(t,
-                            #                      ' '.join(
-                            #                          [f'<span style="color: green;"><b>{l_tf}</b></span>'
-                            #                           if internal_sandhi(standardize_iast(re.sub(r'\s+', '', re.sub(r'\W', '', l_tf)))) in l_anandamak_text else l_tf
-                            #                           for l_tf in l_text]
-                            #                      ),
-                            #                      f'<b>{" ".join([format_ref(l_ref) for l_ref in n if l_ref is not None])}</b>') for t, l_text, n in l_v_display_list]
-                            l_v_display_list_new = []
-                            l_dmp = dmp.diff_match_patch()
-                            for l_id_outer in range(len(l_v_display_list)):
-                                t, _, n = l_v_display_list[l_id_outer]
-                                l_nw_word_array = []
-                                l_cur_found = 0
-                                for w in l_word_array[l_id_outer]:
-                                    l_word_cmp = internal_sandhi(re.sub(r'[॥।“”‘’–.,;:?!\-)(\[\]]', '', w))
-                                    if len(l_word_cmp) > 0 and 'green' not in l_word_cmp and '॥' not in l_word_cmp and not re.match(r'\d+', l_word_cmp):
-                                        # if l_word_cmp == 'īśvarānityatvasyāprastutatvād':
-                                        #     for c in list(l_word_cmp):
-                                        #         print(f'{c} {ord(c)}')
-                                        #     print()
-                                        #     for l_id_anandamak in range(16, 16+len(l_word_cmp)):
-                                        #         c = l_anandamak_text[l_id_anandamak]
-                                        #         print(f'{c} {ord(c)}')
-
-                                        l_blocks_display = ''
-                                        l_common_len = 0
-                                        for l_i_change in range(len(l_word_cmp)):
-                                            l_w_mod = l_word_cmp
-                                            for  z, l_w_mod_1 in [('e', l_w_mod[0:l_i_change] + '.' + l_w_mod[l_i_change:]),      # expansion
-                                                                  ('i', l_w_mod[0:l_i_change] + '.' + l_w_mod[l_i_change + 1:]),  # iso
-                                                                  ('c', l_w_mod[0:l_i_change] + '-' + l_w_mod[l_i_change + 1:])]: # contraction
-
-                                                # kenacidapauruṣeyamityuktamuktavākyasamam
-                                                if l_word_cmp == 'īśvarānityatvasyāprastutatvād':
-                                                     print(l_w_mod_1)
-
-                                                l_w_mod_x = (l_w_mod_1
-                                                                .replace('(', r'\(')
-                                                                .replace(')', r'\)')
-                                                                .replace('-', r''))
-                                                try:
-                                                    l_match = re.search(l_w_mod_x, l_anandamak_text[l_cur_found:])
-                                                    if l_match:
-                                                        l_cur_found += l_match.start()
-                                                        print('Hillbilly 1:', ' ' * len(l_word_cmp), l_w_mod_1)
-                                                        l_w_mod_display = l_w_mod_1.replace('.', '-')
-                                                        l_common_len = len(l_w_mod_display.replace('-', ''))
-                                                        l_blocks_display = '{' + f'{z} ' + l_w_mod_display + '}'
-                                                        break
-                                                except re.error as e:
-                                                    print(e, l_w_mod_1, file=sys.stderr)
-                                                    sys.exit(0)
-
-                                        if l_common_len == 0:
-                                            l_is_breaking = False
-                                            for l_i_change in range(1, len(l_word_cmp)):
-                                                if l_is_breaking: break
-                                                for l_j_change in range(0, l_i_change):
-                                                    l_w_mod_1 = l_word_cmp
-                                                    for z, l_w_mod_3 in [('ee', l_w_mod_1[0:l_j_change] + '.' + l_w_mod_1[l_j_change    :l_i_change] + '.' + l_w_mod_1[l_i_change:]),      # expansion
-                                                                         ('ei', l_w_mod_1[0:l_j_change] + '.' + l_w_mod_1[l_j_change    :l_i_change] + '.' + l_w_mod_1[l_i_change + 1:]),  # exp + iso
-                                                                         ('ie', l_w_mod_1[0:l_j_change] + '.' + l_w_mod_1[l_j_change + 1:l_i_change] + '.' + l_w_mod_1[l_i_change:]),      # iso + exp
-                                                                         ('ec', l_w_mod_1[0:l_j_change] + '.' + l_w_mod_1[l_j_change    :l_i_change] + '-' + l_w_mod_1[l_i_change + 1:]),  # exp + contraction
-                                                                         ('ce', l_w_mod_1[0:l_j_change] + '-' + l_w_mod_1[l_j_change + 1:l_i_change] + '.' + l_w_mod_1[l_i_change:]),      # contraction + exp
-                                                                         ('ii', l_w_mod_1[0:l_j_change] + '.' + l_w_mod_1[l_j_change + 1:l_i_change] + '.' + l_w_mod_1[l_i_change + 1:]),  # full iso
-                                                                         ('ci', l_w_mod_1[0:l_j_change] + '-' + l_w_mod_1[l_j_change + 1:l_i_change] + '.' + l_w_mod_1[l_i_change + 1:]),  # contraction + iso
-                                                                         ('ic', l_w_mod_1[0:l_j_change] + '.' + l_w_mod_1[l_j_change + 1:l_i_change] + '-' + l_w_mod_1[l_i_change + 1:]),  # iso + contraction
-                                                                         ('cc', l_w_mod_1[0:l_j_change] + '-' + l_w_mod_1[l_j_change + 1:l_i_change] + '-' + l_w_mod_1[l_i_change + 1:])   # full contraction
-                                                                      ]:
-
-                                                        # kenacidapauruṣeyamityuktamuktavākyasamam
-                                                        # if l_word_cmp == 'kenacidapauruṣeyamityuktamuktavākyasamam':
-                                                        #     print(l_w_mod_3)
-
-                                                        l_w_mod_x = (l_w_mod_3
-                                                                .replace('(', r'\(')
-                                                                .replace(')', r'\)')
-                                                                .replace('-', r''))
-                                                        l_match = re.search(l_w_mod_x, l_anandamak_text[l_cur_found:])
-                                                        if l_match:
-                                                            l_cur_found += l_match.start()
-                                                            print('Hillbilly 2:', ' ' * len(l_word_cmp), l_w_mod_3)
-                                                            l_w_mod_display = l_w_mod_3.replace('.', '-')
-                                                            l_common_len = len(l_w_mod_display.replace('-', ''))
-                                                            l_blocks_display = '{' + f'{z} ' + l_w_mod_display + '}'
-                                                            l_is_breaking = True
-                                                            break
-
-                                        if l_common_len == 0:
-                                            l_diffs = l_dmp.diff_main(l_word_cmp, l_anandamak_text[l_cur_found:])
-                                            l_sm = difflib.SequenceMatcher(None, l_word_cmp, l_anandamak_text[l_cur_found:],
-                                                                           autojunk=False)
-                                            # l_dmp.diff_cleanupSemantic(l_diffs)
-                                            l_dmp_list = [l_seg for l_op, l_seg in l_diffs if l_op == 0]
-                                            print('dmp        :', l_word_cmp, l_dmp_list, l_diffs)
-                                            print('difflib    :', ' ' * len(l_word_cmp), '_'.join(list(l_word_cmp)), list(l_sm.get_matching_blocks()))
-
-                                            # l_common_len = sum([len(s) for s in l_dmp_list])
-                                            l_common_len = sum([n for _, _, n in l_sm.get_matching_blocks()])
-
-                                            #l_blocks_display = '{' + ' '.join([f'{len(s)}-{s}' for s in l_dmp_list]) + '}'
-                                            l_blocks_display = '{' + ' '.join([f"{a}/{n}-{w[a:a + n]}" for a, _, n in l_sm.get_matching_blocks() if n > 0]) + '}'
-
-                                        l_my_ratio = float(l_common_len)/float(len(l_word_cmp))
-                                        w = '<span style="color: ' + \
-                                            ('DarkGreen' if l_my_ratio > .85 else 'maroon' if l_my_ratio > .7 else 'red') + \
-                                            f';"><b>{w}</b></span> ({l_word_cmp}) {l_my_ratio:.4} {l_blocks_display}'
-
-                                    l_nw_word_array.append(w)
-
-                                l_v_display_list_new.append((t,
-                                                         ' '.join(l_nw_word_array),
-                                                         f'<b>{" ".join([format_ref(l_ref) for l_ref in n if l_ref is not None])}</b>'))
-
-                        l_v_display_list = l_v_display_list_new
+                    l_v_display_list_2 = []
 
                     def format_ref(p_ref):
                         return f'[{p_ref.replace("#note-pathantara-", "")}]'
 
-                    l_v_display = ' '.join([f'{t}: {l_text} {l_n}' for t, l_text, l_n in l_v_display_list])
-                    if k_o in g_sethuila_sarvamula_note.keys():
-                        l_note = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{format_ref(l_ref)}: {devtrans.dev2iast(l_note_text)}" for l_ref, l_note_text in g_sethuila_sarvamula_note[k_o]])}'
+                    if not l_amak_found:
+                        l_empty_cell = '<td></td>'
+                        l_v_display_list_2 = [(t, ' '.join(l_tl), ' '.join([f'<b>{format_ref(l_n)}</b>' for l_n in n_list if l_n is not None])) for t, l_tl, n_list in l_v_display_list]
+                        l_v_display_list_2_sk = [(t, ' '.join([devtrans.iast2dev(w) for w in l_tl]), ' '.join([f'<b>{format_ref(l_n)}</b>' for l_n in n_list if l_n is not None])) for t, l_tl, n_list in l_v_display_list]
+                    else:
+                        # l_extra_text += f'<br/><b>Anandamak raw</b>\n: {l_amak_text_2}\n'
 
-                l_fout.write(f'{l_empty_cell}<td><b>{l_source_key}</b> {l_v_display}{l_note}{l_extra_text}</td>\n')
+                        # original Sethuila Chunks with words split (no Sandhi yet)
+                        l_seth_chunks_list = [(t, l_text.split(' '), n) for t, l_text, n in v]
+                        # 2-d array of un-sandhied Sethuila words, still with punctuation attached
+                        l_seth_word_array = [l_words_list for _, l_words_list, _ in l_seth_chunks_list]
+                        l_seth_word_array_2 = copy.deepcopy(l_seth_word_array)
+                        l_seth_word_array_2_sk = [[devtrans.iast2dev(l_word) for l_word in l_row] for l_row in copy.deepcopy(l_seth_word_array)]
+
+                        # l_seth_word_array = [l_tri[1] for l_tri in l_seth_chunks_list]
+
+                        # list of all Sethuila words, together with their outer and inner ids (ref to l_seth_word_array)
+                        l_seth_word_list = []
+                        for l_word_id_outer in range(len(l_seth_chunks_list)):
+                            l_inner_word_list = l_seth_chunks_list[l_word_id_outer][1]
+                            for l_word_id_inner in range(len(l_inner_word_list)):
+                                l_seth_word_list.append((l_word_id_outer, l_word_id_inner, l_inner_word_list[l_word_id_inner]))
+
+                        print(f'---------------------------- {l_verse_k} ----------------------------------\n', l_seth_word_list)
+
+                        # Sethuila word list + candidates. Punctuation removed and internal Sandhi applied
+                        l_seth_word_list_expanded = []
+                        for l_id_outer, l_id_inner, l_word_cmp in l_seth_word_list:
+                            if not l_word_cmp == '॥' and not re.match(r'\d+', l_word_cmp):
+                                l_word_cmp = re.sub(r'[=॥।“”‘’–.,;:?!\-)(\[\]]', '', re.sub(r'(\w)’(\w)', r"\1'\2", l_word_cmp))
+                                for l_word_candidate in list_candidates(internal_sandhi(standardize_iast(l_word_cmp.replace('\'', 'ऽ')))):
+                                    l_seth_word_list_expanded.append((l_id_outer, l_id_inner, l_word_candidate))
+                        for l_item in sorted(l_seth_word_list_expanded, key=lambda t: t[2][0], reverse=True):
+                            print(l_item)
+                        l_seth_word_list_expanded = [(l_id_outer, l_id_inner, l_word_candidate)
+                                                     for l_id_outer, l_id_inner, (_, l_word_candidate) in sorted(l_seth_word_list_expanded, key=lambda t: t[2][0], reverse=True)]
+
+                        # list of id pairs (in l_seth_word_array) that do not need to be processed anymore bc they have been found already
+                        l_forbidden_id_list = []
+                        # try to fit Sethuila words into Anandamakaranda chunks list
+                        for l_pc_i, (l_id_outer, l_id_inner, l_candidate) in enumerate(l_seth_word_list_expanded):
+                            if f'{l_id_outer}-{l_id_inner}' in l_forbidden_id_list or len(l_candidate) <= 5:
+                                continue
+
+                            print(f'1P: {l_candidate}', l_id_outer, l_id_inner, l_amak_chunk_list)
+                            print(f'1P {(float(l_pc_i) * 100)/len(l_seth_word_list_expanded):.1f}', end='\r', file=sys.stderr)
+                            for l_amak_id, l_amak_chunk in [(i, s) for i, s in enumerate(l_amak_chunk_list) if len(s) > 0 and len(s) + 2 >= len(l_candidate)]:
+                                # print(f'    trying {l_candidate} in {l_amak_chunk}')
+                                if l_candidate in l_amak_chunk:
+                                    # un-sandhied matching
+                                    # replace only the first encountered match bc the following ones will correspond to other words (candidtates)
+                                    l_amak_chunk_list[l_amak_id] = re.sub('^⌿', '', re.sub('⌿$', '', re.sub(l_candidate, '', l_amak_chunk, count=1)))
+                                    print(f'    Candidate    [{l_candidate}] found in {l_amak_chunk}', l_amak_chunk_list[l_amak_id], l_amak_chunk_list)
+                                    l_forbidden_id_list.append(f'{l_id_outer}-{l_id_inner}')
+                                    l_seth_word_array_2[l_id_outer][l_id_inner] = \
+                                        f'<span style="color: green;">{l_seth_word_array_2[l_id_outer][l_id_inner]}</span>'
+                                    l_seth_word_array_2_sk[l_id_outer][l_id_inner] = \
+                                        f'<span style="color: green;">{l_seth_word_array_2_sk[l_id_outer][l_id_inner]}</span>'
+                                    break
+                                else:
+                                    l_amak_sandhied_chunk = external_sandhi(l_amak_chunk)
+                                    # print(f'    trying {l_candidate} in {l_amak_sandhied_chunk}')
+                                    # l_match = re.search(l_candidate, l_amak_sandhied_chunk)
+                                    if l_candidate in l_amak_sandhied_chunk:
+                                        # sandhied matching
+                                        print(f'    Candidate    [{l_candidate}] found in (Sandhied): {l_amak_sandhied_chunk}', l_amak_chunk_list)
+                                        l_forbidden_id_list.append(f'{l_id_outer}-{l_id_inner}')
+                                        l_seth_word_array_2[l_id_outer][l_id_inner] = \
+                                            f'<span style="color: green;">{l_seth_word_array_2[l_id_outer][l_id_inner]}</span>'
+                                        l_seth_word_array_2_sk[l_id_outer][l_id_inner] = \
+                                            f'<span style="color: green;">{l_seth_word_array_2_sk[l_id_outer][l_id_inner]}</span>'
+                                        break
+
+                        # try to fit Sethuila words into Anandamakaranda chunks list, 2nd pass: 1 and 2 letters change
+                        for l_pc_i, (l_id_outer, l_id_inner, l_candidate) in enumerate(l_seth_word_list_expanded):
+                            if f'{l_id_outer}-{l_id_inner}' in l_forbidden_id_list or len(l_candidate) <= 5:
+                                continue
+
+                            print(f'2P: {l_candidate}', l_id_outer, l_id_inner, l_amak_chunk_list)
+                            print(f'2P {(float(l_pc_i) * 100)/len(l_seth_word_list_expanded):.1f}', end='\r', file=sys.stderr)
+                            l_is_breaking = False
+                            for l_amak_id, l_amak_chunk in [(i, s) for i, s in enumerate(l_amak_chunk_list) if len(s) > 0 and len(s) + 2 >= len(l_candidate)]:
+                                if l_is_breaking:
+                                    break
+
+                                # 1 letter change
+                                l_re_base = l_candidate
+                                print(f'    trying {l_candidate} in ONE {l_amak_chunk}')
+                                for l_i_change in range(len(l_candidate)):
+                                    if l_is_breaking:
+                                        break
+
+                                    for  z, l_re_1 in [('e', l_re_base[0:l_i_change] + '.' + l_re_base[l_i_change:]),       # expansion
+                                                       ('i', l_re_base[0:l_i_change] + '.' + l_re_base[l_i_change + 1:]),   # iso
+                                                       ('c', l_re_base[0:l_i_change] + '-' + l_re_base[l_i_change + 1:])]:  # contraction
+
+                                        # kenacidapauruṣeyamityuktamuktavākyasamam
+                                        # if l_word_cmp == 'īśvarānityatvasyāprastutatvād':
+                                        #      print(l_w_mod_1)
+
+                                        l_re_x = (l_re_1
+                                                        .replace('(', r'\(')
+                                                        .replace(')', r'\)')
+                                                        .replace('-', r''))
+                                        try: # l_amak_chunk
+                                            # l_match = re.search(l_w_mod_x, l_amak_sandhied_chunk)
+
+                                            l_match = re.search(l_re_x, l_amak_chunk)
+                                            # print(f'    trying {l_re_x} in {l_amak_chunk}')
+                                            if l_match is not None:
+                                                l_is_breaking = True
+                                                l_amak_chunk_list[l_amak_id] = re.sub('^⌿', '', re.sub('⌿$', '', re.sub(l_re_x, '', l_amak_chunk)))
+                                                print(f'    Hillbilly 1: [{l_candidate}] {l_re_1} found in: {l_amak_chunk}', l_amak_chunk_list[l_amak_id], l_amak_chunk_list)
+                                            else:
+                                                l_match = re.search(l_re_x, l_amak_sandhied_chunk)
+                                                # print(f'    trying {l_re_x} in {l_amak_sandhied_chunk}')
+                                                if l_match is not None:
+                                                    l_is_breaking = True
+                                                    print(f'    Hillbilly 1: [{l_candidate}] {l_re_1} found in (Sandhied): {l_amak_sandhied_chunk}')
+
+                                            if l_is_breaking:
+                                                print(f'    NS {l_amak_chunk}')
+                                                print(f'    S  {l_amak_sandhied_chunk}')
+
+                                                l_w_mod_display = l_re_1.replace('.', '-')
+                                                l_common_len = len(l_w_mod_display.replace('-', ''))
+                                                l_blocks_display = '{' + f'{z} ' + l_w_mod_display + '}'
+                                                l_blocks_display_sk = '{' + f'{z} ' + devtrans.iast2dev(l_w_mod_display) + '}'
+
+                                                l_forbidden_id_list.append(f'{l_id_outer}-{l_id_inner}')
+                                                l_seth_word_array_2[l_id_outer][l_id_inner] = \
+                                                    f'<span style="color: DarkGreen;"><b>{l_seth_word_array_2[l_id_outer][l_id_inner]}</b></span> ONE {l_blocks_display}'
+                                                l_seth_word_array_2_sk[l_id_outer][l_id_inner] = \
+                                                    f'<span style="color: DarkGreen;"><b>{l_seth_word_array_2_sk[l_id_outer][l_id_inner]}</b></span> ONE {l_blocks_display_sk}'
+                                                break
+                                        except re.error as e:
+                                            print(e, l_re_1, file=sys.stderr)
+                                            sys.exit(0)
+
+                                # 2 letters change
+                                if not l_is_breaking:
+                                    print(f'    trying {l_candidate} in TWO {l_amak_chunk}')
+                                    for l_i_change in range(1, len(l_candidate)):
+                                        if l_is_breaking: break
+                                        for l_j_change in range(0, l_i_change):
+                                            if l_is_breaking: break
+
+                                            # if l_candidate == 'natveveti': print(f'    {l_i_change} {l_j_change}')
+                                            for z, l_re_1 in [('ee', l_re_base[0:l_j_change] + '.' + l_re_base[l_j_change    :l_i_change] + '.' + l_re_base[l_i_change:]),      # expansion
+                                                              ('ei', l_re_base[0:l_j_change] + '.' + l_re_base[l_j_change    :l_i_change] + '.' + l_re_base[l_i_change + 1:]),  # exp + iso
+                                                              ('ie', l_re_base[0:l_j_change] + '.' + l_re_base[l_j_change + 1:l_i_change] + '.' + l_re_base[l_i_change:]),      # iso + exp
+                                                              ('ec', l_re_base[0:l_j_change] + '.' + l_re_base[l_j_change    :l_i_change] + '-' + l_re_base[l_i_change + 1:]),  # exp + contraction
+                                                              ('ce', l_re_base[0:l_j_change] + '-' + l_re_base[l_j_change + 1:l_i_change] + '.' + l_re_base[l_i_change:]),      # contraction + exp
+                                                              ('ii', l_re_base[0:l_j_change] + '.' + l_re_base[l_j_change + 1:l_i_change] + '.' + l_re_base[l_i_change + 1:]),  # full iso
+                                                              ('ci', l_re_base[0:l_j_change] + '-' + l_re_base[l_j_change + 1:l_i_change] + '.' + l_re_base[l_i_change + 1:]),  # contraction + iso
+                                                              ('ic', l_re_base[0:l_j_change] + '.' + l_re_base[l_j_change + 1:l_i_change] + '-' + l_re_base[l_i_change + 1:]),  # iso + contraction
+                                                              ('cc', l_re_base[0:l_j_change] + '-' + l_re_base[l_j_change + 1:l_i_change] + '-' + l_re_base[l_i_change + 1:])   # full contraction
+                                                              ]:
+                                                l_re_x = (l_re_1
+                                                          .replace('(', r'\(')
+                                                          .replace(')', r'\)')
+                                                          .replace('-', r''))
+                                                try:  # l_amak_chunk
+                                                    # l_match = re.search(l_w_mod_x, l_amak_sandhied_chunk)
+                                                    l_match = re.search(l_re_x, l_amak_chunk)
+                                                    # print(f'    trying {l_re_x} in {l_amak_chunk}')
+                                                    # if l_candidate == 'natveveti': print(f'    {z} Trying {l_re_x} ({l_re_1}) in {l_amak_chunk}')
+                                                    if l_match is not None:
+                                                        l_is_breaking = True
+                                                        l_amak_chunk_list[l_amak_id] = re.sub('^⌿', '',
+                                                                                              re.sub('⌿$', '',
+                                                                                                     re.sub(l_re_x, '', l_amak_chunk)))
+                                                        print(f'Hillbilly 2: [{l_candidate}] {l_re_1} found in: {l_amak_chunk}', l_amak_chunk_list[l_amak_id], l_amak_chunk_list)
+                                                    else:
+                                                        l_match = re.search(l_re_x, l_amak_sandhied_chunk)
+                                                        # print(f'    trying {l_re_x} in {l_amak_sandhied_chunk}')
+                                                        # if l_candidate == 'natveveti': print(f'    {z} Trying {l_re_x} ({l_re_1}) in {l_amak_sandhied_chunk}')
+                                                        if l_match is not None:
+                                                            l_is_breaking = True
+                                                            print(f'Hillbilly 2: [{l_candidate}] {l_re_1} found in (Sandhied): {l_amak_sandhied_chunk}')
+
+                                                    if l_is_breaking:
+                                                        print(f'    NS {l_amak_chunk}')
+                                                        print(f'    S  {l_amak_sandhied_chunk}')
+
+                                                        l_w_mod_display = l_re_1.replace('.', '-')
+                                                        l_common_len = len(l_w_mod_display.replace('-', ''))
+                                                        l_blocks_display = '{' + f'{z} ' + l_w_mod_display + '}'
+                                                        l_blocks_display_sk = '{' + f'{z} ' + devtrans.iast2dev(l_w_mod_display) + '}'
+
+                                                        l_forbidden_id_list.append(f'{l_id_outer}-{l_id_inner}')
+                                                        l_seth_word_array_2[l_id_outer][l_id_inner] = \
+                                                            f'<span style="color: Maroon;"><b>{l_seth_word_array_2[l_id_outer][l_id_inner]}</b></span> TWO {l_blocks_display}'
+                                                        l_seth_word_array_2_sk[l_id_outer][l_id_inner] = \
+                                                            f'<span style="color: Maroon;"><b>{l_seth_word_array_2_sk[l_id_outer][l_id_inner]}</b></span> TWO {l_blocks_display_sk}'
+                                                        break
+                                                except re.error as e:
+                                                    print(e, l_re_1, file=sys.stderr)
+                                                    sys.exit(0)
+                        # new display list with fitted words from Sethuila
+                        l_v_display_list_2 = [(t,
+                                               ' '.join(l_seth_word_array_2[l_outer_id]),
+                                               f'<b>{" ".join([format_ref(l_ref) for l_ref in n if l_ref is not None])}</b>')
+                                              for l_outer_id, (t, _, n) in enumerate(l_v_display_list)]
+
+                        l_v_display_list_2_sk = [(t,
+                                               ' '.join(l_seth_word_array_2_sk[l_outer_id]),
+                                               f'<b>{" ".join([format_ref(l_ref) for l_ref in n if l_ref is not None])}</b>')
+                                              for l_outer_id, (t, _, n) in enumerate(l_v_display_list)]
+
+                    def format_ref(p_ref):
+                        return f'[{p_ref.replace("#note-pathantara-", "")}]'
+
+                    # l_v_display = ' '.join([f'{t}: {l_text} {l_n}' for t, l_text, l_n in l_v_display_list])
+                    l_v_display = ' '.join([f'{t}: {l_text} {l_n}' for t, l_text, l_n in l_v_display_list_2])
+                    l_v_display_sk = ' '.join([f'{l_text} {l_n}' for t, l_text, l_n in l_v_display_list_2_sk])
+                    l_v_display_2 = ''
+                    if l_underscore_k in g_sethuila_sarvamula_note.keys():
+                        l_note = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{format_ref(l_ref)}: {devtrans.dev2iast(l_note_text)}" for l_ref, l_note_text in g_sethuila_sarvamula_note[l_underscore_k]])}'
+                        l_note_sk = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{format_ref(l_ref)}: {l_note_text}" for l_ref, l_note_text in g_sethuila_sarvamula_note[l_underscore_k]])}'
+
+                l_new_seth = f'<br/><b>{l_source_key} New</b> {l_v_display_2}' if len(l_v_display_2) > 0 else ''
+                l_fout.write(f'{l_empty_cell}<td><b>{l_source_key}</b> {l_v_display}{l_note}{l_extra_text}{l_new_seth}</td>\n')
+                l_fout_sk.write(f'{l_empty_cell}<td><b>{l_source_key}</b> {l_v_display_sk}{l_note_sk}</td>\n')
             l_fout.write('</tr>\n')
         l_fout.write("""</table>
         </body>
             </html>
         """)
 
-    # for k in g_tei_changes.keys():
-    #     l_original = g_gita_tei_file_bc[k]
-    #     print(f'{k:5}', l_original)
-    #     for l_v1, l_v2 in g_tei_changes[k]:
+    # for l_verse_k in g_tei_changes.keys():
+    #     l_original = g_gita_tei_file_bc[l_verse_k]
+    #     print(f'{l_verse_k:5}', l_original)
+    #     for l_v1, l_v2 in g_tei_changes[l_verse_k]:
     #         l_original = l_original.replace(l_v1, l_v2)
     #         print(f'      {l_original} ({l_v1} --> {l_v2}')
 

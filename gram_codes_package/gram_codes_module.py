@@ -168,7 +168,7 @@ g_attr_values = [
         ('Bantu21', 'NCB21', 'singular, augmentatives, derogatives'),
         ('Bantu22', 'NCB22', 'plural, augmentatives'),
         ('Bantu23', 'NCB23', 'location with place names'),
-        ('Wol1', 'NCWL1', 'Wolof noun class 1/k (singular human)'),
+        ('Wol1', 'NCWL1', 'Wolof noun class 1/l_verse_k (singular human)'),
         ('Wol2', 'NCWL2', 'Wolof noun class 2/ñ (plural human)'),
         ('Wol3', 'NCWL3', 'Wolof noun class 3/g (singular)'),
         ('Wol4', 'NCWL4', 'Wolof noun class 4/j (singular)'),

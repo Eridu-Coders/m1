@@ -353,10 +353,10 @@ def list_candidates(p_k):
                         re.sub(r'(.)t( |$)', r'\1l\2', p_k),
                         re.sub(r'(.)ṭ( |$)', r'\1ṇ\2', p_k),
                         re.sub(r'(.)d( |$)', r'\1c\2', p_k),
-                        re.sub(r'(.)k( |$)', r'\1g\2', p_k),
-                        re.sub(r'(.)k( |$)', r'\1ṃ\2', p_k),
+                        re.sub(r'(.)l_verse_k( |$)', r'\1g\2', p_k),
+                        re.sub(r'(.)l_verse_k( |$)', r'\1ṃ\2', p_k),
 
-                        # ktiḥ ktim antr ṃ kalp aranś k tribhiḥ trividham saṃnyāsam
+                        # ktiḥ ktim antr ṃ kalp aranś l_verse_k tribhiḥ trividham saṃnyāsam
                         re.sub(r'(.)ktiḥ( |$)', r'\1kitar\2', p_k),
                         re.sub(r'(.)ktim( |$)', r'\1kitam\2', p_k),
                         re.sub(r'(.)antr(.)', r'\1aṃtr\2', p_k),
@@ -927,8 +927,8 @@ if __name__ == '__main__':
 
                 l_source = "Kaggle/Bhagavad Gita API Database"
                 for k in l_json_local:
-                    # l_txt = re.sub(r'\s+', ' ', str(l_json_local[k]))
-                    # print(f'[{k:10}] {l_txt}')
+                    # l_txt = re.sub(r'\s+', ' ', str(l_json_local[l_verse_k]))
+                    # print(f'[{l_verse_k:10}] {l_txt}')
                     if type(l_json_local[k]) is dict and 'author' in l_json_local[k]:
                         d = l_json_local[k]
                         l_author_local = author_normalize(universal_cleanup(d['author']))
@@ -1373,7 +1373,7 @@ if __name__ == '__main__':
                                         if len(l_tlc) < l_max_repeats: del l_wfw_dict[c]
                                         print(f'FOUND INCLUSION: {a} {b} {c} --> {l_longest} {l_wfw_dict[l_longest]}')
 
-                                        # l_key_list = [l_key_list[n] for n in range(len(l_key_list)) if n not in [0, i+1, j+1, k+1]]
+                                        # l_key_list = [l_key_list[n] for n in range(len(l_key_list)) if n not in [0, i+1, j+1, l_verse_k+1]]
                                         l_key_list = [l_key_list[n] for n in range(len(l_key_list)) if n not in [i+1, j+1, k+1]]
                                         print(f'    l_key_list: {l_key_list}')
                                         l_breakup_dict[l_longest] = [
@@ -1524,8 +1524,8 @@ if __name__ == '__main__':
             l_iast_sk = l_iast_sk.replace(' ', '')
             print('l_iast_sk (no_space):', l_iast_sk)
 
-            # for k in l_key_list:
-            #       l_km = simplify_iast(k)
+            # for l_verse_k in l_key_list:
+            #       l_km = simplify_iast(l_verse_k)
             #       l_sk_to_test = simplify_iast(l_iast_sk)
             #       print(f'{l_km:30} {l_sk_to_test} {"*" if l_km in l_sk_to_test else ""}')
 
@@ -1637,7 +1637,7 @@ if __name__ == '__main__':
             for k, _ in l_place_list:
                 l_breakup = l_breakup_dict.setdefault(k, None)
                 l_tl, l_ts = l_wfw_dict[k]
-                # print(f'{k:30} {"|".join(list(l_ts))}{f"{l_breakup}" if l_breakup else ""}')
+                # print(f'{l_verse_k:30} {"|".join(list(l_ts))}{f"{l_breakup}" if l_breakup else ""}')
 
                 if l_breakup is None:
                     l_wfw_inria_list = inria_sloka_words(l_chap_number, l_verse_number, devtrans.iast2dev(k), p_is_fragment=True)

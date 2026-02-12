@@ -656,7 +656,7 @@ def process_cursor_list_en(p_cursor_list, p_txt_key, p_phase_ii=True):
         print('l_txt_with_notes, count of {{:', len(re.findall(r'\{\{', l_txt_with_notes)))
         l_txt_no_notes += l_section_txt_no_notes
         g_raw_text_without_notes_or_markup += l_section_txt_no_notes
-    # end for l_id, l_book, l_section, l_en in p_cursor_list:
+    # end for l_amak_id, l_book, l_section, l_en in p_cursor_list:
 
     # eliminate final space
     l_txt_with_notes = l_txt_with_notes.strip()
@@ -1839,7 +1839,7 @@ def process_cursor_list_gr(p_cursor_list):
             # dependencies in sentence tree
             l_dep = '-'.join([(w.deps if w.deps else '') for w in t.words])
             l_xpos = '-'.join([w.xpos for w in t.words])
-            # series of k=v groups separated by |
+            # series of l_verse_k=v groups separated by |
             l_grammar = '-'.join([w.feats if w.feats else '' for w in t.words])
             # father in sentence tree
             l_father = '-'.join([l_sent_words[w.head].text for w in t.words])
