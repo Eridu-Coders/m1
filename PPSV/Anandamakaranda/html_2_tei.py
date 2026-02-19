@@ -244,13 +244,24 @@ def sethuila(p_file):
                         # print(l_existing_dict, g_parallel[l_verse_id])
                         # g_parallel[l_verse_id] = l_existing_dict
                     elif l_div_inner.attrib['class'] == 'Sarvamula':
-                        def sarvamula_process(s): # ॥\s*([- \d]*\d)\s*॥
+                        def sarvamula_process(s): # =॥।“”‘’–.,;:?!\'\-)(\[\] eva
+                            l_seperator = '-,;:?!\s'
+                            l_hard_boundary_left = '(?:^|[=॥।“”‘’–.,;:?!\'\-)(\[\]\s])'
+                            l_hard_boundary_right = '(?:[=॥।“”‘’–.,;:?!\'\-)(\[\]\s]|$)'
                             s = re.sub(r'(\S)\s*\.\.\s*([- \d]*\d)\s*\.\.', r'\1 ॥ \2 ॥', s)
                             s = re.sub(r'(\S)\s*\.\.', r'\1 ॥', s)
-                            s = re.sub(r'na\W+([^0-9\W_])', lambda m: external_sandhi(f'na⌿{m.group(1)}'), s)
-                            s = re.sub(r'([^0-9\W_])\W+ca', lambda m: external_sandhi(f'{m.group(1)}⌿ca'), s)
-                            s = re.sub(r'([^0-9\W_])\W+([^0-9\W_]{2,3})', lambda m: external_sandhi(f'{m.group(1)}⌿{m.group(2)}'), s)
-                            s = re.sub(r'([^0-9\W_]{2,3})\W+([^0-9\W_])', lambda m: external_sandhi(f'{m.group(1)}⌿{m.group(2)}'), s)
+                            s = re.sub(r'(\S)\s*\.', r'\1 ।', s)
+                            # na + xxx
+                            s = re.sub(fr'({l_hard_boundary_left})na[{l_seperator}]+([^0-9\W_]+)', lambda m: external_sandhi(f'{m.group(1)}na⌿{m.group(2)}'), s, flags=re.UNICODE)
+                            # xxx + ca
+                            s = re.sub(fr'([^0-9\W_]+)[{l_seperator}]ca({l_hard_boundary_right})', lambda m: external_sandhi(f'{m.group(1)}⌿ca{m.group(2)}'), s, flags=re.UNICODE)
+                            # xxx + eva
+                            s = re.sub(fr'([^0-9\W_]+)[{l_seperator}]eva({l_hard_boundary_right})', lambda m: external_sandhi(f'{m.group(1)}⌿eva{m.group(2)}'), s, flags=re.UNICODE)
+                            # two 2-3 char long words
+                            s = re.sub(fr'({l_hard_boundary_left}[^0-9\W_]{{2,3}})[{l_seperator}]+([^0-9\W_]{{2,3}}{l_hard_boundary_right})', lambda m: external_sandhi(f'{m.group(1)}⌿{m.group(2)}'), s, flags=re.UNICODE)
+                            # other small words (3 char max)
+                            s = re.sub(fr'([^0-9\W_]+)[{l_seperator}]+([^0-9\W_]{{2,3}}{l_hard_boundary_right})', lambda m: external_sandhi(f'{m.group(1)}⌿{m.group(2)}'), s, flags=re.UNICODE)
+                            s = re.sub(fr'({l_hard_boundary_left}[^0-9\W_]{{2,3}})[{l_seperator}]+([^0-9\W_]+)', lambda m: external_sandhi(f'{m.group(1)}⌿{m.group(2)}'), s, flags=re.UNICODE)
                             return s
 
                         print()
@@ -407,13 +418,15 @@ def remove_invisibles(s):
     return re.sub(r'[\u2060\u3164\u2800\u00A0]+', ' ', re.sub(r'[\u200b\u200c\u200d]+', '', s))
 
 def standardize_iast(s): # ātmalm̐labhante
-    return remove_invisibles(s.replace('ṁ', 'ṃ')
-             .replace('ṅ', 'ṃ')
-             .replace('lm̐l', 'ṃl')
-             .replace(':', 'ḥ')
-             .replace('o़\'', 'o\'')
-             .replace('ṛ़', 'ṝ') # to apply to original text/files ़
-    )
+    return re.sub(r'([aāiīuūoe]):([-,;:?!\s])', r'\1ḥ\2',
+                  remove_invisibles(
+                      s.replace('ṁ', 'ṃ')
+                       .replace('ṅ', 'ṃ')
+                       .replace('lm̐l', 'ṃl')
+                       # .replace(':', 'ḥ')
+                       .replace('o़\'', 'o\'')
+                       .replace('ṛ़', 'ṝ') # to apply to original text/files ़
+    ))
 
 def internal_sandhi(s): # ⌿
     return (
@@ -440,7 +453,16 @@ def external_sandhi(s, p_insert_invisible=False): # taddhi agnyāderapi
         re.sub(r'ḥ⌿([aāiīuūoe])', rf'r{l_invisible_space}\1',
         re.sub(r'e⌿([aāiīuūo])', rf'ay{l_invisible_space}\1',
         re.sub(r'(.)t⌿([bdgaāiīuūoey])', rf'\1d{l_invisible_space}\2',
-               s))))))))) # t⌿ś
+               s,
+               flags=re.UNICODE),
+               flags=re.UNICODE),
+               flags=re.UNICODE),
+               flags=re.UNICODE),
+               flags=re.UNICODE),
+               flags=re.UNICODE),
+               flags=re.UNICODE),
+               flags=re.UNICODE),
+               flags=re.UNICODE)
         .replace('ḥ⌿s', 'ss')
         .replace('t⌿ś', 'cch')
         .replace('ḥ⌿t', 'st')
@@ -680,24 +702,28 @@ g_html_header = """<html>
     <tr><th>Sloka</th><th>Anandamakaranda</th><th>Sethuila</th></tr>
 """
 
-def process_anandamak(p_amak_raw_list):
+def process_anandamak(p_amak_raw_list, p_underscore_k):
     """
 
     :param p_amak_raw_list: list of triplets (l_underscore_k, l_intro_text, l_full_bhashya_text)
+    :param p_underscore_k
     :return:
     """
+    if p_underscore_k == '3_16':
+        print(f'process_anandamak() {p_amak_raw_list}')
+
     def process_for_display(s):
         r = s
         # r = re.sub(r'\([^\d(]*\d+[^)]*\)', r' ', r) # (ṛ.10.72.2) (bhāga.1.2.31) (bṛ.u.6.3.7)
-        r = re.sub(r'(\s*\.\s*\d+)+\.?', lambda m: m.group(1).replace(' ', ''), r) # cleanup of sequences of dots and numbers
-        r = re.sub(r'\(\s+(\S)', r'(\1', r)               # space after (
-        r = re.sub(r'(\S)\s+\)', r'\1)', r)               # space before )
-        r = re.sub(r'(\S)\s*॥\s*([- \d]*\d)\s*॥', r'\1&#xA0;॥&#xA0;\2&#xA0;॥', r)
-        r = re.sub(r'(\S)\s*।', r'\1&#xA0;।', r)
-        r = re.sub(r'(\w)[’\'](\w)', r"\1ऽ\2", r)         # Avagraha (single one)
-        r = re.sub(r'(\w)(?:’’|\'\')(\w)', r"\1ऽऽ\2", r)  # Avagraha (2 of them) “ ”
+        r = re.sub(r'(\s*\.\s*\d+)+\.?', lambda m: m.group(1).replace(' ', ''), r, flags=re.UNICODE) # cleanup of sequences of dots and numbers
+        r = re.sub(r'\(\s+(\S)', r'(\1', r, flags=re.UNICODE)               # space after (
+        r = re.sub(r'(\S)\s+\)', r'\1)', r, flags=re.UNICODE)               # space before )
+        r = re.sub(r'(\S)\s*॥\s*([- \d]*\d)\s*॥', r'\1&nbsp;॥&nbsp;\2&nbsp;॥', r, flags=re.UNICODE)
+        r = re.sub(r'(\S)\s*।', r'\1&#xA0;।', r, flags=re.UNICODE)
+        r = re.sub(r'(\w)[’\'](\w)', r"\1ऽ\2", r, flags=re.UNICODE)         # Avagraha (single one)
+        r = re.sub(r'(\w)(?:’’|\'\')(\w)', r"\1ऽऽ\2", r, flags=re.UNICODE)  # Avagraha (2 of them) “ ”
 
-        return r
+        return standardize_iast(r)
 
     l_amak_text_x_list = []
     l_amak_text_display_list = []
@@ -709,28 +735,29 @@ def process_anandamak(p_amak_raw_list):
                                   re.sub(r'\(\s+(\S)', r'(\1',                  # space after (
                                   re.sub(r'(\S)\s+\)', r'\1)',                  # space before )
                                   re.sub(r'<[^>]+>', r'',                       # HTML tag removal
-                                  re.sub(r'॥\s*[- \d]+\s*॥', r'',                # remove final verse references
+                                  re.sub(r'॥\s*[- \d]+\s*॥', r'',               # remove final verse references
                                   re.sub(r'(\w)[’\'](\w)', r"\1ऽ\2",            # Avagraha (single one)
                                   re.sub(r'(\w)(?:’’|\'\')(\w)', r"\1ऽऽ\2",     # Avagraha (2 of them)
-                                 f'{l_intro_text_h} {l_full_bhashya_text_h}'))))))))))
-
-        l_intro_text_h = re.sub(r'\([^\d(]*\d+[^)]*\)', r' ',       # (ṛ.10.72.2) (bhāga.1.2.31) (bṛ.u.6.3.7)
-                         re.sub(r'(\s*\.\s*\d+)+\.?', lambda m: m.group(1).replace(' ', ''),  # cleanup of sequences of dots and numbers
-                         re.sub(r'\(\s+(\S)', r'(\1',               # space after (
-                         re.sub(r'(\S)\s+\)', r'\1)',               # space before )
-                         re.sub(r'(\w)[’\'](\w)', r"\1ऽ\2",         # Avagraha (single one)
-                         re.sub(r'(\w)(?:’’|\'\')(\w)', r"\1ऽऽ\2",  # Avagraha (2 of them)
-                                              l_intro_text_h))))))
+                                 f'{standardize_iast(l_intro_text_h)} {standardize_iast(l_full_bhashya_text_h)}',
+                                         flags=re.UNICODE),
+                                         flags=re.UNICODE),
+                                         flags=re.UNICODE),
+                                         flags=re.UNICODE),
+                                         flags=re.UNICODE),
+                                         flags=re.UNICODE),
+                                         flags=re.UNICODE),
+                                         flags=re.UNICODE),
+                                         flags=re.UNICODE))
 
         l_amak_text_display_list.append(f'{process_for_display(l_intro_text_h)}<br/>[{l_underscore_k_h.replace("_", ".")}] {process_for_display(l_full_bhashya_text_h)}')
-        l_amak_text_display_list_sk.append(f'{process_for_display(l_intro_text_h)}<br/>{l_full_bhashya_text_h} ॥{l_underscore_k_h.replace("_", ".")}॥')
+        l_amak_text_display_list_sk.append(f'{process_for_display(l_intro_text_h)}<br/>{l_full_bhashya_text_h}&nbsp;॥&nbsp;{l_underscore_k_h.replace("_", ".")}&nbsp;॥')
 
         # chunk (⌅) and word (⌿) separators ('⌬' = end)
     l_amak_text_x_1 = re.sub(r'[=॥।–.)(\[\]]', '⌅', ' '.join(l_amak_text_x_list) + '⌬')
     l_amak_text_x_2 = re.sub(r'\s+', '⌿', l_amak_text_x_1)
     l_amak_text_x_3 = re.sub(r'⌿*(?:⌿*⌅)+⌿*', '⌅', l_amak_text_x_2)
     l_amak_text_x_4 = re.sub(r'^⌿|⌅⌬|⌿⌬', '', l_amak_text_x_3)
-    l_amak_chunk_list_r = [remove_avagraha(standardize_iast(s).replace('⌬', '')) for s in l_amak_text_x_4.split('⌅')]
+    l_amak_chunk_list_r = [remove_avagraha(s.replace('⌬', '')) for s in l_amak_text_x_4.split('⌅')]
 
     l_amak_text_display = '\n'.join(l_amak_text_display_list)
     l_v_display = standardize_iast(l_amak_text_display)
@@ -776,7 +803,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
             l_word_cmp = re.sub(r'[=॥।“”‘’–.,;:?!\'\-)(\[\]]', '',  # remove punctuation
                          re.sub(r'(\w)[’\'](\w)', r"\1ऽ\2",         # single avagraha
                          re.sub(r'(\w)(?:’’|\'\')(\w)', r"\1ऽऽ\2",  # double avagraha
-                                l_word_cmp)))
+                                l_word_cmp, flags=re.UNICODE), flags=re.UNICODE), flags=re.UNICODE)
             for l_word_candidate in list_candidates(internal_sandhi(standardize_iast(remove_avagraha(l_word_cmp)))):
                 l_seth_word_list_expanded.append((l_id_outer, l_id_inner, l_word_candidate))
 
@@ -846,17 +873,22 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
 
                 l_amak_sandhied_chunk = external_sandhi(l_amak_chunk)
                 l_strings_to_match = []
-                for l_stm_block in [l_amak_chunk, remove_avagraha(l_amak_chunk), l_amak_sandhied_chunk, remove_avagraha(l_amak_sandhied_chunk)]:
+                l_strings_base = [l_amak_chunk, remove_avagraha(l_amak_chunk)]
+                for l_stm_block in l_strings_base:
                     l_strings_to_match += [s for s in re.split('⌿+', l_stm_block)]
+                l_strings_to_match += l_strings_base + [l_amak_sandhied_chunk, remove_avagraha(l_amak_sandhied_chunk)]
+
                 for l_string_to_match in l_strings_to_match:
-                    if l_candidate == 'bahutarasneha': print('   ', l_critical, l_string_to_match)
+                    if l_candidate == 'bhavati': print('   ', l_critical, l_candidate, l_string_to_match)
 
                     l_sm = difflib.SequenceMatcher(None, l_candidate, l_string_to_match)
                     l_frag_list = []
                     l_begin_b = 0
                     l_begin_a = 0
-                    l_diff_count = 0
+                    l_diff_count_all = 0
+                    l_diff_count_a = 0
                     l_match_count = 0
+                    l_frag_count = 0
 
                     l_start_found_in_b = -1
                     for a, b, s in l_sm.get_matching_blocks():
@@ -869,9 +901,10 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
                         if len(l_frag_dif_a + l_frag_dif_b) > 0 and \
                                 not (l_begin_b == 0 and len(l_frag_dif_a) == 0) and \
                                 not (s == 0 and len(l_frag_dif_a) == 0):
-                            l_diff_count += len(l_frag_dif_a) if len(l_frag_dif_a) > len(l_frag_dif_b) else len(l_frag_dif_b)
-                            if l_candidate == 'bahutarasneha':
-                                l_frag_list.append(f'[{len(l_frag_dif_a)}]{l_frag_dif_a}/[{len(l_frag_dif_b)}]{l_frag_dif_b}<{l_diff_count}>')
+                            l_diff_count_all += len(l_frag_dif_a) if len(l_frag_dif_a) > len(l_frag_dif_b) or s == 0 else len(l_frag_dif_b)
+                            l_diff_count_a += len(l_frag_dif_a)
+                            if l_candidate == 'bhavati':
+                                l_frag_list.append(f'[{len(l_frag_dif_a)}]{l_frag_dif_a}/[{len(l_frag_dif_b)}]{l_frag_dif_b}<{l_diff_count_a}/{l_diff_count_all}>')
                             else:
                                 l_frag_list.append(f'{l_frag_dif_a}/{l_frag_dif_b}')
                             # if l_candidate == 'niṣkarmatāṃ': print('       ', f'{l_diff_count}')
@@ -879,26 +912,27 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
                         l_match_count += s
                         if s > 0:
                             l_frag_list.append(f'(<span style="color: CornflowerBlue;">{l_string_to_match[b: b + s]}</span>)')
+                            l_frag_count += 1
 
                         l_begin_b = b + s  # start of next differing fragment in b
                         l_begin_a = a + s  # start of next differing fragment in a
 
-                    l_span = l_diff_count + l_match_count
+                    l_inflation_ratio = float(l_diff_count_all + l_match_count)/l_match_count - 1.0 if l_match_count > 0 else 99.0
                     l_sm_frag_display = '_'.join(l_frag_list)
-                    l_span_gap = abs(l_span - len(l_candidate))
-                    l_match_gap = abs(l_match_count - len(l_candidate))
-                    if l_candidate == 'bahutarasneha': print('       ', f'd: {l_diff_count} m: {l_match_count} sp: {l_span} len: {len(l_candidate)}', l_span_gap, l_match_gap, l_sm_frag_display)
-                    if l_span_gap > 2 * l_critical + 1 or l_match_gap > l_critical + 1 or '⌿' in l_sm_frag_display:
+
+                    if l_candidate == 'bhavati': print('       ', f'd: {l_diff_count_a}/{l_diff_count_all} m: {l_match_count} in: {l_inflation_ratio*100:.2f} % len: {len(l_candidate)}',
+                                                       l_sm_frag_display)
+                    if '⌿' in l_sm_frag_display or l_inflation_ratio > .6:
                         continue
 
-                    if l_diff_count <= l_critical:
+                    if l_diff_count_a <= l_critical:
                         print(f'    Found: {l_sm_frag_display}')
-                        l_color_style = 'DarkGreen;' if l_diff_count <= 1 else 'Maroon;'
+                        l_color_style = 'DarkGreen;' if l_diff_count_a <= 1 else 'Maroon;'
                         l_forbidden_id_list.append(f'{l_id_outer}-{l_id_inner}')
                         # f'[{len(l_candidate)} {l_span_b} [{l_start_found_in_b} {l_begin_b} {l_string_to_match}] {abs(l_span_b - len(l_candidate))}] ' + \
                         l_seth_word_array_2[l_id_outer][l_id_inner] = \
                             f'<span style="font-weight: bold; color: {l_color_style}">{l_seth_word_array_2[l_id_outer][l_id_inner]}</span> ' + \
-                            f'[{l_diff_count} <span style="color: CornflowerBlue;">{l_candidate}</span> {l_sm_frag_display}]'
+                            f'[{l_diff_count_a}/{l_diff_count_all} <span style="color: CornflowerBlue;">{l_candidate}</span> {l_frag_count} {l_inflation_ratio*100:.1f} % {l_sm_frag_display}]'
                         l_seth_word_array_2_sk[l_id_outer][l_id_inner] = \
                             f'<span style="font-weight: bold; color: {l_color_style}">{l_seth_word_array_2_sk[l_id_outer][l_id_inner]}</span>'
                         l_is_breaking = True
@@ -1102,8 +1136,9 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
 
     # Display all remaining words in red
     for l_pc_i, (l_id_outer, l_id_inner, l_candidate, l_is_original) in enumerate(l_seth_word_list_expanded):
-        if f'{l_id_outer}-{l_id_inner}' in l_forbidden_id_list or len(l_candidate) <= 5 or not l_is_original:
+        if f'{l_id_outer}-{l_id_inner}' in l_forbidden_id_list or len(l_candidate) <= 2 or not l_is_original:
             continue
+
         l_seth_word_array_2[l_id_outer][l_id_inner] = \
             f'<span style="font-weight: bold; color: red">{l_seth_word_array_2[l_id_outer][l_id_inner]}</span>'
         l_seth_word_array_2_sk[l_id_outer][l_id_inner] = \
@@ -1132,15 +1167,17 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
         l_amak_frag_table += f'<tr><td class="inner">{l_disp_s}</td><td class="inner">{remove_avagraha(external_sandhi(s, p_insert_invisible=True))}</td></tr>'
     l_amak_frag_table += '</table>'
 
-    # iti kṛ pāṭhaḥ iti go pāṭhaḥ “ityabhidhānam”
+    # iti kṛ pāṭhaḥ iti go pāṭhaḥ “ityabhidhānam” ”,” -
     if l_underscore_k in g_sethuila_sarvamula_note.keys():
         l_notes_sloka_list = [(format_ref(l_ref),
-                               re.sub(r'“([^”]+)”[-,\s]*iti kṛ pāṭhaḥ', r'<span style="color: Coral;">\1</span> (kṛ)',
-                               re.sub(r'“([^”]+)”[-,\s]*iti go pāṭhaḥ', r'<span style="color: DarkOrange;">\1</span> (go)',
+                               devtrans.dev2iast(l_note_text),
+                               re.sub(r'“([^”]+)”[-”,\s]*iti kṛ pāṭhaḥ', r'<span style="color: Coral;">\1</span> (kṛ)',
+                               re.sub(r'“([^”]+)”[-”,\s]*iti go pāṭhaḥ', r'<span style="color: DarkOrange;">\1</span> (go)',
                                #re.sub(r'iti go pāṭhaḥ', '<span style="color: DarkOrange;">iti go pāṭhaḥ</span>',
-                               devtrans.dev2iast(l_note_text))))
+                               devtrans.dev2iast(l_note_text).replace('[-]', '{nothing}'))))
                               for l_ref, l_note_text in g_sethuila_sarvamula_note[l_underscore_k]]
-        l_notes_block = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{l_ref}: {l_note_text}" for l_ref, l_note_text in l_notes_sloka_list])}'
+        l_notes_block = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{l_ref}: {l_note_go_kr}" for l_ref, _, l_note_go_kr in l_notes_sloka_list])}'
+        # l_notes_block = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{l_ref}: {l_note_go_kr} / {l_note_text}" for l_ref, l_note_text, l_note_go_kr in l_notes_sloka_list])}'
         l_notes_block_sk = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{format_ref(l_ref)}: {l_note_text}" for l_ref, l_note_text in g_sethuila_sarvamula_note[l_underscore_k]])}'
     else:
         l_notes_block = ''
@@ -1221,7 +1258,7 @@ if __name__ == '__main__':
                             f'<td class="outer" style="text-align: center; background-color: #ccc;" colspan="2">{l_mula_sk}</td></tr>\n')
 
             if l_amak_found and l_seth_found:
-                l_amak_chunk_list, l_anandamak_cell, l_anandamak_cell_sk = process_anandamak(l_anandamak_prev)
+                l_amak_chunk_list, l_anandamak_cell, l_anandamak_cell_sk = process_anandamak(l_anandamak_prev, l_underscore_k)
                 l_seth_cell, l_seth_cell_sk = process_seth(l_amak_chunk_list, l_seth_prev)
 
                 l_anandamak_prev = []
