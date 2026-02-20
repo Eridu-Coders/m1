@@ -844,11 +844,12 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
             if l_is_breaking:
                 l_color_style = 'green;' if l_is_original else 'green; text-decoration: underline;'
                 l_display_candidate = '' if l_is_original else f' [<span style="color: CornflowerBlue;">{l_candidate}</span>]'
+                l_display_candidate_sk = '' if l_is_original else f' [<span style="color: CornflowerBlue;">{devtrans.iast2dev(l_candidate)}</span>]'
                 l_forbidden_id_list.append(f'{l_id_outer}-{l_id_inner}')
                 l_seth_word_array_2[l_id_outer][l_id_inner] = \
                     f'<span style="color: {l_color_style}">{l_seth_word_array_2[l_id_outer][l_id_inner]}</span>{l_display_candidate}'
                 l_seth_word_array_2_sk[l_id_outer][l_id_inner] = \
-                    f'<span style="color: {l_color_style}">{l_seth_word_array_2_sk[l_id_outer][l_id_inner]}</span>'
+                    f'<span style="color: {l_color_style}">{l_seth_word_array_2_sk[l_id_outer][l_id_inner]}</span>{l_display_candidate_sk}'
                 break
     print(f'{l_underscore_k}     ', ' ' * l_prev_cand_len * 3, end='\r', file=sys.stderr)
 
@@ -883,6 +884,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
 
                     l_sm = difflib.SequenceMatcher(None, l_candidate, l_string_to_match)
                     l_frag_list = []
+                    l_frag_list_sk = []
                     l_begin_b = 0
                     l_begin_a = 0
                     l_diff_count_all = 0
@@ -907,11 +909,13 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
                                 l_frag_list.append(f'[{len(l_frag_dif_a)}]{l_frag_dif_a}/[{len(l_frag_dif_b)}]{l_frag_dif_b}<{l_diff_count_a}/{l_diff_count_all}>')
                             else:
                                 l_frag_list.append(f'{l_frag_dif_a}/{l_frag_dif_b}')
+                            l_frag_list_sk.append(f'{devtrans.iast2dev(l_frag_dif_a)}/{devtrans.iast2dev(l_frag_dif_b)}')
                             # if l_candidate == 'niṣkarmatāṃ': print('       ', f'{l_diff_count}')
 
                         l_match_count += s
                         if s > 0:
                             l_frag_list.append(f'(<span style="color: CornflowerBlue;">{l_string_to_match[b: b + s]}</span>)')
+                            l_frag_list_sk.append(f'(<span style="color: CornflowerBlue;">{devtrans.iast2dev(l_string_to_match[b: b + s])}</span>)')
                             l_frag_count += 1
 
                         l_begin_b = b + s  # start of next differing fragment in b
@@ -919,6 +923,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
 
                     l_inflation_ratio = float(l_diff_count_all + l_match_count)/l_match_count - 1.0 if l_match_count > 0 else 99.0
                     l_sm_frag_display = '_'.join(l_frag_list)
+                    l_sm_frag_display_sk = '_'.join(l_frag_list_sk)
 
                     if l_candidate == 'bhavati': print('       ', f'd: {l_diff_count_a}/{l_diff_count_all} m: {l_match_count} in: {l_inflation_ratio*100:.2f} % len: {len(l_candidate)}',
                                                        l_sm_frag_display)
@@ -934,7 +939,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
                             f'<span style="font-weight: bold; color: {l_color_style}">{l_seth_word_array_2[l_id_outer][l_id_inner]}</span> ' + \
                             f'[{l_diff_count_a}/{l_diff_count_all} <span style="color: CornflowerBlue;">{l_candidate}</span> {l_frag_count} {l_inflation_ratio*100:.1f} % {l_sm_frag_display}]'
                         l_seth_word_array_2_sk[l_id_outer][l_id_inner] = \
-                            f'<span style="font-weight: bold; color: {l_color_style}">{l_seth_word_array_2_sk[l_id_outer][l_id_inner]}</span>'
+                            f'<span style="font-weight: bold; color: {l_color_style}">{l_seth_word_array_2_sk[l_id_outer][l_id_inner]}</span> [{l_sm_frag_display_sk}]'
                         l_is_breaking = True
                         break
     print(f'{l_underscore_k}     ', ' ' * l_prev_cand_len * 3, end='\r', file=sys.stderr)
@@ -1176,9 +1181,16 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
                                #re.sub(r'iti go pāṭhaḥ', '<span style="color: DarkOrange;">iti go pāṭhaḥ</span>',
                                devtrans.dev2iast(l_note_text).replace('[-]', '{nothing}'))))
                               for l_ref, l_note_text in g_sethuila_sarvamula_note[l_underscore_k]]
+        l_notes_sloka_list_sk = [(format_ref(l_ref),
+                                  l_note_text,
+                                  re.sub(r'(^|>)([^<]+)($|<)', lambda m: f'{m.group(1)}{devtrans.iast2dev(m.group(2))}{m.group(3)}',
+                                  re.sub(r'“([^”]+)”[-”,\s]*iti kṛ pāṭhaḥ', lambda m: f'<span style="color: Coral;">{devtrans.iast2dev(m.group(1))}</span> (kṛ)',
+                                  re.sub(r'“([^”]+)”[-”,\s]*iti go pāṭhaḥ', lambda m: f'<span style="color: DarkOrange;">{devtrans.iast2dev(m.group(1))}</span> (go)',
+                                        devtrans.dev2iast(l_note_text).replace('[-]', '{nothing}')))))
+                              for l_ref, l_note_text in g_sethuila_sarvamula_note[l_underscore_k]]
         l_notes_block = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{l_ref}: {l_note_go_kr}" for l_ref, _, l_note_go_kr in l_notes_sloka_list])}'
         # l_notes_block = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{l_ref}: {l_note_go_kr} / {l_note_text}" for l_ref, l_note_text, l_note_go_kr in l_notes_sloka_list])}'
-        l_notes_block_sk = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{format_ref(l_ref)}: {l_note_text}" for l_ref, l_note_text in g_sethuila_sarvamula_note[l_underscore_k]])}'
+        l_notes_block_sk = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{format_ref(l_ref)}: {l_note_go_kr}" for l_ref, _, l_note_go_kr in l_notes_sloka_list_sk])}'
     else:
         l_notes_block = ''
         l_notes_block_sk = ''
