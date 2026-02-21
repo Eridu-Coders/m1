@@ -172,17 +172,18 @@ g_sethuila_mula_note = dict()
 g_sethuila_sarvamula_note = dict()
 
 def sethuila(p_file):
+    """
+    CAVEAT: some divs that should have class="sarvamula" have class="inline". These should be corrected manually from the original HTML from sethuila.in
+
+    :param p_file:
+    :return:
+    """
     global g_sethuila_mula_note
     global g_sethuila_sarvamula_note
     with (open(p_file, 'r') as l_fin):
         l_txt = l_fin.read()
+        print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
         print('Sethuila:', p_file, len(l_txt))
-        # l_txt = l_txt.replace('<br>', '<br/>')
-        #  .replace('&nbsp;', '&#160;')
-        # data-note="प्राणैः= शिरः= इत्यधुनातनीये= आयुष्यसूक्ते।="
-        # l_txt = l_txt.replace('data-note="" प्राणैः="" शिरः"="" इत्यधुनातनीये="" आयुष्यसूक्ते।"=""', 'data-note="प्राणैः= शिरः= इत्यधुनातनीये= आयुष्यसूक्ते।="')
-        # <img draggable="false" role="img" class="emoji" alt="🔗" src="https://s.w.org/images/core/emoji/17.0.2/svg/1f517.svg">
-        # l_txt = re.sub(r'<img([^>]+)>', r'<img\1/>', l_txt)
         try:
             l_tree = ET.fromstring(f'{l_txt}')
         except ET.ParseError as e:
@@ -194,21 +195,21 @@ def sethuila(p_file):
         for l_div_outer in l_tree.findall('div'):
             print(l_div_outer.attrib['class'])
             if l_div_outer.attrib['class'] == 'content':
+                def purge_bhashya_list():
+                    nonlocal l_bhashya_list
+
+                    if len(l_bhashya_list) > 0:
+                        l_exi_dict = g_parallel_bhashya.setdefault(l_verse_id, dict())
+                        l_exi_dict['Sethuila'] = l_bhashya_list
+                    l_bhashya_list = []
+
                 for l_div_inner in l_div_outer.findall('div'):
                     print('    <div>', l_div_inner.attrib['class'], end=' ')
                     if l_div_inner.attrib['class'] == 'Mula':
-                        if len(l_bhashya_list) > 0:
-                            l_existing_dict = g_parallel_bhashya.setdefault(l_verse_id, dict())
-                            # l_bhashya_text_list = [(t, re.sub(r'(\S)\s*\.\.\s*(\d+)\s*\.\.', r'\1 ॥ \2 ॥', l_text), n) for t, l_text, n in l_bhashya_list]
-                            # l_existing_dict['Sethuila'] = l_bhashya_text_list
-                            l_existing_dict['Sethuila'] = l_bhashya_list
-                        l_bhashya_list = []
+                        # record bhashya of previous verse in g_parallel_bhashya
+                        purge_bhashya_list()
 
-                        # for l_it in l_div_inner.iter():
-                        #     print(f'<{l_it.tag}>', l_it.text, end='')
                         l_uvaca = l_div_inner.find("span[@class='inline iast']")
-                        # l_uvaca = l_div_inner.find('span')
-                        # print(l_uvaca)
                         if l_uvaca is not None:
                             l_uvaca_prefix = l_uvaca.text.strip() + ' '
                             print(l_uvaca_prefix, l_uvaca.attrib['class'])
@@ -234,17 +235,13 @@ def sethuila(p_file):
                         if len(l_notes_list) > 0 and l_notes_list != [None, None]:
                             g_sethuila_mula_note[l_verse_id] = l_notes_list
 
-                        # l_verse_id = re.match(r'^.*\[oṃ].*\[oṃ]\.\.\s+(\d+/\d+/\d+)\.\.', l_verse_text).group(1).replace('/', '_')
                         print(l_verse_id, l_verse_text, end=' ')
 
                         l_existing_dict = g_parallel.setdefault(l_verse_id, dict())
-                        # print(l_verse_id, g_parallel[l_verse_id], l_existing_dict, end=' ')
                         l_existing_dict['Sethuila'] = l_verse_text
                         print(g_parallel[l_verse_id])
-                        # print(l_existing_dict, g_parallel[l_verse_id])
-                        # g_parallel[l_verse_id] = l_existing_dict
-                    elif l_div_inner.attrib['class'] == 'Sarvamula':
-                        def sarvamula_process(s): # =॥।“”‘’–.,;:?!\'\-)(\[\] eva
+                    elif l_div_inner.attrib['class'] == 'Sarvamula': # see CAVEAT in docstring above
+                        def sarvamula_process(s):
                             l_seperator = '-,;:?!\s'
                             l_hard_boundary_left = '(?:^|[=॥।“”‘’–.,;:?!\'\-)(\[\]\s])'
                             l_hard_boundary_right = '(?:[=॥।“”‘’–.,;:?!\'\-)(\[\]\s]|$)'
@@ -265,60 +262,89 @@ def sethuila(p_file):
                             return s
 
                         print()
-                        for l_span_1 in l_div_inner.findall('span'):
-                            print('       ', l_span_1.attrib['class'], end=': ')
-                            # padya iast
-                            if l_span_1.attrib['class'] in ['padya iast', 'inline iast']:
-                                l_bhashya_fragment = sarvamula_process(l_span_1.text.strip())
-                                # l_bhashya_fragment = re.sub(r'(\S)\s*\.\.\s*(\d+)\s*\.\.', r'\1 ॥ \2 ॥', l_bhashya_fragment)
-                                # l_bhashya_fragment = re.sub(r'(\S)\s*\.\.', r'\1 ॥', l_bhashya_fragment)
-                                print(l_bhashya_fragment, end=' ')
-                                # l_bhashya_list.append(f'[iast] {l_bhashya_fragment}')
-                                # l_bhashya_list.append(('[iast]', l_bhashya_fragment))
+                        # l_prev_id = ''
+                        for l_span_sarva in l_div_inner.iter(tag='span'):
+                            l_span_id = l_span_sarva.get('id')
+                            l_span_text = sarvamula_process(l_span_sarva.text.strip() if l_span_sarva.text else '')
 
-                                l_note_elem = find_note(l_span_1)
-                                l_note_ref = None
-                                if l_note_elem is not None:
-                                    l_note_ref = l_note_elem[0]
-                                    g_sethuila_sarvamula_note.setdefault(l_verse_id, []).append(l_note_elem)
-                                    print(f'Note: {l_note_elem}')
-                                else:
-                                    print()
+                            print('       ', l_span_sarva.attrib['class'], '<No ID>' if l_span_id is None else l_span_id, end=' ')
+                            print('<no text>' if len(l_span_text) == 0 else l_span_text, end=' ')
 
-                                l_bhashya_list.append(('{iast}', l_bhashya_fragment, [l_note_ref]))
+                            if l_span_sarva.attrib['class'] == 'pathantara':
+                                # l_a_text = l_span_sarva.find('a').text
+                                l_note_ref = l_span_sarva.find('a').attrib['href']
+                                l_note_text = l_span_sarva.attrib['data-note'].strip()
+                                print(l_note_ref, l_note_text, end=' ')
+                                l_cl, l_txt, _ = l_bhashya_list[-1]
+                                l_bhashya_list[-1] = (l_cl, l_txt, l_note_ref.replace('note-pathantara-', ''))
+                                g_sethuila_sarvamula_note.setdefault(l_verse_id, dict())[l_note_ref.replace('note-pathantara-', '')] = l_note_text
+                                print(' '.join([r.replace('note-pathantara-', '') for r, _ in g_sethuila_sarvamula_note[l_verse_id].items()]), end=' ')
 
-                            # padya
-                            elif l_span_1.attrib['class'] in ['padya', 'inline']:
-                                l_span_2 = l_span_1.find("span[@class='pramana iast']")
-                                # print(l_span_2)
-                                if l_span_2 is None:
-                                    l_span_2 = l_span_1.find("span[@class='pratika iast']")
-                                # print(l_span_2)
-
-                                l_frag_text = sarvamula_process(l_span_2.text.strip())
-                                # l_frag_text = re.sub(r'(\S)\s*\.\.\s*(\d+)\s*\.\.', r'\1 ॥ \2 ॥', l_frag_text)
-                                # l_frag_text = re.sub(r'(\S)\s*\.\.', r'\1 ॥', l_frag_text)
-                                print(l_frag_text, end=' ')
-
-                                l_note_elem = find_note(l_span_1)
-                                l_note_ref_1 = None
-                                if l_note_elem is not None:
-                                    l_note_ref_1 = l_note_elem[0]
-                                    g_sethuila_sarvamula_note.setdefault(l_verse_id, []).append(l_note_elem)
-                                    print(f'Note 1: {l_note_elem}')
-
-                                l_note_elem = find_note(l_span_2)
-                                l_note_ref_2 = None
-                                if l_note_elem is not None:
-                                    l_note_ref_2 = l_note_elem[0]
-                                    g_sethuila_sarvamula_note.setdefault(l_verse_id, []).append(l_note_elem)
-                                    print(f'Note 2: {l_note_elem}')
-                                else:
-                                    print()
-
-                                l_bhashya_list.append(('{-}', l_frag_text, [l_note_ref_1, l_note_ref_2]))
+                            if 'kutra' in l_span_sarva.attrib['class']:
+                                print('REF')
                             else:
                                 print()
+
+                            if len(l_span_text) > 0:
+                                # l_prev_id = l_span_id
+                                l_bhashya_list.append(('{' + l_span_sarva.attrib["class"] + '}', l_span_text, None))
+
+                        # for l_span_1 in l_div_inner.findall('span'):
+                        #     # padya iast
+                        #     if l_span_1.attrib['class'] in ['padya iast', 'inline iast']:
+                        #         l_bhashya_fragment = sarvamula_process(l_span_1.text.strip())
+                        #         # l_bhashya_fragment = re.sub(r'(\S)\s*\.\.\s*(\d+)\s*\.\.', r'\1 ॥ \2 ॥', l_bhashya_fragment)
+                        #         # l_bhashya_fragment = re.sub(r'(\S)\s*\.\.', r'\1 ॥', l_bhashya_fragment)
+                        #         # print(l_bhashya_fragment, end=' ')
+                        #         # l_bhashya_list.append(f'[iast] {l_bhashya_fragment}')
+                        #         # l_bhashya_list.append(('[iast]', l_bhashya_fragment))
+                        #
+                        #         l_note_elem = find_note(l_span_1)
+                        #         l_note_ref = None
+                        #         if l_note_elem is not None:
+                        #             l_note_ref = l_note_elem[0]
+                        #             g_sethuila_sarvamula_note.setdefault(l_verse_id, []).append(l_note_elem)
+                        #             # print(f'Note: {l_note_elem}')
+                        #         else:
+                        #             pass
+                        #             # print()
+                        #
+                        #         l_bhashya_list.append(('{iast}', l_bhashya_fragment, [l_note_ref]))
+                        #
+                        #     # padya
+                        #     elif l_span_1.attrib['class'] in ['padya', 'inline']:
+                        #         l_span_2 = l_span_1.find("span[@class='pramana iast']")
+                        #         # print(l_span_2)
+                        #         if l_span_2 is None:
+                        #             l_span_2 = l_span_1.find("span[@class='pratika iast']")
+                        #         # print(l_span_2)
+                        #
+                        #         l_frag_text = sarvamula_process(l_span_2.text.strip())
+                        #         # l_frag_text = re.sub(r'(\S)\s*\.\.\s*(\d+)\s*\.\.', r'\1 ॥ \2 ॥', l_frag_text)
+                        #         # l_frag_text = re.sub(r'(\S)\s*\.\.', r'\1 ॥', l_frag_text)
+                        #         # print(l_frag_text, end=' ')
+                        #
+                        #         l_note_elem = find_note(l_span_1)
+                        #         l_note_ref_1 = None
+                        #         if l_note_elem is not None:
+                        #             l_note_ref_1 = l_note_elem[0]
+                        #             g_sethuila_sarvamula_note.setdefault(l_verse_id, []).append(l_note_elem)
+                        #             # print(f'Note 1: {l_note_elem}')
+                        #
+                        #         l_note_elem = find_note(l_span_2)
+                        #         l_note_ref_2 = None
+                        #         if l_note_elem is not None:
+                        #             l_note_ref_2 = l_note_elem[0]
+                        #             g_sethuila_sarvamula_note.setdefault(l_verse_id, []).append(l_note_elem)
+                        #             # print(f'Note 2: {l_note_elem}')
+                        #         else:
+                        #             pass
+                        #             # print()
+                        #
+                        #         l_bhashya_list.append(('{-}', l_frag_text, [l_note_ref_1, l_note_ref_2]))
+                        #     else:
+                        #         pass
+                        #         # print()
                     elif l_div_inner.attrib['class'] == 'Heading3':
                         # span class="heading-number iast">1.1.1.</span>
                         l_heading_number = l_div_inner.find("span[@class='heading-number iast']").text
@@ -328,6 +354,9 @@ def sethuila(p_file):
 
                     else:
                         print()
+
+                # bhashya of last verse
+                purge_bhashya_list()
 
 def list_candidates(p_k):
     l_list_candidate = [p_k,
@@ -772,11 +801,13 @@ def process_anandamak(p_amak_raw_list, p_underscore_k):
 
     return l_amak_chunk_list_r, l_anandamak_cell_r, l_anandamak_cell_sk_r
 
-def process_seth(p_amak_chunk_list, p_seth_chunk_list):
+def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_underscore_k):
     """
 
     :param p_amak_chunk_list:
     :param p_seth_chunk_list: original Sethuila Chunks with words split (no Sandhi yet)
+    :param p_do_one_two_letters:
+    :param p_underscore_k:
     :return:
     """
     def format_ref(p_ref):
@@ -821,24 +852,24 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
         if f'{l_id_outer}-{l_id_inner}' in l_forbidden_id_list or len(l_candidate) <= 3:
             continue
 
-        print(f'1P: {l_candidate}', l_id_outer, l_id_inner, l_amak_chunk_list)
-        print(f'{l_underscore_k} 1P: {(float(l_pc_i) * 100) / len(l_seth_word_list_expanded):.1f}%' + ' ' * l_prev_cand_len * 2, end='\r', file=sys.stderr)
+        print(f'1P: {l_candidate}', l_id_outer, l_id_inner, p_amak_chunk_list)
+        print(f'{p_underscore_k} 1P: {(float(l_pc_i) * 100) / len(l_seth_word_list_expanded):.1f}%' + ' ' * l_prev_cand_len * 2, end='\r', file=sys.stderr)
         l_prev_cand_len = len(l_candidate)
         l_is_breaking = False
-        for l_amak_id, l_amak_chunk in [(i, s) for i, s in enumerate(l_amak_chunk_list) if len(s) > 0 and len(s) + 2 >= len(l_candidate)]:
+        for l_amak_id, l_amak_chunk in [(i, s) for i, s in enumerate(p_amak_chunk_list) if len(s) > 0 and len(s) + 2 >= len(l_candidate)]:
             # print(f'    trying {l_candidate} in {l_amak_chunk}')
             if l_candidate in l_amak_chunk or remove_avagraha(l_candidate) in remove_avagraha(l_amak_chunk):
                 # un-sandhied matching
                 # replace only the first encountered match bc the following ones will correspond to other words (candidtates)
-                l_amak_chunk_list[l_amak_id] = re.sub('^⌿', '', re.sub('⌿$', '', re.sub(l_candidate, '', l_amak_chunk, count=1)))
-                print(f'    Candidate    [{l_candidate}] found in {l_amak_chunk}', l_amak_chunk_list[l_amak_id], l_amak_chunk_list)
+                p_amak_chunk_list[l_amak_id] = re.sub('^⌿', '', re.sub('⌿$', '', re.sub(l_candidate, '', l_amak_chunk, count=1)))
+                print(f'    Candidate    [{l_candidate}] found in {l_amak_chunk}', p_amak_chunk_list[l_amak_id], p_amak_chunk_list)
                 l_is_breaking = True
             else:
                 l_amak_sandhied_chunk = external_sandhi(l_amak_chunk)
                 # print(f'    trying {l_candidate} in {l_amak_sandhied_chunk}')
                 if l_candidate in l_amak_sandhied_chunk or remove_avagraha(l_candidate) in remove_avagraha(l_amak_sandhied_chunk):
                     # sandhied matching
-                    print(f'    Candidate    [{l_candidate}] found in (Sandhied): {l_amak_sandhied_chunk}', l_amak_chunk_list)
+                    print(f'    Candidate    [{l_candidate}] found in (Sandhied): {l_amak_sandhied_chunk}', p_amak_chunk_list)
                     l_is_breaking = True
 
             if l_is_breaking:
@@ -851,7 +882,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
                 l_seth_word_array_2_sk[l_id_outer][l_id_inner] = \
                     f'<span style="color: {l_color_style}">{l_seth_word_array_2_sk[l_id_outer][l_id_inner]}</span>{l_display_candidate_sk}'
                 break
-    print(f'{l_underscore_k}     ', ' ' * l_prev_cand_len * 3, end='\r', file=sys.stderr)
+    print(f'{p_underscore_k}     ', ' ' * l_prev_cand_len * 3, end='\r', file=sys.stderr)
 
     # fitting Sethuila words using difflib's SequenceMatcher
     for l_pc_i, (l_id_outer, l_id_inner, l_candidate, l_is_original) in enumerate(l_seth_word_list_expanded):
@@ -859,8 +890,8 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
         if f'{l_id_outer}-{l_id_inner}' in l_forbidden_id_list or len(l_candidate) <= 5:
             continue
 
-        print(f'xP: {l_candidate}', l_id_outer, l_id_inner, l_amak_chunk_list)
-        print(f'{l_underscore_k} xP: {(float(l_pc_i) * 100) / len(l_seth_word_list_expanded):.1f}%' + ' ' * l_prev_cand_len * 2, end='\r', file=sys.stderr)
+        print(f'xP: {l_candidate}', l_id_outer, l_id_inner, p_amak_chunk_list)
+        print(f'{p_underscore_k} xP: {(float(l_pc_i) * 100) / len(l_seth_word_list_expanded):.1f}%' + ' ' * l_prev_cand_len * 2, end='\r', file=sys.stderr)
         l_prev_cand_len = len(l_candidate)
         l_is_breaking = False
         # allowed difference of increasing size
@@ -868,7 +899,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
             if l_is_breaking:
                 break
 
-            for l_amak_id, l_amak_chunk in [(i, s) for i, s in enumerate(l_amak_chunk_list) if len(s) > 0 and len(s) + 2 >= len(l_candidate)]:
+            for l_amak_id, l_amak_chunk in [(i, s) for i, s in enumerate(p_amak_chunk_list) if len(s) > 0 and len(s) + 2 >= len(l_candidate)]:
                 if l_is_breaking:
                     break
 
@@ -942,20 +973,20 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
                             f'<span style="font-weight: bold; color: {l_color_style}">{l_seth_word_array_2_sk[l_id_outer][l_id_inner]}</span> [{l_sm_frag_display_sk}]'
                         l_is_breaking = True
                         break
-    print(f'{l_underscore_k}     ', ' ' * l_prev_cand_len * 3, end='\r', file=sys.stderr)
+    print(f'{p_underscore_k}     ', ' ' * l_prev_cand_len * 3, end='\r', file=sys.stderr)
 
     # try to fit Sethuila words into Anandamakaranda chunks list, 2nd and 3rd pass: 1 and 2 letters change
-    if l_do_one_two_letters:
+    if p_do_one_two_letters:
         # 1 letter change
         for l_pc_i, (l_id_outer, l_id_inner, l_candidate, l_is_original) in enumerate(l_seth_word_list_expanded):
             if f'{l_id_outer}-{l_id_inner}' in l_forbidden_id_list or len(l_candidate) <= 5:
                 continue
 
-            print(f'2P: {l_candidate}', l_id_outer, l_id_inner, l_amak_chunk_list)
-            print(f'{l_underscore_k} 2P: {(float(l_pc_i) * 100) / len(l_seth_word_list_expanded):.1f}' + ' ' * l_prev_cand_len * 2, end='\r', file=sys.stderr)
+            print(f'2P: {l_candidate}', l_id_outer, l_id_inner, p_amak_chunk_list)
+            print(f'{p_underscore_k} 2P: {(float(l_pc_i) * 100) / len(l_seth_word_list_expanded):.1f}' + ' ' * l_prev_cand_len * 2, end='\r', file=sys.stderr)
             l_prev_cand_len = len(l_candidate)
             l_is_breaking = False
-            for l_amak_id, l_amak_chunk in [(i, s) for i, s in enumerate(l_amak_chunk_list) if len(s) > 0 and len(s) + 2 >= len(l_candidate)]:
+            for l_amak_id, l_amak_chunk in [(i, s) for i, s in enumerate(p_amak_chunk_list) if len(s) > 0 and len(s) + 2 >= len(l_candidate)]:
                 if l_is_breaking:
                     break
 
@@ -988,8 +1019,8 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
                             # print(f'    trying {l_re_x} in {l_amak_chunk}')
                             if l_match is not None:
                                 l_is_breaking = True
-                                l_amak_chunk_list[l_amak_id] = re.sub('^⌿', '', re.sub('⌿$', '', re.sub(l_re_x, '', l_amak_chunk)))
-                                print(f'    Hillbilly 1: [{l_candidate}] {l_re_1} found in: {l_amak_chunk}', l_amak_chunk_list[l_amak_id], l_amak_chunk_list)
+                                p_amak_chunk_list[l_amak_id] = re.sub('^⌿', '', re.sub('⌿$', '', re.sub(l_re_x, '', l_amak_chunk)))
+                                print(f'    Hillbilly 1: [{l_candidate}] {l_re_1} found in: {l_amak_chunk}', p_amak_chunk_list[l_amak_id], p_amak_chunk_list)
                             else:
                                 # 2 ⌬ to prevent matching over the boundary (1 letter difference)
                                 l_string_to_match = f'{l_amak_sandhied_chunk}⌬⌬{remove_avagraha(l_amak_sandhied_chunk)}'
@@ -1035,7 +1066,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
                         except re.error as e:
                             print(e, l_re_1, file=sys.stderr)
                             sys.exit(0)
-        print(f'{l_underscore_k}      ', ' ' * l_prev_cand_len * 3, end='\r', file=sys.stderr)
+        print(f'{p_underscore_k}      ', ' ' * l_prev_cand_len * 3, end='\r', file=sys.stderr)
 
         # 2 letters change
         l_prev_cand_len = 0
@@ -1043,11 +1074,11 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
             if f'{l_id_outer}-{l_id_inner}' in l_forbidden_id_list or len(l_candidate) <= 5:
                 continue
 
-            print(f'3P: {l_candidate}', l_id_outer, l_id_inner, l_amak_chunk_list)
-            print(f'{l_underscore_k} 3P: {(float(l_pc_i) * 100) / len(l_seth_word_list_expanded):.1f} [{l_candidate}]' + ' ' * l_prev_cand_len * 2, end='\r', file=sys.stderr)
+            print(f'3P: {l_candidate}', l_id_outer, l_id_inner, p_amak_chunk_list)
+            print(f'{p_underscore_k} 3P: {(float(l_pc_i) * 100) / len(l_seth_word_list_expanded):.1f} [{l_candidate}]' + ' ' * l_prev_cand_len * 2, end='\r', file=sys.stderr)
             l_prev_cand_len = len(l_candidate)
             l_is_breaking = False
-            for l_amak_id, l_amak_chunk in [(i, s) for i, s in enumerate(l_amak_chunk_list) if len(s) > 0 and len(s) + 2 >= len(l_candidate)]:
+            for l_amak_id, l_amak_chunk in [(i, s) for i, s in enumerate(p_amak_chunk_list) if len(s) > 0 and len(s) + 2 >= len(l_candidate)]:
                 if l_is_breaking:
                     break
 
@@ -1083,10 +1114,10 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
                                 if l_candidate == 'kenacidapauruṣeyamityuktamuktavākyasamam': print(f'    {z} Trying {l_re_x} ({l_re_1}) in {l_amak_chunk}')
                                 if l_match is not None:
                                     l_is_breaking = True
-                                    l_amak_chunk_list[l_amak_id] = re.sub('^⌿', '',
+                                    p_amak_chunk_list[l_amak_id] = re.sub('^⌿', '',
                                                                           re.sub('⌿$', '',
                                                                                  re.sub(l_re_x, '', l_amak_chunk)))
-                                    print(f'Hillbilly 2: [{l_candidate}] {l_re_1} found in: {l_amak_chunk}', l_amak_chunk_list[l_amak_id], l_amak_chunk_list)
+                                    print(f'Hillbilly 2: [{l_candidate}] {l_re_1} found in: {l_amak_chunk}', p_amak_chunk_list[l_amak_id], p_amak_chunk_list)
                                 else:
                                     # 3 ⌬ to prevent matching over the boundary (2 letters difference)
                                     l_string_to_match = f'{l_amak_sandhied_chunk}⌬⌬⌬{remove_avagraha(l_amak_sandhied_chunk)}'
@@ -1135,7 +1166,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
                             except re.error as e:
                                 print(e, l_re_1, file=sys.stderr)
                                 sys.exit(0)
-        print(f'{l_underscore_k}     ', ' ' * l_prev_cand_len * 3, end='\n', file=sys.stderr)
+        print(f'{p_underscore_k}     ', ' ' * l_prev_cand_len * 3, end='\n', file=sys.stderr)
     else:
         print(file=sys.stderr)
 
@@ -1173,21 +1204,21 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
     l_amak_frag_table += '</table>'
 
     # iti kṛ pāṭhaḥ iti go pāṭhaḥ “ityabhidhānam” ”,” -
-    if l_underscore_k in g_sethuila_sarvamula_note.keys():
+    if p_underscore_k in g_sethuila_sarvamula_note.keys():
         l_notes_sloka_list = [(format_ref(l_ref),
                                devtrans.dev2iast(l_note_text),
                                re.sub(r'“([^”]+)”[-”,\s]*iti kṛ pāṭhaḥ', r'<span style="color: Coral;">\1</span> (kṛ)',
                                re.sub(r'“([^”]+)”[-”,\s]*iti go pāṭhaḥ', r'<span style="color: DarkOrange;">\1</span> (go)',
                                #re.sub(r'iti go pāṭhaḥ', '<span style="color: DarkOrange;">iti go pāṭhaḥ</span>',
                                devtrans.dev2iast(l_note_text).replace('[-]', '{nothing}'))))
-                              for l_ref, l_note_text in g_sethuila_sarvamula_note[l_underscore_k]]
+                              for l_ref, l_note_text in g_sethuila_sarvamula_note[p_underscore_k]]
         l_notes_sloka_list_sk = [(format_ref(l_ref),
                                   l_note_text,
                                   re.sub(r'(^|>)([^<]+)($|<)', lambda m: f'{m.group(1)}{devtrans.iast2dev(m.group(2))}{m.group(3)}',
                                   re.sub(r'“([^”]+)”[-”,\s]*iti kṛ pāṭhaḥ', lambda m: f'<span style="color: Coral;">{devtrans.iast2dev(m.group(1))}</span> (kṛ)',
                                   re.sub(r'“([^”]+)”[-”,\s]*iti go pāṭhaḥ', lambda m: f'<span style="color: DarkOrange;">{devtrans.iast2dev(m.group(1))}</span> (go)',
                                         devtrans.dev2iast(l_note_text).replace('[-]', '{nothing}')))))
-                              for l_ref, l_note_text in g_sethuila_sarvamula_note[l_underscore_k]]
+                              for l_ref, l_note_text in g_sethuila_sarvamula_note[p_underscore_k]]
         l_notes_block = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{l_ref}: {l_note_go_kr}" for l_ref, _, l_note_go_kr in l_notes_sloka_list])}'
         # l_notes_block = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{l_ref}: {l_note_go_kr} / {l_note_text}" for l_ref, l_note_text, l_note_go_kr in l_notes_sloka_list])}'
         l_notes_block_sk = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{format_ref(l_ref)}: {l_note_go_kr}" for l_ref, _, l_note_go_kr in l_notes_sloka_list_sk])}'
@@ -1202,25 +1233,9 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list):
     l_seth_cell_sk_r = f'<td class="outer"><b>Sethuila</b>: {l_v_display_sk}</td>'
 
     return l_seth_cell_r, l_seth_cell_sk_r
-# ------------- main() -------------------------------------------------------------------------------------------------
-if __name__ == '__main__':
-    # anandamak('brahmasūtrabhāṣyam.html')
-    # sethuila('brahmasūtrabhāṣyam_s.html')
-    anandamak('śrīmadbhagavadgītābhāṣyam.html')
-    sethuila('śrīmadbhagavadgītābhāṣyam_s.html')
 
-    parallel_dump()
-
-    for l_verse_k in g_sethuila_mula_note.keys():
-        print(f'{l_verse_k:5} {g_sethuila_mula_note[l_verse_k]}')
-
-    for l_verse_k, v in g_sethuila_sarvamula_note.items():
-        print(f'{l_verse_k:5} {v}')
-
+def sarvamula_comparison(p_do_one_two_letters):
     l_fout_sk = open('bhasyha_compare_sk.html', 'w', encoding="utf-8")
-
-    l_do_one_two_letters = False
-
     with open('bhasyha_compare.html', 'w', encoding="utf-8") as l_fout:
         l_fout.write(g_html_header)
         l_fout_sk.write(g_html_header)
@@ -1231,7 +1246,7 @@ if __name__ == '__main__':
         #                                  ) for l_k in ['0_0'] + list(g_gita_tei_file.keys())]):
         for l_underscore_k in sorted(['0_0'] + list(g_gita_tei_file.keys()), key=lambda k: re.sub(r'^(\d)_', r'0\1_', re.sub(r'_(\d)$', r'_0\1', k))):
             if l_underscore_k == '5_1':
-                break # 2_18 2_45 3_2 2_25
+                break  # 2_18 2_45 3_2 2_25
 
             print(f'BEGIN {l_underscore_k}', end=' ')
 
@@ -1248,7 +1263,7 @@ if __name__ == '__main__':
                         print(l_intro_text, l_full_bhashya_text)
                         l_anandamak_prev.append((l_underscore_k, remove_invisibles(l_intro_text), remove_invisibles(l_full_bhashya_text)))
                         print(f'ANANDAMAK {len(l_anandamak_prev)} {len(l_seth_prev)}')
-                    else: # l_source_key == 'Sethuila'
+                    else:  # l_source_key == 'Sethuila'
                         l_seth_found = True
                         l_seth_prev += [(t, remove_invisibles(l_text).split(' '), n) for t, l_text, n in v]
                         print(f'SETHUILA {len(l_anandamak_prev)} {len(l_seth_prev)}')
@@ -1271,7 +1286,7 @@ if __name__ == '__main__':
 
             if l_amak_found and l_seth_found:
                 l_amak_chunk_list, l_anandamak_cell, l_anandamak_cell_sk = process_anandamak(l_anandamak_prev, l_underscore_k)
-                l_seth_cell, l_seth_cell_sk = process_seth(l_amak_chunk_list, l_seth_prev)
+                l_seth_cell, l_seth_cell_sk = process_seth(l_amak_chunk_list, l_seth_prev, p_do_one_two_letters, l_underscore_k)
 
                 l_anandamak_prev = []
                 l_seth_prev = []
@@ -1283,6 +1298,39 @@ if __name__ == '__main__':
         </body>
             </html>
         """)
+
+# ------------- main() -------------------------------------------------------------------------------------------------
+if __name__ == '__main__':
+    # anandamak('brahmasūtrabhāṣyam.html')
+    # sethuila('brahmasūtrabhāṣyam_s.html')
+    anandamak('śrīmadbhagavadgītābhāṣyam.html')
+    sethuila('śrīmadbhagavadgītābhāṣyam_s.html')
+
+    parallel_dump()
+
+    for l_verse_k in g_sethuila_mula_note.keys():
+        print(f'{l_verse_k:5} {g_sethuila_mula_note[l_verse_k]}')
+
+    l_prev_note = 0
+    for l_verse_k, v in g_sethuila_sarvamula_note.items():
+        print(f'{l_verse_k:5}')
+        for r, t in v.items():
+            print(f'    {r:5}: {t}')
+            l_note_val = int(r[1:])
+            if l_note_val != l_prev_note + 1 and not l_note_val in [62]: # note 61 is in Mula
+                print('Missing note ref')
+                sys.exit(0)
+            l_prev_note = l_note_val
+
+    for l_verse_k, d in sorted(list(g_parallel_bhashya.items()), key=lambda p: re.sub(r'^(\d)_', r'0\1_', re.sub(r'_(\d)$', r'_0\1', p[0]))):
+        print(l_verse_k)
+        if 'Sethuila' in d.keys():
+            for l_class, l_chunk, l_note in d['Sethuila']:
+                l_n_p = l_note if l_note is not None else ''
+                l_n_text = '' if l_note is None else f' [{devtrans.dev2iast(g_sethuila_sarvamula_note[l_verse_k][l_note])}]'
+                print(f'    {l_class:14} {l_n_p:4} {l_chunk}{l_n_text}')
+
+    # sarvamula_comparison(False)
 
     # for l_verse_k in g_tei_changes.keys():
     #     l_original = g_gita_tei_file_bc[l_verse_k]
