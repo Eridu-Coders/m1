@@ -14,53 +14,8 @@ import unicodedata
 g_parallel = dict()
 g_parallel_bhashya = dict()
 
-# for brahmasūtrabhāṣyam
-# def anandamak(p_file):
-#     with open(p_file, 'r') as l_fin:
-#         l_txt = l_fin.read().replace('<br>', '<br/>')
-#         print('Anandamak:', p_file, len(l_txt))
-#         try:
-#             l_tree = ET.fromstring(f'{l_txt}')
-#         except ET.ParseError as e:
-#             print(f'XML parse ERROR: {e.code} {e.msg} in [{l_txt[:100]}]')
-#
-#         for l_div_adhyaya in l_tree.findall('div'):
-#             print(l_div_adhyaya.attrib['data-name'])
-#             for l_div_paada in l_div_adhyaya.findall('div'):
-#                 print('   ', l_div_paada.attrib['title'].strip())
-#                 for l_section in l_div_paada.findall('section'):
-#                     print('       ', l_section.attrib['title'].strip())
-#                     for l_div_verse in l_section.findall('div'):
-#                         # <div class="verse" id="BS_C01_S01_V01" type="sutra" data-adhikaranaid="BS_C01_S01_A001" data-adhikarana="jijñāsādhikaraṇam">
-#                         l_verse_id_0 = l_div_verse.attrib['id'].strip()
-#                         l_verse_id = re.sub(r'^BS_', '',
-#                                             re.sub(r'_[CSV]0?', '_', l_verse_id_0))
-#                         # verse-text
-#                         l_verse_text = l_div_verse.find("div[@class='verse-text']/p").text
-#                         g_parallel.setdefault(l_verse_id, dict())['Anandamak'] = l_verse_text
-#                         print('           >', l_verse_id_0, l_verse_id, l_div_verse.attrib['data-adhikarana'].strip(), l_verse_text)
-#                         for l_div_bhashya_collection in l_div_verse.findall('div'):
-#                             if l_div_bhashya_collection.attrib['class'] == 'bhashya-collection':
-#                                  for l_div_bhashya in l_div_bhashya_collection.findall('div'):
-#                                      if l_div_bhashya.attrib['class'].strip() == 'bhashya':
-#                                          l_text = l_div_bhashya.text.strip()
-#                                          if len(l_text) > 0:
-#                                             print('               ', l_div_bhashya.attrib['id'], l_text)
-#                                          else:
-#                                              print('               ', l_div_bhashya.attrib['class'], l_div_bhashya.attrib['id'])
-#                                              for l_div_p_in_bhashya in l_div_bhashya.findall('p'):
-#                                                  print('                   ', l_div_p_in_bhashya.text)
-#                                      else:
-#                                          print('               ', l_div_bhashya.attrib['class'])
-#                                          for l_div_bhashya_in_pramana in l_div_bhashya.findall('div'):
-#                                              print('                   ', l_div_bhashya_in_pramana.attrib['class'])
-#                                              for l_div_p_in_pramana in l_div_bhashya_in_pramana.findall('p'):
-#                                                  print('                       ', l_div_p_in_pramana.text)
-
-# for śrīmadbhagavadgītābhāṣyam
 g_id_prefix = 'BGB'
 
-# TODO process the variants in Amak between ()
 def amak_text_cleanup(p_full_bhashya_text):
     def equalize_space_comma(s):
         return re.sub(r",\s*(\d)", r", \1", s)
@@ -734,43 +689,50 @@ g_html_header = """<html>
     <tr><th>Sloka</th><th>Anandamakaranda</th><th>Sethuila</th></tr>
 """
 
-def process_anandamak(p_amak_raw_list, p_underscore_k):
+def process_anandamak(p_amak_raw_list, p_k_list):
     """
 
     :param p_amak_raw_list: list of triplets (l_underscore_k, l_intro_text, l_full_bhashya_text)
-    :param p_underscore_k
+    :param p_k_list
     :return:
     """
-    if p_underscore_k == '3_16':
-        print(f'process_anandamak() {p_amak_raw_list}')
+    # if p_underscore_k == '3_16':
+    #     print(f'process_anandamak() {p_amak_raw_list}')
 
     def process_for_display(s):
-        r = s
+        l_ret = s
         # r = re.sub(r'\([^\d(]*\d+[^)]*\)', r' ', r) # (ṛ.10.72.2) (bhāga.1.2.31) (bṛ.u.6.3.7)
-        r = re.sub(r'(\s*\.\s*\d+)+\.?', lambda m: m.group(1).replace(' ', ''), r, flags=re.UNICODE) # cleanup of sequences of dots and numbers
-        r = re.sub(r'\(\s+(\S)', r'(\1', r, flags=re.UNICODE)               # space after (
-        r = re.sub(r'(\S)\s+\)', r'\1)', r, flags=re.UNICODE)               # space before )
-        r = re.sub(r'(\S)\s*॥\s*([- \d]*\d)\s*॥', r'\1&nbsp;॥&nbsp;\2&nbsp;॥', r, flags=re.UNICODE)
-        r = re.sub(r'(\S)\s*।', r'\1&#xA0;।', r, flags=re.UNICODE)
-        r = re.sub(r'(\w)[’\'](\w)', r"\1ऽ\2", r, flags=re.UNICODE)         # Avagraha (single one)
-        r = re.sub(r'(\w)(?:’’|\'\')(\w)', r"\1ऽऽ\2", r, flags=re.UNICODE)  # Avagraha (2 of them) “ ”
+        l_ret = re.sub(r'(\s*\.\s*\d+)+\.?', lambda m: m.group(1).replace(' ', ''), l_ret, flags=re.UNICODE) # cleanup of sequences of dots and numbers
+        l_ret = re.sub(r'\(\s+(\S)', r'(\1', l_ret, flags=re.UNICODE)               # space after (
+        l_ret = re.sub(r'(\S)\s+\)', r'\1)', l_ret, flags=re.UNICODE)               # space before )
+        l_ret = re.sub(r'(\S)\(', r'\1 (', l_ret, flags=re.UNICODE)                 # insert space before (
+        l_ret = re.sub(r'\)(\S)', r') \1', l_ret, flags=re.UNICODE)                 # insert space after )
+        l_ret = re.sub(r'(\S)\s*॥\s*([- \d]*\d)\s*॥', r'\1&nbsp;॥&nbsp;\2&nbsp;॥', l_ret, flags=re.UNICODE)
+        l_ret = re.sub(r'(\S)\s*([।॥])’', r'\1’ \2', l_ret)
+        l_ret = re.sub(r'(\S)\s*।', r'\1&#xA0;।', l_ret, flags=re.UNICODE)
+        l_ret = re.sub(r'(\w)[’\'](\w)', r"\1ऽ\2", l_ret, flags=re.UNICODE)         # Avagraha (single one)
+        l_ret = re.sub(r'(\w)(?:’’|\'\')(\w)', r"\1ऽऽ\2", l_ret, flags=re.UNICODE)  # Avagraha (2 of them) “ ”
 
-        return standardize_iast(r)
+        return standardize_iast(l_ret)
 
     l_amak_text_x_list = []
     l_amak_text_display_list = []
     l_amak_text_display_list_sk = []
-    for l_underscore_k_h, l_intro_text_h, l_full_bhashya_text_h in p_amak_raw_list:
-        l_amak_text_x_list.append(re.sub(r'[“”‘’,;:\'\-?!]', r' ',              # punctuation removal
+    for l_underscore_k_h, l_intro_text_h, l_full_bhashya_text_h in p_amak_raw_list:  # m ॥’ ‘
+        l_amak_text_x_list.append(re.sub(r'[“”‘’,;:\'\-?!]', r' ',              # punctuation removal \([^\s\d)]+\)
+                                  re.sub(r'\(([^\s\d)]+)\)', r'\1',             # remove brackets around Anandamak variant indications
                                   re.sub(r'\([^\d(]*\d+[^)]*\)', r' ',          # (ṛ.10.72.2) (bhāga.1.2.31) (bṛ.u.6.3.7)
                                   re.sub(r'(\s*\.\s*\d+)+\.?', lambda m: m.group(1).replace(' ', ''),  # cleanup of sequences of dots and numbers
                                   re.sub(r'\(\s+(\S)', r'(\1',                  # space after (
                                   re.sub(r'(\S)\s+\)', r'\1)',                  # space before )
                                   re.sub(r'<[^>]+>', r'',                       # HTML tag removal
+                                  re.sub(r'(\S)\s*([।॥])’', r'\1’ \2',
                                   re.sub(r'॥\s*[- \d]+\s*॥', r'',               # remove final verse references
                                   re.sub(r'(\w)[’\'](\w)', r"\1ऽ\2",            # Avagraha (single one)
                                   re.sub(r'(\w)(?:’’|\'\')(\w)', r"\1ऽऽ\2",     # Avagraha (2 of them)
                                  f'{standardize_iast(l_intro_text_h)} {standardize_iast(l_full_bhashya_text_h)}',
+                                         flags=re.UNICODE),
+                                         flags=re.UNICODE),
                                          flags=re.UNICODE),
                                          flags=re.UNICODE),
                                          flags=re.UNICODE),
@@ -804,13 +766,13 @@ def process_anandamak(p_amak_raw_list, p_underscore_k):
 
     return l_amak_chunk_list_r, l_anandamak_cell_r, l_anandamak_cell_sk_r
 
-def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_underscore_k):
+def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_k_list):
     """
 
     :param p_amak_chunk_list:
     :param p_seth_chunk_list: original Sethuila Chunks with words split (no Sandhi yet)
     :param p_do_one_two_letters:
-    :param p_underscore_k:
+    :param p_k_list:
     :return:
     """
     def format_ref(p_ref):
@@ -856,7 +818,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_u
             continue
 
         print(f'1P: {l_candidate}', l_id_outer, l_id_inner, p_amak_chunk_list)
-        print(f'{p_underscore_k} 1P: {(float(l_pc_i) * 100) / len(l_seth_word_list_expanded):.1f}%' + ' ' * l_prev_cand_len * 2, end='\r', file=sys.stderr)
+        print(f'{p_k_list[-1]} 1P: {(float(l_pc_i) * 100) / len(l_seth_word_list_expanded):.1f}%' + ' ' * l_prev_cand_len * 2, end='\r', file=sys.stderr)
         l_prev_cand_len = len(l_candidate)
         l_is_breaking = False
         for l_amak_id, l_amak_chunk in [(i, s) for i, s in enumerate(p_amak_chunk_list) if len(s) > 0 and len(s) + 2 >= len(l_candidate)]:
@@ -885,7 +847,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_u
                 l_seth_word_array_2_sk[l_id_outer][l_id_inner] = \
                     f'<span style="color: {l_color_style}">{l_seth_word_array_2_sk[l_id_outer][l_id_inner]}</span>{l_display_candidate_sk}'
                 break
-    print(f'{p_underscore_k}     ', ' ' * l_prev_cand_len * 3, end='\r', file=sys.stderr)
+    print(f'{p_k_list[-1]}     ', ' ' * l_prev_cand_len * 3, end='\r', file=sys.stderr)
 
     # fitting Sethuila words using difflib's SequenceMatcher
     for l_pc_i, (l_id_outer, l_id_inner, l_candidate, l_is_original) in enumerate(l_seth_word_list_expanded):
@@ -894,7 +856,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_u
             continue
 
         print(f'xP: {l_candidate}', l_id_outer, l_id_inner, p_amak_chunk_list)
-        print(f'{p_underscore_k} xP: {(float(l_pc_i) * 100) / len(l_seth_word_list_expanded):.1f}%' + ' ' * l_prev_cand_len * 2, end='\r', file=sys.stderr)
+        print(f'{p_k_list[-1]} xP: {(float(l_pc_i) * 100) / len(l_seth_word_list_expanded):.1f}%' + ' ' * l_prev_cand_len * 2, end='\r', file=sys.stderr)
         l_prev_cand_len = len(l_candidate)
         l_is_breaking = False
         # allowed difference of increasing size
@@ -908,13 +870,11 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_u
 
                 l_amak_sandhied_chunk = external_sandhi(l_amak_chunk)
                 l_strings_to_match = []
-                l_strings_base = [l_amak_chunk, remove_avagraha(l_amak_chunk)]
-                for l_stm_block in l_strings_base:
+                for l_stm_block in [l_amak_chunk, remove_avagraha(l_amak_chunk), l_amak_sandhied_chunk, remove_avagraha(l_amak_sandhied_chunk)]:
                     l_strings_to_match += [s for s in re.split('⌿+', l_stm_block)]
-                l_strings_to_match += l_strings_base + [l_amak_sandhied_chunk, remove_avagraha(l_amak_sandhied_chunk)]
 
                 for l_string_to_match in l_strings_to_match:
-                    if l_candidate == 'bhavati': print('   ', l_critical, l_candidate, l_string_to_match)
+                    if l_candidate == 'cakrurvedaiśca': print('   ', l_critical, l_candidate, l_string_to_match)
 
                     l_sm = difflib.SequenceMatcher(None, l_candidate, l_string_to_match)
                     l_frag_list = []
@@ -939,12 +899,12 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_u
                                 not (s == 0 and len(l_frag_dif_a) == 0):
                             l_diff_count_all += len(l_frag_dif_a) if len(l_frag_dif_a) > len(l_frag_dif_b) or s == 0 else len(l_frag_dif_b)
                             l_diff_count_a += len(l_frag_dif_a)
-                            if l_candidate == 'bhavati':
-                                l_frag_list.append(f'[{len(l_frag_dif_a)}]{l_frag_dif_a}/[{len(l_frag_dif_b)}]{l_frag_dif_b}<{l_diff_count_a}/{l_diff_count_all}>')
+                            if l_candidate == 'māṃvidhattebhidhattemām':
+                                l_frag_list.append(f'[{len(l_frag_dif_a)}]{l_frag_dif_a}/[{len(l_frag_dif_b)}]{l_frag_dif_b}({l_diff_count_a}_{l_diff_count_all})')
                             else:
                                 l_frag_list.append(f'{l_frag_dif_a}/{l_frag_dif_b}')
                             l_frag_list_sk.append(f'{devtrans.iast2dev(l_frag_dif_a)}/{devtrans.iast2dev(l_frag_dif_b)}')
-                            # if l_candidate == 'niṣkarmatāṃ': print('       ', f'{l_diff_count}')
+                            if l_candidate == 'cakrurvedaiśca': print('       ', f'{l_diff_count_a} {l_diff_count_all} {l_frag_list}')
 
                         l_match_count += s
                         if s > 0:
@@ -959,8 +919,8 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_u
                     l_sm_frag_display = '_'.join(l_frag_list)
                     l_sm_frag_display_sk = '_'.join(l_frag_list_sk)
 
-                    if l_candidate == 'bhavati': print('       ', f'd: {l_diff_count_a}/{l_diff_count_all} m: {l_match_count} in: {l_inflation_ratio*100:.2f} % len: {len(l_candidate)}',
-                                                       l_sm_frag_display)
+                    if l_candidate == 'cakrurvedaiśca':
+                        print('       ', f'd: {l_diff_count_a}/{l_diff_count_all} m: {l_match_count} in: {l_inflation_ratio*100:.2f} % len: {len(l_candidate)}', l_sm_frag_display)
                     if '⌿' in l_sm_frag_display or l_inflation_ratio > .6:
                         continue
 
@@ -976,7 +936,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_u
                             f'<span style="font-weight: bold; color: {l_color_style}">{l_seth_word_array_2_sk[l_id_outer][l_id_inner]}</span> [{l_sm_frag_display_sk}]'
                         l_is_breaking = True
                         break
-    print(f'{p_underscore_k}     ', ' ' * l_prev_cand_len * 3, end='\r', file=sys.stderr)
+    print(f'{p_k_list[-1]}     ', ' ' * l_prev_cand_len * 3, end='\r', file=sys.stderr)
 
     # try to fit Sethuila words into Anandamakaranda chunks list, 2nd and 3rd pass: 1 and 2 letters change
     if p_do_one_two_letters:
@@ -1175,7 +1135,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_u
 
     # Display all remaining words in red
     for l_pc_i, (l_id_outer, l_id_inner, l_candidate, l_is_original) in enumerate(l_seth_word_list_expanded):
-        if f'{l_id_outer}-{l_id_inner}' in l_forbidden_id_list or len(l_candidate) <= 2 or not l_is_original:
+        if f'{l_id_outer}-{l_id_inner}' in l_forbidden_id_list or len(l_candidate) <= 3 or not l_is_original:
             continue
 
         l_seth_word_array_2[l_id_outer][l_id_inner] = \
@@ -1209,27 +1169,32 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_u
     l_amak_frag_table += '</table>'
 
     # iti kṛ pāṭhaḥ iti go pāṭhaḥ “ityabhidhānam” ”,” -
-    if p_underscore_k in g_sethuila_sarvamula_note.keys():
-        try:
-            l_notes_sloka_list = [(format_ref(l_ref),
-                                   devtrans.dev2iast(l_note_text),
-                                   re.sub(r'“([^”]+)”[-”,\s]*iti kṛ pāṭhaḥ', r'<span style="color: Coral;">\1</span> (kṛ)',
-                                   re.sub(r'“([^”]+)”[-”,\s]*iti go pāṭhaḥ', r'<span style="color: DarkOrange;">\1</span> (go)',
-                                   #re.sub(r'iti go pāṭhaḥ', '<span style="color: DarkOrange;">iti go pāṭhaḥ</span>',
-                                   devtrans.dev2iast(l_note_text).replace('[-]', '{nothing}'))))
-                                  for l_ref, l_note_text in g_sethuila_sarvamula_note[p_underscore_k].items()]
-        except ValueError as e:
-            print(e)
-            print(p_underscore_k, g_sethuila_sarvamula_note[p_underscore_k])
-            sys.exit(0)
+    l_notes_sloka_list = []
+    l_notes_sloka_list_sk = []
+    for l_underscore_k in p_k_list:
+        if l_underscore_k in g_sethuila_sarvamula_note.keys():
+            try:
+                l_notes_sloka_list += [(format_ref(l_ref),
+                                       devtrans.dev2iast(l_note_text),
+                                       re.sub(r'“([^”]+)”[-”,\s]*iti kṛ pāṭhaḥ', r'<span style="color: Coral;">\1</span> (kṛ)',
+                                       re.sub(r'“([^”]+)”[-”,\s]*iti go pāṭhaḥ', r'<span style="color: DarkOrange;">\1</span> (go)',
+                                       #re.sub(r'iti go pāṭhaḥ', '<span style="color: DarkOrange;">iti go pāṭhaḥ</span>',
+                                       devtrans.dev2iast(l_note_text).replace('[-]', '{nothing}'))))
+                                      for l_ref, l_note_text in g_sethuila_sarvamula_note[l_underscore_k].items()]
+            except ValueError as e:
+                print(e)
+                print(l_underscore_k, g_sethuila_sarvamula_note[l_underscore_k])
+                sys.exit(0)
 
-        l_notes_sloka_list_sk = [(format_ref(l_ref),
-                                  l_note_text,
-                                  re.sub(r'(^|>)([^<]+)($|<)', lambda m: f'{m.group(1)}{devtrans.iast2dev(m.group(2))}{m.group(3)}',
-                                  re.sub(r'“([^”]+)”[-”,\s]*iti kṛ pāṭhaḥ', lambda m: f'<span style="color: Coral;">{devtrans.iast2dev(m.group(1))}</span> (kṛ)',
-                                  re.sub(r'“([^”]+)”[-”,\s]*iti go pāṭhaḥ', lambda m: f'<span style="color: DarkOrange;">{devtrans.iast2dev(m.group(1))}</span> (go)',
-                                        devtrans.dev2iast(l_note_text).replace('[-]', '{nothing}')))))
-                              for l_ref, l_note_text in g_sethuila_sarvamula_note[p_underscore_k].items()]
+            l_notes_sloka_list_sk += [(format_ref(l_ref),
+                                      l_note_text,
+                                      re.sub(r'(^|>)([^<]+)($|<)', lambda m: f'{m.group(1)}{devtrans.iast2dev(m.group(2))}{m.group(3)}',
+                                      re.sub(r'“([^”]+)”[-”,\s]*iti kṛ pāṭhaḥ', lambda m: f'<span style="color: Coral;">{devtrans.iast2dev(m.group(1))}</span> (kṛ)',
+                                      re.sub(r'“([^”]+)”[-”,\s]*iti go pāṭhaḥ', lambda m: f'<span style="color: DarkOrange;">{devtrans.iast2dev(m.group(1))}</span> (go)',
+                                            devtrans.dev2iast(l_note_text).replace('[-]', '{nothing}')))))
+                                  for l_ref, l_note_text in g_sethuila_sarvamula_note[l_underscore_k].items()]
+
+    if len(l_notes_sloka_list) > 0:
         l_notes_block = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{l_ref}: {l_note_go_kr}" for l_ref, _, l_note_go_kr in l_notes_sloka_list])}'
         # l_notes_block = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{l_ref}: {l_note_go_kr} / {l_note_text}" for l_ref, l_note_text, l_note_go_kr in l_notes_sloka_list])}'
         l_notes_block_sk = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{l_ref}: {l_note_go_kr}" for l_ref, _, l_note_go_kr in l_notes_sloka_list_sk])}'
@@ -1247,6 +1212,8 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_u
 
 def sarvamula_comparison(p_do_one_two_letters):
     l_fout_sk = open('bhasyha_compare_sk.html', 'w', encoding="utf-8")
+    l_seth_k_list = []
+    l_amak_k_list = []
     with open('bhasyha_compare.html', 'w', encoding="utf-8") as l_fout:
         l_fout.write(g_html_header)
         l_fout_sk.write(g_html_header)
@@ -1270,10 +1237,12 @@ def sarvamula_comparison(p_do_one_two_letters):
                         l_intro_text, l_full_bhashya_text = v
                         print(l_intro_text, l_full_bhashya_text)
                         l_anandamak_prev.append((l_underscore_k, remove_invisibles(l_intro_text), remove_invisibles(l_full_bhashya_text)))
+                        l_amak_k_list.append(l_underscore_k)
                         print(f'ANANDAMAK {len(l_anandamak_prev)} {len(l_seth_prev)}')
                     else:  # l_source_key == 'Sethuila'
                         l_seth_found = True
                         l_seth_prev += [(t, remove_invisibles(l_text).split(' '), n, k) for t, l_text, n, k in v]
+                        l_seth_k_list.append(l_underscore_k)
                         print(f'SETHUILA {len(l_anandamak_prev)} {len(l_seth_prev)}')
 
             # purge accumulators if found on both sides
@@ -1293,11 +1262,13 @@ def sarvamula_comparison(p_do_one_two_letters):
                             f'<td class="outer" style="text-align: center; background-color: #ccc;" colspan="2">{l_mula_sk}</td></tr>\n')
 
             if l_amak_found and l_seth_found:
-                l_amak_chunk_list, l_anandamak_cell, l_anandamak_cell_sk = process_anandamak(l_anandamak_prev, l_underscore_k)
-                l_seth_cell, l_seth_cell_sk = process_seth(l_amak_chunk_list, l_seth_prev, p_do_one_two_letters, l_underscore_k)
+                l_amak_chunk_list, l_anandamak_cell, l_anandamak_cell_sk = process_anandamak(l_anandamak_prev, l_amak_k_list)
+                l_seth_cell, l_seth_cell_sk = process_seth(l_amak_chunk_list, l_seth_prev, p_do_one_two_letters, l_seth_k_list)
 
                 l_anandamak_prev = []
                 l_seth_prev = []
+                l_seth_k_list = []
+                l_amak_k_list = []
 
                 l_fout.write(f'<tr>{l_anandamak_cell}{l_seth_cell}</tr>\n')
                 l_fout_sk.write(f'<tr>{l_anandamak_cell_sk}{l_seth_cell_sk}</tr>\n')
