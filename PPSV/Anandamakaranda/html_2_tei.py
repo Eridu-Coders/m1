@@ -10,27 +10,290 @@ import cydifflib as difflib
 import devtrans
 import copy
 import unicodedata
+import sandhi
+import json
 
-g_parallel = dict()
+g_soft_boundaries_chars = ',;:'
+g_hard_boundaries_char = r'=॥।“”‘’–.?!\-)(\[\]'
+g_all_boundaries_char = g_soft_boundaries_chars + g_hard_boundaries_char
+g_samskrit_vowels = 'aāiīuūoe'
+
+g_parallel_mula = dict()
 g_parallel_bhashya = dict()
 
 g_id_prefix = 'BGB'
 
+def remove_all_punct_and_space(s):
+    return re.sub(fr'[{g_all_boundaries_char}\s]', '', s)
+
+def remove_avagraha(s):
+    return s.replace('ऽ', '')
+
+def remove_invisibles(s):
+    return re.sub(r'[\u2060\u3164\u2800\u00A0]+', ' ', re.sub(r'[\u200b\u200c\u200d]+', '', s))
+
+def avagraha_iast2deva(s):
+    """
+    Turns \' (iast avagraha) into ऽ (Devanagari avagraha).
+    Removes remaining single quotes
+
+    :param s: the string to change
+    :return: the result
+    """
+    l_ret = s
+    l_ret = re.sub(r'(\w)[’\'](\w)', r"\1ऽ\2", l_ret, flags=re.UNICODE)  # Avagraha (single one)
+    l_ret = re.sub(r'(\w)(?:’’|\'\')(\w)', r"\1ऽऽ\2", l_ret, flags=re.UNICODE)  # Avagraha (2 of them) “ ”
+    return l_ret.replace('\'', '')
+
+def standardize_iast(s):
+    return re.sub(rf'([{g_samskrit_vowels}]):([{g_all_boundaries_char}\s])', r'\1ḥ\2',
+                  avagraha_iast2deva(remove_invisibles(
+                      s.replace('ṃ', 'ṁ')
+                       # .replace('ṅ', 'ṁ')
+                       .replace('lm̐l', 'ṁl') # ātmalm̐labhante
+                       .replace('o़\'', 'o\'')
+                       .replace('ṛ़', 'ṝ') # to apply to original text/files ़
+    )))
+
+def internal_sandhi(s):
+    return (
+        re.sub(r'[āa][āa]', 'ā',
+        re.sub(r'[īi][īi]', 'ī',
+        re.sub(r'[uū][uū]', 'ū',
+        # re.sub(r"[āa]'?i", 'e', t⌿ś
+        re.sub(r'(.[aāiīuūoe])nny', r'\1ṁny',
+               s))))
+        .replace('ḥs', 'ss')
+        .replace('ṁj', 'ñj')
+        .replace('ṁc', 'ñc')
+        .replace('dn', 'nn')
+    )
+
+def external_sandhi_excluding_punct(s):
+    if re.search(r'\W⌿|⌿\W', s, flags=re.UNICODE):
+        return s.replace('⌿', ' ')
+
+    return external_sandhi(s)
+
+g_sandhi_engine = sandhi.Sandhi()
+g_sandhi_log = open('Sandhi_log.txt', 'w')
+g_sandhi_dict = dict()
+g_sandhi_save_cycle = -1
+def external_sandhi(p_iast_str, p_insert_invisible=False):
+    global g_sandhi_save_cycle
+    global g_sandhi_dict
+
+    if g_sandhi_save_cycle == -1:
+        with open('sandhi_cache.json', 'r', encoding='utf-8') as l_json_fout:
+            g_sandhi_dict = json.load(l_json_fout)
+
+    l_invisible_space = '\u200b' if p_insert_invisible else ''
+    l_left_junk = re.search(rf'^[{g_all_boundaries_char}\s]*', p_iast_str).group(0)
+    l_right_junk = re.search(rf'[{g_all_boundaries_char}\d\s]*$', p_iast_str).group(0)
+
+    l_word_list = re.sub(fr'^[{g_all_boundaries_char}\s]*|[{g_all_boundaries_char}\d\s]*$', '',  p_iast_str).split('⌿')
+
+    class MyError(Exception):
+        pass
+
+    try:
+        print(f'[{p_iast_str}] --> {l_word_list}', file=g_sandhi_log)
+        i = 0
+        l_ww_s = []
+        while i < len(l_word_list) - 1:
+            #for i in range(len(l_word_list)- 1):
+            l_w1 = l_word_list[i]
+            l_w2 = l_word_list[i+1]
+            l_sandhi_cache_key = f'{l_w1}-{l_w2}'
+            if l_sandhi_cache_key in g_sandhi_dict.keys():
+                l_ww_s = g_sandhi_dict[l_sandhi_cache_key]
+                print(f'    FOUND IN CACHE:', file=g_sandhi_log, end=' ')
+            else:
+                print(f'    NEW:', file=g_sandhi_log, end=' ')
+                l_sandhi_ret = g_sandhi_engine.sandhi(devtrans.iast2dev(l_w1), devtrans.iast2dev(l_w2))
+                # there may be an extra space inbetween the 2 words: vijitendriyaḥ⌿iti --> vijitendriya  iti
+                l_ww_s = devtrans.dev2iast(re.sub(r'\s+', ' ', l_sandhi_ret[0][0])).split(' ')
+
+                g_sandhi_dict[l_sandhi_cache_key] = l_ww_s
+                if g_sandhi_save_cycle % 10 == 0:
+                    g_sandhi_save_cycle = 0
+                    with open('sandhi_cache.json', 'w', encoding='utf-8') as l_json_fout:
+                        json.dump(g_sandhi_dict, l_json_fout, ensure_ascii=False, indent=4)
+                g_sandhi_save_cycle += 1
+
+            if len(l_ww_s) == 2:
+                l_word_list[i] = l_ww_s[0]
+                l_word_list[i+1] = l_ww_s[1]
+                i += 1
+            elif len(l_ww_s) == 1:
+                l_word_list = l_word_list[:i] + l_ww_s + l_word_list[i+2:]
+            else:
+                raise MyError('len(l_ww_s) neither 1 not 2')
+            print(f'    {i:<3}', l_w1, l_w2, l_word_list, file=g_sandhi_log)
+    except (IndexError, MyError) as e:
+        print(f'\np_iast_str: {p_iast_str}')
+        print(e, f'i: {i}')
+        print('l_sandhi_ret:', [[devtrans.dev2iast(l_elem) for l_elem in l_list] for l_list in l_sandhi_ret])
+        print(f'w1:#{l_w1}# w2:#{l_w2}# --> {l_ww_s}')
+        sys.exit(0)
+
+    l_ret = l_left_junk + l_invisible_space.join(l_word_list) + l_right_junk
+    print(f'    --> [{l_ret}]', file=g_sandhi_log)
+    return l_ret
+
+def external_sandhi_old(p_iast_str, p_insert_invisible=False):
+    l_invisible_space = '\u200b' if p_insert_invisible else ''
+
+    l_iast_str_r = p_iast_str
+    # Simple Vowel Sandhi
+    l_iast_str_r = re.sub(r'[āa]⌿[āa]', f'ā{l_invisible_space}', l_iast_str_r)
+    l_iast_str_r = re.sub(r'[īi]⌿[īi]', f'ī{l_invisible_space}', l_iast_str_r)
+    l_iast_str_r = re.sub(r'[uū]⌿[uū]', f'ū{l_invisible_space}', l_iast_str_r)
+    l_iast_str_r = re.sub(r'[ṛṝ]⌿[ṛṝ]', f'ṝ{l_invisible_space}', l_iast_str_r)
+
+    # (अ, आ) + (इ, ई) = ए
+    l_iast_str_r = re.sub(r'[āa]⌿[īi]', f'e{l_invisible_space}', l_iast_str_r)
+    # (अ, आ) + (उ, ऊ) = ओ
+    l_iast_str_r = re.sub(r'[āa]⌿[uū]', f'o{l_invisible_space}', l_iast_str_r)
+    # (अ, आ) + ओ = औ
+    l_iast_str_r = re.sub(r'[āa]⌿o', f'au{l_invisible_space}', l_iast_str_r)
+    # (अ, आ) + (ऋ, ॠ) = अर्
+    l_iast_str_r = re.sub(r'[āa]⌿[ṛṝ]', f'ar{l_invisible_space}', l_iast_str_r)
+    # (अ, आ) + ऌ = अल्
+    l_iast_str_r = re.sub(r'[āa]⌿[ḷl̤]', f'al{l_invisible_space}', l_iast_str_r)
+    # (अ, आ) + ए = ऐ
+    l_iast_str_r = re.sub(r'[āa]⌿e', f'ai{l_invisible_space}', l_iast_str_r)
+    # (अ, आ) + ऐ = ऐ
+    l_iast_str_r = re.sub(r'[āa]⌿ai', f'ai{l_invisible_space}', l_iast_str_r)
+    # (अ, आ) + औ = औ
+    l_iast_str_r = re.sub(r'[āa]⌿au', f'au{l_invisible_space}', l_iast_str_r)
+
+    # (इ, ई) + (dissimilar vowel) = (य्) & that (dissimilar vowel)
+    l_iast_str_r = re.sub(r'[īi]⌿([āaūuoeṛṝḷl])', fr'y{l_invisible_space}\1', l_iast_str_r)
+    # (उ, ऊ) + (dissimilar vowel) = (व्) + that (dissimilar vowel)
+    l_iast_str_r = re.sub(r'[ūu]⌿([āaīioeṛṝḷl])', fr'v{l_invisible_space}\1', l_iast_str_r)
+    # (ऋ, ॠ) + (dissimilar vowel) = (र्) & that (dissimilar vowel)
+    l_iast_str_r = re.sub(r'[ṛṝ]⌿([āaīiūuoeḷl̤])', fr'r{l_invisible_space}\1', l_iast_str_r)
+    # (ऌ) + (dissimilar vowel) = (ल्) & (dissimilar vowel)
+    l_iast_str_r = re.sub(r'[ḷl̤]⌿([āaīiūuoeṛṝ̤])', fr'r{l_invisible_space}\1', l_iast_str_r)
+
+
+    # final ⌿ removal
+    l_iast_str_r = re.sub('(\w)⌿(\w)', rf'\1{l_invisible_space}\2', l_iast_str_r)
+    return l_iast_str_r
+    # return
+    #     re.sub(fr'(.[{g_samskrit_vowels}])[mn]⌿([pbtdkgm])', rf'\1ṁ{l_invisible_space}\2',
+    #     re.sub(fr'ḥ⌿([{g_samskrit_vowels}])', rf'r{l_invisible_space}\1',
+    #     re.sub(r'[aā]ḥ⌿[aā]', rf'o{l_invisible_space}',
+    #     re.sub(fr'e⌿([{g_samskrit_vowels}])', rf'ay{l_invisible_space}\1',
+    #     re.sub(fr'(.)t⌿([bdgy{g_samskrit_vowels}])', rf'\1d{l_invisible_space}\2',
+    #            s,
+    #            flags=re.UNICODE),
+    #            flags=re.UNICODE),
+    #            flags=re.UNICODE),
+    #            flags=re.UNICODE),
+    #            flags=re.UNICODE),
+    #            flags=re.UNICODE),
+    #            flags=re.UNICODE),
+    #            flags=re.UNICODE),
+    #            flags=re.UNICODE),
+    #            flags=re.UNICODE)
+    #     .replace('ḥ⌿s', 'ss')
+    #     .replace('t⌿ś', 'cch')
+    #     .replace('ṁ⌿nu', 'nna') # kiṁ⌿nu --> kinna
+    #     .replace('ḥ⌿t', 'st')
+    #     .replace('ṁ⌿j', 'ñj')
+    #     .replace('ṁ⌿c', 'ñc')
+    #     .replace('d⌿n', 'nn')
+    #     # .replace('n⌿ś', 'ṁś')
+    #               )
+
+g_gita_tei_file = dict()
+g_gita_tei_file_bc = dict()
+
+g_tei_changes = {
+    # '2_1': [('kṛpayā\'viṣṭam', 'kṛpayāviṣṭam')]
+    # '2_7': [('dharmasaṁmūḍhacetāḥ', 'dharmasammūḍhacetāḥ')] śarīrayātrā'pi
+    '2_8': [('ṛddham', 'ṛddhaṁ')]
+    , '2_9': [('parantapa । na', 'parantapaḥ । na')]
+    , '2_26': [('naivaṁ', 'nainaṁ')]
+    , '2_29': [('śrutvāpyenaṁ', 'śrutvā\'pyenaṁ'), ('śrṛṇoti', 'śṛṇoti')]
+    , '2_31': [('yuddhāchreyo', 'yuddhācchreyo')]
+    , '2_44': [('tayāpahṛtacetasām', 'tayā\'pahṛtacetasām')]
+    , '2_52': [('gantāsi', 'gantā\'si')]
+    , '2_55': [("ātmanyevātmanā", "ātmanyevā'tmanā")]
+    , '2_65': [('paryavatiṣṭhate', 'paryavatiṣṭhati')]
+    , '2_71': [('niḥspṛhaḥ', 'nispṛhaḥ'), ('śāṁtimadhigacchati', 'śāntimadhigacchati')]
+    , '3_2': [('vyāmiśreṇeva', 'vyāmiśreṇaiva')]
+    , '3_3': [('mayānagha', 'mayā\'nagha')]
+    , '3_7': [('niyamyārabhate\'rjuna', 'niyamyā\'rabhate\'rjuna')]
+    , '3_8': [('śarīrayātrāpi', 'śarīrayātrā\'pi')] #
+    , '3_25': [('vidvāṁstathāsakta', 'vidvāṁstathā\'sakta')]
+    , '3_29': [('tānakṛtsnavido', 'tānakṛsnavido')]
+    , '4_22': [('kṛtvāpi', 'kṛtvā\'pi')]
+    , '4_28': [('yogayajñāstathāpare', 'yogayajñāstathā\'pare')]
+    , '4_29': [('prāṇa prāṇe\'pānaṁ', 'prāṇaṁ prāṇe\'pānaṁ')]
+    # , '5_8': [('spṛśañjidhrannaśnan', 'spṛśañcidhrannaśnan')]
+}
+
+def load_gita_tei():
+    global g_gita_tei_file
+    global g_gita_tei_file_bc
+    with (open('../../gitaDnl/bg_final.xml', 'r') as l_fin):
+        l_txt = l_fin.read().replace('<br>', '<br/>')
+        try:
+            l_tree = ET.fromstring(f'{l_txt}')
+        except ET.ParseError as e:
+            print(f'XML parse ERROR: {e.code} {e.msg} in [{l_txt[:100]}]')
+
+        # for l_elem in l_tree.iter():
+        #     print(l_elem.tag)
+        l_text = l_tree.find('{http://www.tei-c.org/ns/1.0}text')
+        for l_div1 in l_text.findall("{http://www.tei-c.org/ns/1.0}div1[@type='chapter']"):
+            for l_sloka in l_div1.findall("{http://www.tei-c.org/ns/1.0}div2[@type='sloka-block']"):
+                l_sloka_l = l_sloka.find('{http://www.tei-c.org/ns/1.0}l')
+                # print(l_sloka.attrib)
+                l_sloka_id = l_sloka.attrib['{http://www.w3.org/XML/1998/namespace}id'].replace('BG_', '').replace('.', '_')
+                l_sloka_sk = devtrans.dev2iast(l_sloka_l.text + '|' + l_sloka_l.find('{http://www.tei-c.org/ns/1.0}caesura').tail)
+                l_sloka_sk = re.sub(r'\s*\.\.\s*\d+\.\d+\s*\.\.$', '', l_sloka_sk).replace('|', ' । ')
+
+                g_gita_tei_file_bc[l_sloka_id] = l_sloka_sk
+
+                l_sloka_sk = l_sloka_sk.replace('-', '')
+                for l_id_k, l_mod_list in g_tei_changes.items():
+                    if l_id_k == l_sloka_id:
+                        for l_vt1, l_vt2 in  l_mod_list:
+                            l_sloka_sk = l_sloka_sk.replace(l_vt1, l_vt2)
+
+                print(l_sloka_id, l_sloka_sk)
+                g_gita_tei_file[l_sloka_id] = l_sloka_sk
+
 def anandamak(p_file):
-    def amak_text_cleanup(p_full_bhashya_text):
-        def equalize_space_comma(s):
-            return re.sub(r",\s*(\d)", r", \1", s)
+    l_digit_separators = '.,_-'
+    def amak_text_cleanup(p_amak_bhashya_text):
+        def equalize_space_sep(s):
+            l_ret = s
+            while True:
+                l_ret_n = re.sub(
+                    fr"(\d)(\s*[{l_digit_separators}])\s*(\d)",
+                    lambda p_m: f'{p_m.group(1)}{p_m.group(2)} {p_m.group(3)}' if p_m.group(2) == ',' else f'{p_m.group(1)}{p_m.group(2)}{p_m.group(3)}',
+                    l_ret)
+                if l_ret_n == l_ret:
+                    break
+                else:
+                    l_ret = l_ret_n
+            return l_ret
 
-        l_full_bhashya_text_r = re.sub(r'(?:</?br/?>)+', '<br/>', p_full_bhashya_text)
-        l_full_bhashya_text_r = l_full_bhashya_text_r.replace('<br>', '<br/>')
-        l_full_bhashya_text_r = l_full_bhashya_text_r.replace(' ॥</em>', '</em> ॥')
-        l_full_bhashya_text_r = re.sub(r'(\S)-\s+<em>', r'\1-<em>', l_full_bhashya_text_r)
-        l_full_bhashya_text_r = re.sub(r'\s*<br/>\s*', r'<br/>', l_full_bhashya_text_r)
-        l_full_bhashya_text_r = re.sub(r'॥\s*(\d+)\s*॥', r'॥ \1 ॥', l_full_bhashya_text_r)
-        l_full_bhashya_text_r = re.sub(r'(\S)\s*॥\s*(\d+)</em>\s*॥', r'\1</em> ॥ \2 ॥', l_full_bhashya_text_r)
-        l_full_bhashya_text_r = re.sub(r'॥\s*(\d+(?:,\s*\d+)+)\s*॥', lambda m: f'॥ {equalize_space_comma(m.group(1))} ॥', l_full_bhashya_text_r)
+        l_amak_bhashya_text_r = re.sub(r'\s*(?:</?br/?>)+\s*', '<br/>', p_amak_bhashya_text)
+        # l_amak_bhashya_text_r = l_amak_bhashya_text_r.replace(' ॥</em>', '</em> ॥')
+        l_amak_bhashya_text_r = re.sub(r'([^\d\s])\s*([॥।-])\s*</em>(\s*\S|$)', r'\1</em> \2\3', l_amak_bhashya_text_r)
+        # l_amak_bhashya_text_r = re.sub(r'(\S)-\s*<em>', r'\1-<em>', l_amak_bhashya_text_r)
+        # l_amak_bhashya_text_r = re.sub(r'\s*<br/>\s*', r'<br/>', l_amak_bhashya_text_r)
+        l_amak_bhashya_text_r = re.sub(fr'॥\s*(\d+(?:\s*[{l_digit_separators}]\s*\d+)*)\s*॥', r'॥ \1 ॥', l_amak_bhashya_text_r)
+        l_amak_bhashya_text_r = re.sub(fr'(\S)\s*॥\s*(\d+(?:\s*[{l_digit_separators}]\s*\d+)*)\s*</em>\s*॥', r'\1</em> ॥ \2 ॥', l_amak_bhashya_text_r)
+        l_amak_bhashya_text_r = re.sub(fr'॥\s*(\d+(?:\s*[{l_digit_separators}]\s*\d+)+)\s*॥', lambda m: f'॥ {equalize_space_sep(m.group(1))} ॥', l_amak_bhashya_text_r)
 
-        return l_full_bhashya_text_r
+        return standardize_iast(l_amak_bhashya_text_r)
 
     with (open(p_file, 'r') as l_fin):
         l_txt = l_fin.read().replace('<br>', '<br/>')
@@ -76,7 +339,7 @@ def anandamak(p_file):
                                         re.sub(r'_[CSV]0?', '_', l_verse_id_0))
                     # verse-text
                     l_verse_text = l_uvaca_prefix + '|'.join([p.text for p in l_div_verse.findall("div[@class='verse-text']/p")])
-                    g_parallel.setdefault(l_verse_id, dict())['Anandamak'] = l_verse_text
+                    g_parallel_mula.setdefault(l_verse_id, dict())['Anandamak'] = l_verse_text
                     print('    Verse:', l_verse_id_0, '-->', l_verse_id, l_verse_text)
                     for l_div_bhashya_collection in l_div_verse.findall('div'):
                         if l_div_bhashya_collection.attrib['class'] == 'bhashya-collection':
@@ -117,21 +380,13 @@ def anandamak(p_file):
                             l_intro_text = ''
                             l_intro_line_list = []
 
-def find_note(p_element):
-    l_note_elem = p_element.find("span[@class='pathantara']")
-    if l_note_elem:
-        l_note_ref = l_note_elem.find("a[@class='pathantara-ref iast']").attrib['href']
-        return l_note_ref, l_note_elem.attrib['data-note']
-    else:
-        return None
-
 g_sethuila_mula_note = dict()
 g_sethuila_sarvamula_note = dict()
 g_sethuila_sarvamula_note_by_ref = dict()
 
 def sethuila(p_file):
     """
-    CAVEAT: some divs that should have class="sarvamula" may have class="inline" instead. These should be corrected manually from the original HTML from sethuila.in
+    CAVEAT: some divs that should have class="Sarvamula" may have class="inline" instead. These should be corrected manually in the original HTML from sethuila.in
 
     :param p_file:
     :return:
@@ -139,6 +394,14 @@ def sethuila(p_file):
     global g_sethuila_mula_note
     global g_sethuila_sarvamula_note
     global g_sethuila_sarvamula_note_by_ref
+
+    def find_note(p_element):
+        l_note_elem = p_element.find("span[@class='pathantara']")
+        if l_note_elem:
+            l_ref = l_note_elem.find("a[@class='pathantara-ref iast']").attrib['href']
+            return l_ref, l_note_elem.attrib['data-note']
+        else:
+            return None
 
     with (open(p_file, 'r') as l_fin):
         l_txt = l_fin.read()
@@ -172,7 +435,7 @@ def sethuila(p_file):
                         l_uvaca = l_div_inner.find("span[@class='inline iast']")
                         if l_uvaca is not None:
                             l_uvaca_prefix = l_uvaca.text.strip() + ' '
-                            print(l_uvaca_prefix, l_uvaca.attrib['class'])
+                            print(f"UP: {l_uvaca_prefix} {l_uvaca.attrib['class']}")
                             continue
 
                         l_verse_text_list = []
@@ -185,9 +448,9 @@ def sethuila(p_file):
                             l_verse_text_list.append(' '.join(l_padya_text_list))
 
                         l_verse_text = l_uvaca_prefix + '|'.join(l_verse_text_list)
-                        print(l_uvaca_prefix, l_verse_text_list)
+                        print(l_uvaca_prefix if len(l_uvaca_prefix) > 0 else '<No UP>', l_verse_text_list)
                         l_uvaca_prefix = ''
-                        # Mula .. [oṃ] anāvṛttiḥ śabdādanāvṛttiḥ śabdāt [oṃ].. 4/4/23..
+                        # Mula .. [oṁ] anāvṛttiḥ śabdādanāvṛttiḥ śabdāt [oṁ].. 4/4/23..
                         l_match = re.search(r'(\d+/\d+/\d+|\d+/\d+)\.\.$', l_verse_text)
                         if l_match is not None:
                             l_verse_id = l_match.group(1).replace('/', '_')
@@ -195,57 +458,78 @@ def sethuila(p_file):
                         if len(l_notes_list) > 0 and l_notes_list != [None, None]:
                             g_sethuila_mula_note[l_verse_id] = l_notes_list
 
-                        print(l_verse_id, l_verse_text, end=' ')
+                        print(f'        [{l_verse_id}]', l_verse_text, end=' ')
 
-                        l_existing_dict = g_parallel.setdefault(l_verse_id, dict())
+                        l_existing_dict = g_parallel_mula.setdefault(l_verse_id, dict())
                         l_existing_dict['Sethuila'] = l_verse_text
-                        print(g_parallel[l_verse_id])
-                    elif l_div_inner.attrib['class'] == 'Sarvamula': # see CAVEAT in docstring above
-                        def sarvamula_process(s):
-                            l_seperator = '-,;:?!\s'
-                            l_hard_boundaries = '=॥।“”‘’–.,;:?!\-)(\[\]\s'
+                        print(g_parallel_mula[l_verse_id])
+                    elif l_div_inner.attrib['class'] in ['Sarvamula', 'Colophon_Sarvamula']: # see CAVEAT in docstring above
+                        def sarvamula_cleanup(p_seth_bhashya_text):
+                            # l_seperator = '-,;:?!\s'
+                            # l_hard_boundaries = '=॥।“”‘’–.,;:?!\-)(\[\]\s'
+                            l_separator = g_soft_boundaries_chars + r'\s'
+                            l_hard_boundaries = g_hard_boundaries_char + r'\s'
                             l_hard_boundary_left = f'(?:^|[{l_hard_boundaries}])'
                             l_hard_boundary_right = f'(?:[{l_hard_boundaries}]|$)'
 
-                            s = unicodedata.normalize('NFC', s)
-                            if s == 'tān': print(s, len(s), re.match(rf'[^0-9\W_]{{2,3}}', s))
+                            l_seth_bhashya_text = unicodedata.normalize('NFC', p_seth_bhashya_text)
+                            # if l_seth_bhashya_text == 'tān': print(l_seth_bhashya_text, len(l_seth_bhashya_text), re.match(rf'[^0-9\W_]{{2,3}}', l_seth_bhashya_text))
 
-                            s = re.sub(r'(\S)\s*\.\.\s*([- \d]*\d)\s*\.\.', r'\1 ॥ \2 ॥', s)
-                            s = re.sub(r'(\S)\s*\.\.', r'\1 ॥', s)
-                            s = re.sub(r'(\S)\s*\.', r'\1 ।', s)
+                            l_seth_bhashya_text = re.sub(r'(\S)\s*\.\.\s*([- \d]*\d)\s*\.\.', r'\1 ॥ \2 ॥', l_seth_bhashya_text)
+                            l_seth_bhashya_text = re.sub(r'(\S|^)\s*\.\.', r'\1 ॥', l_seth_bhashya_text).strip()
+                            l_seth_bhashya_text = re.sub(r'(\S|^)\s*\.', r'\1 ।', l_seth_bhashya_text).strip()
+                            # print('-->', l_seth_bhashya_text)
+
+                            # def process_match(p_m):
+                            #     print(f'p_m.group(1): [{p_m.group(1)}]')
+                            #     print(f'p_m.group(2): [{p_m.group(2)}]')
+                            #     return external_sandhi(f'{p_m.group(1)}⌿{p_m.group(2)}')
+
                             # na + xxx
-                            s = re.sub(fr'({l_hard_boundary_left})na[{l_seperator}]+([^0-9\W_]+)', lambda m: external_sandhi(f'{m.group(1)}na⌿{m.group(2)}'), s, flags=re.UNICODE)
+                            l_seth_bhashya_text = re.sub(fr'({l_hard_boundary_left})na[{l_separator}]+([^0-9\W_]+)', lambda m: external_sandhi(f'{m.group(1)}na⌿{m.group(2)}'), l_seth_bhashya_text, flags=re.UNICODE)
+                            # print('A')
                             # xxx + ca
-                            s = re.sub(fr'([^0-9\W_]+)[{l_seperator}]ca({l_hard_boundary_right})', lambda m: external_sandhi(f'{m.group(1)}⌿ca{m.group(2)}'), s, flags=re.UNICODE)
+                            l_seth_bhashya_text = re.sub(fr'([^0-9\W_]+)[{l_separator}]ca({l_hard_boundary_right})', lambda m: external_sandhi(f'{m.group(1)}⌿ca{m.group(2)}'), l_seth_bhashya_text, flags=re.UNICODE)
+                            # print('B')
                             # xxx + eva
-                            s = re.sub(fr'([^0-9\W_]+)[{l_seperator}]eva({l_hard_boundary_right})', lambda m: external_sandhi(f'{m.group(1)}⌿eva{m.group(2)}'), s, flags=re.UNICODE)
+                            l_seth_bhashya_text = re.sub(fr'([^0-9\W_]+)[{l_separator}]eva({l_hard_boundary_right})', lambda m: external_sandhi(f'{m.group(1)}⌿eva{m.group(2)}'), l_seth_bhashya_text, flags=re.UNICODE)
+                            # print('C')
                             # two 2-3 char long words
-                            s = re.sub(fr'({l_hard_boundary_left}[^0-9\W_]{{2,3}})[{l_seperator}]+([^0-9\W_]{{2,3}}{l_hard_boundary_right})', lambda m: external_sandhi(f'{m.group(1)}⌿{m.group(2)}'), s, flags=re.UNICODE)
+                            l_seth_bhashya_text = re.sub(fr'({l_hard_boundary_left}[^0-9\W_]{{2,3}})[{l_separator}]+([^0-9\W_]{{2,3}}{l_hard_boundary_right})',
+                                                         lambda m: external_sandhi(f'{m.group(1)}⌿{m.group(2)}'), l_seth_bhashya_text, flags=re.UNICODE)
+                                                        # lambda m: process_match(m), l_seth_bhashya_text, flags=re.UNICODE)
+                            # print('D')
                             # other small words (3 char max)
-                            s = re.sub(fr'([^0-9\W_]+)[{l_seperator}]+([^0-9\W_]{{2,3}}{l_hard_boundary_right})', lambda m: external_sandhi(f'{m.group(1)}⌿{m.group(2)}'), s, flags=re.UNICODE)
-                            s = re.sub(fr'({l_hard_boundary_left}[^0-9\W_]{{2,3}})[{l_seperator}]+([^0-9\W_]+)', lambda m: external_sandhi(f'{m.group(1)}⌿{m.group(2)}'), s, flags=re.UNICODE)
+                            # print('E')
+                            l_seth_bhashya_text = re.sub(fr'([^0-9\W_]+)[{l_separator}]+([^0-9\W_]{{2,3}}{l_hard_boundary_right})', lambda m: external_sandhi(f'{m.group(1)}⌿{m.group(2)}'), l_seth_bhashya_text, flags=re.UNICODE)
+                            # print('F')
+                            l_seth_bhashya_text = re.sub(fr'({l_hard_boundary_left}[^0-9\W_]{{2,3}})[{l_separator}]+([^0-9\W_]+)', lambda m: external_sandhi(f'{m.group(1)}⌿{m.group(2)}'), l_seth_bhashya_text, flags=re.UNICODE)
+                            # print('G')
 
-                            # if re.search(fr'(?:^|[{l_seperator}{l_hard_boundaries}])[^0-9\W_]{{2,3}}(?:[{l_seperator}{l_hard_boundaries}]|$)', s) and len(s) > 3:
-                            #     print('Found small word', s, file=sys.stderr)
-                            #     print()
-                            #     sys.exit(0)
+                            return standardize_iast(l_seth_bhashya_text)
 
-                            return s
-
-                        print()
+                        print('<<<')
                         # l_prev_id = ''
                         for l_span_sarva in l_div_inner.iter(tag='span'):
                             l_span_id = l_span_sarva.get('id')
+                            l_span_text = l_span_sarva.text.strip() if l_span_sarva.text else ''
+                            print('       <span>', l_span_sarva.attrib['class'], '<No ID>' if l_span_id is None else l_span_id, end=' ')
+                            if len(l_span_text) == 0 and l_span_sarva.attrib['class'] != 'pathantara':
+                                print('<no text>')
+                                continue
 
-                            print('       ', l_span_sarva.attrib['class'], '<No ID>' if l_span_id is None else l_span_id, end=' ')
-                            l_span_text = sarvamula_process(l_span_sarva.text.strip() if l_span_sarva.text else '')
-                            print('<no text>' if len(l_span_text) == 0 else l_span_text, end=' ')
+                            l_span_text = sarvamula_cleanup(l_span_text)
+                            if len(l_span_text) == 0 and l_span_sarva.attrib['class'] != 'pathantara':
+                                print('<no text after cleanup>')
+                                continue
+                            else:
+                                print(f'#{l_span_text}#', end=' ')
 
                             if l_span_sarva.attrib['class'] == 'pathantara':
                                 # l_a_text = l_span_sarva.find('a').text
                                 l_note_ref = l_span_sarva.find('a').attrib['href']
                                 l_note_text = l_span_sarva.attrib['data-note'].strip()
-                                print(l_note_ref, l_note_text, end=' ')
+                                print(f'|{l_note_ref}| <{l_note_text}>', end=' ')
                                 l_cl, l_txt, _, l_kutra = l_bhashya_list[-1]
                                 l_ref_short = l_note_ref.replace('note-pathantara-', '')
 
@@ -288,14 +572,20 @@ def sethuila(p_file):
 
             # attach short elements to next chunk
             for l_css_class, l_text_chunk, l_note_ref, l_kutra_txt in l_ver_dict['Sethuila']:
+                print(f'{l_key_underscore:5} [{l_prev_chunk}] {l_text_chunk}', end=' ')
                 # only if there is no note or kutra attached to it
                 if len(remove_all_punct_and_space(l_text_chunk)) <= 4 and l_note_ref is None and l_kutra_txt is None:
-                    l_prev_chunk = l_text_chunk if l_prev_chunk is None else external_sandhi_with_punct(f'{l_prev_chunk}⌿{l_text_chunk}')
+                    l_prev_chunk = l_text_chunk if l_prev_chunk is None else external_sandhi_excluding_punct(f'{l_prev_chunk}⌿{l_text_chunk}')
+                    print(f'l_prev_chunk --> @{l_prev_chunk}@')
                 else:
                     if l_prev_chunk is not None:
-                        l_new_list.append((l_css_class, external_sandhi_with_punct(f'{l_prev_chunk}⌿{l_text_chunk}'), l_note_ref, l_kutra_txt))
+                        l_w_list = l_text_chunk.split(' ')
+                        l_sandhi = external_sandhi_excluding_punct(f'{l_prev_chunk}⌿{l_w_list[0]}') + ' '.join(l_w_list[1:])
+                        print(f'l_sandhi: {l_sandhi}')
+                        l_new_list.append((l_css_class, l_sandhi, l_note_ref, l_kutra_txt))
                     else:
                         l_new_list.append((l_css_class, l_text_chunk, l_note_ref, l_kutra_txt))
+                        print('NOTHING')
                     l_prev_chunk = None
 
             # leftover l_prev_chunk in the end --> attach to last element
@@ -303,7 +593,10 @@ def sethuila(p_file):
                 l_css_class, l_text_chunk, l_note_ref, l_kutra_txt = l_new_list[-1]
                 if l_note_ref is None:
                     # only if last element has no note, otherwise, it has to stay by itself
-                    l_new_list[-1] = (l_css_class, external_sandhi_with_punct(f'{l_text_chunk}⌿{l_prev_chunk}'), l_note_ref, l_kutra_txt)
+                    l_w_list = l_text_chunk.split(' ')
+                    l_sandhi = ' '.join(l_w_list[:-1]) + external_sandhi_excluding_punct(f'{l_w_list[-1]}⌿{l_prev_chunk}')
+                    print(f'{l_key_underscore:5} [{l_prev_chunk}] l_sandhi: {l_sandhi}')
+                    l_new_list[-1] = (l_css_class, l_sandhi, l_note_ref, l_kutra_txt)
                 else:
                     l_new_list.append((l_css_class, l_prev_chunk, None, None))
 
@@ -339,7 +632,7 @@ def list_candidates(p_k):
                         re.sub(r'( |^)c(.)', r'\1\2', p_k),
                         re.sub(r'( |^)r(.)', r'\1\2', p_k),
                         re.sub(r'( |^)l(.)', r'\1ll\2', p_k),
-                        re.sub(r'( |^)saṃ(.)', r'\1ṇaṃ\2', p_k),
+                        re.sub(r'( |^)saṁ(.)', r'\1ṇaṁ\2', p_k),
 
                         # final vowels
                         re.sub(r'(.)e( |$)', r'\1a\2', p_k),
@@ -360,13 +653,13 @@ def list_candidates(p_k):
                         re.sub(r'(.)ḥ( |$)', r'\1\2', p_k),
                         re.sub(r'(.)aḥ( |$)', r'\1o\2', p_k),
                         re.sub(r'(.)m( |$)', r'\1\2', p_k),
-                        re.sub(r'(.)m( |$)', r'\1ṃ\2', p_k),
-                        re.sub(r'(.)m ', r'\1ṃ ', p_k),
-                        re.sub(r'(.)m$', r'\1ṃ', p_k),
-                        re.sub(r'(.)n( |$)', r'\1ṃ\2', p_k),
-                        re.sub(r'(.)n( |$)', r'\1ṃs\2', p_k),
-                        re.sub(r'(.)n( |$)', r'\1ṃś\2', p_k),
-                        re.sub(r'(.)ṃ( |$)', r'\1ñ\2', p_k),
+                        re.sub(r'(.)m( |$)', r'\1ṁ\2', p_k),
+                        re.sub(r'(.)m ', r'\1ṁ ', p_k),
+                        re.sub(r'(.)m$', r'\1ṁ', p_k),
+                        re.sub(r'(.)n( |$)', r'\1ṁ\2', p_k),
+                        re.sub(r'(.)n( |$)', r'\1ṁs\2', p_k),
+                        re.sub(r'(.)n( |$)', r'\1ṁś\2', p_k),
+                        re.sub(r'(.)ṁ( |$)', r'\1ñ\2', p_k),
                         # re.sub(r'(.)n( |$)', r'\1nn\2', p_k),
                         re.sub(r'(.)t( |$)', r'\1d\2', p_k),
                         re.sub(r'(.)t( |$)', r'\1j\2', p_k),
@@ -375,319 +668,23 @@ def list_candidates(p_k):
                         re.sub(r'(.)ṭ( |$)', r'\1ṇ\2', p_k),
                         re.sub(r'(.)d( |$)', r'\1c\2', p_k),
                         re.sub(r'(.)l_verse_k( |$)', r'\1g\2', p_k),
-                        re.sub(r'(.)l_verse_k( |$)', r'\1ṃ\2', p_k),
+                        re.sub(r'(.)l_verse_k( |$)', r'\1ṁ\2', p_k),
 
-                        # ktiḥ ktim antr ṃ kalp aranś l_verse_k tribhiḥ trividham saṃnyāsam
+                        # ktiḥ ktim antr ṁ kalp aranś l_verse_k tribhiḥ trividham saṁnyāsam
                         re.sub(r'(.)ktiḥ( |$)', r'\1kitar\2', p_k),
                         re.sub(r'(.)ktim( |$)', r'\1kitam\2', p_k),
-                        re.sub(r'(.)antr(.)', r'\1aṃtr\2', p_k),
+                        re.sub(r'(.)antr(.)', r'\1aṁtr\2', p_k),
                         re.sub(r'(.)kalp(.)', r'\1kamp\2', p_k),
-                        re.sub(r'(.)aranś(.)', r'\1oṃऽś\2', p_k),
+                        re.sub(r'(.)aranś(.)', r'\1oṁऽś\2', p_k),
                         re.sub(r'(.)kti(.)', r'\1kita\2', p_k),
-                        re.sub(r'aṃśa', r'ṃऽśa', p_k),
+                        re.sub(r'aṁśa', r'ṁऽśa', p_k),
                         re.sub(r'tribhiḥ', r'itrabhir', p_k),
-                        re.sub(r'trividham', r'itravidhaṃ', p_k),
+                        re.sub(r'trividham', r'itravidhaṁ', p_k),
                         ]
     # 힣 = Unicode U+D7A3 --> after every Devanagari block so will be first in a reverse=true search
-    l_list_candidate = [(f'{len(p_k):04}-{"힣"*len(l_cand) if l_cand == p_k else l_cand}', len(p_k), l_cand) for l_cand in list(set(l_list_candidate))]
+    l_list_candidate = [(f'{len(p_k):04}-{"힣"*len(p_k) if l_cand == p_k else l_cand}', len(p_k), l_cand) for l_cand in list(set(l_list_candidate))]
+    # returns list of triplets (key, length, candidate_string)
     return l_list_candidate
-
-# TODO normalize punct lists and eliminate \' and remove (') from Sethuila
-# TODO standardize processing of iast input (standardize_iast(), avagraha, invisibles removal, etc.)
-
-def remove_all_punct_and_space(s):
-    return re.sub(r'[=॥।“”‘’–.,;:?!\-)(\[\]\s]', '', s)
-
-def remove_avagraha(s):
-    return s.replace('ऽ', '')
-
-def remove_invisibles(s):
-    return re.sub(r'[\u2060\u3164\u2800\u00A0]+', ' ', re.sub(r'[\u200b\u200c\u200d]+', '', s))
-
-def avagraha_deva(s):
-    """
-    turns \' (iast avagraha) into ऽ (Devanagari avagraha)
-
-    :param s: the string to change
-    :return: the result
-    """
-    l_ret = s
-    l_ret = re.sub(r'(\w)[’\'](\w)', r"\1ऽ\2", l_ret, flags=re.UNICODE)  # Avagraha (single one)
-    l_ret = re.sub(r'(\w)(?:’’|\'\')(\w)', r"\1ऽऽ\2", l_ret, flags=re.UNICODE)  # Avagraha (2 of them) “ ”
-    return l_ret
-
-def standardize_iast(s): # ātmalm̐labhante
-    return re.sub(r'([aāiīuūoe]):([-,;:?!\s])', r'\1ḥ\2',
-                  remove_invisibles(
-                      s.replace('ṁ', 'ṃ')
-                       .replace('ṅ', 'ṃ')
-                       .replace('lm̐l', 'ṃl')
-                       # .replace(':', 'ḥ')
-                       .replace('o़\'', 'o\'')
-                       .replace('ṛ़', 'ṝ') # to apply to original text/files ़
-    ))
-
-def internal_sandhi(s): # ⌿
-    return (
-        re.sub(r'[āa][āa]', 'ā', 
-        re.sub(r'[īi][īi]', 'ī', 
-        re.sub(r'[uū][uū]', 'ū', 
-        # re.sub(r"[āa]'?i", 'e', t⌿ś
-        re.sub(r'(.[aāiīuūoe])nny', r'\1ṃny', 
-               s))))
-        .replace('ḥs', 'ss')
-        .replace('ṃj', 'ñj')
-        .replace('ṃc', 'ñc')
-        .replace('dn', 'nn')
-    )
-
-def external_sandhi_with_punct(s):
-    if re.search(r'\W⌿|⌿\W', s):
-        return s.replace('⌿', ' ')
-
-    return external_sandhi(s)
-
-def external_sandhi(s, p_insert_invisible=False):
-    l_invisible_space = '\u200b' if p_insert_invisible else ''
-    return re.sub('(\w)⌿(\w)', rf'\1{l_invisible_space}\2',
-        re.sub(r'[āa]⌿[āa]', 'ā',
-        re.sub(r'[īi]⌿[īi]', 'ī',
-        re.sub(r'(.)[īi]⌿([āauū])', fr'\1y{l_invisible_space}\2',
-        re.sub(r'[uū]⌿[uū]', 'ū',
-        re.sub(r"[āa]⌿i", 'e',
-        re.sub(r'(.[aāiīuūoe])[mn]⌿([pbtdkgm])', rf'\1ṃ{l_invisible_space}\2',
-        re.sub(r'ḥ⌿([aāiīuūoe])', rf'r{l_invisible_space}\1',
-        re.sub(r'[aā]ḥ⌿[aā]', rf'o{l_invisible_space}',
-        re.sub(r'e⌿([aāiīuūo])', rf'ay{l_invisible_space}\1',
-        re.sub(r'(.)t⌿([bdgaāiīuūoey])', rf'\1d{l_invisible_space}\2',
-               s,
-               flags=re.UNICODE),
-               flags=re.UNICODE),
-               flags=re.UNICODE),
-               flags=re.UNICODE),
-               flags=re.UNICODE),
-               flags=re.UNICODE),
-               flags=re.UNICODE),
-               flags=re.UNICODE),
-               flags=re.UNICODE),
-               flags=re.UNICODE)
-        .replace('ḥ⌿s', 'ss') # ​kiṃ⌿​nu
-        .replace('t⌿ś', 'cch')
-        .replace('ṃ⌿nu', 'nna')
-        .replace('ḥ⌿t', 'st')
-        .replace('ṃ⌿j', 'ñj')
-        .replace('ṃ⌿c', 'ñc')
-        .replace('d⌿n', 'nn')
-        # .replace('n⌿ś', 'ṃś')
-                  )
-
-g_tei_changes = {
-    # '2_1': [('kṛpayā\'viṣṭam', 'kṛpayāviṣṭam')]
-    # '2_7': [('dharmasaṃmūḍhacetāḥ', 'dharmasammūḍhacetāḥ')] śarīrayātrā'pi
-    '2_8': [('ṛddham', 'ṛddhaṃ')]
-    , '2_9': [('parantapa । na', 'parantapaḥ । na')]
-    , '2_26': [('naivaṃ', 'nainaṃ')]
-    , '2_29': [('śrutvāpyenaṃ', 'śrutvā\'pyenaṃ'), ('śrṛṇoti', 'śṛṇoti')]
-    , '2_31': [('yuddhāchreyo', 'yuddhācchreyo')]
-    , '2_44': [('tayāpahṛtacetasām', 'tayā\'pahṛtacetasām')]
-    , '2_52': [('gantāsi', 'gantā\'si')]
-    , '2_55': [("ātmanyevātmanā", "ātmanyevā'tmanā")]
-    , '2_65': [('paryavatiṣṭhate', 'paryavatiṣṭhati')]
-    , '2_71': [('niḥspṛhaḥ', 'nispṛhaḥ'), ('śāṃtimadhigacchati', 'śāntimadhigacchati')]
-    , '3_2': [('vyāmiśreṇeva', 'vyāmiśreṇaiva')]
-    , '3_3': [('mayānagha', 'mayā\'nagha')]
-    , '3_7': [('niyamyārabhate\'rjuna', 'niyamyā\'rabhate\'rjuna')]
-    , '3_8': [('śarīrayātrāpi', 'śarīrayātrā\'pi')] #
-    , '3_25': [('vidvāṃstathāsakta', 'vidvāṃstathā\'sakta')]
-    , '3_29': [('tānakṛtsnavido', 'tānakṛsnavido')]
-    , '4_22': [('kṛtvāpi', 'kṛtvā\'pi')]
-    , '4_28': [('yogayajñāstathāpare', 'yogayajñāstathā\'pare')]
-    , '4_29': [('prāṇa prāṇe\'pānaṃ', 'prāṇaṃ prāṇe\'pānaṃ')]
-    # , '5_8': [('spṛśañjidhrannaśnan', 'spṛśañcidhrannaśnan')]
-}
-
-g_html_changes = { #
-    '1_18': [('śaṃkhaṃ', 'śaṃkhāṃ')],
-    '1_20': [('śastrasampāte', 'śastrasaṃpāte')],
-    '1_23': [('^sañjaya uvāca ', '')],
-    '1_24': [('^evamukto', 'sañjaya uvāca evamukto')],
-    '1_28': [('^kṛpayā', 'arjuna uvāca kṛpayā')],
-    '1_44': [('narake niyataṃ', 'narake\'niyataṃ')],
-    '2_1': [('kṛpayā\'\'viṣṭam', 'kṛpayā\'viṣṭam')],
-    '2_4': [('ajurna', 'arjuna')],
-    '2_5': [('hatvā\'rthakāmāṃstu', 'hatvārthakāmāṃstu')],
-    '2_7': [('dharmasammūḍhacetāḥ', 'dharmasaṃmūḍhacetāḥ')],
-    '2_9': [('parantapa । na', 'parantapaḥ । na')],
-    '2_16': [("vidyate'bhāvo", "vidyatebhāvo")],
-    '2_18': [("yuddhyasva", "yudhyasva")],
-    '2_26': [("tathā'pi", "tathāpi")],
-    '2_29': [("kaścidenamāścaryavadāścaryavad", "kaścidenamāścaryavadvadati"), ("śṛṇotiśrutvāśrutvāpyenaṃ", "śṛṇoti śrutvāpyenaṃ")],
-    '2_31': [("cā'vekṣya", "cāvekṣya")],
-    '2_33': [("atha cet tvamimaṃ", "atha cait tvamimaṃ")],
-    '2_34': [("te'vyayām।sambhāvitasya", "te'vyayām।saṃbhāvitasya")],
-    '2_53': [("yathā", "yadā")],
-    '2_54': [('^sthitaprajñasya', 'arjuna uvāca sthitaprajñasya')],
-    '2_55': [("ātmanyevātmanā", "ātmanyevā'tmanā")],
-    '2_63': [("buddhināśād vina\(praṇa\)śyati", "buddhināśāt praṇaśyati"), ("d vinaśyati", "t praṇaśyati")],
-    '2_71': [("niḥspṛhaḥ", "nispṛhaḥ")],
-    '2_72': [("nirbāṇam", "nirvāṇam")],
-    '3_7': [('niyamyārabhate\'rjuna', 'niyamyā\'rabhate\'rjuna')],
-    '3_8': [("prasidhyedakarmaṇaḥ", "prasiddhyedakarmaṇaḥ")],
-    '3_13': [("tvadhaṃ", "tvaghaṃ")],
-    '3_25': [("vidvān tathā", "vidvāṃstathā")],
-    '3_27': [("kartāhamiti", "kartā\'hamiti")],
-    '3_30': [('yudadhyasva', 'yudhyasva'), ('yuddhyasva', 'yudhyasva')],
-    '3_37': [('vidhyenamiha', 'viddhyenamiha')],
-    '4_13': [('vidhyakartāramavyayam', 'viddhyakartāramavyayam')],
-    '4_14': [('baddhyate', 'badhyate')],
-    '4_16': [('tat te\(\'\)karma', 'tatte karma')],
-    '4_20': [('nityatṛpto\(\'\)nirāśrayaḥ', 'nityatṛpto nirāśrayaḥ'), ('karmaphalā\'saṃgaṃ', 'karmaphalāsaṃgaṃ')],
-    '4_21': [('kurvan nā\'pnoti', 'kurvan nāpnoti')],
-    '4_22': [('nibaddhyate', 'nibadhyate')],
-    '4_23': [('yajñāyā\'carataḥ', 'yajñāyācarataḥ')],
-    '4_28': [('yatayaśśaṃsitavratāḥ', 'yatayaḥ saṃśitavratāḥ')],
-    '4_29': [('apāne juhvani prāṇaṃ', 'apāne juhvati prāṇaṃ')],
-    '4_30': [('niyatā\'hārāḥ', 'niyatāhārāḥ')],
-    '4_33': [('karmā\(\'\)khilaṃ', 'karmākhilaṃ'), ('yajñād jñānayajñaḥ', 'yajñājjñānayajñaḥ')],
-    '4_34': [('paripraśrena', 'paripraśnena'), ('jñāninastatvadarśinaḥ', 'jñāninastattvadarśinaḥ')],
-    '4_38': [('kālenā\'tmani', 'kālenātmani')],
-    '4_39': [('śraddhāvāllaṃbhate', 'śraddhāvāṃllabhate'), ('śraddhāvālm̐labhate', 'śraddhāvāṃllabhate'), ('jñānaṃ matparaḥ', 'jñānaṃ tatparaḥ')],
-    '5_8': [('paśyan śṛṇvan', 'paśyañśṛṇvan'), ('spṛśan jighran aśnan', 'spṛśañcidhrannaśnan'), ('svapan śvasan', 'svapañśvasan'), ('spṛśañcidhrannaśnan', 'spṛśañjighrannaśnan')],
-    '5_9': [('gṛhṇan unmiṣan', 'gṛhṇannunmiṣan')],
-    '5_12': [('nibaddhyate', 'nibadhyate')],
-    '5_13': [('saṃnyasyā\'ste', 'saṃnyasyāste')],
-    '5_15': [('nā\'datte', 'nādatte'), ('ajñānenā\'vṛtaṃ', 'ajñānenāvṛtaṃ')],
-    '5_17': [('tadbuddhayastadātmānaḥ tanniṣṭhāstatparāyaṇāḥ', 'tadbuddhayastadātmānastanniṣṭhāstatparāyaṇāḥ')],
-    '5_21': [('bāhmasparśeṣvasaktātmā', 'bāhyasparśeṣvasaktātmā')],
-    '5_24': [('ntarārāmastathā\'ntarjyotireva', 'ntarārāmastathāntarjyotireva')],
-    '5_25': [('brahmanirbā\(vā\)ṇam', 'brahmanirvāṇam'), ('chinnadvaidhā\(?\'\'\)?yatātmānaḥ', 'chinnadvaidhā yatātmānaḥ')],
-    '5_28': [('buddhiḥ munirmokṣa', 'buddhirmunirmokṣa')],
-}
-# yatayaśśaṃsitavratāḥ yajñād
-def display_dif(p_base, p_other):
-    print('-----------------------------------------------------------------------------')
-    l_sm = difflib.SequenceMatcher(None, p_base, p_other)
-    l_turn = 0
-    l_gap_start = -1
-    l_gap_end = -1
-    for a, _, s in l_sm.get_matching_blocks():
-        if s > 0:
-            if l_turn == 0: l_gap_start = a + s
-            if l_turn == 1: l_gap_end = a
-            print(f'{a:3} {s:3} {" " * a}{p_base[a:a + s]}')
-            print(f'        {" " * a}{p_other[a:a + s]}')
-            l_turn += 1
-    if l_gap_start >= 0 and l_gap_end >= 0:
-        # print(l_gap_start, l_gap_end, len(p_base), len(p_other))
-        if l_gap_end == l_gap_start:
-            l_gap_end += 1
-        print(f'{l_gap_start:3} {l_gap_end:3} {" " * l_gap_start}{p_base[l_gap_start:l_gap_end]} {ord(p_base[l_gap_start:l_gap_end][0]):x}')
-        print(f'        {" " * l_gap_start}{p_other[l_gap_start:l_gap_end]} {ord(p_other[l_gap_start:l_gap_end][0]):x}')
-    for l_string in [p_base, p_other]:
-        for i in range(0, len(l_string)):
-            print(l_string[i], end='_')
-        print()
-
-g_gita_tei_file = dict()
-g_gita_tei_file_bc = dict()
-def load_gita_tei():
-    global g_gita_tei_file
-    global g_gita_tei_file_bc
-    with (open('../../gitaDnl/bg_final.xml', 'r') as l_fin):
-        l_txt = l_fin.read().replace('<br>', '<br/>')
-        try:
-            l_tree = ET.fromstring(f'{l_txt}')
-        except ET.ParseError as e:
-            print(f'XML parse ERROR: {e.code} {e.msg} in [{l_txt[:100]}]')
-
-        # for l_elem in l_tree.iter():
-        #     print(l_elem.tag)
-        l_text = l_tree.find('{http://www.tei-c.org/ns/1.0}text')
-        for l_div1 in l_text.findall("{http://www.tei-c.org/ns/1.0}div1[@type='chapter']"):
-            for l_sloka in l_div1.findall("{http://www.tei-c.org/ns/1.0}div2[@type='sloka-block']"):
-                l_sloka_l = l_sloka.find('{http://www.tei-c.org/ns/1.0}l')
-                # print(l_sloka.attrib)
-                l_sloka_id = l_sloka.attrib['{http://www.w3.org/XML/1998/namespace}id'].replace('BG_', '').replace('.', '_')
-                l_sloka_sk = devtrans.dev2iast(l_sloka_l.text + '|' + l_sloka_l.find('{http://www.tei-c.org/ns/1.0}caesura').tail)
-                l_sloka_sk = re.sub(r'\s*\.\.\s*\d+\.\d+\s*\.\.$', '', l_sloka_sk).replace('|', ' । ')
-
-                g_gita_tei_file_bc[l_sloka_id] = l_sloka_sk
-
-                l_sloka_sk = l_sloka_sk.replace('-', '')
-                for l_id_k, l_mod_list in g_tei_changes.items():
-                    if l_id_k == l_sloka_id:
-                        for l_vt1, l_vt2 in  l_mod_list:
-                            l_sloka_sk = l_sloka_sk.replace(l_vt1, l_vt2)
-
-                print(l_sloka_id, l_sloka_sk)
-                g_gita_tei_file[l_sloka_id] = l_sloka_sk
-
-def parallel_dump():
-    load_gita_tei()
-
-    g_sethuila_mula_note['2_63'] = [('#note-pathantara-9990', '‘vinaśyati’')]
-    g_sethuila_mula_note['4_16'] = [('#note-pathantara-9991', '‘tat te\'karma’')]
-    g_sethuila_mula_note['4_20'] = [('#note-pathantara-9992', '‘nityatṛpto\'nirāśrayaḥ’')]
-    g_sethuila_mula_note['4_33'] = [('#note-pathantara-9993', '‘karmā\'khilaṃ’')]
-    g_sethuila_mula_note['5_8'] = [('#note-pathantara-9993', '‘spṛśañcidhrannaśnan’')]
-    g_sethuila_mula_note['5_25'] = [('#note-pathantara-9994', '‘brahmanirbāṇamṛṣayaḥ’'),
-                                    ('#note-pathantara-9996', '‘chinnadvaidhā''yatātmānaḥ’')]
-    for l_bs_vn, d in g_parallel.items(): # chinnadvaidhā''yatātmānaḥ
-        print(f'{l_bs_vn} {g_sethuila_mula_note[l_bs_vn] if l_bs_vn in g_sethuila_mula_note else ""}')
-        l_comp = []
-        for k, v in d.items():
-            try:
-                v = standardize_iast(v)
-
-                # l_match = re.match(r'^.*?\[?oṃ]?\s+(.*?)\s+\[?oṃ]?.*$', v) # for Brahma Sutra Bhashya
-                # if l_match:
-                #     v = l_match.group(1)
-
-                v = v.replace('–', '')
-                v = v.replace('-', '')
-                v = v.replace(' ।|', ' । ')
-                v = v.replace(' ॥|', ' । ') #  । |
-                v = v.replace('.|', ' । ')
-                v = v.replace(' । |', ' । ')
-                v = v.replace('..', '॥')
-                v = v.replace('. । ', ' । ')
-                v = v.replace('\u200d', '')
-                v = re.sub(r'(\S)\|(\S)', r'\1 \2', v)
-                v = re.sub(r'\s*॥\s*(?:\d+/)?(\d+)\s*॥', r' ॥ \1 ॥', v)
-                v = re.sub(r'\s+', ' ', v)
-
-                for l_id_k, l_mod_list in g_html_changes.items():
-                    if l_id_k == l_bs_vn:
-                        for l_vt1, l_vt2 in  l_mod_list:
-                            v = re.sub(l_vt1, l_vt2, v)
-                            #print (l_vt1, l_vt2, v)
-
-                # print(l_verse_k, v, re.match(r'^oṃ\s+(.*?)\s+oṃ', v), re.search(r'\[oṃ]\s+(.*?)\s+\[oṃ]', v))
-                # l_comp.append(re.match(r'^oṃ\s+(.*?)\s+oṃ', v).group(1) if l_verse_k == 'Anandamak' else re.search(r'\[oṃ]\s+(.*?)\s+\[oṃ]', v).group(1))
-
-                l_v_comp = re.sub(r'॥\d+॥', '', re.sub(r'\s+', '', v))
-                l_v_comp = internal_sandhi(l_v_comp)
-
-                l_comp.append(l_v_comp)
-                print(f'    {k:10} : {v}')
-            except AttributeError:
-                print(k, v)
-                sys.exit(0)
-        print(f'    TEI        : {g_gita_tei_file[l_bs_vn]}')
-        l_ref_text = internal_sandhi(standardize_iast(g_gita_tei_file[l_bs_vn].replace(' ', '')))
-        l_base = l_comp[0]
-        l_other = l_comp[1]
-        if len(l_comp) < 2 or not (l_base == l_other and l_base == l_ref_text):
-            print('    p_base  :', l_base)
-            print('    p_other :', l_other)
-            print('    ref     :', l_ref_text)
-
-            if l_base != l_other:
-                display_dif(l_base, l_other)
-            if l_base != l_ref_text:
-                display_dif(l_base, l_ref_text)
-            # sys.exit(0)
-            return
 
 g_html_header = """<html>
 <head>
@@ -718,6 +715,10 @@ g_html_header = """<html>
     <table>
     <tr><th>Sloka</th><th>Anandamakaranda</th><th>Sethuila</th></tr>
 """
+g_html_footer = """</table>
+</body>
+</html>
+"""
 
 g_frag_folder = 'Fragment Files'
 
@@ -733,71 +734,99 @@ def process_anandamak(p_amak_raw_list, p_k_list):
 
     def process_for_display(s):
         l_ret = s
+        # variants btw ()
+        l_ret = re.sub(r'\(([^\d\W_)]+)\)([^\d\W_])', r'{[{\1}]}\2', l_ret, flags=re.UNICODE)
+        l_ret = re.sub(r'([^\d\W_])\(([^\d\W_)]+)\)', r'\1{[{\2}]}', l_ret, flags=re.UNICODE)
+
         # r = re.sub(r'\([^\d(]*\d+[^)]*\)', r' ', r) # (ṛ.10.72.2) (bhāga.1.2.31) (bṛ.u.6.3.7)
         l_ret = re.sub(r'(\s*\.\s*\d+)+\.?', lambda m: m.group(1).replace(' ', ''), l_ret, flags=re.UNICODE) # cleanup of sequences of dots and numbers
-        l_ret = re.sub(r'\(\s+(\S)', r'(\1', l_ret, flags=re.UNICODE)               # space after (
-        l_ret = re.sub(r'(\S)\s+\)', r'\1)', l_ret, flags=re.UNICODE)               # space before )
+        l_ret = re.sub(r'\(\s+(\S)', r'(\1', l_ret, flags=re.UNICODE)               # remove space after (
+        l_ret = re.sub(r'(\S)\s+\)', r'\1)', l_ret, flags=re.UNICODE)               # remove space before )
         l_ret = re.sub(r'(\S)\(', r'\1 (', l_ret, flags=re.UNICODE)                 # insert space before (
         l_ret = re.sub(r'\)(\S)', r') \1', l_ret, flags=re.UNICODE)                 # insert space after )
+
         l_ret = re.sub(r'(\S)\s*॥\s*([- \d]*\d)\s*॥', r'\1&nbsp;॥&nbsp;\2&nbsp;॥', l_ret, flags=re.UNICODE)
         l_ret = re.sub(r'(\S)\s*([।॥])’', r'\1’ \2', l_ret)
-        l_ret = re.sub(r'(\S)\s*।', r'\1&#xA0;।', l_ret, flags=re.UNICODE)
+        l_ret = re.sub(r'(\S)\s*।', r'\1&nbsp;।', l_ret, flags=re.UNICODE)
         # l_ret = re.sub(r'(\w)[’\'](\w)', r"\1ऽ\2", l_ret, flags=re.UNICODE)         # Avagraha (single one)
         # l_ret = re.sub(r'(\w)(?:’’|\'\')(\w)', r"\1ऽऽ\2", l_ret, flags=re.UNICODE)  # Avagraha (2 of them) “ ”
-        l_ret = avagraha_deva(l_ret)
+        # l_ret = avagraha_iast2deva(l_ret)
 
-        return standardize_iast(l_ret)
+        # return standardize_iast(l_ret)
+        return l_ret
 
-    l_amak_text_x_list = []
+    l_amak_text_process_list = []
     l_amak_text_display_list = []
     l_amak_text_display_list_sk = []
+    # g_soft_boundaries_chars = ',;:'
+    # g_hard_boundaries_char = '=॥।“”‘’–.?!\-)(\[\]'
     for l_underscore_k_h, l_intro_text_h, l_full_bhashya_text_h in p_amak_raw_list:  # m ॥’ ‘
-        l_amak_text_x_list.append(avagraha_deva(
-                                  re.sub(r'[=,;:\'\-]', r' ',                 # punctuation removal \([^\s\d)]+\)
-                                  re.sub(r'\(([^\s\d)]+)\)', r'\1',             # remove brackets around Anandamak variant indications
-                                  re.sub(r'\([^\d(]*\d+[^)]*\)', r' ',          # (ṛ.10.72.2) (bhāga.1.2.31) (bṛ.u.6.3.7)
-                                  re.sub(r'(\s*\.\s*\d+)+\.?', lambda m: m.group(1).replace(' ', ''),  # cleanup of sequences of dots and numbers
-                                  re.sub(r'\(\s+(\S)', r'(\1',                  # space after (
-                                  re.sub(r'(\S)\s+\)', r'\1)',                  # space before )
-                                  re.sub(r'<[^>]+>', r'',                       # HTML tag removal
-                                  re.sub(r'(\S)\s*([।॥])’', r'\1’ \2',
-                                  re.sub(r'॥\s*[- \d]+\s*॥', r'',               # remove final verse references
-                                  # re.sub(r'(\w)[’\'](\w)', r"\1ऽ\2",            # Avagraha (single one)
-                                  # re.sub(r'(\w)(?:’’|\'\')(\w)', r"\1ऽऽ\2",     # Avagraha (2 of them)
-                                 f'{standardize_iast(l_intro_text_h)} {standardize_iast(l_full_bhashya_text_h)}',
-                                         # flags=re.UNICODE),
-                                         # flags=re.UNICODE),
-                                         flags=re.UNICODE),
-                                         flags=re.UNICODE),
-                                         flags=re.UNICODE),
-                                         flags=re.UNICODE),
-                                         flags=re.UNICODE),
-                                         flags=re.UNICODE),
-                                         flags=re.UNICODE),
-                                         flags=re.UNICODE),
-                                         flags=re.UNICODE)))
+        # l_amak_text_process_list.append(avagraha_iast2deva(
+        l_amak_frag = f'{l_intro_text_h} {l_full_bhashya_text_h}'.strip()
+        l_amak_frag = re.sub(r'॥\s*[- \d]+\s*॥', r'', l_amak_frag, flags=re.UNICODE)                # remove final verse references
+        l_amak_frag = re.sub(r'(\S)\s*([।॥])’', r'\1’ \2', l_amak_frag, flags=re.UNICODE)            # normalize spaces before ।॥
+        l_amak_frag = re.sub(r'<[^>]+>', r'', l_amak_frag, flags=re.UNICODE)                        # HTML tag removal
+        l_amak_frag = re.sub(r'\(\s+(\S)', r'(\1', l_amak_frag, flags=re.UNICODE)                   # remove space after (
+        l_amak_frag = re.sub(r'(\S)\s+\)', r'\1)', l_amak_frag, flags=re.UNICODE)                   # remove space before )
+        # l_amak_frag = re.sub(r'\(([^\s\d)]+)\)', r'\1', l_amak_frag, flags=re.UNICODE)
+        l_amak_frag = re.sub(r'\(([^\d\W_)]+)\)([^\d\W_])', r'\1\2', l_amak_frag, flags=re.UNICODE) # remove brackets around Anandamak variant indications
+        l_amak_frag = re.sub(r'([^\d\W_])\(([^\d\W_)]+)\)', r'\1\2', l_amak_frag, flags=re.UNICODE)
+        l_amak_frag = re.sub(r'(\S)\(', r'\1 (', l_amak_frag, flags=re.UNICODE)                     # insert space before (
+        l_amak_frag = re.sub(r'\)(\S)', r') \1', l_amak_frag, flags=re.UNICODE)                     # insert space after )
+        # l_amak_frag = re.sub(r'(\S)\s+\)', r'\1)', l_amak_frag, flags=re.UNICODE)
+        # l_amak_frag = re.sub(r'\(\s+(\S)', r'(\1', l_amak_frag, flags=re.UNICODE)
+        l_amak_frag = re.sub(r'(\s*\.\s*\d+)+\.?', lambda m: m.group(1).replace(' ', ''), l_amak_frag, flags=re.UNICODE) # cleanup of sequences of dots and numbers
+        l_amak_frag = re.sub(r'\([^\d(]*\d+[^)]*\)', r' ', l_amak_frag, flags=re.UNICODE)           # (ṛ.10.72.2) (bhāga.1.2.31) (bṛ.u.6.3.7)
+        l_amak_frag = re.sub(fr'[{g_soft_boundaries_chars}]', r' ', l_amak_frag, flags=re.UNICODE)  # soft punctuation removal \([^\s\d)]+\)
+        l_amak_text_process_list.append(internal_sandhi(l_amak_frag))
+        # l_amak_text_process_list.append(
+        #                           re.sub(fr'[{g_soft_boundaries_chars}]', r' ', # soft punctuation removal \([^\s\d)]+\)
+        #                           re.sub(r'\(([^\s\d)]+)\)', r'\1',             # remove brackets around Anandamak variant indications
+        #                           re.sub(r'\([^\d(]*\d+[^)]*\)', r' ',          # (ṛ.10.72.2) (bhāga.1.2.31) (bṛ.u.6.3.7)
+        #                           re.sub(r'(\s*\.\s*\d+)+\.?', lambda m: m.group(1).replace(' ', ''),  # cleanup of sequences of dots and numbers
+        #                           re.sub(r'\(\s+(\S)', r'(\1',                  # space after (
+        #                           re.sub(r'(\S)\s+\)', r'\1)',                  # space before )
+        #                           re.sub(r'<[^>]+>', r'',                       # HTML tag removal
+        #                           re.sub(r'(\S)\s*([।॥])’', r'\1’ \2',
+        #                           re.sub(r'॥\s*[- \d]+\s*॥', r'',               # remove final verse references
+        #                           # re.sub(r'(\w)[’\'](\w)', r"\1ऽ\2",            # Avagraha (single one)
+        #                           # re.sub(r'(\w)(?:’’|\'\')(\w)', r"\1ऽऽ\2",     # Avagraha (2 of them)
+        #                          # f'{standardize_iast(l_intro_text_h)} {standardize_iast(l_full_bhashya_text_h)}',
+        #                          f'{l_intro_text_h} {l_full_bhashya_text_h}',
+        #                                  # flags=re.UNICODE),
+        #                                  # flags=re.UNICODE),
+        #                                  flags=re.UNICODE),
+        #                                  flags=re.UNICODE),
+        #                                  flags=re.UNICODE),
+        #                                  flags=re.UNICODE),
+        #                                  flags=re.UNICODE),
+        #                                  flags=re.UNICODE),
+        #                                  flags=re.UNICODE),
+        #                                  flags=re.UNICODE),
+        #                                  flags=re.UNICODE))
 
+        def iast2dev_outside_tags(p_amak_text):
+            l_cmp_list = re.split(r'(<[^>]+>|&[\d#a-z]+;)', p_amak_text)
+            l_cmp_list = [devtrans.iast2dev(l_cmp) if l_cmp[0] not in '<&' else l_cmp for l_cmp in l_cmp_list if len(l_cmp) > 0]
+            return ''.join(l_cmp_list)
 
-        l_amak_text_display_list.append(f'{process_for_display(l_intro_text_h)}<br/>[{l_underscore_k_h.replace("_", ".")}] {process_for_display(l_full_bhashya_text_h)}')
-        l_amak_text_display_list_sk.append(f'{process_for_display(l_intro_text_h)}<br/>{l_full_bhashya_text_h}&nbsp;॥&nbsp;{l_underscore_k_h.replace("_", ".")}&nbsp;॥')
+        l_amak_text_display_list.append(f'{process_for_display(l_intro_text_h)}<br/>' if len(l_intro_text_h.strip()) > 0 else '' +
+                                        f'[{l_underscore_k_h.replace("_", ".")}] {process_for_display(l_full_bhashya_text_h)}')
+        l_amak_text_display_list_sk.append(f'{process_for_display(iast2dev_outside_tags(l_intro_text_h))}<br/>' if len(l_intro_text_h.strip()) > 0 else '' +
+                                           f'{iast2dev_outside_tags(l_full_bhashya_text_h)}&nbsp;॥&nbsp;{l_underscore_k_h.replace("_", ".")}&nbsp;॥')
 
         # chunk (⌅) and word (⌿) separators ('⌬' = end)
-    l_amak_text_x_1 = re.sub(r'[“”‘’॥।–.?!)(\[\]]', '⌅', ' '.join(l_amak_text_x_list) + '⌬')
+    l_amak_text_x_1 = re.sub(fr'[{g_hard_boundaries_char}]', '⌅', ' '.join(l_amak_text_process_list) + '⌬')
     l_amak_text_x_2 = re.sub(r'\s+', '⌿', l_amak_text_x_1)
     l_amak_text_x_3 = re.sub(r'⌿*(?:⌿*⌅)+⌿*', '⌅', l_amak_text_x_2)
     l_amak_text_x_4 = re.sub(r'^⌿|⌅⌬|⌿⌬', '', l_amak_text_x_3)
     l_amak_chunk_list_r = [remove_avagraha(s.replace('⌬', '')) for s in l_amak_text_x_4.split('⌅')]
 
     l_amak_text_display = '\n'.join(l_amak_text_display_list)
-    l_v_display = standardize_iast(l_amak_text_display)
-    # l_v_display = standardize_iast(v) + f'\n<br/><b>l_amak_chunk_list</b>: <br/>[{l_amak_text_x}]<br/>[{l_amak_text_x_1}]<br/>[{l_amak_text_x_2}]<br/>[{l_amak_text_x_3}]<br/>[{l_amak_text_x_4}] <br/>{l_amak_chunk_list}'
-
     l_amak_text_display_sk = '\n'.join(l_amak_text_display_list_sk)
-    l_v_display_sk = devtrans.iast2dev(re.sub(r'<[^>]+>', '', standardize_iast(l_amak_text_display_sk)))
-    # l_v_display_sk = devtrans.iast2dev(standardize_iast(l_amak_text_display))
 
-    l_anandamak_cell_r = f'<td class="outer"><b>Anandamakaranda</b>: {l_v_display}</td>\n'
-    l_anandamak_cell_sk_r = f'<td class="outer"><b>Anandamakaranda</b>: {l_v_display_sk}</td>\n'
+    l_anandamak_cell_r = f'<td class="outer"><b>Anandamakaranda</b>: {l_amak_text_display}</td>\n'
+    l_anandamak_cell_sk_r = f'<td class="outer"><b>Anandamakaranda</b>: {l_amak_text_display_sk}</td>\n'
 
     return l_amak_chunk_list_r, l_anandamak_cell_r, l_anandamak_cell_sk_r
 
@@ -831,11 +860,11 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_k
     l_seth_word_list_expanded = []
     for l_id_outer, l_id_inner, l_word_cmp in l_seth_word_list:
         if not l_word_cmp == '॥' and not re.match(r'\d+', l_word_cmp):
-            l_word_cmp = re.sub(r'[=॥।“”‘’–.,;:?!\'\-)(\[\]]', '',  # remove punctuation
-                         re.sub(r'(\w)[’\'](\w)', r"\1ऽ\2",         # single avagraha
-                         re.sub(r'(\w)(?:’’|\'\')(\w)', r"\1ऽऽ\2",  # double avagraha
-                                l_word_cmp, flags=re.UNICODE), flags=re.UNICODE), flags=re.UNICODE)
-            for l_word_candidate in list_candidates(internal_sandhi(standardize_iast(remove_avagraha(l_word_cmp)))):
+            l_word_cmp = re.sub(fr'[{g_all_boundaries_char}]', '', l_word_cmp, flags=re.UNICODE)  # remove all punctuation
+                         # re.sub(r'(\w)[’\'](\w)', r"\1ऽ\2",         # single avagraha
+                         # re.sub(r'(\w)(?:’’|\'\')(\w)', r"\1ऽऽ\2",  # double avagraha
+                         #        l_word_cmp, flags=re.UNICODE), flags=re.UNICODE), flags=re.UNICODE)
+            for l_word_candidate in list_candidates(internal_sandhi(remove_avagraha(l_word_cmp))):
                 l_seth_word_list_expanded.append((l_id_outer, l_id_inner, l_word_candidate))
 
     for l_item in sorted(l_seth_word_list_expanded, key=lambda t: t[2][0], reverse=True): print(l_item)
@@ -868,6 +897,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_k
                     l_is_breaking = True
                 else:
                     l_amak_sandhied_chunk = external_sandhi(l_amak_chunk)
+                    print('Sandhi:', l_amak_chunk, l_amak_sandhied_chunk)
                     # print(f'    trying {l_candidate} in {l_amak_sandhied_chunk}')
                     if l_candidate in l_amak_sandhied_chunk or remove_avagraha(l_candidate) in remove_avagraha(l_amak_sandhied_chunk):
                         # sandhied matching
@@ -937,7 +967,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_k
                                 l_diff_count_all += len(l_frag_dif_a) if len(l_frag_dif_a) > len(l_frag_dif_b) or s == 0 else len(l_frag_dif_b)
                                 l_diff_count_a += len(l_frag_dif_a)
                                 l_diff_count_b += len(l_frag_dif_b)
-                                if l_candidate == 'māṃvidhattebhidhattemām':
+                                if l_candidate == 'māṁvidhattebhidhattemām':
                                     l_frag_list.append(f'[{len(l_frag_dif_a)}]{l_frag_dif_a}/[{len(l_frag_dif_b)}]{l_frag_dif_b}({l_diff_count_a}_{l_diff_count_all})')
                                 else:
                                     l_frag_list.append(f'{l_frag_dif_a}/{l_frag_dif_b}')
@@ -1188,8 +1218,8 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_k
         return f'[{p_ref.replace("#note-pathantara-", "")}]'
 
     l_xml_list = [(t,
-                   avagraha_deva(standardize_iast(' '.join(l_text))),
-                   avagraha_deva(standardize_iast(devtrans.dev2iast(g_sethuila_sarvamula_note_by_ref[n]))) if n is not None else '', k)
+                   avagraha_iast2deva(standardize_iast(' '.join(l_text))),
+                   avagraha_iast2deva(standardize_iast(devtrans.dev2iast(g_sethuila_sarvamula_note_by_ref[n]))) if n is not None else '', k)
                   for _, (t, l_text, n, k) in enumerate(p_seth_chunk_list)]
 
     print(f'XML List for {p_k_list}')
@@ -1262,7 +1292,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_k
         l_fout_xml_frag.write(f'<TEI xmlns="http://www.tei-c.org/ns/1.0">{l_xml_frag_dev}</TEI>\n')
 
     l_v_display_list_2 = [(t,
-                           avagraha_deva(' '.join(l_seth_word_array_2[l_outer_id])),
+                           avagraha_iast2deva(' '.join(l_seth_word_array_2[l_outer_id])),
                            f' <b>{format_ref(n)}</b>' if n is not None else '',
                            f' <span style="font-size: smaller; color: #888">(kutra: {k})</span>' if k is not None else '')
                           for l_outer_id, (t, _, n, k) in enumerate(p_seth_chunk_list)]
@@ -1289,11 +1319,11 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_k
         if l_underscore_k in g_sethuila_sarvamula_note.keys():
             try:
                 l_notes_sloka_list += [(format_ref(l_ref),
-                                       avagraha_deva(standardize_iast(devtrans.dev2iast(l_note_text))),
-                                       re.sub(r'“([^”]+)”[-”,\s]*iti kṛ pāṭhaḥ', r'<span style="color: Coral;">\1</span> (kṛ)',
-                                       re.sub(r'“([^”]+)”[-”,\s]*iti go pāṭhaḥ', r'<span style="color: DarkOrange;">\1</span> (go)',
-                                       #re.sub(r'iti go pāṭhaḥ', '<span style="color: DarkOrange;">iti go pāṭhaḥ</span>',
-                                       avagraha_deva(standardize_iast(devtrans.dev2iast(l_note_text)).replace('[-]', '{nothing}')))))
+                                        avagraha_iast2deva(standardize_iast(devtrans.dev2iast(l_note_text))),
+                                        re.sub(r'“([^”]+)”[-”,\s]*iti kṛ pāṭhaḥ', r'<span style="color: Coral;">\1</span> (kṛ)',
+                                               re.sub(r'“([^”]+)”[-”,\s]*iti go pāṭhaḥ', r'<span style="color: DarkOrange;">\1</span> (go)',
+                                                      #re.sub(r'iti go pāṭhaḥ', '<span style="color: DarkOrange;">iti go pāṭhaḥ</span>',
+                                                      avagraha_iast2deva(standardize_iast(devtrans.dev2iast(l_note_text)).replace('[-]', '{nothing}')))))
                                       for l_ref, l_note_text in g_sethuila_sarvamula_note[l_underscore_k].items()]
             except ValueError as e:
                 print(e)
@@ -1405,9 +1435,9 @@ def sarvamula_comparison(p_do_one_two_letters):
                 l_p_k_d_expanded = re.sub(r'(^|[_-])(\d$|\d_)', lambda p_m: f'{p_m.group(1)}0{p_m.group(2)}', l_p_k_d.replace('_', '__'))
                 l_file_out_root = f'sm-{l_p_k_d_expanded.replace("__", "_")}'
                 with open(f'{g_frag_folder}/{l_file_out_root}-iast.html', 'w') as l_fout_html_frag:
-                    l_fout_html_frag.write(f'{g_html_header}{l_html_frag}</table></body></html>\n')
+                    l_fout_html_frag.write(f'{g_html_header}{l_html_frag}{g_html_footer}')
                 with open(f'{g_frag_folder}/{l_file_out_root}-deva.html', 'w') as l_fout_html_frag:
-                    l_fout_html_frag.write(f'{g_html_header}{l_html_frag_deva}</table></body></html>\n')
+                    l_fout_html_frag.write(f'{g_html_header}{l_html_frag_deva}{g_html_footer}')
 
                 l_html_frag = ''
                 l_html_frag_deva = ''
@@ -1416,14 +1446,8 @@ def sarvamula_comparison(p_do_one_two_letters):
                 l_seth_k_list = []
                 l_amak_k_list = []
 
-        l_fout.write(f"""</table>
-</body>
-</html>
-""")
-        l_fout_sk.write(f"""</table>
-</body>
-</html>
-""")
+        l_fout.write(g_html_footer)
+        l_fout_sk.write(g_html_footer)
 
 # ------------- main() -------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
@@ -1432,7 +1456,8 @@ if __name__ == '__main__':
     anandamak('śrīmadbhagavadgītābhāṣyam.html')
     sethuila('śrīmadbhagavadgītābhāṣyam_s.html')
 
-    parallel_dump()
+    load_gita_tei()
+    # parallel_dump()
 
     for l_verse_k in g_sethuila_mula_note.keys():
         print(f'{l_verse_k:5} {g_sethuila_mula_note[l_verse_k]}')
@@ -1451,10 +1476,10 @@ if __name__ == '__main__':
     for l_verse_k, d in sorted(list(g_parallel_bhashya.items()), key=lambda p: re.sub(r'^(\d)_', r'0\1_', re.sub(r'_(\d)$', r'_0\1', p[0]))):
         print(l_verse_k)
         if 'Sethuila' in d.keys():
-            for l_class, l_chunk, l_note, l_kutra in d['Sethuila']:
+            for l_class, l_chunk, l_note, l_kut in d['Sethuila']:
                 l_n_p = l_note if l_note is not None else ''
                 l_n_text = '' if l_note is None else f' [{devtrans.dev2iast(g_sethuila_sarvamula_note[l_verse_k][l_note])}]'
-                l_kutra_text = '' if l_kutra is None else f' (kutra: {l_kutra})'
+                l_kutra_text = '' if l_kut is None else f' (kutra: {l_kut})'
                 print(f'    {l_class:14} {l_n_p:4} {l_chunk}{l_n_text}{l_kutra_text}')
 
     sarvamula_comparison(False)
@@ -1466,6 +1491,152 @@ if __name__ == '__main__':
     #         l_original = l_original.replace(l_v1, l_v2)
     #         print(f'      {l_original} ({l_v1} --> {l_v2}')
 
+g_html_changes = { #
+    '1_18': [('śaṁkhaṁ', 'śaṁkhāṁ')],
+    '1_20': [('śastrasampāte', 'śastrasaṁpāte')],
+    '1_23': [('^sañjaya uvāca ', '')],
+    '1_24': [('^evamukto', 'sañjaya uvāca evamukto')],
+    '1_28': [('^kṛpayā', 'arjuna uvāca kṛpayā')],
+    '1_44': [('narake niyataṁ', 'narake\'niyataṁ')],
+    '2_1': [('kṛpayā\'\'viṣṭam', 'kṛpayā\'viṣṭam')],
+    '2_4': [('ajurna', 'arjuna')],
+    '2_5': [('hatvā\'rthakāmāṁstu', 'hatvārthakāmāṁstu')],
+    '2_7': [('dharmasammūḍhacetāḥ', 'dharmasaṁmūḍhacetāḥ')],
+    '2_9': [('parantapa । na', 'parantapaḥ । na')],
+    '2_16': [("vidyate'bhāvo", "vidyatebhāvo")],
+    '2_18': [("yuddhyasva", "yudhyasva")],
+    '2_26': [("tathā'pi", "tathāpi")],
+    '2_29': [("kaścidenamāścaryavadāścaryavad", "kaścidenamāścaryavadvadati"), ("śṛṇotiśrutvāśrutvāpyenaṁ", "śṛṇoti śrutvāpyenaṁ")],
+    '2_31': [("cā'vekṣya", "cāvekṣya")],
+    '2_33': [("atha cet tvamimaṁ", "atha cait tvamimaṁ")],
+    '2_34': [("te'vyayām।sambhāvitasya", "te'vyayām।saṁbhāvitasya")],
+    '2_53': [("yathā", "yadā")],
+    '2_54': [('^sthitaprajñasya', 'arjuna uvāca sthitaprajñasya')],
+    '2_55': [("ātmanyevātmanā", "ātmanyevā'tmanā")],
+    '2_63': [("buddhināśād vina\(praṇa\)śyati", "buddhināśāt praṇaśyati"), ("d vinaśyati", "t praṇaśyati")],
+    '2_71': [("niḥspṛhaḥ", "nispṛhaḥ")],
+    '2_72': [("nirbāṇam", "nirvāṇam")],
+    '3_7': [('niyamyārabhate\'rjuna', 'niyamyā\'rabhate\'rjuna')],
+    '3_8': [("prasidhyedakarmaṇaḥ", "prasiddhyedakarmaṇaḥ")],
+    '3_13': [("tvadhaṁ", "tvaghaṁ")],
+    '3_25': [("vidvān tathā", "vidvāṁstathā")],
+    '3_27': [("kartāhamiti", "kartā\'hamiti")],
+    '3_30': [('yudadhyasva', 'yudhyasva'), ('yuddhyasva', 'yudhyasva')],
+    '3_37': [('vidhyenamiha', 'viddhyenamiha')],
+    '4_13': [('vidhyakartāramavyayam', 'viddhyakartāramavyayam')],
+    '4_14': [('baddhyate', 'badhyate')],
+    '4_16': [('tat te\(\'\)karma', 'tatte karma')],
+    '4_20': [('nityatṛpto\(\'\)nirāśrayaḥ', 'nityatṛpto nirāśrayaḥ'), ('karmaphalā\'saṁgaṁ', 'karmaphalāsaṁgaṁ')],
+    '4_21': [('kurvan nā\'pnoti', 'kurvan nāpnoti')],
+    '4_22': [('nibaddhyate', 'nibadhyate')],
+    '4_23': [('yajñāyā\'carataḥ', 'yajñāyācarataḥ')],
+    '4_28': [('yatayaśśaṁsitavratāḥ', 'yatayaḥ saṁśitavratāḥ')],
+    '4_29': [('apāne juhvani prāṇaṁ', 'apāne juhvati prāṇaṁ')],
+    '4_30': [('niyatā\'hārāḥ', 'niyatāhārāḥ')],
+    '4_33': [('karmā\(\'\)khilaṁ', 'karmākhilaṁ'), ('yajñād jñānayajñaḥ', 'yajñājjñānayajñaḥ')],
+    '4_34': [('paripraśrena', 'paripraśnena'), ('jñāninastatvadarśinaḥ', 'jñāninastattvadarśinaḥ')],
+    '4_38': [('kālenā\'tmani', 'kālenātmani')],
+    '4_39': [('śraddhāvāllaṁbhate', 'śraddhāvāṁllabhate'), ('śraddhāvālm̐labhate', 'śraddhāvāṁllabhate'), ('jñānaṁ matparaḥ', 'jñānaṁ tatparaḥ')],
+    '5_8': [('paśyan śṛṇvan', 'paśyañśṛṇvan'), ('spṛśan jighran aśnan', 'spṛśañcidhrannaśnan'), ('svapan śvasan', 'svapañśvasan'), ('spṛśañcidhrannaśnan', 'spṛśañjighrannaśnan')],
+    '5_9': [('gṛhṇan unmiṣan', 'gṛhṇannunmiṣan')],
+    '5_12': [('nibaddhyate', 'nibadhyate')],
+    '5_13': [('saṁnyasyā\'ste', 'saṁnyasyāste')],
+    '5_15': [('nā\'datte', 'nādatte'), ('ajñānenā\'vṛtaṁ', 'ajñānenāvṛtaṁ')],
+    '5_17': [('tadbuddhayastadātmānaḥ tanniṣṭhāstatparāyaṇāḥ', 'tadbuddhayastadātmānastanniṣṭhāstatparāyaṇāḥ')],
+    '5_21': [('bāhmasparśeṣvasaktātmā', 'bāhyasparśeṣvasaktātmā')],
+    '5_24': [('ntarārāmastathā\'ntarjyotireva', 'ntarārāmastathāntarjyotireva')],
+    '5_25': [('brahmanirbā\(vā\)ṇam', 'brahmanirvāṇam'), ('chinnadvaidhā\(?\'\'\)?yatātmānaḥ', 'chinnadvaidhā yatātmānaḥ')],
+    '5_28': [('buddhiḥ munirmokṣa', 'buddhirmunirmokṣa')],
+}
+# yatayaśśaṁsitavratāḥ yajñād
+def display_dif(p_base, p_other):
+    print('-----------------------------------------------------------------------------')
+    l_sm = difflib.SequenceMatcher(None, p_base, p_other)
+    l_turn = 0
+    l_gap_start = -1
+    l_gap_end = -1
+    for a, _, s in l_sm.get_matching_blocks():
+        if s > 0:
+            if l_turn == 0: l_gap_start = a + s
+            if l_turn == 1: l_gap_end = a
+            print(f'{a:3} {s:3} {" " * a}{p_base[a:a + s]}')
+            print(f'        {" " * a}{p_other[a:a + s]}')
+            l_turn += 1
+    if l_gap_start >= 0 and l_gap_end >= 0:
+        # print(l_gap_start, l_gap_end, len(p_base), len(p_other))
+        if l_gap_end == l_gap_start:
+            l_gap_end += 1
+        print(f'{l_gap_start:3} {l_gap_end:3} {" " * l_gap_start}{p_base[l_gap_start:l_gap_end]} {ord(p_base[l_gap_start:l_gap_end][0]):x}')
+        print(f'        {" " * l_gap_start}{p_other[l_gap_start:l_gap_end]} {ord(p_other[l_gap_start:l_gap_end][0]):x}')
+    for l_string in [p_base, p_other]:
+        for i in range(0, len(l_string)):
+            print(l_string[i], end='_')
+        print()
+
+def parallel_dump():
+    g_sethuila_mula_note['2_63'] = [('#note-pathantara-9990', '‘vinaśyati’')]
+    g_sethuila_mula_note['4_16'] = [('#note-pathantara-9991', '‘tat te\'karma’')]
+    g_sethuila_mula_note['4_20'] = [('#note-pathantara-9992', '‘nityatṛpto\'nirāśrayaḥ’')]
+    g_sethuila_mula_note['4_33'] = [('#note-pathantara-9993', '‘karmā\'khilaṁ’')]
+    g_sethuila_mula_note['5_8'] = [('#note-pathantara-9993', '‘spṛśañcidhrannaśnan’')]
+    g_sethuila_mula_note['5_25'] = [('#note-pathantara-9994', '‘brahmanirbāṇamṛṣayaḥ’'),
+                                    ('#note-pathantara-9996', '‘chinnadvaidhā''yatātmānaḥ’')]
+    for l_bs_vn, d in g_parallel_mula.items(): # chinnadvaidhā''yatātmānaḥ
+        print(f'{l_bs_vn} {g_sethuila_mula_note[l_bs_vn] if l_bs_vn in g_sethuila_mula_note else ""}')
+        l_comp = []
+        for k, v in d.items():
+            try:
+                v = standardize_iast(v)
+
+                # l_match = re.match(r'^.*?\[?oṁ]?\s+(.*?)\s+\[?oṁ]?.*$', v) # for Brahma Sutra Bhashya
+                # if l_match:
+                #     v = l_match.group(1)
+
+                v = v.replace('–', '')
+                v = v.replace('-', '')
+                v = v.replace(' ।|', ' । ')
+                v = v.replace(' ॥|', ' । ') #  । |
+                v = v.replace('.|', ' । ')
+                v = v.replace(' । |', ' । ')
+                v = v.replace('..', '॥')
+                v = v.replace('. । ', ' । ')
+                v = v.replace('\u200d', '')
+                v = re.sub(r'(\S)\|(\S)', r'\1 \2', v)
+                v = re.sub(r'\s*॥\s*(?:\d+/)?(\d+)\s*॥', r' ॥ \1 ॥', v)
+                v = re.sub(r'\s+', ' ', v)
+
+                for l_id_k, l_mod_list in g_html_changes.items():
+                    if l_id_k == l_bs_vn:
+                        for l_vt1, l_vt2 in  l_mod_list:
+                            v = re.sub(l_vt1, l_vt2, v)
+                            #print (l_vt1, l_vt2, v)
+
+                # print(l_verse_k, v, re.match(r'^oṁ\s+(.*?)\s+oṁ', v), re.search(r'\[oṁ]\s+(.*?)\s+\[oṁ]', v))
+                # l_comp.append(re.match(r'^oṁ\s+(.*?)\s+oṁ', v).group(1) if l_verse_k == 'Anandamak' else re.search(r'\[oṁ]\s+(.*?)\s+\[oṁ]', v).group(1))
+
+                l_v_comp = re.sub(r'॥\d+॥', '', re.sub(r'\s+', '', v))
+                l_v_comp = internal_sandhi(l_v_comp)
+
+                l_comp.append(l_v_comp)
+                print(f'    {k:10} : {v}')
+            except AttributeError:
+                print(k, v)
+                sys.exit(0)
+        print(f'    TEI        : {g_gita_tei_file[l_bs_vn]}')
+        l_ref_text = internal_sandhi(standardize_iast(g_gita_tei_file[l_bs_vn].replace(' ', '')))
+        l_base = l_comp[0]
+        l_other = l_comp[1]
+        if len(l_comp) < 2 or not (l_base == l_other and l_base == l_ref_text):
+            print('    p_base  :', l_base)
+            print('    p_other :', l_other)
+            print('    ref     :', l_ref_text)
+
+            if l_base != l_other:
+                display_dif(l_base, l_other)
+            if l_base != l_ref_text:
+                display_dif(l_base, l_ref_text)
+            # sys.exit(0)
+            return
 
 # if l_bs_vn == '1_1_29':
 #     l_v_comp = l_v_comp.replace('cedadhyātmasambhandhabhūmā', 'cedadhyātmasambandhabhūmā')
