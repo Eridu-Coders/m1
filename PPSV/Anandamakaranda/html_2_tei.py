@@ -91,53 +91,63 @@ def external_sandhi(p_iast_str, p_insert_invisible=False):
     l_left_junk = re.search(rf'^[{g_all_boundaries_char}\s]*', p_iast_str).group(0)
     l_right_junk = re.search(rf'[{g_all_boundaries_char}\d\s]*$', p_iast_str).group(0)
 
-    l_word_list = re.sub(fr'^[{g_all_boundaries_char}\s]*|[{g_all_boundaries_char}\d\s]*$', '',  p_iast_str).split('⌿')
+    l_iast_shrunk = re.sub(fr'^[{g_all_boundaries_char}\s]*|[{g_all_boundaries_char}\d\s]*$', '',  p_iast_str)
 
     class MyError(Exception):
         pass
 
-    try:
-        print(f'[{p_iast_str}] --> {l_word_list}', file=g_sandhi_log)
-        i = 0
-        l_ww_s = []
-        while i < len(l_word_list) - 1:
-            #for i in range(len(l_word_list)- 1):
-            l_w1 = l_word_list[i]
-            l_w2 = l_word_list[i+1]
-            l_sandhi_cache_key = f'{l_w1}-{l_w2}'
-            if l_sandhi_cache_key in g_sandhi_dict.keys():
-                l_ww_s = g_sandhi_dict[l_sandhi_cache_key]
-                print(f'    FOUND IN CACHE:', file=g_sandhi_log, end=' ')
-            else:
-                print(f'    NEW:', file=g_sandhi_log, end=' ')
-                l_sandhi_ret = g_sandhi_engine.sandhi(devtrans.iast2dev(l_w1), devtrans.iast2dev(l_w2))
-                # there may be an extra space inbetween the 2 words: vijitendriyaḥ⌿iti --> vijitendriya  iti
-                l_ww_s = devtrans.dev2iast(re.sub(r'\s+', ' ', l_sandhi_ret[0][0])).split(' ')
+    # ⌅
+    l_new_chunk_list = []
+    print(f'[{p_iast_str}]', file=g_sandhi_log)
+    for l_iast_chunk in l_iast_shrunk.split('⌅'):
+        l_word_list = l_iast_chunk.split('⌿')
+        print(f'    {l_word_list}', file=g_sandhi_log)
+        try:
+            i = 0
+            l_ww_s = []
+            while i < len(l_word_list) - 1:
+                #for i in range(len(l_word_list)- 1):
+                l_w1 = l_word_list[i]
+                l_w2 = l_word_list[i+1]
+                l_sandhi_cache_key = f'{l_w1}-{l_w2}'
+                l_sandhi_ret = None
+                if l_sandhi_cache_key in g_sandhi_dict.keys():
+                    l_ww_s = [g_sandhi_dict[l_sandhi_cache_key]]
+                    print(f'        FOUND IN CACHE:', file=g_sandhi_log, end=' ')
+                else:
+                    print(f'        NEW:', file=g_sandhi_log, end=' ')
+                    l_sandhi_ret = g_sandhi_engine.sandhi(devtrans.iast2dev(l_w1), devtrans.iast2dev(l_w2))
+                    # there may be an extra space inbetween the 2 words: vijitendriyaḥ⌿iti --> vijitendriya  iti
+                    l_ww_s = devtrans.dev2iast(re.sub(r'\s+', ' ', re.sub(r'[><]', '', l_sandhi_ret[0][0]))).split(' ')
 
-                g_sandhi_dict[l_sandhi_cache_key] = l_ww_s
-                if g_sandhi_save_cycle % 10 == 0:
-                    g_sandhi_save_cycle = 0
-                    with open('sandhi_cache.json', 'w', encoding='utf-8') as l_json_fout:
-                        json.dump(g_sandhi_dict, l_json_fout, ensure_ascii=False, indent=4)
-                g_sandhi_save_cycle += 1
+                    g_sandhi_dict[l_sandhi_cache_key] = l_ww_s[0]
+                    if g_sandhi_save_cycle % 10 == 0:
+                        g_sandhi_save_cycle = 0
+                        with open('sandhi_cache.json', 'w', encoding='utf-8') as l_json_fout:
+                            json.dump(g_sandhi_dict, l_json_fout, ensure_ascii=False, indent=4)
+                    g_sandhi_save_cycle += 1
 
-            if len(l_ww_s) == 2:
-                l_word_list[i] = l_ww_s[0]
-                l_word_list[i+1] = l_ww_s[1]
-                i += 1
-            elif len(l_ww_s) == 1:
-                l_word_list = l_word_list[:i] + l_ww_s + l_word_list[i+2:]
-            else:
-                raise MyError('len(l_ww_s) neither 1 not 2')
-            print(f'    {i:<3}', l_w1, l_w2, l_word_list, file=g_sandhi_log)
-    except (IndexError, MyError) as e:
-        print(f'\np_iast_str: {p_iast_str}')
-        print(e, f'i: {i}')
-        print('l_sandhi_ret:', [[devtrans.dev2iast(l_elem) for l_elem in l_list] for l_list in l_sandhi_ret])
-        print(f'w1:#{l_w1}# w2:#{l_w2}# --> {l_ww_s}')
-        sys.exit(0)
+                if len(l_ww_s) == 2:
+                    l_word_list[i] = l_ww_s[0]
+                    l_word_list[i+1] = l_ww_s[1]
+                    i += 1
+                elif len(l_ww_s) == 1:
+                    l_composite_word = l_ww_s[0]
+                    l_composite_word = l_composite_word[:len(l_w1)] + l_invisible_space + l_composite_word[len(l_w1):]
+                    l_word_list = l_word_list[:i] + [l_composite_word] + l_word_list[i+2:]
+                else:
+                    raise MyError('len(l_ww_s) neither 1 not 2')
+                print(f'{i:<3} #{l_w1}# #{l_w2}# {l_ww_s}', l_word_list, l_sandhi_ret if l_sandhi_ret else '', file=g_sandhi_log)
 
-    l_ret = l_left_junk + l_invisible_space.join(l_word_list) + l_right_junk
+            l_new_chunk_list.append('⌿'.join(l_word_list))
+        except (IndexError, MyError) as e:
+            print(f'\np_iast_str: {p_iast_str}')
+            print(e, f'i: {i}')
+            print('l_sandhi_ret:', [[devtrans.dev2iast(l_elem) for l_elem in l_list] for l_list in l_sandhi_ret])
+            print(f'w1:#{l_w1}# w2:#{l_w2}# --> {l_ww_s}')
+            sys.exit(0)
+
+    l_ret = l_left_junk + '⌅'.join(l_new_chunk_list) + l_right_junk
     print(f'    --> [{l_ret}]', file=g_sandhi_log)
     return l_ret
 
@@ -878,6 +888,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_k
     l_prev_cand_len = 0 # for erasing previous printout after \r
     # try to fit Sethuila words into Anandamakaranda chunks list
     # l_is_original = True -> candidate in its original form and not one added by list_candidates()
+    l_triple_amak = [(l_amak_id, l_amak_chunk, external_sandhi(l_amak_chunk)) for l_amak_id, l_amak_chunk in enumerate(p_amak_chunk_list)]
     for l_critical_big_m, l_critical_big_sm in [(12, 12), (3, 5)]:
         for l_pc_i, (l_id_outer, l_id_inner, l_len, l_candidate, l_is_original) in enumerate(l_seth_word_list_expanded):
             if f'{l_id_outer}-{l_id_inner}' in l_forbidden_id_list or l_len < l_critical_big_m:
@@ -886,18 +897,25 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_k
             print(f'1P: {l_candidate}', l_id_outer, l_id_inner, p_amak_chunk_list)
             print(f'{p_k_list[-1]} 1P[{l_critical_big_m}]: {(float(l_pc_i) * 100) / len(l_seth_word_list_expanded):.1f}%' + ' ' * l_prev_cand_len * 2, end='\r', file=sys.stderr)
             l_prev_cand_len = len(l_candidate)
+            # for l_amak_id, l_amak_chunk in [(i, s) for i, s in enumerate(p_amak_chunk_list) if len(s) > 0 and len(s) + 2 >= len(l_candidate)]:
             l_is_breaking = False
-            for l_amak_id, l_amak_chunk in [(i, s) for i, s in enumerate(p_amak_chunk_list) if len(s) > 0 and len(s) + 2 >= len(l_candidate)]:
+            for l_amak_id, l_amak_chunk, l_amak_sandhied_chunk in [(i, s1, s2) for i, s1, s2 in l_triple_amak if len(s1) > 0 and len(s1) + 2 >= len(l_candidate) and len(s2) + 2 >= len(l_candidate)]:
                 # print(f'    trying {l_candidate} in {l_amak_chunk}')
                 if l_candidate in l_amak_chunk or remove_avagraha(l_candidate) in remove_avagraha(l_amak_chunk):
                     # un-sandhied matching
                     # replace only the first encountered match bc the following ones will correspond to other words (candidtates)
-                    p_amak_chunk_list[l_amak_id] = re.sub('^⌿', '', re.sub('⌿$', '', re.sub(l_candidate, '', l_amak_chunk, count=1)))
-                    print(f'    Candidate    [{l_candidate}] found in {l_amak_chunk}', p_amak_chunk_list[l_amak_id], p_amak_chunk_list)
+                    l_chunk_tmp = re.sub(l_candidate, '', l_amak_chunk, count=1)
+                    l_chunk_tmp = re.sub('⌿⌿+', '⌅', l_chunk_tmp)
+                    l_chunk_tmp = re.sub('(^|⌅)⌿+|⌿+($|⌅)', r'\1', l_chunk_tmp)
+                    l_chunk_tmp = re.sub('⌅⌿⌅', '⌅⌅',  l_chunk_tmp)
+                    l_triple_amak[l_amak_id] = (l_amak_id, l_chunk_tmp, external_sandhi(l_chunk_tmp))
+                    p_amak_chunk_list[l_amak_id] = l_chunk_tmp
+
+                    print(f'    Candidate    [{l_candidate}] found in {l_amak_chunk} --> {l_chunk_tmp}')
                     l_is_breaking = True
                 else:
-                    l_amak_sandhied_chunk = external_sandhi(l_amak_chunk)
-                    print('Sandhi:', l_amak_chunk, l_amak_sandhied_chunk)
+                    # l_amak_sandhied_chunk = external_sandhi(l_amak_chunk)
+                    # print('Sandhi:', l_amak_chunk, l_amak_sandhied_chunk)
                     # print(f'    trying {l_candidate} in {l_amak_sandhied_chunk}')
                     if l_candidate in l_amak_sandhied_chunk or remove_avagraha(l_candidate) in remove_avagraha(l_amak_sandhied_chunk):
                         # sandhied matching
@@ -921,7 +939,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_k
             if f'{l_id_outer}-{l_id_inner}' in l_forbidden_id_list or l_len < l_critical_big_sm or not l_is_original:
                 continue
 
-            print(f'xP: {l_candidate}', l_id_outer, l_id_inner, p_amak_chunk_list)
+            print(f'xP[{l_critical_big_sm}]: {l_candidate}', l_id_outer, l_id_inner, p_amak_chunk_list)
             print(f'{p_k_list[-1]} xP[{l_critical_big_sm}]: {(float(l_pc_i) * 100) / len(l_seth_word_list_expanded):.1f}%' + ' ' * l_prev_cand_len * 2, end='\r', file=sys.stderr)
             l_prev_cand_len = len(l_candidate)
             l_is_breaking = False
@@ -930,17 +948,23 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_k
                 if l_is_breaking:
                     break
 
-                for l_amak_id, l_amak_chunk in [(i, s) for i, s in enumerate(p_amak_chunk_list) if len(s) > 0 and len(s) + 2 >= len(l_candidate)]:
+                # for l_amak_id, l_amak_chunk in [(i, s) for i, s in enumerate(p_amak_chunk_list) if len(s) > 0 and len(s) + 2 >= len(l_candidate)]:
+                # for l_amak_id, l_amak_chunk in [(i, s) for i, s in enumerate(p_amak_chunk_list) if len(s) > 0 and len(s) + l_critical >= len(l_candidate)]:
+                for l_amak_id, l_amak_chunk, l_amak_sandhied_chunk in [(i, s1, s2) for i, s1, s2 in l_triple_amak if len(s1) > 0 and
+                                                                                                                     len(s1) + l_critical >= len(l_candidate) and
+                                                                                                                     len(s2) + l_critical >= len(l_candidate)]:
                     if l_is_breaking:
                         break
 
-                    l_amak_sandhied_chunk = external_sandhi(l_amak_chunk)
+                    if l_candidate == 'śrutamiti': print('   ', l_critical, l_amak_chunk)
+                    # l_amak_sandhied_chunk = external_sandhi(l_amak_chunk)
                     l_strings_to_match = []
                     for l_stm_block in [l_amak_chunk, remove_avagraha(l_amak_chunk), l_amak_sandhied_chunk, remove_avagraha(l_amak_sandhied_chunk)]:
                         l_strings_to_match += [s for s in re.split('⌿+', l_stm_block)]
+                    l_strings_to_match = list(set(l_strings_to_match))
 
                     for l_string_to_match in l_strings_to_match:
-                        if l_candidate == 'cakrurvedaiśca': print('   ', l_critical, l_candidate, l_string_to_match)
+                        if l_candidate == 'śrutamiti': print('       ', l_string_to_match)
 
                         l_sm = difflib.SequenceMatcher(None, l_candidate, l_string_to_match)
                         l_frag_list = []
@@ -967,12 +991,12 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_k
                                 l_diff_count_all += len(l_frag_dif_a) if len(l_frag_dif_a) > len(l_frag_dif_b) or s == 0 else len(l_frag_dif_b)
                                 l_diff_count_a += len(l_frag_dif_a)
                                 l_diff_count_b += len(l_frag_dif_b)
-                                if l_candidate == 'māṁvidhattebhidhattemām':
+                                if l_candidate == 'śrutamiti':
                                     l_frag_list.append(f'[{len(l_frag_dif_a)}]{l_frag_dif_a}/[{len(l_frag_dif_b)}]{l_frag_dif_b}({l_diff_count_a}_{l_diff_count_all})')
                                 else:
                                     l_frag_list.append(f'{l_frag_dif_a}/{l_frag_dif_b}')
                                 l_frag_list_sk.append(f'{devtrans.iast2dev(l_frag_dif_a)}/{devtrans.iast2dev(l_frag_dif_b)}')
-                                if l_candidate == 'cakrurvedaiśca': print('       ', f'{l_diff_count_a} {l_diff_count_all} {l_frag_list}')
+                                if l_candidate == 'śrutamiti': print('           ', f'{l_diff_count_a} {l_diff_count_all} {l_frag_list}')
 
                             l_match_count += s
                             if s > 0:
@@ -987,7 +1011,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_k
                         l_sm_frag_display = '_'.join(l_frag_list)
                         l_sm_frag_display_sk = '_'.join(l_frag_list_sk)
 
-                        if l_candidate == 'cakrurvedaiśca':
+                        if l_candidate == 'śrutamiti':
                             print('       ', f'd: {l_diff_count_a}/{l_diff_count_all} m: {l_match_count} in: {l_inflation_ratio*100:.2f} % len: {len(l_candidate)}', l_sm_frag_display)
                         if '⌿' in l_sm_frag_display or l_inflation_ratio > .6:
                             continue
