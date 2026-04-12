@@ -92,7 +92,8 @@ private:
 
     static QString skipUntil(int p_indent_count, QString& p_indent, QXmlStreamReader& p_xml_reader, const QString& p_elem_close);
     static AuthorTEI readPersName(QXmlStreamReader& p_xml_reader);
-    static void loadTeiInternal(const QString& p_file_path, bool p_validate_only=false);
+    static void loadTeiInternal1(const QString& p_file_path, bool p_validate_only=false);
+    static void loadTeiInternal2(const QString& p_file_path, bool p_validate_only=false);
 
     static void create_text(
         const QString& p_title,
@@ -121,7 +122,8 @@ private:
     static M1Store::Item_lv2* getPersonOrg(const QString& p_name, const QString& p_role, OrgOrPerson p_is_person, ReturnEntityOrRole p_return);
 public:
     static void init();
-    static void loadTei(const QString& p_file_path);
+    static void loadTei1(const QString& p_file_path);
+    static void loadTei2(const QString& p_file_path);
 };
 
 } // end of namespace M1Store

@@ -26,7 +26,7 @@ Q_LOGGING_CATEGORY(g_cat_tmp_debug, "tmp_debug")
 /*
 void loadEnoch();
 int loadGita();
-bool loadTei(bool p_validate=false);
+bool loadTei1(bool p_validate=false);
 */
 
 int main(int argc, char *argv[])
@@ -37,9 +37,9 @@ int main(int argc, char *argv[])
     // std::vector<std::string> l_fuck;
     l_desc.add_options()
         ("help,h", "produce help message")
-        ("load-gita,g", "Load Bhagavad Gita test data")
-        ("load-json,j", "Load a json file")
-        ("load-tei,t", "Loads a TEI file")
+        ("load-json,j", "Load a json file (Old Plato Republic style)")
+        ("load-tei-1,b", "Load a TEI file - Bhagavad Gita Style")
+        ("load-tei-2,p", "Load a TEI file - Plato Perseus Style")
         ("reset,r", "Reset (empty) storage")
         // ("qmljsdebugger", po::value<std::vector<std::string>>(&l_fuck), "Fuck")
         ;
@@ -54,7 +54,8 @@ int main(int argc, char *argv[])
         // printf("T\n");
 
         if(l_program_options_vm.count("reset")) std::cout << "reset option detected" << std::endl;
-        if(l_program_options_vm.count("load-tei")) std::cout << "load-tei option detected" << std::endl;
+        if(l_program_options_vm.count("load-tei-1")) std::cout << "load-tei-1 option detected" << std::endl;
+        if(l_program_options_vm.count("load-tei-2")) std::cout << "load-tei-2 option detected" << std::endl;
         if(l_program_options_vm.count("load-json")) std::cout << "load-json option detected" << std::endl;
         // if(l_program_options_vm.count("qmljsdebugger")) std::cout << l_fuck.at(0) << std::endl;
         // printf("U\n");
@@ -104,7 +105,7 @@ int main(int argc, char *argv[])
                                         "tree_display=false\n"
                                         "passages_panel=false\n"
                                         "main_window=false\n"
-                                        "tei_interface=false\n"
+                                        //"tei_interface=false\n"
                                         "tree_row=false\n"
                                         "qt.*.debug=false\n");
     M1Env::EnvStatic::setTmpDebug(false);
@@ -127,20 +128,32 @@ int main(int argc, char *argv[])
             return 1;
         }
     }
-    if(l_program_options_vm.count("load-tei")){
+    if(l_program_options_vm.count("load-tei-1")){
         try{
-            std::cout << "Loading TEI file ..." << std::endl;
-            M1Store::TEIInterface::loadTei("../gitaDnl/bg_final_ex.xml");
-            qCDebug(g_cat_main).noquote() << "End of TEI XML loading";
+            std::cout << "Loading TEI file (Gita Style) ..." << std::endl;
+            M1Store::TEIInterface::loadTei1("../gitaDnl/bg_final_ex.xml");
+            qCDebug(g_cat_main).noquote() << "End of TEI XML (1) loading";
             // std::_Exit(0);
         }
         catch(const M1Env::M1Exception& e){
-            qCDebug(g_cat_main).noquote() << "TEI load error" << e.code() << e.message();
+            qCDebug(g_cat_main).noquote() << "TEI (1) load error" << e.code() << e.message();
+            return 1;
+        }
+    }
+    if(l_program_options_vm.count("load-tei-2")){
+        try{
+            std::cout << "Loading TEI file (Plato style) ..." << std::endl;
+            M1Store::TEIInterface::loadTei2("../../Greek_Translation_alignment_claude/PR05_emb.xml");
+            qCDebug(g_cat_main).noquote() << "End of TEI (2) XML loading";
+            // std::_Exit(0);
+        }
+        catch(const M1Env::M1Exception& e){
+            qCDebug(g_cat_main).noquote() << "TEI load (2) error" << e.code() << e.message();
             return 1;
         }
     }
 
-    qCDebug(g_cat_main).noquote() << "Testing g_re_final_p: " << QString("भोगिनः। विष्णोश्चलति तद्भोगोऽत्यतीव हरितोषणम् इति पाद्मे।</p>").replace(g_re_final_p, "");
+    // qCDebug(g_cat_main).noquote() << "Testing g_re_final_p: " << QString("भोगिनः। विष्णोश्चलति तद्भोगोऽत्यतीव हरितोषणम् इति पाद्मे।</p>").replace(g_re_final_p, "");
 
     // throw M1Env::M1Exception("", 0);
     QApplication a(argc, argv);

@@ -390,20 +390,20 @@ def anandamak(p_file):
                             l_intro_text = ''
                             l_intro_line_list = []
 
-g_sethuila_mula_note = dict()
-g_sethuila_sarvamula_note = dict()
-g_sethuila_sarvamula_note_by_ref = dict()
+g_setutila_mula_note = dict()
+g_setutila_sarvamula_note = dict()
+g_setutila_sarvamula_note_by_ref = dict()
 
-def sethuila(p_file):
+def setutila(p_file):
     """
-    CAVEAT: some divs that should have class="Sarvamula" may have class="inline" instead. These should be corrected manually in the original HTML from sethuila.in
+    CAVEAT: some divs that should have class="Sarvamula" may have class="inline" instead. These should be corrected manually in the original HTML from setutila.in
 
     :param p_file:
     :return:
     """
-    global g_sethuila_mula_note
-    global g_sethuila_sarvamula_note
-    global g_sethuila_sarvamula_note_by_ref
+    global g_setutila_mula_note
+    global g_setutila_sarvamula_note
+    global g_setutila_sarvamula_note_by_ref
 
     def find_note(p_element):
         l_note_elem = p_element.find("span[@class='pathantara']")
@@ -416,7 +416,7 @@ def sethuila(p_file):
     with (open(p_file, 'r') as l_fin):
         l_txt = l_fin.read()
         print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
-        print('Sethuila:', p_file, len(l_txt))
+        print('Setutila:', p_file, len(l_txt))
         try:
             l_tree = ET.fromstring(f'{l_txt}')
         except ET.ParseError as e:
@@ -433,7 +433,7 @@ def sethuila(p_file):
 
                     if len(l_bhashya_list) > 0:
                         l_exi_dict = g_parallel_bhashya.setdefault(l_verse_id, dict())
-                        l_exi_dict['Sethuila'] = l_bhashya_list
+                        l_exi_dict['Setutila'] = l_bhashya_list
                     l_bhashya_list = []
 
                 for l_div_inner in l_div_outer.findall('div'):
@@ -466,12 +466,12 @@ def sethuila(p_file):
                             l_verse_id = l_match.group(1).replace('/', '_')
 
                         if len(l_notes_list) > 0 and l_notes_list != [None, None]:
-                            g_sethuila_mula_note[l_verse_id] = l_notes_list
+                            g_setutila_mula_note[l_verse_id] = l_notes_list
 
                         print(f'        [{l_verse_id}]', l_verse_text, end=' ')
 
                         l_existing_dict = g_parallel_mula.setdefault(l_verse_id, dict())
-                        l_existing_dict['Sethuila'] = l_verse_text
+                        l_existing_dict['Setutila'] = l_verse_text
                         print(g_parallel_mula[l_verse_id])
                     elif l_div_inner.attrib['class'] in ['Sarvamula', 'Colophon_Sarvamula']: # see CAVEAT in docstring above
                         def sarvamula_cleanup(p_seth_bhashya_text):
@@ -544,10 +544,10 @@ def sethuila(p_file):
                                 l_ref_short = l_note_ref.replace('note-pathantara-', '')
 
                                 l_bhashya_list[-1] = (l_cl, l_txt, l_ref_short, l_kutra)
-                                g_sethuila_sarvamula_note.setdefault(l_verse_id, dict())[l_ref_short] = l_note_text
-                                g_sethuila_sarvamula_note_by_ref[l_ref_short] = l_note_text
+                                g_setutila_sarvamula_note.setdefault(l_verse_id, dict())[l_ref_short] = l_note_text
+                                g_setutila_sarvamula_note_by_ref[l_ref_short] = l_note_text
 
-                                print(' '.join([r.replace('note-pathantara-', '') for r, _ in g_sethuila_sarvamula_note[l_verse_id].items()]), end=' ')
+                                print(' '.join([r.replace('note-pathantara-', '') for r, _ in g_setutila_sarvamula_note[l_verse_id].items()]), end=' ')
 
                             if len(l_span_text) > 0:
                                 if 'kutra' in l_span_sarva.attrib['class']:
@@ -576,12 +576,12 @@ def sethuila(p_file):
 
     # re-attach text fragments of 4 char or fewer
     for l_key_underscore, l_ver_dict in sorted(list(g_parallel_bhashya.items()), key=lambda p: re.sub(r'^(\d)_', r'0\1_', re.sub(r'_(\d)$', r'_0\1', p[0]))):
-        if 'Sethuila' in l_ver_dict.keys():
+        if 'Setutila' in l_ver_dict.keys():
             l_new_list = []
             l_prev_chunk = None
 
             # attach short elements to next chunk
-            for l_css_class, l_text_chunk, l_note_ref, l_kutra_txt in l_ver_dict['Sethuila']:
+            for l_css_class, l_text_chunk, l_note_ref, l_kutra_txt in l_ver_dict['Setutila']:
                 print(f'{l_key_underscore:5} [{l_prev_chunk}] {l_text_chunk}', end=' ')
                 # only if there is no note or kutra attached to it
                 if len(remove_all_punct_and_space(l_text_chunk)) <= 4 and l_note_ref is None and l_kutra_txt is None:
@@ -610,7 +610,7 @@ def sethuila(p_file):
                 else:
                     l_new_list.append((l_css_class, l_prev_chunk, None, None))
 
-            g_parallel_bhashya[l_key_underscore]['Sethuila'] = l_new_list
+            g_parallel_bhashya[l_key_underscore]['Setutila'] = l_new_list
 
 def list_candidates(p_k):
     l_list_candidate = [p_k,
@@ -723,7 +723,7 @@ g_html_header = """<html>
 </head>
     <body>
     <table>
-    <tr><th>Sloka</th><th>Anandamakaranda</th><th>Sethuila</th></tr>
+    <tr><th>Sloka</th><th>Anandamakaranda</th><th>Setutila</th></tr>
 """
 g_html_footer = """</table>
 </body>
@@ -844,7 +844,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_k
     """
 
     :param p_amak_chunk_list:
-    :param p_seth_chunk_list: original Sethuila Chunks with words split (no Sandhi yet)
+    :param p_seth_chunk_list: original Setutila Chunks with words split (no Sandhi yet)
     :param p_do_one_two_letters:
     :param p_k_list:
     :return:
@@ -854,19 +854,19 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_k
 
     l_amak_chunk_list_display = copy.deepcopy(p_amak_chunk_list)
 
-    # 2-d array of un-sandhied Sethuila words, still with punctuation attached
+    # 2-d array of un-sandhied Setutila words, still with punctuation attached
     l_seth_word_array = [l_words_list for _, l_words_list, _, _ in p_seth_chunk_list]
     l_seth_word_array_2 = copy.deepcopy(l_seth_word_array)
     l_seth_word_array_2_sk = [[devtrans.iast2dev(l_word) for l_word in l_row] for l_row in copy.deepcopy(l_seth_word_array)]
 
-    # list of all Sethuila words, together with their outer and inner ids (ref to l_seth_word_array)
+    # list of all Setutila words, together with their outer and inner ids (ref to l_seth_word_array)
     l_seth_word_list = []
     for l_word_id_outer, (_, l_inner_word_list, _, _) in enumerate(p_seth_chunk_list):
         # l_inner_word_list = p_seth_chunk_list[l_word_id_outer][1]
         for l_word_id_inner,  l_word in enumerate(l_inner_word_list):
             l_seth_word_list.append((l_word_id_outer, l_word_id_inner, l_word))
 
-    # Sethuila word list + candidates. Punctuation removed and internal Sandhi applied
+    # Setutila word list + candidates. Punctuation removed and internal Sandhi applied
     l_seth_word_list_expanded = []
     for l_id_outer, l_id_inner, l_word_cmp in l_seth_word_list:
         if not l_word_cmp == '॥' and not re.match(r'\d+', l_word_cmp):
@@ -886,7 +886,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_k
     # list of id pairs (in l_seth_word_array) that do not need to be processed anymore bc they have been found already
     l_forbidden_id_list = []
     l_prev_cand_len = 0 # for erasing previous printout after \r
-    # try to fit Sethuila words into Anandamakaranda chunks list
+    # try to fit Setutila words into Anandamakaranda chunks list
     # l_is_original = True -> candidate in its original form and not one added by list_candidates()
     l_triple_amak = [(l_amak_id, l_amak_chunk, external_sandhi(l_amak_chunk)) for l_amak_id, l_amak_chunk in enumerate(p_amak_chunk_list)]
     for l_critical_big_m, l_critical_big_sm in [(12, 12), (3, 5)]:
@@ -934,7 +934,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_k
                     break
         print(f'{p_k_list[-1]}     ', ' ' * l_prev_cand_len * 3, end='\r', file=sys.stderr)
 
-        # fitting Sethuila words using difflib's SequenceMatcher
+        # fitting Setutila words using difflib's SequenceMatcher
         for l_pc_i, (l_id_outer, l_id_inner, l_len, l_candidate, l_is_original) in enumerate(l_seth_word_list_expanded):
             if f'{l_id_outer}-{l_id_inner}' in l_forbidden_id_list or l_len < l_critical_big_sm or not l_is_original:
                 continue
@@ -1032,7 +1032,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_k
                             break
         print(f'{p_k_list[-1]}     ', ' ' * l_prev_cand_len * 3, end='\r', file=sys.stderr)
 
-    # try to fit Sethuila words into Anandamakaranda chunks list, 2nd and 3rd pass: 1 and 2 letters change
+    # try to fit Setutila words into Anandamakaranda chunks list, 2nd and 3rd pass: 1 and 2 letters change
     if p_do_one_two_letters:
         # 1 letter change
         for l_pc_i, (l_id_outer, l_id_inner, l_candidate, l_is_original) in enumerate(l_seth_word_list_expanded):
@@ -1237,13 +1237,13 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_k
         l_seth_word_array_2_sk[l_id_outer][l_id_inner] = \
             f'<span style="font-weight: bold; color: red">{l_seth_word_array_2_sk[l_id_outer][l_id_inner]}</span>'
 
-    # new display list with fitted words from Sethuila
+    # new display list with fitted words from Setutila
     def format_ref(p_ref):
         return f'[{p_ref.replace("#note-pathantara-", "")}]'
 
     l_xml_list = [(t,
                    avagraha_iast2deva(standardize_iast(' '.join(l_text))),
-                   avagraha_iast2deva(standardize_iast(devtrans.dev2iast(g_sethuila_sarvamula_note_by_ref[n]))) if n is not None else '', k)
+                   avagraha_iast2deva(standardize_iast(devtrans.dev2iast(g_setutila_sarvamula_note_by_ref[n]))) if n is not None else '', k)
                   for _, (t, l_text, n, k) in enumerate(p_seth_chunk_list)]
 
     print(f'XML List for {p_k_list}')
@@ -1340,18 +1340,18 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_k
     l_notes_sloka_list = []
     l_notes_sloka_list_sk = []
     for l_underscore_k in p_k_list:
-        if l_underscore_k in g_sethuila_sarvamula_note.keys():
+        if l_underscore_k in g_setutila_sarvamula_note.keys():
             try:
                 l_notes_sloka_list += [(format_ref(l_ref),
                                         avagraha_iast2deva(standardize_iast(devtrans.dev2iast(l_note_text))),
-                                        re.sub(r'“([^”]+)”[-”,\s]*iti kṛ pāṭhaḥ', r'<span style="color: Coral;">\1</span> (kṛ)',
+                                        re.sub(r'“([^”]+)”[-”,\s]*iti kṛ pāṭhaḥ', r'<span style="color: BlueViolet;">\1</span> (kṛ)',
                                                re.sub(r'“([^”]+)”[-”,\s]*iti go pāṭhaḥ', r'<span style="color: DarkOrange;">\1</span> (go)',
                                                       #re.sub(r'iti go pāṭhaḥ', '<span style="color: DarkOrange;">iti go pāṭhaḥ</span>',
                                                       avagraha_iast2deva(standardize_iast(devtrans.dev2iast(l_note_text)).replace('[-]', '{nothing}')))))
-                                      for l_ref, l_note_text in g_sethuila_sarvamula_note[l_underscore_k].items()]
+                                      for l_ref, l_note_text in g_setutila_sarvamula_note[l_underscore_k].items()]
             except ValueError as e:
                 print(e)
-                print(l_underscore_k, g_sethuila_sarvamula_note[l_underscore_k])
+                print(l_underscore_k, g_setutila_sarvamula_note[l_underscore_k])
                 sys.exit(0)
 
             l_notes_sloka_list_sk += [(format_ref(l_ref),
@@ -1360,7 +1360,7 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_k
                                       re.sub(r'“([^”]+)”[-”,\s]*iti kṛ pāṭhaḥ', lambda m: f'<span style="color: Coral;">{devtrans.iast2dev(m.group(1))}</span> (kṛ)',
                                       re.sub(r'“([^”]+)”[-”,\s]*iti go pāṭhaḥ', lambda m: f'<span style="color: DarkOrange;">{devtrans.iast2dev(m.group(1))}</span> (go)',
                                             devtrans.dev2iast(l_note_text).replace('[-]', '{nothing}')))))
-                                  for l_ref, l_note_text in g_sethuila_sarvamula_note[l_underscore_k].items()]
+                                  for l_ref, l_note_text in g_setutila_sarvamula_note[l_underscore_k].items()]
 
     if len(l_notes_sloka_list) > 0:
         l_notes_block = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{l_ref}: {l_note_go_kr}" for l_ref, _, l_note_go_kr in l_notes_sloka_list])}'
@@ -1379,8 +1379,8 @@ def process_seth(p_amak_chunk_list, p_seth_chunk_list, p_do_one_two_letters, p_k
     l_xml_frag_d = l_xml_frag_d.replace('&lt;/p&gt;<br/>', '<div style="margin: 0 0 0 2em;">&lt;/p&gt;</div>')
     l_xml_frag_d = re.sub(r'&lt;seg(.*?)&lt;/seg&gt;<br/>', r'<div style="margin: 0 0 0 4em;">&lt;seg\1&lt;/seg&gt;</div>', l_xml_frag_d)
     l_xml_frag_d = re.sub(r'(&lt;/?[a-z]+(?:&gt;)?|&gt;)', r'<span style="color: DarkBlue">\1</span>', l_xml_frag_d)
-    l_seth_cell_r = f'<td class="outer"><b>Sethuila</b>: {l_v_display}</td></tr>\n<tr><td class="xmld" colspan="2">{l_xml_frag_d}</td>'
-    l_seth_cell_sk_r = f'<td class="outer"><b>Sethuila</b>: {l_v_display_sk}</td>'
+    l_seth_cell_r = f'<td class="outer"><b>Setutila</b>: {l_v_display}</td></tr>\n<tr><td class="xmld" colspan="2">{l_xml_frag_d}</td>'
+    l_seth_cell_sk_r = f'<td class="outer"><b>Setutila</b>: {l_v_display_sk}</td>'
 
     return l_seth_cell_r, l_seth_cell_sk_r
 
@@ -1406,7 +1406,7 @@ def sarvamula_comparison(p_do_one_two_letters):
 
             if l_underscore_k in g_parallel_bhashya.keys():
                 # in the case of Anandamak, v contains a (l_intro_text, l_full_bhashya_text) pair
-                # in the case of Sethuila, it contains a list of chunks with their class, note and kutra
+                # in the case of Setutila, it contains a list of chunks with their class, note and kutra
                 for l_source_key, v in g_parallel_bhashya[l_underscore_k].items():
                     if l_source_key == 'Anandamak':
                         l_amak_found = True
@@ -1415,7 +1415,7 @@ def sarvamula_comparison(p_do_one_two_letters):
                         l_anandamak_prev.append((l_underscore_k, remove_invisibles(l_intro_text), remove_invisibles(l_full_bhashya_text)))
                         l_amak_k_list.append(l_underscore_k)
                         print(f'ANANDAMAK {len(l_anandamak_prev)} {len(l_seth_prev)}')
-                    else:  # l_source_key == 'Sethuila'
+                    else:  # l_source_key == 'Setutila'
                         l_seth_found = True
                         l_seth_prev += [(t, remove_invisibles(l_text).split(' '), n, k) for t, l_text, n, k in v]
                         l_seth_k_list.append(l_underscore_k)
@@ -1476,18 +1476,18 @@ def sarvamula_comparison(p_do_one_two_letters):
 # ------------- main() -------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     # anandamak('brahmasūtrabhāṣyam.html')
-    # sethuila('brahmasūtrabhāṣyam_s.html')
+    # setutila('brahmasūtrabhāṣyam_s.html')
     anandamak('śrīmadbhagavadgītābhāṣyam.html')
-    sethuila('śrīmadbhagavadgītābhāṣyam_s.html')
+    setutila('śrīmadbhagavadgītābhāṣyam_s.html')
 
     load_gita_tei()
     # parallel_dump()
 
-    for l_verse_k in g_sethuila_mula_note.keys():
-        print(f'{l_verse_k:5} {g_sethuila_mula_note[l_verse_k]}')
+    for l_verse_k in g_setutila_mula_note.keys():
+        print(f'{l_verse_k:5} {g_setutila_mula_note[l_verse_k]}')
 
     l_prev_note = 0
-    for l_verse_k, v in g_sethuila_sarvamula_note.items():
+    for l_verse_k, v in g_setutila_sarvamula_note.items():
         print(f'{l_verse_k:5}')
         for r, t in v.items():
             print(f'    {r:5}: {t}')
@@ -1499,10 +1499,10 @@ if __name__ == '__main__':
 
     for l_verse_k, d in sorted(list(g_parallel_bhashya.items()), key=lambda p: re.sub(r'^(\d)_', r'0\1_', re.sub(r'_(\d)$', r'_0\1', p[0]))):
         print(l_verse_k)
-        if 'Sethuila' in d.keys():
-            for l_class, l_chunk, l_note, l_kut in d['Sethuila']:
+        if 'Setutila' in d.keys():
+            for l_class, l_chunk, l_note, l_kut in d['Setutila']:
                 l_n_p = l_note if l_note is not None else ''
-                l_n_text = '' if l_note is None else f' [{devtrans.dev2iast(g_sethuila_sarvamula_note[l_verse_k][l_note])}]'
+                l_n_text = '' if l_note is None else f' [{devtrans.dev2iast(g_setutila_sarvamula_note[l_verse_k][l_note])}]'
                 l_kutra_text = '' if l_kut is None else f' (kutra: {l_kut})'
                 print(f'    {l_class:14} {l_n_p:4} {l_chunk}{l_n_text}{l_kutra_text}')
 
@@ -1598,15 +1598,15 @@ def display_dif(p_base, p_other):
         print()
 
 def parallel_dump():
-    g_sethuila_mula_note['2_63'] = [('#note-pathantara-9990', '‘vinaśyati’')]
-    g_sethuila_mula_note['4_16'] = [('#note-pathantara-9991', '‘tat te\'karma’')]
-    g_sethuila_mula_note['4_20'] = [('#note-pathantara-9992', '‘nityatṛpto\'nirāśrayaḥ’')]
-    g_sethuila_mula_note['4_33'] = [('#note-pathantara-9993', '‘karmā\'khilaṁ’')]
-    g_sethuila_mula_note['5_8'] = [('#note-pathantara-9993', '‘spṛśañcidhrannaśnan’')]
-    g_sethuila_mula_note['5_25'] = [('#note-pathantara-9994', '‘brahmanirbāṇamṛṣayaḥ’'),
+    g_setutila_mula_note['2_63'] = [('#note-pathantara-9990', '‘vinaśyati’')]
+    g_setutila_mula_note['4_16'] = [('#note-pathantara-9991', '‘tat te\'karma’')]
+    g_setutila_mula_note['4_20'] = [('#note-pathantara-9992', '‘nityatṛpto\'nirāśrayaḥ’')]
+    g_setutila_mula_note['4_33'] = [('#note-pathantara-9993', '‘karmā\'khilaṁ’')]
+    g_setutila_mula_note['5_8'] = [('#note-pathantara-9993', '‘spṛśañcidhrannaśnan’')]
+    g_setutila_mula_note['5_25'] = [('#note-pathantara-9994', '‘brahmanirbāṇamṛṣayaḥ’'),
                                     ('#note-pathantara-9996', '‘chinnadvaidhā''yatātmānaḥ’')]
     for l_bs_vn, d in g_parallel_mula.items(): # chinnadvaidhā''yatātmānaḥ
-        print(f'{l_bs_vn} {g_sethuila_mula_note[l_bs_vn] if l_bs_vn in g_sethuila_mula_note else ""}')
+        print(f'{l_bs_vn} {g_setutila_mula_note[l_bs_vn] if l_bs_vn in g_setutila_mula_note else ""}')
         l_comp = []
         for k, v in d.items():
             try:
@@ -1730,14 +1730,14 @@ def parallel_dump():
                     # else:
                     #     l_amak_chunk_list_display = copy.deepcopy(l_amak_chunk_list)
                     #
-                    #     # original Sethuila Chunks with words split (no Sandhi yet)
+                    #     # original Setutila Chunks with words split (no Sandhi yet)
                     #     l_seth_chunks_list = [(t, l_text.split(' '), n) for t, l_text, n in v]
-                    #     # 2-d array of un-sandhied Sethuila words, still with punctuation attached
+                    #     # 2-d array of un-sandhied Setutila words, still with punctuation attached
                     #     l_seth_word_array = [l_words_list for _, l_words_list, _ in l_seth_chunks_list]
                     #     l_seth_word_array_2 = copy.deepcopy(l_seth_word_array)
                     #     l_seth_word_array_2_sk = [[devtrans.iast2dev(l_word) for l_word in l_row] for l_row in copy.deepcopy(l_seth_word_array)]
                     #
-                    #     # list of all Sethuila words, together with their outer and inner ids (ref to l_seth_word_array)
+                    #     # list of all Setutila words, together with their outer and inner ids (ref to l_seth_word_array)
                     #     l_seth_word_list = []
                     #     for l_word_id_outer in range(len(l_seth_chunks_list)):
                     #         l_inner_word_list = l_seth_chunks_list[l_word_id_outer][1]
@@ -1746,7 +1746,7 @@ def parallel_dump():
                     #
                     #     print(f'---------------------------- {l_verse_k} ----------------------------------\n', l_seth_word_list)
                     #
-                    #     # Sethuila word list + candidates. Punctuation removed and internal Sandhi applied
+                    #     # Setutila word list + candidates. Punctuation removed and internal Sandhi applied
                     #     l_seth_word_list_expanded = []
                     #     for l_id_outer, l_id_inner, l_word_cmp in l_seth_word_list:
                     #         if not l_word_cmp == '॥' and not re.match(r'\d+', l_word_cmp):
@@ -1762,7 +1762,7 @@ def parallel_dump():
                     #     # list of id pairs (in l_seth_word_array) that do not need to be processed anymore bc they have been found already
                     #     l_forbidden_id_list = []
                     #     l_prev_cand_len = 0
-                    #     # try to fit Sethuila words into Anandamakaranda chunks list
+                    #     # try to fit Setutila words into Anandamakaranda chunks list
                     #     # l_is_original = True -> candidate in its original form and not one added by list_candidates()
                     #     for l_pc_i, (l_id_outer, l_id_inner, l_candidate, l_is_original) in enumerate(l_seth_word_list_expanded):
                     #         if f'{l_id_outer}-{l_id_inner}' in l_forbidden_id_list or len(l_candidate) <= 5:
@@ -1799,7 +1799,7 @@ def parallel_dump():
                     #                 break
                     #     print(f'{l_underscore_k}     ', ' ' * l_prev_cand_len * 3, end='\r', file=sys.stderr)
                     #
-                    #     # fitting Sethuila words using difflib's SequenceMatcher
+                    #     # fitting Setutila words using difflib's SequenceMatcher
                     #     for l_pc_i, (l_id_outer, l_id_inner, l_candidate, l_is_original) in enumerate(l_seth_word_list_expanded):
                     #         # if f'{l_id_outer}-{l_id_inner}' in l_forbidden_id_list or len(l_candidate) <= 5 or not l_is_original:
                     #         if f'{l_id_outer}-{l_id_inner}' in l_forbidden_id_list or len(l_candidate) <= 5:
@@ -1879,7 +1879,7 @@ def parallel_dump():
                     #                         break
                     #     print(f'{l_underscore_k}     ', ' ' * l_prev_cand_len * 3, end='\r', file=sys.stderr)
                     #
-                    #     # try to fit Sethuila words into Anandamakaranda chunks list, 2nd and 3rd pass: 1 and 2 letters change
+                    #     # try to fit Setutila words into Anandamakaranda chunks list, 2nd and 3rd pass: 1 and 2 letters change
                     #     if l_do_one_two_letters:
                     #         # 1 letter change
                     #         for l_pc_i, (l_id_outer, l_id_inner, l_candidate, l_is_original) in enumerate(l_seth_word_list_expanded):
@@ -2083,7 +2083,7 @@ def parallel_dump():
                     #         l_seth_word_array_2_sk[l_id_outer][l_id_inner] = \
                     #             f'<span style="font-weight: bold; color: red">{l_seth_word_array_2_sk[l_id_outer][l_id_inner]}</span>'
                     #
-                    #     # new display list with fitted words from Sethuila
+                    #     # new display list with fitted words from Setutila
                     #     l_v_display_list_2 = [(t,
                     #                            ' '.join(l_seth_word_array_2[l_outer_id]),
                     #                            f'<b>{" ".join([format_ref(l_ref) for l_ref in n if l_ref is not None])}</b>')
@@ -2106,9 +2106,9 @@ def parallel_dump():
                     #     l_amak_frag_table += f'<tr><td class="inner">{l_disp_s}</td><td class="inner">{remove_avagraha(external_sandhi(s, p_insert_invisible=True))}</td></tr>'
                     # l_amak_frag_table += '</table>'
                     #
-                    # if l_underscore_k in g_sethuila_sarvamula_note.keys():
-                    #     l_notes_block = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{format_ref(l_ref)}: {devtrans.dev2iast(l_note_text)}" for l_ref, l_note_text in g_sethuila_sarvamula_note[l_underscore_k]])}'
-                    #     l_notes_block_sk = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{format_ref(l_ref)}: {l_note_text}" for l_ref, l_note_text in g_sethuila_sarvamula_note[l_underscore_k]])}'
+                    # if l_underscore_k in g_setutila_sarvamula_note.keys():
+                    #     l_notes_block = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{format_ref(l_ref)}: {devtrans.dev2iast(l_note_text)}" for l_ref, l_note_text in g_setutila_sarvamula_note[l_underscore_k]])}'
+                    #     l_notes_block_sk = f'<br/><b>Notes</b>:<br/>{"<br/>".join([f"{format_ref(l_ref)}: {l_note_text}" for l_ref, l_note_text in g_setutila_sarvamula_note[l_underscore_k]])}'
                     #
                     # l_v_display += f'{l_notes_block}{l_amak_frag_table}'
                     # l_v_display_sk += f'{l_notes_block_sk}'

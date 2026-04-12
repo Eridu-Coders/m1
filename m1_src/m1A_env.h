@@ -22,6 +22,8 @@ extern QRegularExpression g_re_stephanus;
 extern QRegularExpression g_re_no_base;
 extern QRegularExpression g_re_extract_vt;
 extern QRegularExpression g_re_html_tags;
+extern QRegularExpression g_re_remove_eng;
+extern QRegularExpression g_re_remove_grc;
 
 /**
  * \defgroup EntryExit function Entry and Exit macros

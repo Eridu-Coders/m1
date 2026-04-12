@@ -33,6 +33,8 @@ QRegularExpression g_re_stephanus(R"((\d+[a-e])<\/span>)");
 QRegularExpression g_re_no_base(R"(^Base:\s+)");
 QRegularExpression g_re_extract_vt(R"(^\[([^]]+)\]\d*[a-e]?\s*(.*)$)");
 QRegularExpression g_re_html_tags(R"(<[^>]+>)");
+QRegularExpression g_re_remove_eng(R"(#eng_\d+_\d+)"); //eng_450_49
+QRegularExpression g_re_remove_grc(R"(#grc_\d+_\d+)"); //grc_450_39
 
 /**
  * @brief M1Store::M1Env::myMessageHandler message handler callback for Qt debug infra
