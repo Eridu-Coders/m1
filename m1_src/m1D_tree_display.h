@@ -43,6 +43,7 @@ namespace M1UI{
         void create_descendant(M1Store::InsertionPoint p_where);
     public:
         explicit TreeDisplay(QWidget *p_parent, MainWindow *p_main_window);
+        void purge();
 
         virtual void paintEvent(QPaintEvent *);
         M1Store::SpecialItem* newEdgeType();

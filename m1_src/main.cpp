@@ -39,7 +39,8 @@ int main(int argc, char *argv[])
         ("help,h", "produce help message")
         ("load-json,j", "Load a json file (Old Plato Republic style)")
         ("load-tei-1,b", "Load a TEI file - Bhagavad Gita Style")
-        ("load-tei-2,p", "Load a TEI file - Plato Perseus Style")
+        ("load-tei-2,q", "Load a TEI file - Plato Perseus Style - with EMBEDDED <w> tags")
+        ("load-tei-3,p", "Load a TEI file - Plato Perseus Style - with SEPARATE <w> tags")
         ("reset,r", "Reset (empty) storage")
         // ("qmljsdebugger", po::value<std::vector<std::string>>(&l_fuck), "Fuck")
         ;
@@ -56,6 +57,7 @@ int main(int argc, char *argv[])
         if(l_program_options_vm.count("reset")) std::cout << "reset option detected" << std::endl;
         if(l_program_options_vm.count("load-tei-1")) std::cout << "load-tei-1 option detected" << std::endl;
         if(l_program_options_vm.count("load-tei-2")) std::cout << "load-tei-2 option detected" << std::endl;
+        if(l_program_options_vm.count("load-tei-2")) std::cout << "load-tei-3 option detected" << std::endl;
         if(l_program_options_vm.count("load-json")) std::cout << "load-json option detected" << std::endl;
         // if(l_program_options_vm.count("qmljsdebugger")) std::cout << l_fuck.at(0) << std::endl;
         // printf("U\n");
@@ -105,7 +107,7 @@ int main(int argc, char *argv[])
                                         "tree_display=false\n"
                                         "passages_panel=false\n"
                                         "main_window=false\n"
-                                        //"tei_interface=false\n"
+                                        "tei_interface=false\n"
                                         "tree_row=false\n"
                                         "qt.*.debug=false\n");
     M1Env::EnvStatic::setTmpDebug(false);
@@ -152,19 +154,36 @@ int main(int argc, char *argv[])
             return 1;
         }
     }
+    if(l_program_options_vm.count("load-tei-3")){
+        try{
+            std::cout << "Loading TEI file (Plato style with embedded <w>) ..." << std::endl;
+            M1Store::TEIInterface::loadTei3("../../Greek_Translation_alignment_claude/PR05_emb.xml");
+            qCDebug(g_cat_main).noquote() << "End of TEI (3) XML loading";
+            // std::_Exit(0);
+        }
+        catch(const M1Env::M1Exception& e){
+            qCDebug(g_cat_main).noquote() << "TEI load (3) error" << e.code() << e.message();
+            return 1;
+        }
+    }
 
     // qCDebug(g_cat_main).noquote() << "Testing g_re_final_p: " << QString("भोगिनः। विष्णोश्चलति तद्भोगोऽत्यतीव हरितोषणम् इति पाद्मे।</p>").replace(g_re_final_p, "");
 
     // throw M1Env::M1Exception("", 0);
     QApplication a(argc, argv);
+    // M1UI::MainWindow* w = new M1UI::MainWindow();
     M1UI::MainWindow w;
     w.show();
+    // w->show();
+    // delete w;
     int l_ret = a.exec();
+    w.purge();
 
     M1Store::StorageStatic::storeShutDown();
-    qCDebug(g_cat_main) << "App ends";
+    qCDebug(g_cat_tmp_spotlight) << "Final Debug Message";
     M1_FUNC_EXIT
     M1Env::EnvStatic::close();
+    M1Env::EnvStatic::setDebug_extra();
 
     printf("Hurrah! No Core Dump ... Returning %d\n", l_ret);
     return l_ret;

@@ -14,6 +14,8 @@
 
 namespace M1UI{
 
+class TreeDisplay;
+
 class MainWindow: public QMainWindow {
     Q_OBJECT
 private:
@@ -23,9 +25,16 @@ private:
     QStatusBar *m_statusbar;
 
     QTabWidget *m_tab_widget;
+
+    M1UI::TreeDisplay* m_tree_display_left;
+    M1UI::TreeDisplay* m_tree_display_right;
+
+    void closeEvent(QCloseEvent *event);
 public:
     MainWindow(QWidget *p_parent = nullptr);
     ~MainWindow();
+
+    void purge();
     // virtual void mouseMoveEvent(QMouseEvent *p_event);
 public slots:
     void htmlReceive(const QString& p_html);

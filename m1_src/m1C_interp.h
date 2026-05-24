@@ -67,6 +67,9 @@ private:
     bool m_drag_bottom = false;
     bool m_block_emit = false;
 
+    // to avoid issuing spurious debug messages upon delete after debug system has been closed
+    bool m_freeze_debug = false;
+
     QTimer m_hold_timer;
 
     M1Store::Item_lv2* m_edge;
@@ -87,6 +90,7 @@ public:
 
     TreeRow(M1Store::Item_lv2* p_edge, M1UI::TreeDisplay* p_tree, int p_depth);
     virtual ~TreeRow();
+    void freezeDebug(){m_freeze_debug = true;}
     TreeRow();
     TreeRow(const TreeRow& p_to_copy);
     TreeRow& operator=(const TreeRow p_to_copy);

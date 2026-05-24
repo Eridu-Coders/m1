@@ -154,16 +154,17 @@ M1UI::TreeRow::TreeRow(){
  * @brief M1UI::TreeRow::~TreeRow
  */
 M1UI::TreeRow::~TreeRow(){
-    if(m_target == nullptr)
-        qCDebug(g_cat_tmp_spotlight()) << "Warning: m_target NULL";
-    else
-        qCDebug(g_cat_tmp_spotlight()) << QString("Deleting - Use Count: %1").arg(m_target.use_count()) << this->dbgOneLiner();
-    // sever link btw TreeRow and Interp (m_target) before destruction
-    // if(m_target != nullptr){
-    //     m_target->setParent(nullptr);
-    //     m_target = nullptr;
-    // }
+    if(!m_freeze_debug){ // to avoid issuing debug messages after debug system has been closed
+        if(m_target == nullptr)
+            qCDebug(g_cat_tmp_spotlight()) << "Warning: m_target NULL";
+        else
+            qCDebug(g_cat_tmp_spotlight()) << QString("Deleting - Use Count: %1").arg(m_target.use_count()) << this->dbgOneLiner();
+    }
 }
+
+/**
+ * @brief M1UI::TreeRow::deParentTarget
+ */
 void M1UI::TreeRow::deParentTarget(){
     if(m_target != nullptr){
         m_target->setParent(nullptr);

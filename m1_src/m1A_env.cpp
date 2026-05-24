@@ -18,6 +18,8 @@ QString M1Env::EnvStatic::cm_normal_filter;
 std::stack<QString> M1Env::EnvStatic::cm_current_category;
 int M1Env::EnvStatic::cm_depth = 0;
 QStringList M1Env::EnvStatic::cm_list_excluded_catergory_for_screen;
+bool M1Env::EnvStatic::cm_debug_extra = false;
+
 
 QRegularExpression g_re_space(R"(\s+)");
 QRegularExpression g_re_punc(R"(^(\W*)(\w+)(\W*))");
@@ -136,6 +138,9 @@ void M1Env::EnvStatic::entry(const QLoggingCategory& p_log_cat(),
     }
     // current category not enabled --> push empty string placeholder
     else cm_current_category.push("");
+
+    if(cm_debug_extra)
+        printf("%s\n", p_msg.toUtf8().constData());
 }
 
 /**
@@ -153,6 +158,7 @@ void M1Env::EnvStatic::exit(
     Q_ASSERT_X(!cm_current_category.empty(),
                "M1Env::M1EnvStatic::exit(const QString& p_file, ...",
                "cm_current_category should not be empty");
+
     if(cm_current_category.top().length() > 0){
         // the matching entry() had an enabled category name
         cm_depth -= 1;
@@ -163,6 +169,9 @@ void M1Env::EnvStatic::exit(
                           p_line,
                           p_func_deco);
     }
+
+    if(cm_debug_extra)
+        printf("[%s %s] Stack size: %d\n", p_file.toUtf8().constData(), p_func.toUtf8().constData(), (int)cm_current_category.size());
     cm_current_category.pop();
 }
 

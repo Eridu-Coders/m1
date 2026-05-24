@@ -75,6 +75,7 @@ class EnvStatic{
         static QStringList cm_list_excluded_catergory_for_screen;
         static std::stack<QString> cm_current_category;
         static QString cm_normal_filter;
+        static bool cm_debug_extra;
 
         // message handler function for qInstallMessageHandler()
         static void myMessageHandler(QtMsgType p_type, const QMessageLogContext &p_context, const QString & p_msg);
@@ -88,6 +89,7 @@ class EnvStatic{
         // startup and closing function for the environment
         static void init();
         static void close();
+        static void setDebug_extra() {cm_debug_extra = true;}
         static void entry(const QLoggingCategory& p_log_cat(),
                           const QString& p_msg,
                           const QString& p_file,

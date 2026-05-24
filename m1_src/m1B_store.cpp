@@ -190,12 +190,11 @@ void M1Store::StorageStatic::storeSetUp(bool p_reset){
  * @brief Shuts down LMDB environment and mmap() areas for items and specials
  */
 void M1Store::StorageStatic::storeShutDown(){
-    M1_FUNC_ENTRY(g_cat_store, "Store shut down")
+    M1_FUNC_ENTRY(g_cat_tmp_spotlight, "Store shut down")
     Q_ASSERT_X( cm_lmdb_env != nullptr, "Storage::close()", "LMDB env must be initialized");
 
     // LMDB return code (for use with return code test macros)
     int l_rc;
-    qCDebug(g_cat_store) << QString("Closing Storage environment");
 
     saveUtilities(nullptr);
 
@@ -235,8 +234,9 @@ void M1Store::StorageStatic::storeShutDown(){
     E(mdb_txn_commit(l_txn));
 
 #if CMAKE_BUILD_TYPE == Debug
-    dbgDump();
+    // dbgDump();
 #endif
+    M1Env::EnvStatic::setSilentMode(false);
 
     // close LMDB env
     mdb_dbi_close(cm_lmdb_env, cm_dbi_util);
@@ -247,9 +247,10 @@ void M1Store::StorageStatic::storeShutDown(){
     M1Store::StorageStatic::mmapSync();
 
     // unmap areas
+    qCDebug(g_cat_tmp_spotlight) << QString("close mmap");
     closeMmapAreas();
 
-    qCDebug(g_cat_store) << QString("Storage environment closed");
+    qCDebug(g_cat_tmp_spotlight) << QString("Storage environment closed");
     M1_FUNC_EXIT
 }
 

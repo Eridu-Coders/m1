@@ -302,7 +302,11 @@ void M1Store::Item_lv1::setType_member_si_id(const unsigned int p_index, const M
  * @return the value of this special type
  */
 M1Store::SpecialItemID M1Store::Item_lv0::getType_si_id(const unsigned int p_index) const{
-    M1_FUNC_ENTRY(g_cat_lv0_members, QString("get special type %1 --> %2").arg(p_index).arg(m_type.getSpecialType(p_index)))
+    M1_FUNC_ENTRY(g_cat_lv0_members, QString("get special type %1 --> %2")
+                                         .arg(p_index)
+                                         .arg(m_type.getSpecialType(p_index))
+                                         // .arg(M1Store::StorageStatic::getSpecialItemPointer(m_type.getSpecialType(p_index))->mnemonic())
+                  )
     Q_ASSERT(p_index < 4);
 
     M1Store::SpecialItemID l_ret = m_type.getSpecialType(p_index);

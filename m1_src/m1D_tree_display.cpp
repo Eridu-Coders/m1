@@ -25,7 +25,6 @@ M1UI::TreeDisplay::TreeDisplay(QWidget *p_parent, MainWindow *p_main_window) : Q
     this->setBackgroundRole(QPalette::Window);
     this->setAutoFillBackground(true);
 
-
     this->createScrollWidget();
     addRow(M1Store::Item_lv2::getExisting(M1Env::HOME_SIID));
 
@@ -37,6 +36,14 @@ M1UI::TreeDisplay::TreeDisplay(QWidget *p_parent, MainWindow *p_main_window) : Q
     // this->setMouseTracking(true);
 
     M1_FUNC_EXIT
+}
+
+void M1UI::TreeDisplay::purge(){
+    qCDebug(g_cat_tmp_spotlight) << "PURGE";
+    for(auto l_tree_row : m_tree_row_list) {
+        qCDebug(g_cat_tmp_spotlight) << l_tree_row->dbgOneLiner();
+        l_tree_row->freezeDebug();
+    }
 }
 
 void M1UI::TreeDisplay::createScrollWidget(){
