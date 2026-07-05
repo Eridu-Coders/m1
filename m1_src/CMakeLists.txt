@@ -49,6 +49,7 @@ set(PROJECT_SOURCES
         m1C_interp.h
         m1C_interp.cpp
         m1C_interp_subclasses.cpp
+        m1C_tree_row.cpp
         m1D_main_window.h
         m1D_main_window.cpp
         m1D_tree_display.h
@@ -64,6 +65,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(m1
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        m1C_tree_row.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET m1_src APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

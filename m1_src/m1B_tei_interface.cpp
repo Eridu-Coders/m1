@@ -21,20 +21,20 @@ void M1Store::TEIInterface::loadTei1(const QString& p_file_path){
     }
     else qCDebug(g_cat_tei) << p_file_path << " does not exist";
 }
-void M1Store::TEIInterface::loadTei2(const QString& p_file_path){
-    qCDebug(g_cat_tei) << "Attempting to load" << p_file_path;
-    if(QFile::exists(p_file_path)){
-        loadTeiInternal2(p_file_path);
-    }
-    else qCDebug(g_cat_tei) << p_file_path << " does not exist";
-}
-void M1Store::TEIInterface::loadTei3(const QString& p_file_path){
-    qCDebug(g_cat_tei) << "Attempting to load" << p_file_path;
-    if(QFile::exists(p_file_path)){
-        loadTeiInternal3(p_file_path);
-    }
-    else qCDebug(g_cat_tei) << p_file_path << " does not exist";
-}
+// void M1Store::TEIInterface::loadTei2(const QString& p_file_path){
+//     qCDebug(g_cat_tei) << "Attempting to load" << p_file_path;
+//     if(QFile::exists(p_file_path)){
+//         loadTeiInternal2(p_file_path);
+//     }
+//     else qCDebug(g_cat_tei) << p_file_path << " does not exist";
+// }
+// void M1Store::TEIInterface::loadTei3(const QString& p_file_path){
+//     qCDebug(g_cat_tei) << "Attempting to load" << p_file_path;
+//     if(QFile::exists(p_file_path)){
+//         loadTeiInternal3(p_file_path);
+//     }
+//     else qCDebug(g_cat_tei) << p_file_path << " does not exist";
+// }
 
 /**
  * @brief M1Store::TEIInterface::cm_text_root
@@ -423,189 +423,189 @@ M1Store::AuthorTEI M1Store::TEIInterface::readPersName(QXmlStreamReader& p_xml_r
  * @param p_file_path
  * @param p_validate_only
  */
-void M1Store::TEIInterface::loadTeiInternal3(const QString& p_file_path, bool p_validate_only){
-    // QXmlStreamReader l_xml;
-    QFile l_fin_tei(p_file_path);
-    qCDebug(g_cat_tei) << "Exists: " << l_fin_tei.exists();
+// void M1Store::TEIInterface::loadTeiInternal3(const QString& p_file_path, bool p_validate_only){
+//     // QXmlStreamReader l_xml;
+//     QFile l_fin_tei(p_file_path);
+//     qCDebug(g_cat_tei) << "Exists: " << l_fin_tei.exists();
 
-    // std::cout << "msg";
-    // std::cout << "msg" << QString("Loading File %1").arg(p_file_path).toUtf8().constData();
-    printf("%s\n", QString("Loading File %1").arg(p_file_path).toUtf8().constData());
+//     // std::cout << "msg";
+//     // std::cout << "msg" << QString("Loading File %1").arg(p_file_path).toUtf8().constData();
+//     printf("%s\n", QString("Loading File %1").arg(p_file_path).toUtf8().constData());
 
-    // the xml stream parse
-    if (!l_fin_tei.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "Failed to open file for reading:" << l_fin_tei.errorString();
-        std::_Exit(0);
-    }
+//     // the xml stream parse
+//     if (!l_fin_tei.open(QIODevice::ReadOnly | QIODevice::Text)) {
+//         qWarning() << "Failed to open file for reading:" << l_fin_tei.errorString();
+//         std::_Exit(0);
+//     }
 
-    int l_indent_count = 4;
-    QXmlStreamReader l_xml_reader(&l_fin_tei);
+//     int l_indent_count = 4;
+//     QXmlStreamReader l_xml_reader(&l_fin_tei);
 
-    QString l_cur_section;
-    QString l_cur_stephanus;
-    QString l_cur_para;
-    QString l_cur_q;
-    QString l_trailing_text;
+//     QString l_cur_section;
+//     QString l_cur_stephanus;
+//     QString l_cur_para;
+//     QString l_cur_q;
+//     QString l_trailing_text;
 
-    while (!l_xml_reader.atEnd()) {
-        QXmlStreamReader::TokenType l_tok_type = l_xml_reader.readNext();
-        QStringView l_tok_name = l_xml_reader.name();
-        if(l_tok_type != QXmlStreamReader::Characters) qCDebug(g_cat_tei).noquote() << cm_indent << "Token Type: " << l_tok_type << l_tok_name <<
-                "H:" << l_cur_section << l_cur_stephanus << l_cur_para << l_cur_q;
+//     while (!l_xml_reader.atEnd()) {
+//         QXmlStreamReader::TokenType l_tok_type = l_xml_reader.readNext();
+//         QStringView l_tok_name = l_xml_reader.name();
+//         if(l_tok_type != QXmlStreamReader::Characters) qCDebug(g_cat_tei).noquote() << cm_indent << "Token Type: " << l_tok_type << l_tok_name <<
+//                 "H:" << l_cur_section << l_cur_stephanus << l_cur_para << l_cur_q;
 
-        if(l_tok_type == QXmlStreamReader::Characters) l_trailing_text = l_xml_reader.text().toString().trimmed();
-    }
-}
-/**
- * @brief M1Store::TEIInterface::loadTeiInternal2
- * @param p_file_path
- * @param p_validate_only
- */
-void M1Store::TEIInterface::loadTeiInternal2(const QString& p_file_path, bool p_validate_only){
-    // QXmlStreamReader l_xml;
-    QFile l_fin_tei(p_file_path);
-    qCDebug(g_cat_tei) << "Exists: " << l_fin_tei.exists();
+//         if(l_tok_type == QXmlStreamReader::Characters) l_trailing_text = l_xml_reader.text().toString().trimmed();
+//     }
+// }
+// /**
+//  * @brief M1Store::TEIInterface::loadTeiInternal2
+//  * @param p_file_path
+//  * @param p_validate_only
+//  */
+// void M1Store::TEIInterface::loadTeiInternal2(const QString& p_file_path, bool p_validate_only){
+//     // QXmlStreamReader l_xml;
+//     QFile l_fin_tei(p_file_path);
+//     qCDebug(g_cat_tei) << "Exists: " << l_fin_tei.exists();
 
-    // std::cout << "msg";
-    // std::cout << "msg" << QString("Loading File %1").arg(p_file_path).toUtf8().constData();
-    printf("%s\n", QString("Loading File %1").arg(p_file_path).toUtf8().constData());
+//     // std::cout << "msg";
+//     // std::cout << "msg" << QString("Loading File %1").arg(p_file_path).toUtf8().constData();
+//     printf("%s\n", QString("Loading File %1").arg(p_file_path).toUtf8().constData());
 
-    // the xml stream parse
-    if (!l_fin_tei.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "Failed to open file for reading:" << l_fin_tei.errorString();
-        std::_Exit(0);
-    }
+//     // the xml stream parse
+//     if (!l_fin_tei.open(QIODevice::ReadOnly | QIODevice::Text)) {
+//         qWarning() << "Failed to open file for reading:" << l_fin_tei.errorString();
+//         std::_Exit(0);
+//     }
 
-    int l_indent_count = 4;
-    QXmlStreamReader l_xml_reader(&l_fin_tei);
-    QString l_title;
-    QString l_sub_title;
-    QString l_alt_title;
-    QString l_cur_section;
-    QString l_cur_stephanus;
-    QString l_cur_para;
-    QString l_cur_q;
-    QString l_trailing_text;
-    typedef std::array<QString, 3> StringTriplet;
-    QList<StringTriplet> l_cur_word_list;
+//     int l_indent_count = 4;
+//     QXmlStreamReader l_xml_reader(&l_fin_tei);
+//     QString l_title;
+//     QString l_sub_title;
+//     QString l_alt_title;
+//     QString l_cur_section;
+//     QString l_cur_stephanus;
+//     QString l_cur_para;
+//     QString l_cur_q;
+//     QString l_trailing_text;
+//     typedef std::array<QString, 3> StringTriplet;
+//     QList<StringTriplet> l_cur_word_list;
 
-    bool l_found_title = false;
-    bool l_in_titleStmt = false;
-    bool l_in_q_spoken = false;
+//     bool l_found_title = false;
+//     bool l_in_titleStmt = false;
+//     bool l_in_q_spoken = false;
 
-    while (!l_xml_reader.atEnd()) {
-        QXmlStreamReader::TokenType l_tok_type = l_xml_reader.readNext();
-        QStringView l_tok_name = l_xml_reader.name();
-        if(l_tok_type != QXmlStreamReader::Characters) qCDebug(g_cat_tei).noquote() << cm_indent << "Token Type: " << l_tok_type << l_tok_name <<
-                "H:" << l_cur_section << l_cur_stephanus << l_cur_para << l_cur_q;
+//     while (!l_xml_reader.atEnd()) {
+//         QXmlStreamReader::TokenType l_tok_type = l_xml_reader.readNext();
+//         QStringView l_tok_name = l_xml_reader.name();
+//         if(l_tok_type != QXmlStreamReader::Characters) qCDebug(g_cat_tei).noquote() << cm_indent << "Token Type: " << l_tok_type << l_tok_name <<
+//                 "H:" << l_cur_section << l_cur_stephanus << l_cur_para << l_cur_q;
 
-        if(l_tok_type == QXmlStreamReader::Characters) l_trailing_text = l_xml_reader.text().toString().trimmed();
-        if(l_tok_type == QXmlStreamReader::StartElement && l_tok_name == "titleStmt") l_in_titleStmt = true;
-        if(l_tok_type == QXmlStreamReader::EndElement && l_tok_name == "titleStmt") l_in_titleStmt = false;
-        if(l_tok_type == QXmlStreamReader::StartElement && l_tok_name == "title" && l_in_titleStmt){
-            QString l_type = l_xml_reader.attributes().value("type").toString();
+//         if(l_tok_type == QXmlStreamReader::Characters) l_trailing_text = l_xml_reader.text().toString().trimmed();
+//         if(l_tok_type == QXmlStreamReader::StartElement && l_tok_name == "titleStmt") l_in_titleStmt = true;
+//         if(l_tok_type == QXmlStreamReader::EndElement && l_tok_name == "titleStmt") l_in_titleStmt = false;
+//         if(l_tok_type == QXmlStreamReader::StartElement && l_tok_name == "title" && l_in_titleStmt){
+//             QString l_type = l_xml_reader.attributes().value("type").toString();
 
-            QXmlStreamReader::TokenType l_tt_title = l_xml_reader.readNext();
-            if(l_tt_title != QXmlStreamReader::Characters) throw M1Env::M1Exception("<title> not followed by Characters", 1000);
-            QString l_title_text = l_xml_reader.text().toString().trimmed();
-            qCDebug(g_cat_tei).noquote() << cm_indent << QString("<title type=\"%1\"> [%2]").arg(l_type).arg(l_title_text);
+//             QXmlStreamReader::TokenType l_tt_title = l_xml_reader.readNext();
+//             if(l_tt_title != QXmlStreamReader::Characters) throw M1Env::M1Exception("<title> not followed by Characters", 1000);
+//             QString l_title_text = l_xml_reader.text().toString().trimmed();
+//             qCDebug(g_cat_tei).noquote() << cm_indent << QString("<title type=\"%1\"> [%2]").arg(l_type).arg(l_title_text);
 
-            if(l_type == "main" || l_type == "") {
-                l_title = l_title_text;
-                l_found_title  = true;
-            }
-            else if(l_type == "sub") l_sub_title = l_title_text;
-            else if(l_type == "alt") l_alt_title = l_title_text;
+//             if(l_type == "main" || l_type == "") {
+//                 l_title = l_title_text;
+//                 l_found_title  = true;
+//             }
+//             else if(l_type == "sub") l_sub_title = l_title_text;
+//             else if(l_type == "alt") l_alt_title = l_title_text;
 
-            // qCDebug(g_cat_tei).noquote() << l_title << l_sub_title << l_alt_title;
-        }
-        if(l_tok_type == QXmlStreamReader::StartElement && l_tok_name == "div"){
-            // <div type="textpart" subtype="book" n="5">
-            // <div type="textpart" subtype="section" resp="perseus" n="449">
-            cm_indent += QString(" ").repeated(l_indent_count);
-            QString l_type = l_xml_reader.attributes().value("type").toString();
-            if(l_type == "textpart"){
-                QString l_subtype = l_xml_reader.attributes().value("subtype").toString();
-                if(l_subtype == "section") l_cur_section = l_xml_reader.attributes().value("n").toString();
-            }
-        }
-        if(l_tok_type == QXmlStreamReader::EndElement && l_tok_name == "div"){
-            for (const auto &l_triplet : l_cur_word_list)
-                qCDebug(g_cat_tei).noquote() << cm_indent + QString(" ").repeated(l_indent_count) <<
-                    QString(">>A> %1 %2%3").arg(l_triplet[0]).arg(l_triplet[1]).arg(l_triplet[2].length() > 0 ? " --> " + l_triplet[2] : "");
-            l_cur_word_list.clear();
-            cm_indent.chop(l_indent_count);
-        }
-        if(l_tok_type == QXmlStreamReader::StartElement && l_tok_name == "milestone"){
-            // cm_indent += QString(" ").repeated(l_indent_count);
-            // <milestone unit="page" resp="Stephanus" n="449" xml:id="eng_ms_page_449" />
-            // <milestone unit="section" resp="Stephanus" n="449a" xml:id="eng_ms_section_449a" />
-            // <milestone ed="P" unit="para" xml:id="eng_ms_para_0" />
-            QString l_unit = l_xml_reader.attributes().value("unit").toString();
-            if(l_trailing_text.length() > 0 && (l_unit == "section" || l_unit == "para"))
-                qCDebug(g_cat_tei).noquote() << cm_indent << QString("previous milestone trailing: %1").arg(l_trailing_text);
+//             // qCDebug(g_cat_tei).noquote() << l_title << l_sub_title << l_alt_title;
+//         }
+//         if(l_tok_type == QXmlStreamReader::StartElement && l_tok_name == "div"){
+//             // <div type="textpart" subtype="book" n="5">
+//             // <div type="textpart" subtype="section" resp="perseus" n="449">
+//             cm_indent += QString(" ").repeated(l_indent_count);
+//             QString l_type = l_xml_reader.attributes().value("type").toString();
+//             if(l_type == "textpart"){
+//                 QString l_subtype = l_xml_reader.attributes().value("subtype").toString();
+//                 if(l_subtype == "section") l_cur_section = l_xml_reader.attributes().value("n").toString();
+//             }
+//         }
+//         if(l_tok_type == QXmlStreamReader::EndElement && l_tok_name == "div"){
+//             for (const auto &l_triplet : l_cur_word_list)
+//                 qCDebug(g_cat_tei).noquote() << cm_indent + QString(" ").repeated(l_indent_count) <<
+//                     QString(">>A> %1 %2%3").arg(l_triplet[0]).arg(l_triplet[1]).arg(l_triplet[2].length() > 0 ? " --> " + l_triplet[2] : "");
+//             l_cur_word_list.clear();
+//             cm_indent.chop(l_indent_count);
+//         }
+//         if(l_tok_type == QXmlStreamReader::StartElement && l_tok_name == "milestone"){
+//             // cm_indent += QString(" ").repeated(l_indent_count);
+//             // <milestone unit="page" resp="Stephanus" n="449" xml:id="eng_ms_page_449" />
+//             // <milestone unit="section" resp="Stephanus" n="449a" xml:id="eng_ms_section_449a" />
+//             // <milestone ed="P" unit="para" xml:id="eng_ms_para_0" />
+//             QString l_unit = l_xml_reader.attributes().value("unit").toString();
+//             if(l_trailing_text.length() > 0 && (l_unit == "section" || l_unit == "para"))
+//                 qCDebug(g_cat_tei).noquote() << cm_indent << QString("previous milestone trailing: %1").arg(l_trailing_text);
 
-            for (const auto &l_triplet : l_cur_word_list)
-                qCDebug(g_cat_tei).noquote() << cm_indent + QString(" ").repeated(l_indent_count) <<
-                    QString(">>B> %1 %2%3").arg(l_triplet[0]).arg(l_triplet[1]).arg(l_triplet[2].length() > 0 ? " --> " + l_triplet[2] : "");
-            l_cur_word_list.clear();
+//             for (const auto &l_triplet : l_cur_word_list)
+//                 qCDebug(g_cat_tei).noquote() << cm_indent + QString(" ").repeated(l_indent_count) <<
+//                     QString(">>B> %1 %2%3").arg(l_triplet[0]).arg(l_triplet[1]).arg(l_triplet[2].length() > 0 ? " --> " + l_triplet[2] : "");
+//             l_cur_word_list.clear();
 
-            qCDebug(g_cat_tei).noquote() << cm_indent << QString("<milestone unit=\"%1\">").arg(l_unit);
-            if(l_unit == "section") l_cur_stephanus = l_xml_reader.attributes().value("xml:id").toString().replace("eng_ms_section_", "S");
-            if(l_unit == "para") l_cur_para = l_xml_reader.attributes().value("xml:id").toString().replace("eng_ms_para_", "ep_");
-        }
-        if(l_tok_type == QXmlStreamReader::StartElement && l_tok_name == "q"){
-            // <q type="spoken"
-            QString l_type = l_xml_reader.attributes().value("type").toString();
+//             qCDebug(g_cat_tei).noquote() << cm_indent << QString("<milestone unit=\"%1\">").arg(l_unit);
+//             if(l_unit == "section") l_cur_stephanus = l_xml_reader.attributes().value("xml:id").toString().replace("eng_ms_section_", "S");
+//             if(l_unit == "para") l_cur_para = l_xml_reader.attributes().value("xml:id").toString().replace("eng_ms_para_", "ep_");
+//         }
+//         if(l_tok_type == QXmlStreamReader::StartElement && l_tok_name == "q"){
+//             // <q type="spoken"
+//             QString l_type = l_xml_reader.attributes().value("type").toString();
 
-            if(l_type == "spoken"){
-                if(l_trailing_text.length() > 0)
-                    qCDebug(g_cat_tei).noquote() << cm_indent << QString("trailing text before <q>: %1").arg(l_trailing_text);
+//             if(l_type == "spoken"){
+//                 if(l_trailing_text.length() > 0)
+//                     qCDebug(g_cat_tei).noquote() << cm_indent << QString("trailing text before <q>: %1").arg(l_trailing_text);
 
-                for (const auto &l_triplet : l_cur_word_list)
-                    qCDebug(g_cat_tei).noquote() << cm_indent + QString(" ").repeated(l_indent_count) <<
-                        QString(">>C> %1 %2%3").arg(l_triplet[0]).arg(l_triplet[1]).arg(l_triplet[2].length() > 0 ? " --> " + l_triplet[2] : "");
-                l_cur_word_list.clear();
+//                 for (const auto &l_triplet : l_cur_word_list)
+//                     qCDebug(g_cat_tei).noquote() << cm_indent + QString(" ").repeated(l_indent_count) <<
+//                         QString(">>C> %1 %2%3").arg(l_triplet[0]).arg(l_triplet[1]).arg(l_triplet[2].length() > 0 ? " --> " + l_triplet[2] : "");
+//                 l_cur_word_list.clear();
 
-                l_cur_q = l_xml_reader.attributes().value("xml:id").toString();
-                cm_indent += QString(" ").repeated(l_indent_count);
-                l_in_q_spoken = true;
-            }
-        }
-        if(l_tok_type == QXmlStreamReader::EndElement && l_tok_name == "q" && l_in_q_spoken){
-            qCDebug(g_cat_tei).noquote() << cm_indent << QString("<q> trailing: %1").arg(l_trailing_text);
+//                 l_cur_q = l_xml_reader.attributes().value("xml:id").toString();
+//                 cm_indent += QString(" ").repeated(l_indent_count);
+//                 l_in_q_spoken = true;
+//             }
+//         }
+//         if(l_tok_type == QXmlStreamReader::EndElement && l_tok_name == "q" && l_in_q_spoken){
+//             qCDebug(g_cat_tei).noquote() << cm_indent << QString("<q> trailing: %1").arg(l_trailing_text);
 
-            for (const auto &l_triplet : l_cur_word_list)
-                qCDebug(g_cat_tei).noquote() << cm_indent + QString(" ").repeated(l_indent_count) <<
-                    QString(">>D> %1 %2%3").arg(l_triplet[0]).arg(l_triplet[1]).arg(l_triplet[2].length() > 0 ? " --> " + l_triplet[2] : "");
-            l_cur_word_list.clear();
+//             for (const auto &l_triplet : l_cur_word_list)
+//                 qCDebug(g_cat_tei).noquote() << cm_indent + QString(" ").repeated(l_indent_count) <<
+//                     QString(">>D> %1 %2%3").arg(l_triplet[0]).arg(l_triplet[1]).arg(l_triplet[2].length() > 0 ? " --> " + l_triplet[2] : "");
+//             l_cur_word_list.clear();
 
-            cm_indent.chop(l_indent_count);
-            l_in_q_spoken = false;
-        }
-        if(l_tok_type == QXmlStreamReader::StartElement && l_tok_name == "w"){
-            // <w xml:id="eng_450_50" corresp="#eng_ms_page_450 #eng_ms_section_450a #eng_ms_para_0">Thrasymachus,<link target="#grc_450_41 #eng_450_50" /></w>
-            QString l_w_id = l_xml_reader.attributes().value("xml:id").toString();
+//             cm_indent.chop(l_indent_count);
+//             l_in_q_spoken = false;
+//         }
+//         if(l_tok_type == QXmlStreamReader::StartElement && l_tok_name == "w"){
+//             // <w xml:id="eng_450_50" corresp="#eng_ms_page_450 #eng_ms_section_450a #eng_ms_para_0">Thrasymachus,<link target="#grc_450_41 #eng_450_50" /></w>
+//             QString l_w_id = l_xml_reader.attributes().value("xml:id").toString();
 
-            QXmlStreamReader::TokenType l_tok_type = l_xml_reader.readNext();
-            if(l_tok_type != QXmlStreamReader::Characters) throw M1Env::M1Exception("<w> not followed by Characters", 1000);
-            QString l_w_content = l_xml_reader.text().toString().trimmed();
+//             QXmlStreamReader::TokenType l_tok_type = l_xml_reader.readNext();
+//             if(l_tok_type != QXmlStreamReader::Characters) throw M1Env::M1Exception("<w> not followed by Characters", 1000);
+//             QString l_w_content = l_xml_reader.text().toString().trimmed();
 
-            QString l_link_id;
-            l_tok_type = l_xml_reader.readNext();
-            QStringView l_tok_name = l_xml_reader.name();
-            if(l_tok_type == QXmlStreamReader::StartElement && l_tok_name == "link"){
-                // <link target="#grc_450_39 #eng_450_49" />
-                QString l_target = l_xml_reader.attributes().value("target").toString();
-                if(l_w_id.contains("eng_")) l_link_id = l_target.replace(g_re_remove_eng, "").trimmed().replace("#", "");
-                else l_link_id = l_target.replace(g_re_remove_grc, "").trimmed().replace("#", "");
-            }
-            l_cur_word_list.append({l_w_id, l_w_content, l_link_id});
+//             QString l_link_id;
+//             l_tok_type = l_xml_reader.readNext();
+//             QStringView l_tok_name = l_xml_reader.name();
+//             if(l_tok_type == QXmlStreamReader::StartElement && l_tok_name == "link"){
+//                 // <link target="#grc_450_39 #eng_450_49" />
+//                 QString l_target = l_xml_reader.attributes().value("target").toString();
+//                 if(l_w_id.contains("eng_")) l_link_id = l_target.replace(g_re_remove_eng, "").trimmed().replace("#", "");
+//                 else l_link_id = l_target.replace(g_re_remove_grc, "").trimmed().replace("#", "");
+//             }
+//             l_cur_word_list.append({l_w_id, l_w_content, l_link_id});
 
-            qCDebug(g_cat_tei).noquote() << cm_indent << QString("<w id=\"%1\"> %2 --> %3").arg(l_w_id).arg(l_w_content).arg(l_link_id);
-        }
-    }
-}
+//             qCDebug(g_cat_tei).noquote() << cm_indent << QString("<w id=\"%1\"> %2 --> %3").arg(l_w_id).arg(l_w_content).arg(l_link_id);
+//         }
+//     }
+// }
 /**
  * @brief M1Store::TEIInterface::loadTeiInternal1
  * @param p_full_load
@@ -957,8 +957,11 @@ void M1Store::TEIInterface::loadTeiInternal1(const QString& p_file_path, bool p_
                             if(l_tt_wfw != QXmlStreamReader::Characters) throw M1Env::M1Exception("<seg type=transliteration> not followed by Characters", 1016);
                             QString l_wfw_form = l_xml_reader.text().toString().trimmed();
                             qCDebug(g_cat_tei).noquote() << cm_indent << QString("Word Word %1.%2.%3 <seg type=\"%4\"> %5")
-                                                                             .arg(cm_cur_chapter_number).arg(cm_cur_sloka_number).arg(l_cur_word)
-                                                                             .arg(l_type).arg(l_wfw_form);
+                                                                             .arg(cm_cur_chapter_number)
+                                                                             .arg(cm_cur_sloka_number)
+                                                                             .arg(l_cur_word)
+                                                                             .arg(l_type)
+                                                                             .arg(l_wfw_form);
                             l_sk_segment = l_wfw_form;
                         }
                     }
