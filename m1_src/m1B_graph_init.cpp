@@ -69,6 +69,18 @@ M1Env::SpecialItemID M1Env::TEXT_WFW_TRANSLAT_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_WFW_POS_SIID = G_NONEX_SI_ID;
 // [WFGRM] Special Vertex ID (Simple Edge type) WfW form Grammatical analysis
 M1Env::SpecialItemID M1Env::TEXT_WFW_GRM_SIID = G_NONEX_SI_ID;
+// [TEXID] Special Vertex ID (Simple Edge type) TEI @xml:id attribute
+M1Env::SpecialItemID M1Env::TEI_XMLID_ATTR_SIID = G_NONEX_SI_ID;
+// [TETYP] Special Vertex ID (Simple Edge type) TEI @type attribute
+M1Env::SpecialItemID M1Env::TEI_TYPE_ATTR_SIID = G_NONEX_SI_ID;
+// [TEINA] Special Vertex ID (Simple Edge type) TEI @n attribute
+M1Env::SpecialItemID M1Env::TEI_N_ATTR_SIID = G_NONEX_SI_ID;
+// [TERND] Special Vertex ID (Simple Edge type) TEI @rend attribute (for <hi>)
+M1Env::SpecialItemID M1Env::TEI_REND_ATTR_SIID = G_NONEX_SI_ID;
+// [TEPCL] Special Vertex ID (Simple Edge type) TEI @place attribute (for <note>)
+M1Env::SpecialItemID M1Env::TEI_PLACE_ATTR_SIID = G_NONEX_SI_ID;
+// [TETAG] Special Vertex ID (Simple Edge type) TEI tag name (for mult-tag nodes like TXTCK)
+M1Env::SpecialItemID M1Env::TEI_TAG_NAME_SIID = G_NONEX_SI_ID;
 // [URLNK] Special Vertex ID (Vertex type) Url link
 M1Env::SpecialItemID M1Env::TEXT_URL_LINK_SIID = G_NONEX_SI_ID;
 // [C2OBG] Special Vertex ID (Edge type) begin chunk + reciprocal
@@ -105,6 +117,7 @@ M1Env::SpecialItemID M1Env::NLTAG_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::STEPHANUS_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TXTVR_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TXTNT_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::TEXT_DIV_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_CHUNK_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_PARA_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_BOOK_SIID = G_NONEX_SI_ID;
@@ -269,6 +282,12 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::TEXT_WFW_TRANSLAT_SIID = M1Store::StorageStatic::getSpecialID("WFTRN");
     M1Env::TEXT_WFW_POS_SIID = M1Store::StorageStatic::getSpecialID("WFPOS");
     M1Env::TEXT_WFW_GRM_SIID = M1Store::StorageStatic::getSpecialID("WFGRM");
+    M1Env::TEI_XMLID_ATTR_SIID = M1Store::StorageStatic::getSpecialID("TEXID");
+    M1Env::TEI_TYPE_ATTR_SIID = M1Store::StorageStatic::getSpecialID("TETYP");
+    M1Env::TEI_N_ATTR_SIID = M1Store::StorageStatic::getSpecialID("TEINA");
+    M1Env::TEI_REND_ATTR_SIID = M1Store::StorageStatic::getSpecialID("TERND");
+    M1Env::TEI_PLACE_ATTR_SIID = M1Store::StorageStatic::getSpecialID("TEPCL");
+    M1Env::TEI_TAG_NAME_SIID = M1Store::StorageStatic::getSpecialID("TETAG");
     M1Env::TEXT_URL_LINK_SIID = M1Store::StorageStatic::getSpecialID("URLNK");
     M1Env::TW_CHUNK_2_OCC_BEGIN_SIID = M1Store::StorageStatic::getSpecialID("C2OBG");
     M1Env::TW_OCC_2_CHUNK_BEGIN_SIID = M1Store::StorageStatic::getSpecialID("O2CBG");
@@ -299,6 +318,7 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::STEPHANUS_SIID = M1Store::StorageStatic::getSpecialID("STPSC");
     M1Env::TXTVR_SIID = M1Store::StorageStatic::getSpecialID("TXTVR");
     M1Env::TXTNT_SIID = M1Store::StorageStatic::getSpecialID("TXTNT");
+    M1Env::TEXT_DIV_SIID = M1Store::StorageStatic::getSpecialID("TXDIV");
     M1Env::TEXT_CHUNK_SIID = M1Store::StorageStatic::getSpecialID("TXTCK");
     M1Env::TEXT_PARA_SIID = M1Store::StorageStatic::getSpecialID("TXTPR");
     M1Env::TEXT_BOOK_SIID = M1Store::StorageStatic::getSpecialID("TXTBK");
@@ -493,6 +513,12 @@ void M1Env::GraphInit::dbg_dump_pseudo_constants(){
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_TRANSLAT_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WFTRN"), 4, 16, QChar('0')).arg("WFTRN");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_POS_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WFPOS"), 4, 16, QChar('0')).arg("WFPOS");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_GRM_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WFGRM"), 4, 16, QChar('0')).arg("WFGRM");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_XMLID_ATTR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TEXID"), 4, 16, QChar('0')).arg("TEXID");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_TYPE_ATTR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TETYP"), 4, 16, QChar('0')).arg("TETYP");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_N_ATTR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TEINA"), 4, 16, QChar('0')).arg("TEINA");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_REND_ATTR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TERND"), 4, 16, QChar('0')).arg("TERND");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_PLACE_ATTR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TEPCL"), 4, 16, QChar('0')).arg("TEPCL");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_TAG_NAME_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TETAG"), 4, 16, QChar('0')).arg("TETAG");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_URL_LINK_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("URLNK"), 4, 16, QChar('0')).arg("URLNK");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TW_CHUNK_2_OCC_BEGIN_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("C2OBG"), 4, 16, QChar('0')).arg("C2OBG");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TW_CHUNK_2_OCC_END_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("C2OEN"), 4, 16, QChar('0')).arg("C2OEN");
@@ -569,6 +595,18 @@ void M1Env::GraphInit::init_base(){
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "WFPOS", nullptr);
     // Special Vertex ID (Simple Edge type) WfW form Grammatical analysis
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "WFGRM", nullptr);
+    // Special Vertex ID (Simple Edge type) TEI @xml:id attribute
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TEXID", nullptr);
+    // Special Vertex ID (Simple Edge type) TEI @type attribute
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TETYP", nullptr);
+    // Special Vertex ID (Simple Edge type) TEI @n attribute
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TEINA", nullptr);
+    // Special Vertex ID (Simple Edge type) TEI @rend attribute (for <hi>)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TERND", nullptr);
+    // Special Vertex ID (Simple Edge type) TEI @place attribute (for <note>)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TEPCL", nullptr);
+    // Special Vertex ID (Simple Edge type) TEI tag name (for mult-tag nodes like TXTCK)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TETAG", nullptr);
     // Special Vertex ID (Vertex type) Url link
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "URLNK", M1Env::TEXT_URL_LINK_ICON_PATH);
     // Special Vertex ID (Edge type) begin chunk + reciprocal
@@ -979,6 +1017,21 @@ void M1Env::GraphInit::init_base(){
         M1Env::FOLDER_ICON_PATH);
     l_txtnt->setType("TYPE_");
     l_txtnt->linkTo(l_txwkk, "BLNGS", nullptr, true);
+
+    // creation of "Text Div (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[TXDIV]-Text Div (type)> item");
+    M1Store::Item_lv2* l_txdiv = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Text Div (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE | M1Env::SI_IS_SELECTABLE,
+        // mnemonic
+        "TXDIV",
+        // icon path
+        M1Env::TEXT_DIV_ICON_PATH);
+    l_txdiv->setType("TYPE_");
 
     // creation of "Text Chunk (type)"
     qCDebug(g_cat_silence) << QString("Creating <[TXTCK]-Text Chunk (type)> item");
@@ -3758,13 +3811,13 @@ void M1Env::GraphInit::init_base(){
     l_ncb23->setType("NCNLS");
     l_ncb23->setType("GRATV");
 
-    // creation of "[Wol1]-Wolof noun class 1/k (singular human)"
-    qCDebug(g_cat_silence) << QString("Creating <[NCWL1]-[Wol1]-Wolof noun class 1/k (singular human)> item");
+    // creation of "[Wol1]-Wolof noun class 1/l_verse_k (singular human)"
+    qCDebug(g_cat_silence) << QString("Creating <[NCWL1]-[Wol1]-Wolof noun class 1/l_verse_k (singular human)> item");
     M1Store::Item_lv2* l_ncwl1 = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "[Wol1]-Wolof noun class 1/k (singular human)",
+        "[Wol1]-Wolof noun class 1/l_verse_k (singular human)",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
         // mnemonic
@@ -6929,8 +6982,4 @@ void M1Env::GraphInit::init_base(){
         nullptr);
     l_ntsp->setType("TYPE_");
     l_ntsp->setType("NLTAG");
-}
-
-void M1Env::GraphInit::init_plato(){
-    
 }

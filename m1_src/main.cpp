@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
         ("help,h", "produce help message")
         //("load-json,j", "Load a json file (Old Plato Republic style)")
         ("load-tei-1,b", "Load a TEI file - Bhagavad Gita Style")
+        ("load-tei,t", po::value<std::string>(), "Load a TEI XML file - Generic style Style")
         // ("load-tei-2,q", "Load a TEI file - Plato Perseus Style - with EMBEDDED <w> tags")
         // ("load-tei-3,p", "Load a TEI file - Plato Perseus Style - with SEPARATE <w> tags")
         ("reset,r", "Reset (empty) storage")
@@ -56,6 +57,7 @@ int main(int argc, char *argv[])
 
         if(l_program_options_vm.count("reset")) std::cout << "reset option detected" << std::endl;
         if(l_program_options_vm.count("load-tei-1")) std::cout << "load-tei-1 option detected" << std::endl;
+        if(l_program_options_vm.count("load-tei")) std::cout << "load-tei option detected" << std::endl;
         //if(l_program_options_vm.count("load-tei-2")) std::cout << "load-tei-2 option detected" << std::endl;
         //if(l_program_options_vm.count("load-tei-2")) std::cout << "load-tei-3 option detected" << std::endl;
         //if(l_program_options_vm.count("load-json")) std::cout << "load-json option detected" << std::endl;
@@ -107,7 +109,7 @@ int main(int argc, char *argv[])
                                         "tree_display=false\n"
                                         "passages_panel=false\n"
                                         "main_window=false\n"
-                                        "tei_interface=false\n"
+                                        // "tei_interface=false\n"
                                         "tree_row=false\n"
                                         "qt.*.debug=false\n");
     M1Env::EnvStatic::setTmpDebug(false);
@@ -140,7 +142,20 @@ int main(int argc, char *argv[])
         catch(const M1Env::M1Exception& e){
             qCDebug(g_cat_main).noquote() << "TEI (1) load error" << e.code() << e.message();
             return 1;
+        } // std::string fileName = vm["template"].as<std::string>();
+    }
+    if(l_program_options_vm.count("load-tei")){
+        // std::string fileName = l_program_options_vm["load-tei"].as<std::string>();
+        try{
+            QString l_file_name = QString::fromStdString(l_program_options_vm["load-tei"].as<std::string>());
+            qCDebug(g_cat_main).noquote() << "TEI XML loading file:" << l_file_name;
+            M1Store::TEIInterface::loadTeiGeneric(l_file_name);
+            // std::_Exit(0);
         }
+        catch(const M1Env::M1Exception& e){
+            qCDebug(g_cat_main).noquote() << "TEI XML load error" << e.code() << e.message();
+            return 1;
+        } // std::string fileName = vm["template"].as<std::string>();
     }
     // if(l_program_options_vm.count("load-tei-2")){
     //     try{

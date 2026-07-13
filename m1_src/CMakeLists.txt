@@ -66,6 +66,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         m1C_tree_row.cpp
+        m1B_tei_ancillaries.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET m1_src APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

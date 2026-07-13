@@ -166,6 +166,7 @@ namespace M1Env{
     static const char* SLOKA_FOLDER_ICON_PATH = "../m1_src/Icons/SlokaFolder.svg";              ///<
     static const char* TEXT_WFW_FORM_ICON_PATH = "../m1_src/Icons/word-form.svg";               ///<
     static const char* TEXT_PARA_ICON_PATH = "../m1_src/Icons/Paragraph.svg";                   ///<
+    static const char* TEXT_DIV_ICON_PATH = "../m1_src/Icons/Div.svg";                          ///<
     static const char* DUSTBIN_ICON_PATH = "../m1_src/Icons/Dustbin.svg";                       ///<
 /**@}*/ //end of IconPaths TEXT_PARA_ICON_PATH
 

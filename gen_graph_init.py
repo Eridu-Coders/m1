@@ -432,6 +432,12 @@ g_special_vertices = [
     ['WFTRN', 'SI_IS_TYPE',                                None,                        'TEXT_WFW_TRANSLAT_SIID', None,     'Special Vertex ID (Simple Edge type) WfW unit Translation field'],
     ['WFPOS', 'SI_IS_TYPE',                                None,                        'TEXT_WFW_POS_SIID', None,          'Special Vertex ID (Simple Edge type) WfW form POS tag'],
     ['WFGRM', 'SI_IS_TYPE',                                None,                        'TEXT_WFW_GRM_SIID', None,          'Special Vertex ID (Simple Edge type) WfW form Grammatical analysis'],
+    ['TEXID', 'SI_IS_TYPE',                                None,                        'TEI_XMLID_ATTR_SIID', None,        'Special Vertex ID (Simple Edge type) TEI @xml:id attribute'],
+    ['TETYP', 'SI_IS_TYPE',                                None,                        'TEI_TYPE_ATTR_SIID', None,         'Special Vertex ID (Simple Edge type) TEI @type attribute'],
+    ['TEINA', 'SI_IS_TYPE',                                None,                        'TEI_N_ATTR_SIID', None,            'Special Vertex ID (Simple Edge type) TEI @n attribute'],
+    ['TERND', 'SI_IS_TYPE',                                None,                        'TEI_REND_ATTR_SIID', None,         'Special Vertex ID (Simple Edge type) TEI @rend attribute (for <hi>)'],
+    ['TEPCL', 'SI_IS_TYPE',                                None,                        'TEI_PLACE_ATTR_SIID', None,        'Special Vertex ID (Simple Edge type) TEI @place attribute (for <note>)'],
+    ['TETAG', 'SI_IS_TYPE',                                None,                        'TEI_TAG_NAME_SIID', None,          'Special Vertex ID (Simple Edge type) TEI tag name (for mult-tag nodes like TXTCK)'],
     ['URLNK', 'SI_IS_TYPE',                                'TEXT_URL_LINK_ICON_PATH',   'TEXT_URL_LINK_SIID', None,         'Special Vertex ID (Vertex type) Url link'],
     # --------------------------- HS2OB / OC2HB ---------------------------
     ['C2OBG', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_BEGIN_ICON_PATH', 'TW_CHUNK_2_OCC_BEGIN_SIID',
@@ -476,6 +482,8 @@ g_vertices = [
 ['Stephanus Section (type)',     ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'STPSC', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'STEPHANUS_SIID'],
 ['Text Version (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'TXTVR', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'TXTVR_SIID'],
 ['Notes (type)',                 ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'TXTNT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'FOLDER_ICON_PATH',       'TXTNT_SIID'],
+['Text Div (type)',              ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXDIV', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
+                                                                                                               'SI_IS_SELECTABLE'],                'TEXT_DIV_ICON_PATH',     'TEXT_DIV_SIID'],
 ['Text Chunk (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXTCK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
                                                                                                                'SI_IS_SELECTABLE'],                'TEXT_CHUNK_ICON_PATH',   'TEXT_CHUNK_SIID'],
 ['Text Paragraph (type)',        ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXTPR', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
@@ -513,7 +521,6 @@ __EXTERN_DECL__
             static void set_pseudo_constants();
             static void dbg_dump_pseudo_constants();
             static void init_base();
-            static void init_plato();
             static QList<M1Env::SpecialItemID> cm_gram_attr_list; 
     };
     
@@ -540,215 +547,9 @@ void M1Env::GraphInit::dbg_dump_pseudo_constants(){
 void M1Env::GraphInit::init_base(){
     __INIT_BASE__
 }
-
-void M1Env::GraphInit::init_plato(){
-    __INIT_PLATO__
-}
 """
-# ------------- main() -------------------------------------------------------------------------------------------------
-if __name__ == '__main__':
-    # gita
-    # g_vertices += g_vertices_gita
-    # g_special_vertices += g_special_vertices_gita
 
-    l_attr_2_mn = dict()
-    l_attr_class_ssid_list = []
-    # Grammar attributes -----------------------------------------------------------------------------------------------
-    for l_name_class, l_label_class, l_val_list in g_attr_values:
-        l_mn_class = (re.sub(r'[a-z]', '', l_name_class) + re.sub(r'[aeiouA-Z]', '', l_name_class).upper())
-        if len(l_mn_class) < 5:
-            l_mn_class = l_name_class.upper()
-        l_mn_class = (l_mn_class + '_' * 5)[:5]
-        print(l_mn_class, l_name_class)
-
-        # ['Email Inbox', ['FULL_VERTEX',  'IS_SPECIAL'], ['TYPE_'], [('BLNGS',  '_MSG_')], 'EMAIL', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], None, 'EMAIL_TYPE_SIID'],
-        # l_vertex_label = (f'[{l_name_class}]-{l_label_class}'[:64]
-        #                           if l_name_class.lower() != l_label_class.lower()
-        #                           else l_name_class[:64])
-        l_vertex_label = l_label_class.capitalize()
-        l_ssid_attr = f'{l_mn_class}_SIID'
-        l_attr_class_ssid_list.append(l_ssid_attr)
-        g_vertices.append([
-            l_vertex_label,
-            ['FULL_VERTEX',  'IS_SPECIAL'],
-            ['TYPE_', 'GRATT'],
-            None,
-            l_mn_class,
-            ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],
-            'FOLDER_ICON_PATH',
-            l_ssid_attr])
-
-        # [('Ex', 'CLSEX', 'exclusive'), ('In', 'CLSIN', 'inclusive')]
-        for l_name_attr, l_mn_attr, l_label_attr in l_val_list:
-            l_attr_key = f'{l_name_class}-{l_name_attr}'
-            l_attr_2_mn[l_attr_key] = l_mn_attr
-
-            l_vertex_label = f'[{l_name_attr}]-{l_label_attr}'[:62] \
-                if l_name_attr.lower() != l_label_attr.lower() \
-                else l_name_attr[:62]
-
-            g_vertices.append([
-                l_vertex_label,
-                ['FULL_VERTEX',  'IS_SPECIAL'],
-                ['TYPE_', l_mn_class, 'GRATV'],
-                None,
-                l_mn_attr,
-                ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],
-                'FOLDER_ICON_PATH',
-                None])
-
-    l_mnemo_dict = dict()
-    def add_mnemo(p_mn):
-        global l_mnemo_dict
-        l_mnemo_dict[p_mn] = l_mnemo_dict.setdefault(p_mn, 0) + 1
-
-    # Tag & Pos --------------------------------------------------------------------------------------------------------
-    l_pos_2_mn = dict()
-    for l_mn, l_pos, l_label in g_nlp_pos_list:
-        l_pos_2_mn[l_pos] = l_mn
-        # ['NLP Tag code (type)', ['FULL_VERTEX',  'IS_SPECIAL'], ['TYPE_'], [('BLNGS',  'HOME_')], 'NLTAG', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], 'ENTITY_ICON_PATH', 'NLTAG_SIID'],
-        g_vertices.append([
-            f'{l_pos}-{l_label}',
-            ['FULL_VERTEX', 'IS_SPECIAL'],
-            ['TYPE_', 'NLPOS'],
-            None,
-            l_mn,
-            ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],
-            None,
-            f'{l_mn}_SIID'
-        ])
-
-    l_tag_2_mn = dict()
-    for l_mn, l_tag, l_label in g_nlp_tag_list:
-        l_tag_2_mn[l_tag] = l_mn
-        # ['NLP Tag code (type)', ['FULL_VERTEX',  'IS_SPECIAL'], ['TYPE_'], [('BLNGS',  'HOME_')], 'NLTAG', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], 'ENTITY_ICON_PATH', 'NLTAG_SIID'],
-        g_vertices.append([
-            f'{l_tag}-{l_label}',
-            ['FULL_VERTEX', 'IS_SPECIAL'],
-            ['TYPE_', 'NLTAG'],
-            None,
-            l_mn,
-            ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],
-            None,
-            f'{l_mn}_SIID'
-        ])
-
-    # |---------|---------|---------|---------|---------|---------|               |---------|---------|---------| |---------|---------|---------|      |---------|---------|---------|
-    # l_label,                       l_vertex_flag_list,              l_type_list, l_edges               l_mnemo, l_si_flag_list,                      l_icon_path,              l_pseudo_constant
-    for l_label, l_vertex_flag_list, l_type_list, l_edges, l_mnemo, l_si_flag_list, l_icon_path, l_pseudo_constant in g_vertices:
-        print(f'{l_label:80} {str(l_vertex_flag_list):30} {l_type_list} {str(l_edges):25} {l_mnemo} {str(l_si_flag_list):35} {str(l_icon_path):25} {l_pseudo_constant}')
-
-    # Ancillaries
-    l_initialization = ''
-    l_dump = ''
-    l_declaration = ''
-    l_extern_declaration = ''
-    for l_mnemo, _, _, l_pseudo_constant, l_reciprocal, l_comment in g_special_vertices:
-        l_extern_declaration += f'// [{l_mnemo}] {l_comment}\nextern M1Env::SpecialItemID {l_pseudo_constant};\n'
-        l_declaration += f'// [{l_mnemo}] {l_comment}\nM1Env::SpecialItemID M1Env::{l_pseudo_constant} = G_NONEX_SI_ID;\n'
-        l_initialization += f'    M1Env::{l_pseudo_constant} = M1Store::StorageStatic::getSpecialID("{l_mnemo}");\n'
-        l_dump += f'    qCDebug(g_cat_silence) << QString("0x%1 M1Env::{l_pseudo_constant} <-- %2").arg(M1Store::StorageStatic::getSpecialID("{l_mnemo}"), 4, 16, QChar(\'0\')).arg("{l_mnemo}");\n'
-        add_mnemo(l_mnemo)
-        if l_reciprocal:
-            l_mnemo_r, l_flags_r, l_icon_path_r, l_pseudo_constant_r = l_reciprocal
-            add_mnemo(l_mnemo_r)
-            l_extern_declaration += (f'// [{l_mnemo_r}] {l_comment} (reciprocal of {l_mnemo} above))\n' +
-                                     f'extern M1Env::SpecialItemID {l_pseudo_constant_r};\n')
-            l_declaration += (f'// [{l_mnemo_r}] {l_comment} (reciprocal of {l_mnemo} above))\n' +
-                              f'M1Env::SpecialItemID M1Env::{l_pseudo_constant_r} = G_NONEX_SI_ID;\n')
-            l_initialization += f'    M1Env::{l_pseudo_constant_r} = M1Store::StorageStatic::getSpecialID("{l_mnemo_r}");\n'
-
-    l_extern_declaration += '\n'
-    l_declaration += '\n'
-    for l_label, _, _, _, l_mnemo, _, _, l_pseudo_constant in g_vertices:
-        add_mnemo(l_mnemo)
-        if l_pseudo_constant:
-            l_extern_declaration += f'// [{l_mnemo}] Special Vertex ID of "{l_label}"\nextern M1Env::SpecialItemID {l_pseudo_constant};\n'
-            l_declaration += f'M1Env::SpecialItemID M1Env::{l_pseudo_constant} = G_NONEX_SI_ID;\n'
-            l_initialization += f'    M1Env::{l_pseudo_constant} = M1Store::StorageStatic::getSpecialID("{l_mnemo}");\n'
-
-    # print(l_extern_declaration)
-    # print(l_declaration)
-    # print(l_initialization)
-
-    with open('m1_src/m1B_graph_init.h', 'w') as l_fout:
-        l_fout.write(g_declaration_template.replace('__EXTERN_DECL__', l_extern_declaration))
-
-    # main code
-    l_base_code = ''
-    for l_mnemo, l_flags, l_icon_path, _, l_reciprocal, l_comment in g_special_vertices:
-        if isinstance(l_flags, list):
-            l_flags = ' | '.join(l_flags)
-        l_icon_path = f'M1Env::{l_icon_path}' if l_icon_path else 'nullptr'
-        if l_reciprocal:
-            l_mnemo_r, l_flags_r, l_icon_path_r, l_pseudo_constant_r = l_reciprocal
-            if isinstance(l_flags_r, list):
-                l_flags_r = ' | '.join(l_flags_r)
-            l_icon_path_r = f'M1Env::{l_icon_path_r}' if l_icon_path_r else 'nullptr'
-            l_base_code += (f'    // {l_comment}\n' +
-                            f'    M1Store::StorageStatic::getNewSpecialWithReciprocal({l_flags},\n' +
-                            f'        "{l_mnemo}", {l_icon_path},\n' +
-                            f'        "{l_mnemo_r}", {l_icon_path_r},\n' +
-                            f'        {l_flags_r});\n')
-        else:
-            l_base_code += f'    // {l_comment}\n    M1Store::StorageStatic::getNewSpecialNoItem({l_flags}, "{l_mnemo}", {l_icon_path});\n'
-
-    l_base_code += '\n'
-    l_mnemo_2_var = dict()
-    for l_label, l_vertex_flag_list, l_type_list, l_edges, l_mnemo, l_si_flag_list, l_icon_path, l_pseudo_constant in g_vertices:
-        l_var_name = 'l_' + l_mnemo.replace('_', '').lower()
-        l_vertex_flag_string = ' | '.join([f'M1Env::{l_flag}' for l_flag in l_vertex_flag_list])
-        l_debug_label = f'[{l_mnemo}]-{l_label}' if l_mnemo else f'{l_label}'
-        l_base_code += (f'    // creation of "{l_label}"\n' +
-                        f'    qCDebug(g_cat_silence) << QString("Creating <{l_debug_label}> item");\n' +
-                        f'    M1Store::Item_lv2* {l_var_name} = M1Store::Item_lv2::getNew(\n' +
-                        f'        // vertex flags\n' +
-                        f'        {l_vertex_flag_string},\n' +
-                        f'        // label\n' +
-                        f'        "{l_label}"')
-        if not l_mnemo:
-            l_base_code += ');\n'
-        else:
-            l_base_code += ',\n'
-            l_mnemo_2_var[l_mnemo] = l_var_name
-            l_si_flag_string = '0' if l_si_flag_list == '0' else ' | '.join([f'M1Env::{l_flag}' for l_flag in l_si_flag_list])
-            l_icon_path = f'M1Env::{l_icon_path}' if l_icon_path else 'nullptr'
-            l_base_code += (
-                    f'        // Special Item flag\n' +
-                    f'        {l_si_flag_string},\n' +
-                    f'        // mnemonic\n' +
-                    f'        "{l_mnemo}",\n' +
-                    f'        // icon path\n' +
-                    f'        {l_icon_path});\n')
-
-        for l_type_mnemo in l_type_list:
-            l_base_code += f'    {l_var_name}->setType("{l_type_mnemo}");\n'
-        if l_edges:
-            for l_edge_type, l_dest_mnemo in l_edges:
-                l_base_code += f'    {l_var_name}->linkTo({l_mnemo_2_var[l_dest_mnemo]}, "{l_edge_type}", nullptr, true);\n'
-        l_base_code += '\n'
-
-    # QList<M1Env::SpecialItemID> cm_gram_attr_list;
-    l_declaration += 'QList<M1Env::SpecialItemID> M1Env::GraphInit::cm_gram_attr_list;\n'
-
-    for l_ssid in l_attr_class_ssid_list:
-        l_initialization += f'    M1Env::GraphInit::cm_gram_attr_list.append(M1Env::{l_ssid});\n'
-
-    with open('m1_src/m1B_graph_init.cpp', 'w') as l_fout:
-        l_fout.write(g_implementation_template
-                     .replace('__PSEUDO_DECLARE__', l_declaration.strip())
-                     .replace('__PSEUDO_DUMP__', l_dump.strip())
-                     .replace('__PSEUDO_INIT__', l_initialization.strip())
-                     .replace('__INIT_BASE__', l_base_code.strip())
-                     # .replace('__INIT_PLATO__', l_plato_code.strip())
-                     .replace('__INIT_PLATO__', ''))
-
-    print('\n================ Duplicate Mnemonics =====================')
-    for l_count, l_mn in sorted([(l_mnemo_dict[l_mn], l_mn) for l_mn in l_mnemo_dict.keys()]):
-        if l_count > 1:
-            print(l_mn, l_count)
-
-    # Plato ------------------------------------------------------------------------------------------------------------
+def do_plato():
     print('\n================ Plato =====================')
     l_plato_code = ''
 
@@ -1080,6 +881,214 @@ if __name__ == '__main__':
 
     with open('plato_code.cpp', "w") as l_fout:
         l_fout.write(l_plato_code)
+
+
+# ------------- main() -------------------------------------------------------------------------------------------------
+if __name__ == '__main__':
+    # gita
+    # g_vertices += g_vertices_gita
+    # g_special_vertices += g_special_vertices_gita
+
+    l_attr_2_mn = dict()
+    l_attr_class_ssid_list = []
+    # Grammar attributes -----------------------------------------------------------------------------------------------
+    for l_name_class, l_label_class, l_val_list in g_attr_values:
+        l_mn_class = (re.sub(r'[a-z]', '', l_name_class) + re.sub(r'[aeiouA-Z]', '', l_name_class).upper())
+        if len(l_mn_class) < 5:
+            l_mn_class = l_name_class.upper()
+        l_mn_class = (l_mn_class + '_' * 5)[:5]
+        print(l_mn_class, l_name_class)
+
+        # ['Email Inbox', ['FULL_VERTEX',  'IS_SPECIAL'], ['TYPE_'], [('BLNGS',  '_MSG_')], 'EMAIL', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], None, 'EMAIL_TYPE_SIID'],
+        # l_vertex_label = (f'[{l_name_class}]-{l_label_class}'[:64]
+        #                           if l_name_class.lower() != l_label_class.lower()
+        #                           else l_name_class[:64])
+        l_vertex_label = l_label_class.capitalize()
+        l_ssid_attr = f'{l_mn_class}_SIID'
+        l_attr_class_ssid_list.append(l_ssid_attr)
+        g_vertices.append([
+            l_vertex_label,
+            ['FULL_VERTEX',  'IS_SPECIAL'],
+            ['TYPE_', 'GRATT'],
+            None,
+            l_mn_class,
+            ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],
+            'FOLDER_ICON_PATH',
+            l_ssid_attr])
+
+        # [('Ex', 'CLSEX', 'exclusive'), ('In', 'CLSIN', 'inclusive')]
+        for l_name_attr, l_mn_attr, l_label_attr in l_val_list:
+            l_attr_key = f'{l_name_class}-{l_name_attr}'
+            l_attr_2_mn[l_attr_key] = l_mn_attr
+
+            l_vertex_label = f'[{l_name_attr}]-{l_label_attr}'[:62] \
+                if l_name_attr.lower() != l_label_attr.lower() \
+                else l_name_attr[:62]
+
+            g_vertices.append([
+                l_vertex_label,
+                ['FULL_VERTEX',  'IS_SPECIAL'],
+                ['TYPE_', l_mn_class, 'GRATV'],
+                None,
+                l_mn_attr,
+                ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],
+                'FOLDER_ICON_PATH',
+                None])
+
+    l_mnemo_dict = dict()
+    def add_mnemo(p_mn):
+        global l_mnemo_dict
+        l_mnemo_dict[p_mn] = l_mnemo_dict.setdefault(p_mn, 0) + 1
+
+    # Tag & Pos --------------------------------------------------------------------------------------------------------
+    l_pos_2_mn = dict()
+    for l_mn, l_pos, l_label in g_nlp_pos_list:
+        l_pos_2_mn[l_pos] = l_mn
+        # ['NLP Tag code (type)', ['FULL_VERTEX',  'IS_SPECIAL'], ['TYPE_'], [('BLNGS',  'HOME_')], 'NLTAG', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], 'ENTITY_ICON_PATH', 'NLTAG_SIID'],
+        g_vertices.append([
+            f'{l_pos}-{l_label}',
+            ['FULL_VERTEX', 'IS_SPECIAL'],
+            ['TYPE_', 'NLPOS'],
+            None,
+            l_mn,
+            ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],
+            None,
+            f'{l_mn}_SIID'
+        ])
+
+    l_tag_2_mn = dict()
+    for l_mn, l_tag, l_label in g_nlp_tag_list:
+        l_tag_2_mn[l_tag] = l_mn
+        # ['NLP Tag code (type)', ['FULL_VERTEX',  'IS_SPECIAL'], ['TYPE_'], [('BLNGS',  'HOME_')], 'NLTAG', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'], 'ENTITY_ICON_PATH', 'NLTAG_SIID'],
+        g_vertices.append([
+            f'{l_tag}-{l_label}',
+            ['FULL_VERTEX', 'IS_SPECIAL'],
+            ['TYPE_', 'NLTAG'],
+            None,
+            l_mn,
+            ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],
+            None,
+            f'{l_mn}_SIID'
+        ])
+
+    # |---------|---------|---------|---------|---------|---------|               |---------|---------|---------| |---------|---------|---------|      |---------|---------|---------|
+    # l_label,                       l_vertex_flag_list,              l_type_list, l_edges               l_mnemo, l_si_flag_list,                      l_icon_path,              l_pseudo_constant
+    for l_label, l_vertex_flag_list, l_type_list, l_edges, l_mnemo, l_si_flag_list, l_icon_path, l_pseudo_constant in g_vertices:
+        print(f'{l_label:80} {str(l_vertex_flag_list):30} {l_type_list} {str(l_edges):25} {l_mnemo} {str(l_si_flag_list):35} {str(l_icon_path):25} {l_pseudo_constant}')
+
+    # Ancillaries
+    l_initialization = ''
+    l_dump = ''
+    l_declaration = ''
+    l_extern_declaration = ''
+    for l_mnemo, _, _, l_pseudo_constant, l_reciprocal, l_comment in g_special_vertices:
+        l_extern_declaration += f'// [{l_mnemo}] {l_comment}\nextern M1Env::SpecialItemID {l_pseudo_constant};\n'
+        l_declaration += f'// [{l_mnemo}] {l_comment}\nM1Env::SpecialItemID M1Env::{l_pseudo_constant} = G_NONEX_SI_ID;\n'
+        l_initialization += f'    M1Env::{l_pseudo_constant} = M1Store::StorageStatic::getSpecialID("{l_mnemo}");\n'
+        l_dump += f'    qCDebug(g_cat_silence) << QString("0x%1 M1Env::{l_pseudo_constant} <-- %2").arg(M1Store::StorageStatic::getSpecialID("{l_mnemo}"), 4, 16, QChar(\'0\')).arg("{l_mnemo}");\n'
+        add_mnemo(l_mnemo)
+        if l_reciprocal:
+            l_mnemo_r, l_flags_r, l_icon_path_r, l_pseudo_constant_r = l_reciprocal
+            add_mnemo(l_mnemo_r)
+            l_extern_declaration += (f'// [{l_mnemo_r}] {l_comment} (reciprocal of {l_mnemo} above))\n' +
+                                     f'extern M1Env::SpecialItemID {l_pseudo_constant_r};\n')
+            l_declaration += (f'// [{l_mnemo_r}] {l_comment} (reciprocal of {l_mnemo} above))\n' +
+                              f'M1Env::SpecialItemID M1Env::{l_pseudo_constant_r} = G_NONEX_SI_ID;\n')
+            l_initialization += f'    M1Env::{l_pseudo_constant_r} = M1Store::StorageStatic::getSpecialID("{l_mnemo_r}");\n'
+
+    l_extern_declaration += '\n'
+    l_declaration += '\n'
+    for l_label, _, _, _, l_mnemo, _, _, l_pseudo_constant in g_vertices:
+        add_mnemo(l_mnemo)
+        if l_pseudo_constant:
+            l_extern_declaration += f'// [{l_mnemo}] Special Vertex ID of "{l_label}"\nextern M1Env::SpecialItemID {l_pseudo_constant};\n'
+            l_declaration += f'M1Env::SpecialItemID M1Env::{l_pseudo_constant} = G_NONEX_SI_ID;\n'
+            l_initialization += f'    M1Env::{l_pseudo_constant} = M1Store::StorageStatic::getSpecialID("{l_mnemo}");\n'
+
+    # print(l_extern_declaration)
+    # print(l_declaration)
+    # print(l_initialization)
+
+    with open('m1_src/m1B_graph_init.h', 'w') as l_fout:
+        l_fout.write(g_declaration_template.replace('__EXTERN_DECL__', l_extern_declaration))
+
+    # main code
+    l_base_code = ''
+    for l_mnemo, l_flags, l_icon_path, _, l_reciprocal, l_comment in g_special_vertices:
+        if isinstance(l_flags, list):
+            l_flags = ' | '.join(l_flags)
+        l_icon_path = f'M1Env::{l_icon_path}' if l_icon_path else 'nullptr'
+        if l_reciprocal:
+            l_mnemo_r, l_flags_r, l_icon_path_r, l_pseudo_constant_r = l_reciprocal
+            if isinstance(l_flags_r, list):
+                l_flags_r = ' | '.join(l_flags_r)
+            l_icon_path_r = f'M1Env::{l_icon_path_r}' if l_icon_path_r else 'nullptr'
+            l_base_code += (f'    // {l_comment}\n' +
+                            f'    M1Store::StorageStatic::getNewSpecialWithReciprocal({l_flags},\n' +
+                            f'        "{l_mnemo}", {l_icon_path},\n' +
+                            f'        "{l_mnemo_r}", {l_icon_path_r},\n' +
+                            f'        {l_flags_r});\n')
+        else:
+            l_base_code += f'    // {l_comment}\n    M1Store::StorageStatic::getNewSpecialNoItem({l_flags}, "{l_mnemo}", {l_icon_path});\n'
+
+    l_base_code += '\n'
+    l_mnemo_2_var = dict()
+    for l_label, l_vertex_flag_list, l_type_list, l_edges, l_mnemo, l_si_flag_list, l_icon_path, l_pseudo_constant in g_vertices:
+        l_var_name = 'l_' + l_mnemo.replace('_', '').lower()
+        l_vertex_flag_string = ' | '.join([f'M1Env::{l_flag}' for l_flag in l_vertex_flag_list])
+        l_debug_label = f'[{l_mnemo}]-{l_label}' if l_mnemo else f'{l_label}'
+        l_base_code += (f'    // creation of "{l_label}"\n' +
+                        f'    qCDebug(g_cat_silence) << QString("Creating <{l_debug_label}> item");\n' +
+                        f'    M1Store::Item_lv2* {l_var_name} = M1Store::Item_lv2::getNew(\n' +
+                        f'        // vertex flags\n' +
+                        f'        {l_vertex_flag_string},\n' +
+                        f'        // label\n' +
+                        f'        "{l_label}"')
+        if not l_mnemo:
+            l_base_code += ');\n'
+        else:
+            l_base_code += ',\n'
+            l_mnemo_2_var[l_mnemo] = l_var_name
+            l_si_flag_string = '0' if l_si_flag_list == '0' else ' | '.join([f'M1Env::{l_flag}' for l_flag in l_si_flag_list])
+            l_icon_path = f'M1Env::{l_icon_path}' if l_icon_path else 'nullptr'
+            l_base_code += (
+                    f'        // Special Item flag\n' +
+                    f'        {l_si_flag_string},\n' +
+                    f'        // mnemonic\n' +
+                    f'        "{l_mnemo}",\n' +
+                    f'        // icon path\n' +
+                    f'        {l_icon_path});\n')
+
+        for l_type_mnemo in l_type_list:
+            l_base_code += f'    {l_var_name}->setType("{l_type_mnemo}");\n'
+        if l_edges:
+            for l_edge_type, l_dest_mnemo in l_edges:
+                l_base_code += f'    {l_var_name}->linkTo({l_mnemo_2_var[l_dest_mnemo]}, "{l_edge_type}", nullptr, true);\n'
+        l_base_code += '\n'
+
+    # QList<M1Env::SpecialItemID> cm_gram_attr_list;
+    l_declaration += 'QList<M1Env::SpecialItemID> M1Env::GraphInit::cm_gram_attr_list;\n'
+
+    for l_ssid in l_attr_class_ssid_list:
+        l_initialization += f'    M1Env::GraphInit::cm_gram_attr_list.append(M1Env::{l_ssid});\n'
+
+    with open('m1_src/m1B_graph_init.cpp', 'w') as l_fout:
+        l_fout.write(g_implementation_template
+                     .replace('__PSEUDO_DECLARE__', l_declaration.strip())
+                     .replace('__PSEUDO_DUMP__', l_dump.strip())
+                     .replace('__PSEUDO_INIT__', l_initialization.strip())
+                     .replace('__INIT_BASE__', l_base_code.strip())
+                     # .replace('__INIT_PLATO__', l_plato_code.strip())
+                     # .replace('__INIT_PLATO__', ''))
+                     )
+    print('\n================ Duplicate Mnemonics =====================')
+    for l_count, l_mn in sorted([(l_mnemo_dict[l_mn], l_mn) for l_mn in l_mnemo_dict.keys()]):
+        if l_count > 1:
+            print(l_mn, l_count)
+
+    # Plato ------------------------------------------------------------------------------------------------------------
+    # do_plato()
+
 # g_special_vertices_gita = [
 #     ['PRABH', 'SI_IS_TYPE', None,                      'TEXT_WFW_PRABUPADA_SIID',    None, 'Special Vertex ID (Vertex type) of Gita translation source: Prabhupada'],
 #     ['SIVAN', 'SI_IS_TYPE', None,                      'TEXT_WFW_SIVANANDA_SIID',    None, 'Special Vertex ID (Vertex type) of Gita translation source: Sivananda'],
@@ -1112,3 +1121,48 @@ if __name__ == '__main__':
 # ['WfW Translation Unit (type)',                           ['FULL_VERTEX',  'IS_SPECIAL'], ['TYPE_'], [('BLNGS',  'BGRT_')], 'TRLUN', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],
 #  'TEXT_WFW_UNIT_ICON_PATH', 'TEXT_WFW_UNIT_SIID'],
 # ]
+
+# g_declaration_template = """
+# #include "m1A_constants.h"
+#
+# namespace M1Env{
+#
+# __EXTERN_DECL__
+#
+#     class GraphInit{
+#         public:
+#             static void set_pseudo_constants();
+#             static void dbg_dump_pseudo_constants();
+#             static void init_base();
+#             static void init_plato();
+#             static QList<M1Env::SpecialItemID> cm_gram_attr_list;
+#     };
+#
+# } // end namespace M1Env
+# """
+#
+# g_implementation_template = """
+# #include "m1B_graph_init.h"
+# #include "m1B_store.h"
+# #include "m1B_lv2_item.h"
+#
+# __PSEUDO_DECLARE__
+#
+# void M1Env::GraphInit::set_pseudo_constants(){
+#     __PSEUDO_INIT__
+# }
+#
+# void M1Env::GraphInit::dbg_dump_pseudo_constants(){
+#     qCDebug(g_cat_silence) << QString("================ Constants dump ========");
+#
+#     __PSEUDO_DUMP__
+# }
+#
+# void M1Env::GraphInit::init_base(){
+#     __INIT_BASE__
+# }
+#
+# void M1Env::GraphInit::init_plato(){
+#     __INIT_PLATO__
+# }
+# """

@@ -69,6 +69,18 @@ extern M1Env::SpecialItemID TEXT_WFW_TRANSLAT_SIID;
 extern M1Env::SpecialItemID TEXT_WFW_POS_SIID;
 // [WFGRM] Special Vertex ID (Simple Edge type) WfW form Grammatical analysis
 extern M1Env::SpecialItemID TEXT_WFW_GRM_SIID;
+// [TEXID] Special Vertex ID (Simple Edge type) TEI @xml:id attribute
+extern M1Env::SpecialItemID TEI_XMLID_ATTR_SIID;
+// [TETYP] Special Vertex ID (Simple Edge type) TEI @type attribute
+extern M1Env::SpecialItemID TEI_TYPE_ATTR_SIID;
+// [TEINA] Special Vertex ID (Simple Edge type) TEI @n attribute
+extern M1Env::SpecialItemID TEI_N_ATTR_SIID;
+// [TERND] Special Vertex ID (Simple Edge type) TEI @rend attribute (for <hi>)
+extern M1Env::SpecialItemID TEI_REND_ATTR_SIID;
+// [TEPCL] Special Vertex ID (Simple Edge type) TEI @place attribute (for <note>)
+extern M1Env::SpecialItemID TEI_PLACE_ATTR_SIID;
+// [TETAG] Special Vertex ID (Simple Edge type) TEI tag name (for mult-tag nodes like TXTCK)
+extern M1Env::SpecialItemID TEI_TAG_NAME_SIID;
 // [URLNK] Special Vertex ID (Vertex type) Url link
 extern M1Env::SpecialItemID TEXT_URL_LINK_SIID;
 // [C2OBG] Special Vertex ID (Edge type) begin chunk + reciprocal
@@ -130,6 +142,8 @@ extern M1Env::SpecialItemID STEPHANUS_SIID;
 extern M1Env::SpecialItemID TXTVR_SIID;
 // [TXTNT] Special Vertex ID of "Notes (type)"
 extern M1Env::SpecialItemID TXTNT_SIID;
+// [TXDIV] Special Vertex ID of "Text Div (type)"
+extern M1Env::SpecialItemID TEXT_DIV_SIID;
 // [TXTCK] Special Vertex ID of "Text Chunk (type)"
 extern M1Env::SpecialItemID TEXT_CHUNK_SIID;
 // [TXTPR] Special Vertex ID of "Text Paragraph (type)"
@@ -393,7 +407,6 @@ extern M1Env::SpecialItemID NT_SP_SIID;
             static void set_pseudo_constants();
             static void dbg_dump_pseudo_constants();
             static void init_base();
-            static void init_plato();
             static QList<M1Env::SpecialItemID> cm_gram_attr_list; 
     };
     

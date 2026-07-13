@@ -60,7 +60,7 @@ void M1Store::JsonInterface::loadJson(const QString& p_file_path){
     QString l_ground_text_version = l_document_object.find("GroundTextVersion").value().toString();
     qCDebug(g_cat_tmp_spotlight).noquote() << QString("Author: %1 Title: %2").arg(l_author).arg(l_title);
 
-    M1Store::TEIInterface::create_text(l_title, "", "", l_author, &cm_text_root, &cm_lexicon_root);
+    M1Store::TEIInterface::create_text(l_title, "", "", l_author, true, &cm_text_root, &cm_lexicon_root);
 
     QJsonObject l_lemmas_object = l_document_object.find("Lemmas").value().toObject();
     qCDebug(g_cat_tmp_spotlight).noquote() << QString("l_lemmas_object.count(): %1").arg(l_lemmas_object.count());

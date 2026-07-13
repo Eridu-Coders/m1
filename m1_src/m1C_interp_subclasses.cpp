@@ -629,26 +629,26 @@ QString M1MidPlane::SentenceInterp::getHtmlVirtual(){
     return QString("<p>%1</p>\n").arg(l_word_list.join(" "));
 }
 
-/** --------------------------------------------------------------- SectionInterp ---------------------------------
- * @brief M1MidPlane::SectionInterp::getOneIfMatch
+/** --------------------------------------------------------------- StephanusSectionInterp ---------------------------------
+ * @brief M1MidPlane::StephanusSectionInterp::getOneIfMatch
  * @param p_myself
  * @return
  */
-M1MidPlane::SectionInterp* M1MidPlane::SectionInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
+M1MidPlane::StephanusSectionInterp* M1MidPlane::StephanusSectionInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be an TranslationBhashya? %1").arg(p_myself->dbgShort()))
-    M1MidPlane::SectionInterp* l_ret = nullptr;
+    M1MidPlane::StephanusSectionInterp* l_ret = nullptr;
     if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::STEPHANUS_SIID))
-        l_ret = new SectionInterp(p_myself);
+        l_ret = new StephanusSectionInterp(p_myself);
     M1_FUNC_EXIT
     return l_ret;
 }
 
-M1MidPlane::SectionInterp::SectionInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){}
-QString M1MidPlane::SectionInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
+M1MidPlane::StephanusSectionInterp::StephanusSectionInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){}
+QString M1MidPlane::StephanusSectionInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
     return m_myself->text();
 }
 
-void M1MidPlane::SectionInterp::initialize(){
+void M1MidPlane::StephanusSectionInterp::initialize(){
     qCDebug(g_cat_tmp_spotlight).noquote() << "initialize()" << m_myself->dbgShort();
     if(!m_initialized){
         // perform same task for all versions
@@ -729,7 +729,7 @@ void M1MidPlane::SectionInterp::initialize(){
     }
 }
 
-QString M1MidPlane::SectionInterp::getHtmlVirtual(){
+QString M1MidPlane::StephanusSectionInterp::getHtmlVirtual(){
     initialize();
 
     QMap<QString, QStringList> l_strings_map;
@@ -749,7 +749,7 @@ QString M1MidPlane::SectionInterp::getHtmlVirtual(){
     return l_html;
 }
 
-QWidget *M1MidPlane::SectionInterp::get_edit_widget(){
+QWidget *M1MidPlane::StephanusSectionInterp::get_edit_widget(){
     qCDebug(g_cat_tmp_spotlight).noquote() << QString("SectionInterp get_edit_widget()") << m_myself->dbgShort();
     initialize();
     /*
@@ -871,36 +871,36 @@ QWidget *M1MidPlane::SectionInterp::get_edit_widget(){
     return l_panel_widget;
 }
 
-/** --------------------------------------------------------------- ChunkInterp ---------------------------------
- * @brief M1MidPlane::ChunkInterp::getOneIfMatch
+/** --------------------------------------------------------------- HighlightChunkInterp ---------------------------------
+ * @brief M1MidPlane::HighlightChunkInterp::getOneIfMatch
  * @param p_myself
  * @return
  */
-M1MidPlane::ChunkInterp* M1MidPlane::ChunkInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
+M1MidPlane::HighlightChunkInterp* M1MidPlane::HighlightChunkInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be an TranslationBhashya? %1").arg(p_myself->dbgShort()))
-    M1MidPlane::ChunkInterp* l_ret = nullptr;
+    M1MidPlane::HighlightChunkInterp* l_ret = nullptr;
     if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::TEXT_HIGHLIGHT_CHUNK_SIID))
-        l_ret = new ChunkInterp(p_myself);
+        l_ret = new HighlightChunkInterp(p_myself);
     M1_FUNC_EXIT
     return l_ret;
 }
 
-M1MidPlane::ChunkInterp::ChunkInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){}
+M1MidPlane::HighlightChunkInterp::HighlightChunkInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){}
 
-void M1MidPlane::ChunkInterp::initialize(){
+void M1MidPlane::HighlightChunkInterp::initialize(){
     if(! m_initialized){
         for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorAuto(M1Env::OWNS_SIID, M1Env::OCCUR_SIID); !l_it.beyondEnd(); l_it.next() )
             m_occ_list.push_back(getInterp(l_it.at()->getTarget_lv2()));
         m_initialized = true;
     }
 }
-QString M1MidPlane::ChunkInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
+QString M1MidPlane::HighlightChunkInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
     initialize();
     QStringList l_word_list;
     for(const auto& l_occ_interp : m_occ_list) l_word_list.append(l_occ_interp->baseText());
     return QString("Passage in [%1]: %2").arg(m_myself->text()).arg(M1Store::StorageStatic::maxLengthChop(l_word_list.join(" "), 100));
 }
-QString M1MidPlane::ChunkInterp::getHtmlVirtual(){
+QString M1MidPlane::HighlightChunkInterp::getHtmlVirtual(){
     initialize();
     QStringList l_word_list;
     for(const auto& l_occ_interp : m_occ_list) l_word_list.append(l_occ_interp->baseTextPlus());
@@ -977,71 +977,123 @@ QString M1MidPlane::HighlightCategory::getHtmlVirtual(){
     return QString("<span style=\"background-color: %1\">%2</span>").arg(m_color).arg(m_myself->text());
 }
 
-/** --------------------------------------------------------------- ParagraphInterp ---------------------------------
- * @brief M1MidPlane::ParagraphInterp::getOneIfMatch
- * @param p_myself
- * @return
+/** --------------------------------------------------------------- TEI_Container ---------------------------------
+ * @brief M1MidPlane::TEI_Container::initialize
  */
-M1MidPlane::ParagraphInterp* M1MidPlane::ParagraphInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
-    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be a ParagraphInterp? %1").arg(p_myself->dbgShort()))
-    M1MidPlane::ParagraphInterp* l_ret = nullptr;
-    if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::TEXT_PARA_SIID))
-        l_ret = new ParagraphInterp(p_myself);
-    M1_FUNC_EXIT
-    return l_ret;
-}
+M1MidPlane::TEI_Container::TEI_Container(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){}
 
-M1MidPlane::ParagraphInterp::ParagraphInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::Interp::Interp(p_myself){}
-QString M1MidPlane::ParagraphInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
-    return m_myself->text();
-}
-
-void M1MidPlane::ParagraphInterp::initialize(){
+void M1MidPlane::TEI_Container::initialize(){
     if(!m_initialized){
         for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorAuto(); !l_it.beyondEnd(); l_it.next())
             if(!l_it.at()->isFullEdge()) continue;
-            else if((l_it.at()->isOfType(M1Env::OWNS_SIID) && l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_CHUNK_SIID)) ||
-                     (l_it.at()->isOfType(M1Env::TEXT_HIGHLIGHT_QUOTE_SIID) && l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_HIGHLIGHT_SIID)))
-                m_chunk_list.push_back(getInterp(l_it.at()->getTarget_lv2()));
+            else if(l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_CHUNK_SIID) && l_it.at()->getTarget_lv2()->getField(M1Env::TEI_TAG_NAME_SIID) == "head")
+                m_heading = getInterp(l_it.at()->getTarget_lv2());
+            else if((l_it.at()->isOfType(M1Env::OWNS_SIID) && (l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_CHUNK_SIID) ||
+                                                                l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_PARA_SIID)||
+                                                                l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_DIV_SIID)) ||
+                      (l_it.at()->isOfType(M1Env::TEXT_HIGHLIGHT_QUOTE_SIID) && l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_HIGHLIGHT_SIID))))
+                m_descendant_list.push_back(getInterp(l_it.at()->getTarget_lv2()));
         m_initialized = true;
     }
 }
 
-QString M1MidPlane::ParagraphInterp::getHtmlVirtual(){
+QString M1MidPlane::TEI_Container::baseText(){
+    initialize();
+    if(m_descendant_list.empty()) return m_myself->text();
+
+    QStringList l_chunk_strings;
+    for(const auto& l_cur_chunk: m_descendant_list){
+        QString l_base_text = l_cur_chunk->baseText();
+        // if(l_base_text.contains("✹")){ // For text highlights
+        //     QStringList l_ver_chunks;
+        //     QString l_ground_text;
+        //     for(const QString& l_version_text : l_base_text.split("✹")){
+        //         QString l_bt_bare = l_version_text;
+        //         l_bt_bare.replace(g_re_html_tags, "");
+        //         QString l_version;
+        //         QString l_text;
+        //         if(g_re_extract_vt.match(l_bt_bare).hasMatch()){
+        //             l_version = g_re_extract_vt.match(l_bt_bare).captured(1);
+        //             l_text = g_re_extract_vt.match(l_bt_bare).captured(2);
+        //         }
+        //         if(l_version == "Greek")
+        //             l_ground_text = QString("<span style=\"font-style: italic;\">%1</span>").arg(l_text);
+        //         else
+        //             l_ver_chunks.append(QString("[%1] %2").arg(l_version).arg(l_text));
+        //     }
+        //     l_chunk_strings.append(
+        //         QString("<span class=\"tooltip\" style=\"font-style: italic; font-family: 'Noto Serif', 'Times New Roman', serif;\">%1").arg(l_ground_text) +
+        //         QString("<span class=\"tooltiptext\" style=\"font-style: italic; font-family: 'Noto Sans', 'Arial', sans-serif;\">%1</span>").arg(l_ver_chunks.join(" / ")) + "</span>");
+        // }
+        // else // ordinary chunks and paragraphs
+            l_chunk_strings.append(QString("%1").arg(l_base_text.replace(g_re_no_base, "")));
+    }
+
+    // return QString("m_descendant_list: %1").arg(m_descendant_list.size()) + l_chunk_strings.join(" ");
+    return l_chunk_strings.join(" ");
+}
+/** --------------------------------------------------------------- TEI_DivInterp ---------------------------------
+ * @brief M1MidPlane::TEI_DivInterp::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
+M1MidPlane::TEI_DivInterp* M1MidPlane::TEI_DivInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be a TEI_DivInterp? %1").arg(p_myself->dbgShort()))
+    M1MidPlane::TEI_DivInterp* l_ret = nullptr;
+    if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::TEXT_DIV_SIID)){
+        l_ret = new TEI_DivInterp(p_myself);
+        qCDebug(g_cat_tmp_spotlight).noquote() << "<div>" << p_myself->dbgShort();
+    }
+    M1_FUNC_EXIT
+    return l_ret;
+}
+
+M1MidPlane::TEI_DivInterp::TEI_DivInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::TEI_Container::TEI_Container(p_myself){}
+
+QString M1MidPlane::TEI_DivInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
+    return QString("%1: %2")
+        .arg(m_myself->text())
+        .arg(M1Store::StorageStatic::maxLengthChop(TEI_Container::get_heading().replace(g_re_html_tags, ""), 50));
+}
+QString M1MidPlane::TEI_DivInterp::baseText(){
+    return QString("<div><p style=\"font-weight: bold\">%1</p>")
+               .arg(TEI_Container::get_heading()) +
+           TEI_Container::baseText() + "</div>\n";
+}
+
+QString M1MidPlane::TEI_DivInterp::getHtmlVirtual(){
     return this->baseText();
 }
 
-QString M1MidPlane::ParagraphInterp::baseText(){
-    initialize();
-    QStringList l_chunk_strings;
-    for(const auto& l_interp: m_chunk_list){
-        QString l_base_text = l_interp->baseText();
-        if(l_base_text.contains("✹")){
-            QStringList l_ver_chunks;
-            QString l_ground_text;
-            for(const QString& l_version_text : l_base_text.split("✹")){
-                QString l_bt_bare = l_version_text;
-                l_bt_bare.replace(g_re_html_tags, "");
-                QString l_version;
-                QString l_text;
-                if(g_re_extract_vt.match(l_bt_bare).hasMatch()){
-                    l_version = g_re_extract_vt.match(l_bt_bare).captured(1);
-                    l_text = g_re_extract_vt.match(l_bt_bare).captured(2);
-                }
-                if(l_version == "Greek")
-                    l_ground_text = QString("<span style=\"font-style: italic;\">%1</span>").arg(l_text);
-                else
-                    l_ver_chunks.append(QString("[%1] %2").arg(l_version).arg(l_text));
-            }
-            l_chunk_strings.append(
-                QString("<span class=\"tooltip\" style=\"font-style: italic; font-family: 'Noto Serif', 'Times New Roman', serif;\">%1").arg(l_ground_text) +
-                QString("<span class=\"tooltiptext\" style=\"font-style: italic; font-family: 'Noto Sans', 'Arial', sans-serif;\">%1</span>").arg(l_ver_chunks.join(" / ")) + "</span>");
-        }
-        else
-            l_chunk_strings.append(QString("%1").arg(l_interp->baseText().replace(g_re_no_base, "")));
+/** --------------------------------------------------------------- TEI_ParagraphInterp ---------------------------------
+ * @brief M1MidPlane::TEI_ParagraphInterp::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
+M1MidPlane::TEI_ParagraphInterp* M1MidPlane::TEI_ParagraphInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be a TEI_ParagraphInterp? %1").arg(p_myself->dbgShort()))
+    M1MidPlane::TEI_ParagraphInterp* l_ret = nullptr;
+    if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::TEXT_PARA_SIID)){
+        l_ret = new TEI_ParagraphInterp(p_myself);
+        qCDebug(g_cat_tmp_spotlight).noquote() << "<p>" << p_myself->dbgShort();
     }
+    M1_FUNC_EXIT
+    return l_ret;
+}
 
-    return "<p>" + l_chunk_strings.join(" ") + "</p>";
+M1MidPlane::TEI_ParagraphInterp::TEI_ParagraphInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::TEI_Container::TEI_Container(p_myself){}
+
+QString M1MidPlane::TEI_ParagraphInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
+    return QString("%1: %2")
+        .arg(m_myself->text())
+        .arg(M1Store::StorageStatic::maxLengthChop(TEI_Container::baseText().replace(g_re_html_tags, ""), 50));
+}
+QString M1MidPlane::TEI_ParagraphInterp::baseText(){
+    return "<p>" + TEI_Container::baseText() + "</p>\n";
+}
+
+QString M1MidPlane::TEI_ParagraphInterp::getHtmlVirtual(){
+    return this->baseText();
 }
 
 /** --------------------------------------------------------------- DustbinInterp ---------------------------------
@@ -1083,4 +1135,42 @@ QString M1MidPlane::DustbinInterp::inTreeDisplayText(const M1Store::Item_lv2* p_
         else
             l_in_can_count += 1;
     return QString("[%1] Dustbin").arg(l_in_can_count);
+}
+
+/** --------------------------------------------------------------- TEI_ChunkInterp ---------------------------------
+ * @brief M1MidPlane::TEI_ChunkInterp::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
+M1MidPlane::TEI_ChunkInterp* M1MidPlane::TEI_ChunkInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be a TEI_ChunkInterp? %1").arg(p_myself->dbgShort()))
+    M1MidPlane::TEI_ChunkInterp* l_ret = nullptr;
+    if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::TEXT_CHUNK_SIID)){
+        l_ret = new TEI_ChunkInterp(p_myself);
+        qCDebug(g_cat_tmp_spotlight).noquote() << "chunk" << p_myself->dbgShort();
+    }
+    M1_FUNC_EXIT
+    return l_ret;
+}
+
+M1MidPlane::TEI_ChunkInterp::TEI_ChunkInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::TEI_Container::TEI_Container(p_myself){
+    m_chunk_tag = m_myself->getField(M1Store::TEI_TAG_NAME_SIID);
+}
+
+QString M1MidPlane::TEI_ChunkInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
+    QString l_base_text = M1Store::StorageStatic::maxLengthChop(baseText().replace(g_re_html_tags, ""), 50);
+    if(m_chunk_tag == "name") return QString("<name> %1").arg(l_base_text);
+    if(m_chunk_tag == "head") return QString("<head> %1").arg(l_base_text);
+    if(m_chunk_tag == "hi") return QString("<hi> %1").arg(l_base_text);
+    if(m_chunk_tag == "term") return QString("<term> %1").arg(l_base_text);
+    if(m_chunk_tag == "note") return QString("<note> %1").arg(l_base_text);
+    return l_base_text;
+}
+QString M1MidPlane::TEI_ChunkInterp::getHtmlVirtual(){
+    if(m_chunk_tag == "hi") return QString("<i>%1</i>").arg(baseText());
+    return baseText();
+}
+QString M1MidPlane::TEI_ChunkInterp::baseText(){
+    if(m_chunk_tag == "Characters" || m_chunk_tag == "name" || m_chunk_tag == "term") return m_myself->text();
+    else return TEI_Container::baseText();
 }

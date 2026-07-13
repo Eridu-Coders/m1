@@ -593,12 +593,14 @@ std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_
             else if((l_interp_raw = TranslationBhashya::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = SlokaInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = SentenceInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            else if((l_interp_raw = SectionInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            else if((l_interp_raw = ChunkInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = StephanusSectionInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = HighlightChunkInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = HighlightInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = HighlightCategory::getOneIfMatch(p_myself)) != nullptr) break;
-            else if((l_interp_raw = ParagraphInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = TEI_ParagraphInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = DustbinInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = TEI_DivInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = TEI_ChunkInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else l_interp_raw = new Interp(p_myself);
         }
         // qCDebug(g_cat_interp_base) << QString("B l_interp_raw: %1").arg(l_interp_raw == nullptr ? "null" : "instanciated");
