@@ -81,6 +81,12 @@ extern M1Env::SpecialItemID TEI_REND_ATTR_SIID;
 extern M1Env::SpecialItemID TEI_PLACE_ATTR_SIID;
 // [TETAG] Special Vertex ID (Simple Edge type) TEI tag name (for mult-tag nodes like TXTCK)
 extern M1Env::SpecialItemID TEI_TAG_NAME_SIID;
+// [TETBR] Special Vertex ID (Simple Edge type) TEI table row count
+extern M1Env::SpecialItemID TEI_TABLE_ROWS_SIID;
+// [TETBC] Special Vertex ID (Simple Edge type) TEI table column count
+extern M1Env::SpecialItemID TEI_TABLE_COLS_SIID;
+// [TERRL] Special Vertex ID (Simple Edge type) TEI table row role
+extern M1Env::SpecialItemID TEI_ROW_ROLE_SIID;
 // [URLNK] Special Vertex ID (Vertex type) Url link
 extern M1Env::SpecialItemID TEXT_URL_LINK_SIID;
 // [C2OBG] Special Vertex ID (Edge type) begin chunk + reciprocal
@@ -144,10 +150,16 @@ extern M1Env::SpecialItemID TXTVR_SIID;
 extern M1Env::SpecialItemID TXTNT_SIID;
 // [TXDIV] Special Vertex ID of "Text Div (type)"
 extern M1Env::SpecialItemID TEXT_DIV_SIID;
-// [TXTCK] Special Vertex ID of "Text Chunk (type)"
-extern M1Env::SpecialItemID TEXT_CHUNK_SIID;
 // [TXTPR] Special Vertex ID of "Text Paragraph (type)"
 extern M1Env::SpecialItemID TEXT_PARA_SIID;
+// [TXTCK] Special Vertex ID of "Text Chunk (type)"
+extern M1Env::SpecialItemID TEXT_CHUNK_SIID;
+// [TXTAB] Special Vertex ID of "Text Table (type)"
+extern M1Env::SpecialItemID TEXT_TABLE_SIID;
+// [TXTRW] Special Vertex ID of "Text Table Row (type)"
+extern M1Env::SpecialItemID TEXT_ROW_SIID;
+// [TXTCL] Special Vertex ID of "Text Table Cell (type)"
+extern M1Env::SpecialItemID TEXT_CELL_SIID;
 // [TXTBK] Special Vertex ID of "Book (type)"
 extern M1Env::SpecialItemID TEXT_BOOK_SIID;
 // [TXTCH] Special Vertex ID of "Chapter (type)"

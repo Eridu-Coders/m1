@@ -108,12 +108,14 @@ namespace M1Env{
  * M1Store class-level constants holding the names of various things
  * @{
  */
-    static const char* STORE_DATA_PATH              = "../Storage";        ///< root dir for data storage
-    static const char* STORE_LMDB_DIR               = "lmdb";              ///< subdir for LMDB data
-    static const char* LMDB_UTIL_DB                 = "util_db";           ///< name of the utilities table
-    static const char* LMDB_STRING_DB               = "string_db";         ///< name of the strings table
-    static const char* LMDB_ITEM_MMAP_FILE_TEMPLATE = "local_store%1.m1";  ///< name template for mmap() item segment files
-    static const char* LMDB_SPECIAL_MMAP_FILE       = "specials.m1";       ///< name of mmap() file for special items
+    static const char* STORE_DATA_PATH              = "../Storage";                 ///< root dir for data storage
+    static const char* STORE_LMDB_DIR               = "lmdb";                       ///< subdir for LMDB data
+    static const char* LMDB_UTIL_DB                 = "util_db";                    ///< name of the utilities table
+    static const char* LMDB_STRING_DB               = "string_db";                  ///< name of the strings table
+    static const char* LMDB_ITEM_MMAP_FILE_TEMPLATE = "local_store%1.m1";           ///< name template for mmap() item segment files
+    static const char* LMDB_SPECIAL_MMAP_FILE       = "specials.m1";                ///< name of mmap() file for special items
+    static const char* STATIC_DATA_PATH             = "../Static";                  ///< root dir for static data storage
+    static const char* INTERP_HTML_TEMPLATE         = "Interp_html_template.html";  ///< name of mmap() file for special items
 /**@}*/ //end of StoreConst
 
 /**
@@ -168,7 +170,10 @@ namespace M1Env{
     static const char* TEXT_PARA_ICON_PATH = "../m1_src/Icons/Paragraph.svg";                   ///<
     static const char* TEXT_DIV_ICON_PATH = "../m1_src/Icons/Div.svg";                          ///<
     static const char* DUSTBIN_ICON_PATH = "../m1_src/Icons/Dustbin.svg";                       ///<
-/**@}*/ //end of IconPaths TEXT_PARA_ICON_PATH
+    static const char* TEXT_TABLE_ICON_PATH = "../m1_src/Icons/Table.svg";                      ///<
+    static const char* TEXT_ROW_ICON_PATH = "../m1_src/Icons/Table-row.svg";                    ///<
+    static const char* TEXT_CELL_ICON_PATH = "../m1_src/Icons/Table-cell.svg";                  ///<
+/**@}*/ //end of IconPaths TEXT_CELL_ICON_PATH
 
     static const bool SKIP_HEAVY_CHECKING = true; ///< true --> skip time-consuming Q_ASSERT in setType() and linkTo()
 } // end of M1Env namespace

@@ -81,6 +81,12 @@ M1Env::SpecialItemID M1Env::TEI_REND_ATTR_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEI_PLACE_ATTR_SIID = G_NONEX_SI_ID;
 // [TETAG] Special Vertex ID (Simple Edge type) TEI tag name (for mult-tag nodes like TXTCK)
 M1Env::SpecialItemID M1Env::TEI_TAG_NAME_SIID = G_NONEX_SI_ID;
+// [TETBR] Special Vertex ID (Simple Edge type) TEI table row count
+M1Env::SpecialItemID M1Env::TEI_TABLE_ROWS_SIID = G_NONEX_SI_ID;
+// [TETBC] Special Vertex ID (Simple Edge type) TEI table column count
+M1Env::SpecialItemID M1Env::TEI_TABLE_COLS_SIID = G_NONEX_SI_ID;
+// [TERRL] Special Vertex ID (Simple Edge type) TEI table row role
+M1Env::SpecialItemID M1Env::TEI_ROW_ROLE_SIID = G_NONEX_SI_ID;
 // [URLNK] Special Vertex ID (Vertex type) Url link
 M1Env::SpecialItemID M1Env::TEXT_URL_LINK_SIID = G_NONEX_SI_ID;
 // [C2OBG] Special Vertex ID (Edge type) begin chunk + reciprocal
@@ -118,8 +124,11 @@ M1Env::SpecialItemID M1Env::STEPHANUS_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TXTVR_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TXTNT_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_DIV_SIID = G_NONEX_SI_ID;
-M1Env::SpecialItemID M1Env::TEXT_CHUNK_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_PARA_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::TEXT_CHUNK_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::TEXT_TABLE_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::TEXT_ROW_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::TEXT_CELL_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_BOOK_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_CHAPTER_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_SENTENCE_SIID = G_NONEX_SI_ID;
@@ -288,6 +297,9 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::TEI_REND_ATTR_SIID = M1Store::StorageStatic::getSpecialID("TERND");
     M1Env::TEI_PLACE_ATTR_SIID = M1Store::StorageStatic::getSpecialID("TEPCL");
     M1Env::TEI_TAG_NAME_SIID = M1Store::StorageStatic::getSpecialID("TETAG");
+    M1Env::TEI_TABLE_ROWS_SIID = M1Store::StorageStatic::getSpecialID("TETBR");
+    M1Env::TEI_TABLE_COLS_SIID = M1Store::StorageStatic::getSpecialID("TETBC");
+    M1Env::TEI_ROW_ROLE_SIID = M1Store::StorageStatic::getSpecialID("TERRL");
     M1Env::TEXT_URL_LINK_SIID = M1Store::StorageStatic::getSpecialID("URLNK");
     M1Env::TW_CHUNK_2_OCC_BEGIN_SIID = M1Store::StorageStatic::getSpecialID("C2OBG");
     M1Env::TW_OCC_2_CHUNK_BEGIN_SIID = M1Store::StorageStatic::getSpecialID("O2CBG");
@@ -319,8 +331,11 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::TXTVR_SIID = M1Store::StorageStatic::getSpecialID("TXTVR");
     M1Env::TXTNT_SIID = M1Store::StorageStatic::getSpecialID("TXTNT");
     M1Env::TEXT_DIV_SIID = M1Store::StorageStatic::getSpecialID("TXDIV");
-    M1Env::TEXT_CHUNK_SIID = M1Store::StorageStatic::getSpecialID("TXTCK");
     M1Env::TEXT_PARA_SIID = M1Store::StorageStatic::getSpecialID("TXTPR");
+    M1Env::TEXT_CHUNK_SIID = M1Store::StorageStatic::getSpecialID("TXTCK");
+    M1Env::TEXT_TABLE_SIID = M1Store::StorageStatic::getSpecialID("TXTAB");
+    M1Env::TEXT_ROW_SIID = M1Store::StorageStatic::getSpecialID("TXTRW");
+    M1Env::TEXT_CELL_SIID = M1Store::StorageStatic::getSpecialID("TXTCL");
     M1Env::TEXT_BOOK_SIID = M1Store::StorageStatic::getSpecialID("TXTBK");
     M1Env::TEXT_CHAPTER_SIID = M1Store::StorageStatic::getSpecialID("TXTCH");
     M1Env::TEXT_SENTENCE_SIID = M1Store::StorageStatic::getSpecialID("TXSNT");
@@ -519,6 +534,9 @@ void M1Env::GraphInit::dbg_dump_pseudo_constants(){
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_REND_ATTR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TERND"), 4, 16, QChar('0')).arg("TERND");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_PLACE_ATTR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TEPCL"), 4, 16, QChar('0')).arg("TEPCL");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_TAG_NAME_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TETAG"), 4, 16, QChar('0')).arg("TETAG");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_TABLE_ROWS_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TETBR"), 4, 16, QChar('0')).arg("TETBR");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_TABLE_COLS_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TETBC"), 4, 16, QChar('0')).arg("TETBC");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_ROW_ROLE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TERRL"), 4, 16, QChar('0')).arg("TERRL");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_URL_LINK_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("URLNK"), 4, 16, QChar('0')).arg("URLNK");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TW_CHUNK_2_OCC_BEGIN_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("C2OBG"), 4, 16, QChar('0')).arg("C2OBG");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TW_CHUNK_2_OCC_END_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("C2OEN"), 4, 16, QChar('0')).arg("C2OEN");
@@ -607,6 +625,12 @@ void M1Env::GraphInit::init_base(){
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TEPCL", nullptr);
     // Special Vertex ID (Simple Edge type) TEI tag name (for mult-tag nodes like TXTCK)
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TETAG", nullptr);
+    // Special Vertex ID (Simple Edge type) TEI table row count
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TETBR", nullptr);
+    // Special Vertex ID (Simple Edge type) TEI table column count
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TETBC", nullptr);
+    // Special Vertex ID (Simple Edge type) TEI table row role
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TERRL", nullptr);
     // Special Vertex ID (Vertex type) Url link
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "URLNK", M1Env::TEXT_URL_LINK_ICON_PATH);
     // Special Vertex ID (Edge type) begin chunk + reciprocal
@@ -1033,6 +1057,21 @@ void M1Env::GraphInit::init_base(){
         M1Env::TEXT_DIV_ICON_PATH);
     l_txdiv->setType("TYPE_");
 
+    // creation of "Text Paragraph (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[TXTPR]-Text Paragraph (type)> item");
+    M1Store::Item_lv2* l_txtpr = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Text Paragraph (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE | M1Env::SI_IS_SELECTABLE,
+        // mnemonic
+        "TXTPR",
+        // icon path
+        M1Env::TEXT_PARA_ICON_PATH);
+    l_txtpr->setType("TYPE_");
+
     // creation of "Text Chunk (type)"
     qCDebug(g_cat_silence) << QString("Creating <[TXTCK]-Text Chunk (type)> item");
     M1Store::Item_lv2* l_txtck = M1Store::Item_lv2::getNew(
@@ -1048,20 +1087,50 @@ void M1Env::GraphInit::init_base(){
         M1Env::TEXT_CHUNK_ICON_PATH);
     l_txtck->setType("TYPE_");
 
-    // creation of "Text Paragraph (type)"
-    qCDebug(g_cat_silence) << QString("Creating <[TXTPR]-Text Paragraph (type)> item");
-    M1Store::Item_lv2* l_txtpr = M1Store::Item_lv2::getNew(
+    // creation of "Text Table (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[TXTAB]-Text Table (type)> item");
+    M1Store::Item_lv2* l_txtab = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
         // label
-        "Text Paragraph (type)",
+        "Text Table (type)",
         // Special Item flag
         M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE | M1Env::SI_IS_SELECTABLE,
         // mnemonic
-        "TXTPR",
+        "TXTAB",
         // icon path
-        M1Env::TEXT_PARA_ICON_PATH);
-    l_txtpr->setType("TYPE_");
+        M1Env::TEXT_TABLE_ICON_PATH);
+    l_txtab->setType("TYPE_");
+
+    // creation of "Text Table Row (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[TXTRW]-Text Table Row (type)> item");
+    M1Store::Item_lv2* l_txtrw = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Text Table Row (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE | M1Env::SI_IS_SELECTABLE,
+        // mnemonic
+        "TXTRW",
+        // icon path
+        M1Env::TEXT_ROW_ICON_PATH);
+    l_txtrw->setType("TYPE_");
+
+    // creation of "Text Table Cell (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[TXTCL]-Text Table Cell (type)> item");
+    M1Store::Item_lv2* l_txtcl = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Text Table Cell (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE | M1Env::SI_IS_SELECTABLE,
+        // mnemonic
+        "TXTCL",
+        // icon path
+        M1Env::TEXT_CELL_ICON_PATH);
+    l_txtcl->setType("TYPE_");
 
     // creation of "Book (type)"
     qCDebug(g_cat_silence) << QString("Creating <[TXTBK]-Book (type)> item");

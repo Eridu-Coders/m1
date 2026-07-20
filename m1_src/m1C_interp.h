@@ -170,7 +170,7 @@ protected:
     virtual QString getHtmlVirtual();
     virtual QString dbgOneLinerVirtual();
 public:
-    static void init(){cm_interp_map.clear();}
+    static void init();
     static void invalidateAllCaches();
     static std::shared_ptr<Interp> getInterp(M1Store::Item_lv2* p_myself);
     static QString dbgMapContents(bool p_html);
@@ -543,6 +543,41 @@ public:
 
     TEI_ChunkInterp(M1Store::Item_lv2* p_myself);
     virtual QString className() {return "TEI_ChunkInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
+    virtual QString baseText();
+};
+
+class TEI_TableInterp : public TEI_Container{
+    Q_OBJECT
+public:
+    static TEI_TableInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    TEI_TableInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "TEI_TableInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
+    virtual QString baseText();
+};
+
+class TEI_RowInterp : public TEI_Container{
+    Q_OBJECT
+public:
+    static TEI_RowInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    TEI_RowInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "TEI_RowInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
+    virtual QString baseText();
+};
+class TEI_CellInterp : public TEI_Container{
+    Q_OBJECT
+public:
+    static TEI_CellInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    TEI_CellInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "TEI_CellInterp";}
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual QString getHtmlVirtual();
     virtual QString baseText();

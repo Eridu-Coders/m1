@@ -16,6 +16,7 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QComboBox>
+#include <QTextStream>
 
 // g_cat_interp_dev g_cat_tree_row
 // Q_LOGGING_CATEGORY(g_cat_interp_dev, "interp.dev") q_re_space
@@ -24,6 +25,398 @@ Q_LOGGING_CATEGORY(g_cat_interp_base, "interp.base")
 // g_cat_interp_drag
 Q_LOGGING_CATEGORY(g_cat_interp_drag, "interp.drag")
 
+std::map<M1Env::ItemID, std::shared_ptr<M1MidPlane::Interp>> M1MidPlane::Interp::cm_interp_map;
+QString M1MidPlane::Interp::cm_html_template;
+
+void M1MidPlane::Interp::init(){
+    cm_interp_map.clear();
+
+    QString l_template_path = (fs::path(M1Store::STATIC_DATA_PATH) / fs::path(M1Store::INTERP_HTML_TEMPLATE)).c_str();
+    qCDebug(g_cat_tmp_spotlight).noquote() << l_template_path;
+    QFile l_file(l_template_path);
+    if(!l_file.open(QIODevice::ReadOnly | QIODevice::Text))
+        throw M1Env::M1Exception("Cannot open Interp HTML Template", 1000);
+
+    QTextStream l_in_ts(&l_file);
+    l_in_ts.setEncoding(QStringConverter::Utf8);
+    cm_html_template = l_in_ts.readAll();
+}
+/** --------------------------------------------------------------- Interp Root Class ---------------------------------
+ * @brief M1MidPlane::Interp::getInterp
+ * @param p_myself
+ * @return
+ */
+std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Getting appropriate Interp for: %1").arg(p_myself->dbgShort()))
+
+    std::shared_ptr<M1MidPlane::Interp> l_ret = nullptr;
+    // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
+    // qCDebug(g_cat_interp_base).noquote() << M1MidPlane::Interp::dbgMapContents();
+    // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
+
+    int l_use_count_ret = 0;
+    int l_use_count_map = 0;
+    auto l_it = cm_interp_map.find(p_myself->item_id());
+    if(l_it != cm_interp_map.end()){
+        l_use_count_map = l_it->second.use_count();
+        l_ret = l_it->second;
+        l_use_count_ret = l_ret.use_count();
+        // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
+        // qCDebug(g_cat_interp_base) << "after cache lookup : Exists";
+    }
+    else{
+        // qCDebug(g_cat_interp_base) << "after cache lookup : Not found -> creating it";
+        // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
+        Interp* l_interp_raw = nullptr;
+        while(l_interp_raw == nullptr){
+            // qCDebug(g_cat_interp_base) << QString("A l_interp_raw: %1").arg(l_interp_raw == nullptr ? "null" : "instanciated");
+
+            //if((l_interp_raw = AutoInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            // else if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break; DustbinInterp
+            if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = TextInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = RoleInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = WfWUnit::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = UrlInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = OccurInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = FormInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = LemmaInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = TranslationBhashya::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = SlokaInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = SentenceInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = StephanusSectionInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = HighlightChunkInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = HighlightInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = HighlightCategory::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = DustbinInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = TEI_ParagraphInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = TEI_DivInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = TEI_ChunkInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = TEI_TableInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = TEI_RowInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = TEI_CellInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else l_interp_raw = new Interp(p_myself);
+
+        }
+        // qCDebug(g_cat_interp_base) << QString("B l_interp_raw: %1").arg(l_interp_raw == nullptr ? "null" : "instanciated");
+        // qCDebug(g_cat_interp_base) << QString("B l_interp_raw class name: %1").arg(l_interp_raw->className());
+        // qCDebug(g_cat_interp_base) << QString("l_interp_raw: %1").arg(l_interp_raw->dbgOneLiner());
+
+        // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
+        l_ret = std::shared_ptr<M1MidPlane::Interp>(l_interp_raw);
+        l_use_count_ret = l_ret.use_count();
+        // qCDebug(g_cat_interp_base) << QString("l_ret one-liner: %1").arg(l_ret->dbgOneLiner());
+        // qCDebug(g_cat_interp_base) << "C";
+        // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
+        cm_interp_map[p_myself->item_id()] = l_ret;
+        // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
+        // qCDebug(g_cat_interp_base) << "D";
+    }
+    // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
+    // qCDebug(g_cat_interp_base) << QString("Returning: %1").arg(l_ret->dbgOneLiner());
+
+    // qCDebug(g_cat_interp_base).noquote() << M1MidPlane::Interp::dbgMapContents();
+
+    qCDebug(g_cat_interp_base()).noquote() << "Found:" << (l_it == cm_interp_map.end() ? "false" : "true") <<
+        QString("Use Count: %1/%2").arg(l_use_count_map).arg(l_use_count_ret) << l_ret->dbgOneLiner();
+
+    M1_FUNC_EXIT
+    return l_ret;
+}
+M1MidPlane::Interp::~Interp(){
+    // qCDebug(g_cat_interp_base).noquote() << "Interp deletion" << this->dbgOneLiner();
+    qCDebug(g_cat_interp_base).noquote() << "Interp deletion:" << m_dbgOneLinerCache;
+}
+
+QString M1MidPlane::Interp::dbgMapContents(bool p_html){
+    qCDebug(g_cat_tmp_spotlight()) << "dbgMapContents";
+
+    QStringList l_ret;
+
+    QString l_row_template;
+    if(p_html){
+        l_row_template = "<tr class=\"technical\"><td>%1:</td><td>(use count: %2)</td><td>%3</td></tr>";
+        l_ret.append(QString("<p class=\"technical\">cm_interp_map [%1] contents:</p>\n<table>").arg(cm_interp_map.size()));
+    }
+    else{
+        l_row_template = "%1: (use count: %2) %3";
+        l_ret.append(QString("cm_interp_map [%1] contents:").arg(cm_interp_map.size()));
+    }
+
+    for(const auto& l_pair : cm_interp_map)
+        l_ret.append(QString(l_row_template)
+                         .arg(l_pair.first, 6)
+                         .arg(l_pair.second != nullptr ? QString("%1").arg(l_pair.second.use_count()) : "NA")
+                         .arg(l_pair.second != nullptr ? l_pair.second->dbgOneLiner() : "WARNING: nullptr"));
+
+    if(p_html){
+        l_ret.append("</table>");
+        return cm_html_template.arg(l_ret.join("\n"));
+    }
+    else return l_ret.join("\n");
+}
+
+void M1MidPlane::Interp::garbageCollect(){
+    // for (auto it = students.begin(); it != students.end(); )
+    for(auto l_it = cm_interp_map.begin(); l_it != cm_interp_map.end();)
+        if(l_it->second.use_count() == 1){
+            qCDebug(g_cat_tmp_spotlight()) << "Garbage collecting" << l_it->second->dbgOneLiner();
+            l_it = cm_interp_map.erase(l_it);
+        }
+        else ++l_it;
+}
+
+// QString M1MidPlane::Interp::cm_html_template =
+//     QString("<html><Head>\n") +
+//         "<style>\n" +
+//         "body {font-size: 12pt; font-family: \"Latin Modern Math\", Times New Roman, Serif}\n" + // sepabove
+//         "h1 {font-size: 20pt; text-align: center;}\n" +
+//         "h2 {font-size: 16pt; font-weight: normal; text-align: center;}\n" +
+//         "h3 {font-size: 12pt; font-weight: normal; text-align: center;}\n" +
+//         "h4 {font-size: 14pt; font-weight: normal; border-top: 1px solid black; font-style: italic}\n" +
+//         "h5 {font-size: 16pt; font-weight: normal;}\n" +
+//         "td.wfw-top {padding-top: 1em; padding-right: 1em;}\n" +
+//         "td.wfw {padding-right: 1em;}\n" + // grammar
+//         "p.grammar {margin: 0; margin-left: 2em;}\n" +
+//         "p.sepabove {border-top: 1px solid black; margin-top: 2em; padding-top: 1em;}\n" +
+//         ".technical {font-size: 12pt; font-weight: normal; font-family: \"Noto Mono\", FreeMono, Monospace}\n}\n" +
+//         "table.wb {border: 1px solid black;border-collapse: collapse;}\n"
+//         "td.wb, th.wb {border: 1px solid black; border-collapse: collapse; padding: 0.5em 0.5em 0.5em 0.5em}\n"
+//         "/* Tooltip container */\n" +
+//         ".tooltip {\n" +
+//         "  position: relative;\n" +
+//         "  display: inline-block;\n" +
+//         "  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */\n" +
+//         "}\n" +
+//         "\n" +
+//         "/* Tooltip text */\n" +
+//         ".tooltip .tooltiptext {\n" +
+//         "  visibility: hidden;\n" +
+//         "  width: 800px;\n" +
+//         "  background-color: #555;\n" +
+//         "  color: #fff;\n" +
+//         "  text-align: center;\n" +
+//         "  padding: 5px 0;\n" +
+//         "  border-radius: 6px;\n" +
+//         "\n" +
+//         "  /* Position the tooltip text */\n" +
+//         "  position: absolute;\n" +
+//         "  z-index: 1;\n" +
+//         "  bottom: -200%;\n" +
+//         "  left: 50%;\n" +
+//         "  margin-left: -60px;\n" +
+//         "\n" +
+//         "  /* Fade in tooltip */\n" +
+//         "  opacity: 0;\n" +
+//         "  transition: opacity 0.3s;\n" +
+//         "}\n" +
+//         "\n" +
+//         "/* Tooltip arrow */\n" +
+//         ".tooltip .tooltiptext::after {\n" +
+//         "  content: "";\n" +
+//         "  position: absolute;\n" +
+//         "  top: 100%;\n" +
+//         "  left: 50%;\n" +
+//         "  margin-left: -5px;\n" +
+//         "  border-width: 5px;\n" +
+//         "  border-style: solid;\n" +
+//         "  border-color: #555 transparent transparent transparent;\n" +
+//         "}\n" +
+//         "\n" +
+//         "/* Show the tooltip text when you mouse over the tooltip container */\n" +
+//         ".tooltip:hover .tooltiptext {\n" +
+//         "  visibility: visible;\n" +
+//         "  opacity: 1;\n" +
+//         "}\n" +
+//         "</style>\n" +
+//         "</Head><body><div style=\"margin: 1em;\">\n%1</div></body></html>";
+
+/**
+ * @brief M1MidPlane::Interp::Interp
+ * @param p_myself (Item_lv2*) can be any category of item, including simple vertices and eges in the case of fields
+ */
+M1MidPlane::Interp::Interp(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Base Interp Constructor from: %1").arg(p_myself->dbgShort()))
+
+    m_myself = p_myself;
+    // M1MidPlane::Interp::cm_interp_map[p_myself->item_id()] = std::shared_ptr<Interp>(this);
+    // qCDebug(g_cat_interp_base) << QString("l_interp_raw: %1").arg(this->dbgOneLiner());
+
+    M1_FUNC_EXIT
+}
+
+/**
+ * @brief M1MidPlane::Interp::inTreeDisplayText
+ * @return
+ */
+QString M1MidPlane::Interp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
+    return m_myself->text();
+}
+
+/**
+ * @brief M1MidPlane::Interp::edgeIcon
+ * @param p_edge
+ * @return
+ */
+QIcon* M1MidPlane::Interp::edgeIcon(const M1Store::Item_lv2* p_edge){
+    return M1Store::StorageStatic::getQIcon(p_edge->getIconSITypeID());
+}
+
+/**
+ * @brief M1MidPlane::Interp::vertexIcon
+ * @return
+ */
+QIcon* M1MidPlane::Interp::vertexIcon(const M1Store::Item_lv2* p_edge){
+    return M1Store::StorageStatic::getQIcon(m_myself->getIconSITypeID());
+}
+
+/**
+ * @brief M1MidPlane::Interp::base_edge_html_fragment
+ * @param p_edge
+ * @return
+ */
+QString M1MidPlane::Interp::base_edge_html_fragment(const M1Store::Item_lv2* p_edge){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("base_edge_html_fragment: %1").arg(this->dbgOneLiner()))
+
+    QStringList l_self_list;
+    l_self_list.append(QString("<tr><td>ID</td><td>:</td><td>%1</td></tr>\n").arg(p_edge->item_id()));
+    l_self_list.append(QString("<tr><td>Nature</td><td>:</td><td>%1</td></tr>\n").arg(
+        p_edge->isFullEdge() ? "Full Edge" : (p_edge->isSimpleEdge() ? "Simple Edge" : "ERROROLOLO")
+        ));
+    l_self_list.append(QString("<tr><td>Type</td><td>:</td><td>%1</td></tr>\n").arg(p_edge->dbgTypeShort()));
+    QString l_self_html = QString("<table class=\"technical\">%1</table>\n").arg(l_self_list.join("\n"));
+    QString l_ret = QString("<p class=\"technical\" style=\"font-weight: bold;\">Edge:</p>\n%1").arg(l_self_html);
+    qCDebug(g_cat_interp_base) << "l_self_html:" << l_ret.length();
+
+    M1_FUNC_EXIT
+    return l_ret;
+}
+
+/**
+ * @brief M1MidPlane::Interp::base_html_fragment
+ * @return
+ */
+QString M1MidPlane::Interp::base_html_fragment(){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("base_html_fragment: %1").arg(this->dbgOneLiner()))
+
+    QString l_html = m_myself->isSimpleEdge() ?
+        QString("<p class=\"technical\"><span style=\"font-weight: bold;\">Field Payload</span>: %1</p>\n").arg(m_myself->text()) :
+        QString("<p class=\"technical\" style=\"font-weight: bold;\">Target:</p>\n<div class=\"technical\">%1</div>\n").arg(m_myself->dbgStringHtml());
+
+    qCDebug(g_cat_interp_base) << "l_html:" << l_html.length();
+    M1_FUNC_EXIT
+    return QString("<div\">%1</div>\n").arg(l_html);
+}
+
+/**
+ * @brief M1MidPlane::Interp::getHtmlVirtual
+ * @param p_edge
+ * @return
+ */
+QString M1MidPlane::Interp::getHtmlVirtual(){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Interp getHtmlVirtual(): %1").arg(this->dbgOneLiner()))
+    M1_FUNC_EXIT
+    return "";
+}
+
+/**
+ * @brief M1MidPlane::Interp::getHtml
+ * @param p_edge
+ * @return
+ */
+QString M1MidPlane::Interp::getHtml(const M1Store::Item_lv2* p_edge){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Interp getHtml(): (Edge ID: %2) %1").arg(this->dbgOneLiner()).arg(p_edge->item_id()))
+
+    QString l_own_html = getHtmlVirtual();
+    QString l_ret_html =
+        l_own_html.left(4) == "http" ? l_own_html : cm_html_template.arg(l_own_html +
+            QString("<p class=\"technical sepabove\"><span style=\"font-weight: bold;\">Class</span>: %1</p>\n").arg(className()) +
+            base_edge_html_fragment(p_edge) +
+            base_html_fragment()
+        );
+
+    qCDebug(g_cat_interp_base) << "l_ret_html:" << l_ret_html.length();
+
+    M1_FUNC_EXIT
+    return l_ret_html;
+}
+
+/**
+ * @brief M1MidPlane::Interp::invalidateCache
+ */
+void M1MidPlane::Interp::invalidateCache(){
+    // m_edge_cache_iid = M1Store::G_VOID_ITEM_ID;
+}
+
+/**
+ * @brief M1MidPlane::Interp::invalidateAllCaches
+ */
+void M1MidPlane::Interp::invalidateAllCaches(){
+    for(const auto& l_interp_pair : cm_interp_map)
+        l_interp_pair.second->invalidateCache();
+}
+
+/**
+ * @brief M1MidPlane::Interp::get_edit_widget
+ *
+ * \todo create a cache for edit_widgets
+ *
+ * @return
+ */
+QWidget *M1MidPlane::Interp::get_edit_widget(){
+    qCDebug(g_cat_interp_base) << QString("text: %1").arg(m_myself->dbgShort());
+
+    QWidget* l_panel_widget = new QWidget();
+    QVBoxLayout* l_panel_layout = new QVBoxLayout();
+    l_panel_widget->setLayout(l_panel_layout);
+
+    QWidget* l_button_bar = new QWidget(l_panel_widget);
+    l_panel_layout->addWidget(l_button_bar);
+    QHBoxLayout* l_bar_layout = new QHBoxLayout();
+    l_button_bar->setLayout(l_bar_layout);
+
+    QPushButton* l_btn0 = new QPushButton("Save", l_button_bar);
+    l_bar_layout->addWidget(l_btn0);
+    l_bar_layout->addStretch(1);
+    QObject::connect(l_btn0, &QPushButton::clicked,
+                     this, &M1MidPlane::Interp::save_text_edit);
+
+    m_text_edit = new QTextEdit(l_panel_widget);
+    l_panel_layout->addWidget(m_text_edit);
+
+    m_text_edit->setPlainText(m_myself->text());
+
+    return l_panel_widget;
+}
+
+/**
+ * @brief M1MidPlane::Interp::save_text_edit
+ */
+void M1MidPlane::Interp::save_text_edit(){
+    qCDebug(g_cat_tmp_spotlight()) << "Saving text edit field START: " << m_text_edit->toPlainText();
+    /*
+    if(m_myself->isSimpleEdge())
+        m_myself->setText_lv1(m_text_edit->toPlainText());
+    else
+        m_myself->getTarget_lv2()->setText_lv1(m_text_edit->toPlainText());
+    */
+    m_myself->setText_lv1(m_text_edit->toPlainText());
+    qCDebug(g_cat_tmp_spotlight()) << "Saving text edit field END: " << m_myself->text();
+
+    m_tree_row->performPostUpdate();
+}
+
+/**
+ * @brief M1MidPlane::Interp::createDescendant
+ * @param p_new_edge_type
+ * @param p_new_vertex_type
+ */
+void M1MidPlane::Interp::createDescendant(M1Store::SpecialItem* p_new_edge_type, M1Store::SpecialItem* p_new_vertex_type, M1Store::InsertionPoint p_where){
+    m_myself->create_descendant(
+        p_new_edge_type->specialId(),
+        "New",
+        p_new_vertex_type->specialId(), p_where);
+}
 
 // QIcon M1UI::TreeRow::cm_open;
 // QIcon M1UI::TreeRow::cm_closed;
@@ -549,381 +942,6 @@ Q_LOGGING_CATEGORY(g_cat_interp_drag, "interp.drag")
 //     m_target->createDescendant(l_new_edge_type, l_new_vertex_type);
 //     m_td_parent->gotoVertex(nullptr, this);
 // }*/
-
-/** --------------------------------------------------------------- Interp Root Class ---------------------------------
- * @brief M1MidPlane::Interp::getInterp
- * @param p_myself
- * @return
- */
-std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_lv2* p_myself){
-    M1_FUNC_ENTRY(g_cat_interp_base, QString("Getting appropriate Interp for: %1").arg(p_myself->dbgShort()))
-
-    std::shared_ptr<M1MidPlane::Interp> l_ret = nullptr;
-    // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
-    // qCDebug(g_cat_interp_base).noquote() << M1MidPlane::Interp::dbgMapContents();
-    // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
-
-    int l_use_count_ret = 0;
-    int l_use_count_map = 0;
-    auto l_it = cm_interp_map.find(p_myself->item_id());
-    if(l_it != cm_interp_map.end()){
-        l_use_count_map = l_it->second.use_count();
-        l_ret = l_it->second;
-        l_use_count_ret = l_ret.use_count();
-        // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
-        // qCDebug(g_cat_interp_base) << "after cache lookup : Exists";
-    }
-    else{
-        // qCDebug(g_cat_interp_base) << "after cache lookup : Not found -> creating it";
-        // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
-        Interp* l_interp_raw = nullptr;
-        while(l_interp_raw == nullptr){
-            // qCDebug(g_cat_interp_base) << QString("A l_interp_raw: %1").arg(l_interp_raw == nullptr ? "null" : "instanciated");
-
-            //if((l_interp_raw = AutoInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            // else if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break; DustbinInterp
-            if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            else if((l_interp_raw = TextInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            else if((l_interp_raw = RoleInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            else if((l_interp_raw = WfWUnit::getOneIfMatch(p_myself)) != nullptr) break;
-            else if((l_interp_raw = UrlInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            else if((l_interp_raw = OccurInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            else if((l_interp_raw = FormInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            else if((l_interp_raw = LemmaInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            else if((l_interp_raw = TranslationBhashya::getOneIfMatch(p_myself)) != nullptr) break;
-            else if((l_interp_raw = SlokaInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            else if((l_interp_raw = SentenceInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            else if((l_interp_raw = StephanusSectionInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            else if((l_interp_raw = HighlightChunkInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            else if((l_interp_raw = HighlightInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            else if((l_interp_raw = HighlightCategory::getOneIfMatch(p_myself)) != nullptr) break;
-            else if((l_interp_raw = TEI_ParagraphInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            else if((l_interp_raw = DustbinInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            else if((l_interp_raw = TEI_DivInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            else if((l_interp_raw = TEI_ChunkInterp::getOneIfMatch(p_myself)) != nullptr) break;
-            else l_interp_raw = new Interp(p_myself);
-        }
-        // qCDebug(g_cat_interp_base) << QString("B l_interp_raw: %1").arg(l_interp_raw == nullptr ? "null" : "instanciated");
-        // qCDebug(g_cat_interp_base) << QString("B l_interp_raw class name: %1").arg(l_interp_raw->className());
-        // qCDebug(g_cat_interp_base) << QString("l_interp_raw: %1").arg(l_interp_raw->dbgOneLiner());
-
-        // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
-        l_ret = std::shared_ptr<M1MidPlane::Interp>(l_interp_raw);
-        l_use_count_ret = l_ret.use_count();
-        // qCDebug(g_cat_interp_base) << QString("l_ret one-liner: %1").arg(l_ret->dbgOneLiner());
-        // qCDebug(g_cat_interp_base) << "C";
-        // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
-        cm_interp_map[p_myself->item_id()] = l_ret;
-        // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
-        // qCDebug(g_cat_interp_base) << "D";
-    }
-    // qCDebug(g_cat_interp_base) << QString("l_ret %1").arg(l_ret.use_count());
-    // qCDebug(g_cat_interp_base) << QString("Returning: %1").arg(l_ret->dbgOneLiner());
-
-    // qCDebug(g_cat_interp_base).noquote() << M1MidPlane::Interp::dbgMapContents();
-
-    qCDebug(g_cat_interp_base()).noquote() << "Found:" << (l_it == cm_interp_map.end() ? "false" : "true") <<
-        QString("Use Count: %1/%2").arg(l_use_count_map).arg(l_use_count_ret) << l_ret->dbgOneLiner();
-
-    M1_FUNC_EXIT
-    return l_ret;
-}
-M1MidPlane::Interp::~Interp(){
-    // qCDebug(g_cat_interp_base).noquote() << "Interp deletion" << this->dbgOneLiner();
-    qCDebug(g_cat_interp_base).noquote() << "Interp deletion:" << m_dbgOneLinerCache;
-}
-
-std::map<M1Env::ItemID, std::shared_ptr<M1MidPlane::Interp>> M1MidPlane::Interp::cm_interp_map;
-
-QString M1MidPlane::Interp::dbgMapContents(bool p_html){
-    qCDebug(g_cat_tmp_spotlight()) << "dbgMapContents";
-
-    QStringList l_ret;
-
-    QString l_row_template;
-    if(p_html){
-        l_row_template = "<tr class=\"technical\"><td>%1:</td><td>(use count: %2)</td><td>%3</td></tr>";
-        l_ret.append(QString("<p class=\"technical\">cm_interp_map [%1] contents:</p>\n<table>").arg(cm_interp_map.size()));
-    }
-    else{
-        l_row_template = "%1: (use count: %2) %3";
-        l_ret.append(QString("cm_interp_map [%1] contents:").arg(cm_interp_map.size()));
-    }
-
-    for(const auto& l_pair : cm_interp_map)
-        l_ret.append(QString(l_row_template)
-                         .arg(l_pair.first, 6)
-                         .arg(l_pair.second != nullptr ? QString("%1").arg(l_pair.second.use_count()) : "NA")
-                         .arg(l_pair.second != nullptr ? l_pair.second->dbgOneLiner() : "WARNING: nullptr"));
-
-    if(p_html){
-        l_ret.append("</table>");
-        return cm_html_template.arg(l_ret.join("\n"));
-    }
-    else return l_ret.join("\n");
-}
-
-void M1MidPlane::Interp::garbageCollect(){
-    // for (auto it = students.begin(); it != students.end(); )
-    for(auto l_it = cm_interp_map.begin(); l_it != cm_interp_map.end();)
-        if(l_it->second.use_count() == 1){
-            qCDebug(g_cat_tmp_spotlight()) << "Garbage collecting" << l_it->second->dbgOneLiner();
-            l_it = cm_interp_map.erase(l_it);
-        }
-        else ++l_it;
-}
-
-QString M1MidPlane::Interp::cm_html_template =
-    QString("<html><Head>\n") +
-        "<style>\n" +
-        "body {font-size: 12pt; font-family: \"Latin Modern Math\", Times New Roman, Serif}\n" + // sepabove
-        "h1 {font-size: 20pt; text-align: center;}\n" +
-        "h2 {font-size: 16pt; font-weight: normal; text-align: center;}\n" +
-        "h3 {font-size: 12pt; font-weight: normal; text-align: center;}\n" +
-        "h4 {font-size: 14pt; font-weight: normal; border-top: 1px solid black; font-style: italic}\n" +
-        "h5 {font-size: 16pt; font-weight: normal;}\n" +
-        "td.wfw-top {padding-top: 1em; padding-right: 1em;}\n" +
-        "td.wfw {padding-right: 1em;}\n" + // grammar
-        "p.grammar {margin: 0; margin-left: 2em;}\n" +
-        "p.sepabove {border-top: 1px solid black; margin-top: 2em; padding-top: 1em;}\n" +
-        ".technical {font-size: 12pt; font-weight: normal; font-family: \"Noto Mono\", FreeMono, Monospace}\n}\n" +
-        "table.wb {border: 1px solid black;border-collapse: collapse;}\n"
-        "td.wb, th.wb {border: 1px solid black; border-collapse: collapse; padding: 0.5em 0.5em 0.5em 0.5em}\n"
-        "/* Tooltip container */\n" +
-        ".tooltip {\n" +
-        "  position: relative;\n" +
-        "  display: inline-block;\n" +
-        "  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */\n" +
-        "}\n" +
-        "\n" +
-        "/* Tooltip text */\n" +
-        ".tooltip .tooltiptext {\n" +
-        "  visibility: hidden;\n" +
-        "  width: 800px;\n" +
-        "  background-color: #555;\n" +
-        "  color: #fff;\n" +
-        "  text-align: center;\n" +
-        "  padding: 5px 0;\n" +
-        "  border-radius: 6px;\n" +
-        "\n" +
-        "  /* Position the tooltip text */\n" +
-        "  position: absolute;\n" +
-        "  z-index: 1;\n" +
-        "  bottom: -200%;\n" +
-        "  left: 50%;\n" +
-        "  margin-left: -60px;\n" +
-        "\n" +
-        "  /* Fade in tooltip */\n" +
-        "  opacity: 0;\n" +
-        "  transition: opacity 0.3s;\n" +
-        "}\n" +
-        "\n" +
-        "/* Tooltip arrow */\n" +
-        ".tooltip .tooltiptext::after {\n" +
-        "  content: "";\n" +
-        "  position: absolute;\n" +
-        "  top: 100%;\n" +
-        "  left: 50%;\n" +
-        "  margin-left: -5px;\n" +
-        "  border-width: 5px;\n" +
-        "  border-style: solid;\n" +
-        "  border-color: #555 transparent transparent transparent;\n" +
-        "}\n" +
-        "\n" +
-        "/* Show the tooltip text when you mouse over the tooltip container */\n" +
-        ".tooltip:hover .tooltiptext {\n" +
-        "  visibility: visible;\n" +
-        "  opacity: 1;\n" +
-        "}\n" +
-        "</style>\n" +
-        "</Head><body><div style=\"margin: 1em;\">\n%1</div></body></html>";
-
-/**
- * @brief M1MidPlane::Interp::Interp
- * @param p_myself (Item_lv2*) can be any category of item, including simple vertices and eges in the case of fields
- */
-M1MidPlane::Interp::Interp(M1Store::Item_lv2* p_myself){
-    M1_FUNC_ENTRY(g_cat_interp_base, QString("Base Interp Constructor from: %1").arg(p_myself->dbgShort()))
-
-    m_myself = p_myself;
-    // M1MidPlane::Interp::cm_interp_map[p_myself->item_id()] = std::shared_ptr<Interp>(this);
-    // qCDebug(g_cat_interp_base) << QString("l_interp_raw: %1").arg(this->dbgOneLiner());
-
-    M1_FUNC_EXIT
-}
-
-/**
- * @brief M1MidPlane::Interp::inTreeDisplayText
- * @return
- */
-QString M1MidPlane::Interp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
-    return m_myself->text();
-}
-
-/**
- * @brief M1MidPlane::Interp::edgeIcon
- * @param p_edge
- * @return
- */
-QIcon* M1MidPlane::Interp::edgeIcon(const M1Store::Item_lv2* p_edge){
-    return M1Store::StorageStatic::getQIcon(p_edge->getIconSITypeID());
-}
-
-/**
- * @brief M1MidPlane::Interp::vertexIcon
- * @return
- */
-QIcon* M1MidPlane::Interp::vertexIcon(const M1Store::Item_lv2* p_edge){
-    return M1Store::StorageStatic::getQIcon(m_myself->getIconSITypeID());
-}
-
-/**
- * @brief M1MidPlane::Interp::base_edge_html_fragment
- * @param p_edge
- * @return
- */
-QString M1MidPlane::Interp::base_edge_html_fragment(const M1Store::Item_lv2* p_edge){
-    M1_FUNC_ENTRY(g_cat_interp_base, QString("base_edge_html_fragment: %1").arg(this->dbgOneLiner()))
-
-    QStringList l_self_list;
-    l_self_list.append(QString("<tr><td>ID</td><td>:</td><td>%1</td></tr>\n").arg(p_edge->item_id()));
-    l_self_list.append(QString("<tr><td>Nature</td><td>:</td><td>%1</td></tr>\n").arg(
-        p_edge->isFullEdge() ? "Full Edge" : (p_edge->isSimpleEdge() ? "Simple Edge" : "ERROROLOLO")
-        ));
-    l_self_list.append(QString("<tr><td>Type</td><td>:</td><td>%1</td></tr>\n").arg(p_edge->dbgTypeShort()));
-    QString l_self_html = QString("<table class=\"technical\">%1</table>\n").arg(l_self_list.join("\n"));
-    QString l_ret = QString("<p class=\"technical\" style=\"font-weight: bold;\">Edge:</p>\n%1").arg(l_self_html);
-    qCDebug(g_cat_interp_base) << "l_self_html:" << l_ret.length();
-
-    M1_FUNC_EXIT
-    return l_ret;
-}
-
-/**
- * @brief M1MidPlane::Interp::base_html_fragment
- * @return
- */
-QString M1MidPlane::Interp::base_html_fragment(){
-    M1_FUNC_ENTRY(g_cat_interp_base, QString("base_html_fragment: %1").arg(this->dbgOneLiner()))
-
-    QString l_html = m_myself->isSimpleEdge() ?
-        QString("<p class=\"technical\"><span style=\"font-weight: bold;\">Field Payload</span>: %1</p>\n").arg(m_myself->text()) :
-        QString("<p class=\"technical\" style=\"font-weight: bold;\">Target:</p>\n<div class=\"technical\">%1</div>\n").arg(m_myself->dbgStringHtml());
-
-    qCDebug(g_cat_interp_base) << "l_html:" << l_html.length();
-    M1_FUNC_EXIT
-    return QString("<div\">%1</div>\n").arg(l_html);
-}
-
-/**
- * @brief M1MidPlane::Interp::getHtmlVirtual
- * @param p_edge
- * @return
- */
-QString M1MidPlane::Interp::getHtmlVirtual(){
-    M1_FUNC_ENTRY(g_cat_interp_base, QString("Interp getHtmlVirtual(): %1").arg(this->dbgOneLiner()))
-    M1_FUNC_EXIT
-    return "";
-}
-
-/**
- * @brief M1MidPlane::Interp::getHtml
- * @param p_edge
- * @return
- */
-QString M1MidPlane::Interp::getHtml(const M1Store::Item_lv2* p_edge){
-    M1_FUNC_ENTRY(g_cat_interp_base, QString("Interp getHtml(): (Edge ID: %2) %1").arg(this->dbgOneLiner()).arg(p_edge->item_id()))
-
-    QString l_own_html = getHtmlVirtual();
-    QString l_ret_html =
-        l_own_html.left(4) == "http" ? l_own_html : cm_html_template.arg(l_own_html +
-            QString("<p class=\"technical sepabove\"><span style=\"font-weight: bold;\">Class</span>: %1</p>\n").arg(className()) +
-            base_edge_html_fragment(p_edge) +
-            base_html_fragment()
-        );
-
-    qCDebug(g_cat_interp_base) << "l_ret_html:" << l_ret_html.length();
-
-    M1_FUNC_EXIT
-    return l_ret_html;
-}
-
-/**
- * @brief M1MidPlane::Interp::invalidateCache
- */
-void M1MidPlane::Interp::invalidateCache(){
-    // m_edge_cache_iid = M1Store::G_VOID_ITEM_ID;
-}
-
-/**
- * @brief M1MidPlane::Interp::invalidateAllCaches
- */
-void M1MidPlane::Interp::invalidateAllCaches(){
-    for(const auto& l_interp_pair : cm_interp_map)
-        l_interp_pair.second->invalidateCache();
-}
-
-/**
- * @brief M1MidPlane::Interp::get_edit_widget
- *
- * \todo create a cache for edit_widgets
- *
- * @return
- */
-QWidget *M1MidPlane::Interp::get_edit_widget(){
-    qCDebug(g_cat_interp_base) << QString("text: %1").arg(m_myself->dbgShort());
-
-    QWidget* l_panel_widget = new QWidget();
-    QVBoxLayout* l_panel_layout = new QVBoxLayout();
-    l_panel_widget->setLayout(l_panel_layout);
-
-    QWidget* l_button_bar = new QWidget(l_panel_widget);
-    l_panel_layout->addWidget(l_button_bar);
-    QHBoxLayout* l_bar_layout = new QHBoxLayout();
-    l_button_bar->setLayout(l_bar_layout);
-
-    QPushButton* l_btn0 = new QPushButton("Save", l_button_bar);
-    l_bar_layout->addWidget(l_btn0);
-    l_bar_layout->addStretch(1);
-    QObject::connect(l_btn0, &QPushButton::clicked,
-                     this, &M1MidPlane::Interp::save_text_edit);
-
-    m_text_edit = new QTextEdit(l_panel_widget);
-    l_panel_layout->addWidget(m_text_edit);
-
-    m_text_edit->setPlainText(m_myself->text());
-
-    return l_panel_widget;
-}
-
-/**
- * @brief M1MidPlane::Interp::save_text_edit
- */
-void M1MidPlane::Interp::save_text_edit(){
-    qCDebug(g_cat_tmp_spotlight()) << "Saving text edit field START: " << m_text_edit->toPlainText();
-    /*
-    if(m_myself->isSimpleEdge())
-        m_myself->setText_lv1(m_text_edit->toPlainText());
-    else
-        m_myself->getTarget_lv2()->setText_lv1(m_text_edit->toPlainText());
-    */
-    m_myself->setText_lv1(m_text_edit->toPlainText());
-    qCDebug(g_cat_tmp_spotlight()) << "Saving text edit field END: " << m_myself->text();
-
-    m_tree_row->performPostUpdate();
-}
-
-/**
- * @brief M1MidPlane::Interp::createDescendant
- * @param p_new_edge_type
- * @param p_new_vertex_type
- */
-void M1MidPlane::Interp::createDescendant(M1Store::SpecialItem* p_new_edge_type, M1Store::SpecialItem* p_new_vertex_type, M1Store::InsertionPoint p_where){
-    m_myself->create_descendant(
-        p_new_edge_type->specialId(),
-        "New",
-        p_new_vertex_type->specialId(), p_where);
-}
 
 /** --------------------------------------------------------------- AutoInterp ---------------------------------
  * @brief M1MidPlane::AutoInterp::getOneIfMatch

@@ -740,8 +740,27 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
         // } figure
         else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "figure") l_in_figure_table = true;
         else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "figure") l_in_figure_table = false;
-        else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "table") l_in_figure_table = true;
-        else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "table") l_in_figure_table = false;
+        else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "cell"){
+            cm_tei_elements_stack.push(TEIStackLevel(TEIEntityType::Table, create_table_cell()));
+            cm_indent += QString(" ").repeated(l_indent_count);
+        }
+        else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "row"){
+            QString l_role = l_xml_reader.attributes().value("role").toString();
+            cm_tei_elements_stack.push(TEIStackLevel(TEIEntityType::Table, create_table_row(l_role)));
+            cm_indent += QString(" ").repeated(l_indent_count);
+        }
+        else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "table"){
+            // l_in_figure_table = true;
+            int l_row_count = l_xml_reader.attributes().value("rows").toInt();
+            int l_col_count = l_xml_reader.attributes().value("cols").toInt();
+            cm_tei_elements_stack.push(TEIStackLevel(TEIEntityType::Table, create_table(l_row_count, l_col_count)));
+            cm_indent += QString(" ").repeated(l_indent_count);
+        }
+        else if(l_tt == QXmlStreamReader::EndElement && (l_tok_name == "table" || l_tok_name == "row" || l_tok_name == "cell")){
+            // l_in_figure_table = false;
+            cm_tei_elements_stack.pop();
+            cm_indent.chop(l_indent_count);
+        }
         else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "div"){
             QString l_type = l_xml_reader.attributes().value("type").toString();
             QString l_div_n = l_xml_reader.attributes().value("n").toString();

@@ -31,6 +31,51 @@ bool M1Store::TEIInterface::cm_no_read = false;
 std::stack<M1Store::TEIStackLevel> M1Store::TEIInterface::cm_tei_elements_stack;
 int M1Store::TEIInterface::cm_cur_paragraph_number;
 
+M1Store::Item_lv2* M1Store::TEIInterface::create_table_row(const QString &p_role){
+    M1Store::Item_lv2* l_new_row = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX,
+        // label
+        QString("<row role=%1>").arg(p_role)
+        );
+    l_new_row->setType(M1Env::TEXT_ROW_SIID);
+    if(p_role.length() > 0) l_new_row->setFieldEdge(QString("%1").arg(p_role), M1Env::TEI_ROW_ROLE_SIID);
+    cm_tei_elements_stack.top().item()->linkTo(l_new_row, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+
+    return l_new_row;
+}
+
+M1Store::Item_lv2* M1Store::TEIInterface::create_table_cell(){
+    M1Store::Item_lv2* l_new_cell = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX,
+        // label
+        QString("<cell>")
+        );
+    l_new_cell->setType(M1Env::TEXT_CELL_SIID);
+    cm_tei_elements_stack.top().item()->linkTo(l_new_cell, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+
+    return l_new_cell;
+}
+M1Store::Item_lv2* M1Store::TEIInterface::create_table(
+    const int p_rows,
+    const int p_columns,
+    const QString& p_xml_id){
+
+    M1Store::Item_lv2* l_new_table = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX,
+        // label
+        QString("<table> %1 rows by %2 columns").arg(p_rows).arg(p_columns)
+        );
+    l_new_table->setType(M1Env::TEXT_TABLE_SIID);
+    l_new_table->setFieldEdge(QString("%1").arg(p_rows), M1Env::TEI_TABLE_ROWS_SIID);
+    l_new_table->setFieldEdge(QString("%1").arg(p_columns), M1Env::TEI_TABLE_COLS_SIID);
+    cm_tei_elements_stack.top().item()->linkTo(l_new_table, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+
+    return l_new_table;
+}
+
 M1Store::Item_lv2* M1Store::TEIInterface::create_div(
     const QString& p_type,
     const QString& p_div_n,

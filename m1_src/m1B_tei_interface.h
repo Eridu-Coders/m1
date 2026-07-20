@@ -27,7 +27,8 @@ enum class TEIEntityType{
     ChunkHi,
     ChunkTerm,
     ChunkHeading,
-    ChunkNote
+    ChunkNote,
+    Table
 };
 
 // list of secondary authors
@@ -171,6 +172,12 @@ private:
         const QString& p_hi_rend=QString(),
         const QString& p_xml_id=QString()
     );
+    static M1Store::Item_lv2* create_table(
+        const int p_rows,
+        const int p_columns,
+        const QString& p_xml_id=QString());
+    static M1Store::Item_lv2* create_table_row(const QString &l_role);
+    static M1Store::Item_lv2* create_table_cell();
 
     static QString format_tt_token(const QXmlStreamReader& p_xml_reader);
 public:
