@@ -178,6 +178,7 @@ private:
         const QString& p_xml_id=QString());
     static M1Store::Item_lv2* create_table_row(const QString &l_role);
     static M1Store::Item_lv2* create_table_cell();
+    static M1Store::Item_lv2* create_figure(const QString& p_picture_path);
 
     static QString format_tt_token(const QXmlStreamReader& p_xml_reader);
 public:

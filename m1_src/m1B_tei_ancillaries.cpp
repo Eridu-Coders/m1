@@ -31,6 +31,20 @@ bool M1Store::TEIInterface::cm_no_read = false;
 std::stack<M1Store::TEIStackLevel> M1Store::TEIInterface::cm_tei_elements_stack;
 int M1Store::TEIInterface::cm_cur_paragraph_number;
 
+M1Store::Item_lv2* M1Store::TEIInterface::create_figure(const QString& p_picture_path){
+    M1Store::Item_lv2* l_new_row = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX,
+        // label
+        QString("<figure>")
+        );
+    l_new_row->setType(M1Env::TEXT_FIGURE_SIID);
+    if(p_picture_path.length() > 0) l_new_row->setFieldEdge(QString("%1").arg(p_picture_path), M1Env::TEI_GRAPHIC_SIID);
+    cm_tei_elements_stack.top().item()->linkTo(l_new_row, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+
+    return l_new_row;
+}
+
 M1Store::Item_lv2* M1Store::TEIInterface::create_table_row(const QString &p_role){
     M1Store::Item_lv2* l_new_row = M1Store::Item_lv2::getNew(
         // vertex flags

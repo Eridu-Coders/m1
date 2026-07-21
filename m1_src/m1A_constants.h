@@ -173,7 +173,8 @@ namespace M1Env{
     static const char* TEXT_TABLE_ICON_PATH = "../m1_src/Icons/Table.svg";                      ///<
     static const char* TEXT_ROW_ICON_PATH = "../m1_src/Icons/Table-row.svg";                    ///<
     static const char* TEXT_CELL_ICON_PATH = "../m1_src/Icons/Table-cell.svg";                  ///<
-/**@}*/ //end of IconPaths TEXT_CELL_ICON_PATH
+    static const char* TEXT_FIGURE_ICON_PATH = "../m1_src/Icons/picture.svg";                   ///<
+/**@}*/ //end of IconPaths
 
     static const bool SKIP_HEAVY_CHECKING = true; ///< true --> skip time-consuming Q_ASSERT in setType() and linkTo()
 } // end of M1Env namespace

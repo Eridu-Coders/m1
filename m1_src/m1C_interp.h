@@ -583,5 +583,17 @@ public:
     virtual QString baseText();
 };
 
+class TEI_FigureInterp : public TEI_Container{
+    Q_OBJECT
+public:
+    static TEI_FigureInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    TEI_FigureInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "TEI_FigureInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
+    virtual QString baseText();
+};
+
 } // namespace M1MidPlane
 #endif // INTERP_H

@@ -87,6 +87,8 @@ extern M1Env::SpecialItemID TEI_TABLE_ROWS_SIID;
 extern M1Env::SpecialItemID TEI_TABLE_COLS_SIID;
 // [TERRL] Special Vertex ID (Simple Edge type) TEI table row role
 extern M1Env::SpecialItemID TEI_ROW_ROLE_SIID;
+// [TEGRP] Special Vertex ID (Simple Edge type) TEI <graphic> path
+extern M1Env::SpecialItemID TEI_GRAPHIC_SIID;
 // [URLNK] Special Vertex ID (Vertex type) Url link
 extern M1Env::SpecialItemID TEXT_URL_LINK_SIID;
 // [C2OBG] Special Vertex ID (Edge type) begin chunk + reciprocal
@@ -160,6 +162,8 @@ extern M1Env::SpecialItemID TEXT_TABLE_SIID;
 extern M1Env::SpecialItemID TEXT_ROW_SIID;
 // [TXTCL] Special Vertex ID of "Text Table Cell (type)"
 extern M1Env::SpecialItemID TEXT_CELL_SIID;
+// [TXFIG] Special Vertex ID of "TEI <figure> (type)"
+extern M1Env::SpecialItemID TEXT_FIGURE_SIID;
 // [TXTBK] Special Vertex ID of "Book (type)"
 extern M1Env::SpecialItemID TEXT_BOOK_SIID;
 // [TXTCH] Special Vertex ID of "Chapter (type)"

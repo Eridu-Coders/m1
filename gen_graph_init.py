@@ -441,6 +441,7 @@ g_special_vertices = [
     ['TETBR', 'SI_IS_TYPE',                                None,                        'TEI_TABLE_ROWS_SIID', None,        'Special Vertex ID (Simple Edge type) TEI table row count'],
     ['TETBC', 'SI_IS_TYPE',                                None,                        'TEI_TABLE_COLS_SIID', None,        'Special Vertex ID (Simple Edge type) TEI table column count'],
     ['TERRL', 'SI_IS_TYPE',                                None,                        'TEI_ROW_ROLE_SIID', None,          'Special Vertex ID (Simple Edge type) TEI table row role'],
+    ['TEGRP', 'SI_IS_TYPE',                                None,                        'TEI_GRAPHIC_SIID', None,           'Special Vertex ID (Simple Edge type) TEI <graphic> path'],
     ['URLNK', 'SI_IS_TYPE',                                'TEXT_URL_LINK_ICON_PATH',   'TEXT_URL_LINK_SIID', None,         'Special Vertex ID (Vertex type) Url link'],
     # --------------------------- HS2OB / OC2HB ---------------------------
     ['C2OBG', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_BEGIN_ICON_PATH', 'TW_CHUNK_2_OCC_BEGIN_SIID',
@@ -497,6 +498,8 @@ g_vertices = [
                                                                                                                'SI_IS_SELECTABLE'],                'TEXT_ROW_ICON_PATH',     'TEXT_ROW_SIID'],
 ['Text Table Cell (type)',       ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXTCL', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
                                                                                                                'SI_IS_SELECTABLE'],                'TEXT_CELL_ICON_PATH',    'TEXT_CELL_SIID'],
+['TEI <figure> (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXFIG', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
+                                                                                                               'SI_IS_SELECTABLE'],                'TEXT_FIGURE_ICON_PATH',  'TEXT_FIGURE_SIID'],
 ['Book (type)',                  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'TXTBK', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'BOOK_ICON_PATH',         'TEXT_BOOK_SIID'],
 ['Chapter (type)',               ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'TXTCH', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'CHAPTER_ICON_PATH',      'TEXT_CHAPTER_SIID'],
 ['Sentence (type)',              ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'TXSNT', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'SENTENCE_ICON_PATH',     'TEXT_SENTENCE_SIID'],
