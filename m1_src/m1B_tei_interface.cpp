@@ -740,6 +740,15 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
         //     QString l_title = l_xml_reader.text().toString().trimmed();
         //     qCDebug(g_cat_tei).noquote() << cm_indent + QString(" ").repeated(l_indent_count) << QString("<name type=%1>%2").arg(l_type).arg(l_title);
         // } figure
+        else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "list"){
+            QString l_type = l_xml_reader.attributes().value("type").toString();
+            cm_tei_elements_stack.push(TEIStackLevel(TEIEntityType::Table, create_list(l_type)));
+            cm_indent += QString(" ").repeated(l_indent_count);
+        }
+        else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "item"){
+            cm_tei_elements_stack.push(TEIStackLevel(TEIEntityType::Table, create_item()));
+            cm_indent += QString(" ").repeated(l_indent_count);
+        }
         else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "figure"){
             cm_indent += QString(" ").repeated(l_indent_count);
             l_picture_path_pending = true;
@@ -769,7 +778,11 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
             cm_tei_elements_stack.push(TEIStackLevel(TEIEntityType::Table, create_table(l_row_count, l_col_count)));
             cm_indent += QString(" ").repeated(l_indent_count);
         }
-        else if(l_tt == QXmlStreamReader::EndElement && (l_tok_name == "table" || l_tok_name == "row" || l_tok_name == "cell")){
+        else if(l_tt == QXmlStreamReader::EndElement && (l_tok_name == "table" ||
+                                                            l_tok_name == "row" ||
+                                                            l_tok_name == "cell" ||
+                                                            l_tok_name == "list" ||
+                                                            l_tok_name == "item")){
             // l_in_figure_table = false;
             cm_tei_elements_stack.pop();
             cm_indent.chop(l_indent_count);
@@ -799,16 +812,21 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
 
             cm_indent.chop(l_indent_count);
         }
+        else if(!l_in_table && l_in_text && l_tt == QXmlStreamReader::StartElement && l_tok_name == "quote"){
+            cm_tei_elements_stack.push(TEIStackLevel(TEIEntityType::Paragraph, create_paragraph_quote(true)));
+
+            qCDebug(g_cat_tei).noquote() << cm_indent << "<quote> start";
+            cm_indent += QString(" ").repeated(l_indent_count);
+        }
         else if(!l_in_table && l_in_text && l_tt == QXmlStreamReader::StartElement && l_tok_name == "p"){
-            cm_tei_elements_stack.push(TEIStackLevel(TEIEntityType::Paragraph, create_paragraph()));
+            cm_tei_elements_stack.push(TEIStackLevel(TEIEntityType::Paragraph, create_paragraph_quote()));
 
             qCDebug(g_cat_tei).noquote() << cm_indent << "<p> start";
             cm_indent += QString(" ").repeated(l_indent_count);
         }
-        else if(!l_in_table && l_in_text && l_tt == QXmlStreamReader::EndElement && l_tok_name == "p"){
+        else if(!l_in_table && l_in_text && l_tt == QXmlStreamReader::EndElement && (l_tok_name == "p" || l_tok_name == "quote")){
             cm_tei_elements_stack.pop();
             cm_indent.chop(l_indent_count);
-            qCDebug(g_cat_tei).noquote() << cm_indent << "End of <p> block";
         }
         else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "name"){
             QString l_type = l_xml_reader.attributes().value("type").toString();

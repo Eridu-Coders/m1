@@ -96,6 +96,9 @@ std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_
             else if((l_interp_raw = TEI_RowInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = TEI_CellInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = TEI_FigureInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = TEI_QuoteInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = TEI_ListInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = TEI_ItemInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else l_interp_raw = new Interp(p_myself);
 
         }

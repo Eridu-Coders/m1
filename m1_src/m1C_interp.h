@@ -595,5 +595,40 @@ public:
     virtual QString baseText();
 };
 
+class TEI_QuoteInterp : public TEI_Container{
+    Q_OBJECT
+public:
+    static TEI_QuoteInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    TEI_QuoteInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "TEI_QuoteInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
+    virtual QString baseText();
+};
+
+class TEI_ListInterp : public TEI_Container{
+    Q_OBJECT
+public:
+    static TEI_ListInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    TEI_ListInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "TEI_ListInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
+    virtual QString baseText();
+};
+
+class TEI_ItemInterp : public TEI_Container{
+    Q_OBJECT
+public:
+    static TEI_ItemInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    TEI_ItemInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "TEI_ItemInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
+    virtual QString baseText();
+};
 } // namespace M1MidPlane
 #endif // INTERP_H

@@ -162,7 +162,7 @@ private:
         const QString& p_type,
         const QString& p_div_n,
         const QString& p_xml_id=QString());
-    static M1Store::Item_lv2* create_paragraph();
+    static M1Store::Item_lv2* create_paragraph_quote(const bool p_is_quote=false);
     static M1Store::Item_lv2* create_chunk(
         const QString& p_text,
         const QString& p_tag,
@@ -179,6 +179,8 @@ private:
     static M1Store::Item_lv2* create_table_row(const QString &l_role);
     static M1Store::Item_lv2* create_table_cell();
     static M1Store::Item_lv2* create_figure(const QString& p_picture_path);
+    static M1Store::Item_lv2* create_list(const QString& p_list_type);
+    static M1Store::Item_lv2* create_item();
 
     static QString format_tt_token(const QXmlStreamReader& p_xml_reader);
 public:

@@ -174,6 +174,8 @@ namespace M1Env{
     static const char* TEXT_ROW_ICON_PATH = "../m1_src/Icons/Table-row.svg";                    ///<
     static const char* TEXT_CELL_ICON_PATH = "../m1_src/Icons/Table-cell.svg";                  ///<
     static const char* TEXT_FIGURE_ICON_PATH = "../m1_src/Icons/picture.svg";                   ///<
+    static const char* TEXT_LIST_ICON_PATH = "../m1_src/Icons/list.svg";                        ///<
+    static const char* TEXT_ITEM_ICON_PATH = "../m1_src/Icons/item.svg";                        ///<
 /**@}*/ //end of IconPaths
 
     static const bool SKIP_HEAVY_CHECKING = true; ///< true --> skip time-consuming Q_ASSERT in setType() and linkTo()

@@ -89,6 +89,8 @@ M1Env::SpecialItemID M1Env::TEI_TABLE_COLS_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEI_ROW_ROLE_SIID = G_NONEX_SI_ID;
 // [TEGRP] Special Vertex ID (Simple Edge type) TEI <graphic> path
 M1Env::SpecialItemID M1Env::TEI_GRAPHIC_SIID = G_NONEX_SI_ID;
+// [TELTP] Special Vertex ID (Simple Edge type) TEI <list> type
+M1Env::SpecialItemID M1Env::TEI_LIST_TYPE_SIID = G_NONEX_SI_ID;
 // [URLNK] Special Vertex ID (Vertex type) Url link
 M1Env::SpecialItemID M1Env::TEXT_URL_LINK_SIID = G_NONEX_SI_ID;
 // [C2OBG] Special Vertex ID (Edge type) begin chunk + reciprocal
@@ -132,6 +134,9 @@ M1Env::SpecialItemID M1Env::TEXT_TABLE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_ROW_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_CELL_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_FIGURE_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::TEXT_LIST_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::TEXT_ITEM_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::TEXT_QUOTE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_BOOK_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_CHAPTER_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_SENTENCE_SIID = G_NONEX_SI_ID;
@@ -304,6 +309,7 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::TEI_TABLE_COLS_SIID = M1Store::StorageStatic::getSpecialID("TETBC");
     M1Env::TEI_ROW_ROLE_SIID = M1Store::StorageStatic::getSpecialID("TERRL");
     M1Env::TEI_GRAPHIC_SIID = M1Store::StorageStatic::getSpecialID("TEGRP");
+    M1Env::TEI_LIST_TYPE_SIID = M1Store::StorageStatic::getSpecialID("TELTP");
     M1Env::TEXT_URL_LINK_SIID = M1Store::StorageStatic::getSpecialID("URLNK");
     M1Env::TW_CHUNK_2_OCC_BEGIN_SIID = M1Store::StorageStatic::getSpecialID("C2OBG");
     M1Env::TW_OCC_2_CHUNK_BEGIN_SIID = M1Store::StorageStatic::getSpecialID("O2CBG");
@@ -341,6 +347,9 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::TEXT_ROW_SIID = M1Store::StorageStatic::getSpecialID("TXTRW");
     M1Env::TEXT_CELL_SIID = M1Store::StorageStatic::getSpecialID("TXTCL");
     M1Env::TEXT_FIGURE_SIID = M1Store::StorageStatic::getSpecialID("TXFIG");
+    M1Env::TEXT_LIST_SIID = M1Store::StorageStatic::getSpecialID("TXQTE");
+    M1Env::TEXT_ITEM_SIID = M1Store::StorageStatic::getSpecialID("TXLST");
+    M1Env::TEXT_QUOTE_SIID = M1Store::StorageStatic::getSpecialID("TXITM");
     M1Env::TEXT_BOOK_SIID = M1Store::StorageStatic::getSpecialID("TXTBK");
     M1Env::TEXT_CHAPTER_SIID = M1Store::StorageStatic::getSpecialID("TXTCH");
     M1Env::TEXT_SENTENCE_SIID = M1Store::StorageStatic::getSpecialID("TXSNT");
@@ -543,6 +552,7 @@ void M1Env::GraphInit::dbg_dump_pseudo_constants(){
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_TABLE_COLS_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TETBC"), 4, 16, QChar('0')).arg("TETBC");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_ROW_ROLE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TERRL"), 4, 16, QChar('0')).arg("TERRL");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_GRAPHIC_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TEGRP"), 4, 16, QChar('0')).arg("TEGRP");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_LIST_TYPE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TELTP"), 4, 16, QChar('0')).arg("TELTP");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_URL_LINK_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("URLNK"), 4, 16, QChar('0')).arg("URLNK");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TW_CHUNK_2_OCC_BEGIN_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("C2OBG"), 4, 16, QChar('0')).arg("C2OBG");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TW_CHUNK_2_OCC_END_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("C2OEN"), 4, 16, QChar('0')).arg("C2OEN");
@@ -639,6 +649,8 @@ void M1Env::GraphInit::init_base(){
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TERRL", nullptr);
     // Special Vertex ID (Simple Edge type) TEI <graphic> path
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TEGRP", nullptr);
+    // Special Vertex ID (Simple Edge type) TEI <list> type
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TELTP", nullptr);
     // Special Vertex ID (Vertex type) Url link
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "URLNK", M1Env::TEXT_URL_LINK_ICON_PATH);
     // Special Vertex ID (Edge type) begin chunk + reciprocal
@@ -1154,6 +1166,51 @@ void M1Env::GraphInit::init_base(){
         // icon path
         M1Env::TEXT_FIGURE_ICON_PATH);
     l_txfig->setType("TYPE_");
+
+    // creation of "TEI <quote> (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[TXQTE]-TEI <quote> (type)> item");
+    M1Store::Item_lv2* l_txqte = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "TEI <quote> (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE | M1Env::SI_IS_SELECTABLE,
+        // mnemonic
+        "TXQTE",
+        // icon path
+        M1Env::TEXT_LIST_ICON_PATH);
+    l_txqte->setType("TYPE_");
+
+    // creation of "TEI <list> (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[TXLST]-TEI <list> (type)> item");
+    M1Store::Item_lv2* l_txlst = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "TEI <list> (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE | M1Env::SI_IS_SELECTABLE,
+        // mnemonic
+        "TXLST",
+        // icon path
+        M1Env::TEXT_ITEM_ICON_PATH);
+    l_txlst->setType("TYPE_");
+
+    // creation of "TEI <item> (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[TXITM]-TEI <item> (type)> item");
+    M1Store::Item_lv2* l_txitm = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "TEI <item> (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE | M1Env::SI_IS_SELECTABLE,
+        // mnemonic
+        "TXITM",
+        // icon path
+        M1Env::HL_QUOTE_ICON_PATH);
+    l_txitm->setType("TYPE_");
 
     // creation of "Book (type)"
     qCDebug(g_cat_silence) << QString("Creating <[TXTBK]-Book (type)> item");

@@ -31,6 +31,32 @@ bool M1Store::TEIInterface::cm_no_read = false;
 std::stack<M1Store::TEIStackLevel> M1Store::TEIInterface::cm_tei_elements_stack;
 int M1Store::TEIInterface::cm_cur_paragraph_number;
 
+M1Store::Item_lv2* M1Store::TEIInterface::create_list(const QString& p_list_type){
+    M1Store::Item_lv2* l_new_list = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX,
+        // label
+        QString("<list type=%1>").arg(p_list_type)
+        );
+    l_new_list->setType(M1Env::TEXT_LIST_SIID);
+    if(p_list_type.length() > 0) l_new_list->setFieldEdge(QString("%1").arg(p_list_type), M1Env::TEI_LIST_TYPE_SIID);
+    cm_tei_elements_stack.top().item()->linkTo(l_new_list, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+
+    return l_new_list;
+}
+M1Store::Item_lv2* M1Store::TEIInterface::create_item(){
+    M1Store::Item_lv2* l_new_item = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX,
+        // label
+        QString("<item>")
+        );
+    l_new_item->setType(M1Env::TEXT_ITEM_SIID);
+    cm_tei_elements_stack.top().item()->linkTo(l_new_item, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+
+    return l_new_item;
+}
+
 M1Store::Item_lv2* M1Store::TEIInterface::create_figure(const QString& p_picture_path){
     M1Store::Item_lv2* l_new_row = M1Store::Item_lv2::getNew(
         // vertex flags
@@ -115,14 +141,17 @@ M1Store::Item_lv2* M1Store::TEIInterface::create_div(
     return l_new_div;
 }
 
-M1Store::Item_lv2* M1Store::TEIInterface::create_paragraph(){
+M1Store::Item_lv2* M1Store::TEIInterface::create_paragraph_quote(const bool p_is_quote){
     M1Store::Item_lv2* l_new_paragraph = M1Store::Item_lv2::getNew(
         // vertex flags
         M1Env::FULL_VERTEX,
         // label
-        QString("Paragraph %1").arg(cm_cur_paragraph_number++)
-        );
-    l_new_paragraph->setType(M1Env::TEXT_PARA_SIID);
+        p_is_quote ? "<quote>" : QString("Paragraph %1").arg(cm_cur_paragraph_number++)
+    );
+    if(p_is_quote)
+        l_new_paragraph->setType(M1Env::TEXT_QUOTE_SIID);
+    else
+        l_new_paragraph->setType(M1Env::TEXT_PARA_SIID);
     cm_tei_elements_stack.top().item()->linkTo(l_new_paragraph, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
 
     return l_new_paragraph;
@@ -193,7 +222,7 @@ void M1Store::TEIInterface::create_text(
         M1Env::FULL_VERTEX,
         // label
         p_title);
-    (*l_text_root)->setType("TEXT_");
+    (*l_text_root)->setType(M1Env::TEXT_SIID);
     if(p_alt_title.length() > 0) (*l_text_root)->setFieldEdge(p_alt_title, M1Env::TEXT_ALT_TITLE_SIID);
     if(p_sub_title.length() > 0) (*l_text_root)->setFieldEdge(p_sub_title, M1Env::TEXT_SUB_TITLE_SIID);
 

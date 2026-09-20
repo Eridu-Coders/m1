@@ -28,9 +28,9 @@ bool M1Store::Item_lv2::setType(const SpecialItem* p_type_si){
     bool l_ret = true;
     // index of first free slot (or -1 if none)
     int l_free_slot = \
-                              getType_si_id(0) == G_VOID_SI_ID ? 0 :
-                          (getType_si_id(1) == G_VOID_SI_ID ? 1 :
-                               (getType_si_id(2) == G_VOID_SI_ID ? 2 :
+                        getType_si_id(0) == G_VOID_SI_ID ? 0 :
+                            (getType_si_id(1) == G_VOID_SI_ID ? 1 :
+                                (getType_si_id(2) == G_VOID_SI_ID ? 2 :
                                     getType_si_id(3) == G_VOID_SI_ID ? 3 : -1));
 
     // store the special item id in m_type if possible
@@ -45,11 +45,12 @@ bool M1Store::Item_lv2::setType(const SpecialItem* p_type_si){
         // full items only from this point onwards
         // create an ISA edge if required (no slot available or SI_REQUIRES_EDGE is set)
         if((l_free_slot < 0) || (p_type_si->flags() & SI_REQUIRES_EDGE))
-            linkTo(p_type_si->itemId(), "_ISA_");
+            //linkTo(p_type_si->itemId(), "_ISA_");
+            linkTo(M1Store::Item_lv2::getExisting(p_type_si->itemId()), "_ISA_", InsertionPoint::at_top, InsertionPoint::at_bottom);
         // will always succeed for full edges and vertices (always possible to materialyse type with an ISA edge) so l_ret is always true
     }
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 /**
@@ -62,7 +63,7 @@ bool M1Store::Item_lv2::setType(const SpecialItemID p_type_si_id){
 
     bool l_ret = setType(M1Store::StorageStatic::getSpecialItemPointer(p_type_si_id));
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 /**
@@ -75,7 +76,7 @@ bool M1Store::Item_lv2::setType(const char* p_mnemonic){
 
     bool l_ret = setType(M1Store::StorageStatic::getSpecialItemPointer(p_mnemonic));
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 /**
@@ -88,7 +89,7 @@ bool M1Store::Item_lv2::setType(const Item_lv2* p_type_lv2){
 
     bool l_ret;
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 /**
@@ -101,7 +102,7 @@ bool M1Store::Item_lv2::isOfType(const Item_lv2* p_type_lv2) const{
 
     bool l_ret;
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 /**
@@ -137,7 +138,7 @@ bool M1Store::Item_lv2::isOfType(const SpecialItemID p_type_si_id) const{
     }
 
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 /**
@@ -150,7 +151,7 @@ bool M1Store::Item_lv2::isOfType(const SpecialItem* p_type_si) const{
 
     bool l_ret = this->isOfType(p_type_si->specialId());
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 /**
@@ -163,7 +164,7 @@ bool M1Store::Item_lv2::isOfType(const char* p_mnemonic) const{
 
     bool l_ret = this->isOfType(M1Store::StorageStatic::getSpecialItemPointer(p_mnemonic)->specialId());
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 /** @}*/
 // end of \defgroup IOT2

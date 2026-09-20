@@ -187,6 +187,16 @@ void M1Store::Item_lv2::installFullEdge_2(Item_lv2* p_new_edge, const SpecialIte
     M1_FUNC_EXIT
 }
 
+M1Store::Item_lv2* M1Store::Item_lv2::linkTo(
+    M1Store::Item_lv2* p_target,
+    const char* p_mnemonic,
+    const InsertionPoint p_where,
+    const InsertionPoint p_where_reciprocal,
+    Item_lv2* p_edge_above){
+
+    return linkTo(p_target, StorageStatic::getSpecialItemPointer(p_mnemonic)->specialId(), p_where, p_where_reciprocal, p_edge_above);
+}
+
 /**
  * @brief link an item to another
  *
@@ -377,7 +387,7 @@ M1Store::Item_lv2* M1Store::Item_lv2::linkTo(Item_lv2* p_target, const char* p_m
     M1Store::Item_lv2* l_ret = linkTo(p_target, StorageStatic::getSpecialItemPointer(p_mnemonic_edge)->specialId(), p_edge_above, p_at_top);
 
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 /**
@@ -400,7 +410,7 @@ M1Store::Item_lv2* M1Store::Item_lv2::linkTo(ItemID p_target_id, const SpecialIt
     M1Store::Item_lv2* l_ret = linkTo(l_target, p_type, p_edge_above, p_at_top);
 
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 /**
@@ -420,7 +430,7 @@ M1Store::Item_lv2*  M1Store::Item_lv2::linkTo(ItemID p_target_id, const char* p_
     M1Store::Item_lv2* l_ret = linkTo(l_target, p_mnemonic_edge, p_edge_above, p_at_top);
 
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 /**
@@ -448,7 +458,7 @@ bool M1Store::Item_lv2::edgeBelongs(Item_lv2* p_edge, bool p_edge_is_special){
     }
 
     M1_FUNC_EXIT
-        return l_ret;
+    return l_ret;
 }
 
 /**

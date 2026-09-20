@@ -165,6 +165,7 @@ class Item_lv2 : public Item_lv1 {
         }
 
         Item_lv2* linkTo(Item_lv2* p_target, const SpecialItemID p_edge_type, const InsertionPoint p_where, const InsertionPoint p_where_reciprocal, Item_lv2* p_edge_above = nullptr);
+        Item_lv2* linkTo(Item_lv2* p_target, const char* p_mnemonic, const InsertionPoint p_where, const InsertionPoint p_where_reciprocal, Item_lv2* p_edge_above = nullptr);
 
         Item_lv2* linkTo(Item_lv2* p_target, const SpecialItemID p_type, Item_lv2* p_edge_above = nullptr, const bool p_at_top = false);
         Item_lv2* linkTo(Item_lv2* p_target, const char* p_mnemonic, Item_lv2* p_edge_above = nullptr, const bool p_at_top = false);

@@ -1037,7 +1037,10 @@ void M1MidPlane::TEI_Container::initialize(){
                                                                 l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_TABLE_SIID)||
                                                                 l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_ROW_SIID)||
                                                                 l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_CELL_SIID)||
-                                                                l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_FIGURE_SIID)) ||
+                                                                l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_FIGURE_SIID)||
+                                                                l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_QUOTE_SIID)||
+                                                                l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_LIST_SIID)||
+                                                                l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_ITEM_SIID)) ||
                       (l_it.at()->isOfType(M1Env::TEXT_HIGHLIGHT_QUOTE_SIID) && l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_HIGHLIGHT_SIID))))
                 m_descendant_list.push_back(getInterp(l_it.at()->getTarget_lv2()));
         m_initialized = true;
@@ -1084,6 +1087,7 @@ QString M1MidPlane::TEI_Container::baseText(){
     // return QString("m_descendant_list: %1").arg(m_descendant_list.size()) + l_chunk_strings.join(" ");
     return l_chunk_strings.join(" ");
 }
+
 /** --------------------------------------------------------------- TEI_DivInterp ---------------------------------
  * @brief M1MidPlane::TEI_DivInterp::getOneIfMatch
  * @param p_myself
@@ -1105,7 +1109,7 @@ M1MidPlane::TEI_DivInterp::TEI_DivInterp(M1Store::Item_lv2* p_myself) : M1MidPla
 QString M1MidPlane::TEI_DivInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
     return QString("%1: %2")
         .arg(m_myself->text())
-        .arg(M1Store::StorageStatic::maxLengthChop(TEI_Container::get_heading().replace(g_re_html_tags, ""), 50));
+        .arg(M1Store::StorageStatic::maxLengthChop(TEI_Container::get_heading().replace(g_re_html_tags, "").replace(g_re_space, " "), 50));
 }
 QString M1MidPlane::TEI_DivInterp::baseText(){
     return QString("<div><p style=\"font-weight: bold\">%1</p>\n")
@@ -1138,7 +1142,7 @@ M1MidPlane::TEI_ParagraphInterp::TEI_ParagraphInterp(M1Store::Item_lv2* p_myself
 QString M1MidPlane::TEI_ParagraphInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
     return QString("%1: %2")
         .arg(m_myself->text())
-        .arg(M1Store::StorageStatic::maxLengthChop(TEI_Container::baseText().replace(g_re_html_tags, ""), 50));
+        .arg(M1Store::StorageStatic::maxLengthChop(TEI_Container::baseText().replace(g_re_html_tags, "").replace(g_re_space, " "), 50));
 }
 QString M1MidPlane::TEI_ParagraphInterp::baseText(){
     return "<p>" + TEI_Container::baseText() + "</p>\n";
@@ -1147,7 +1151,6 @@ QString M1MidPlane::TEI_ParagraphInterp::baseText(){
 QString M1MidPlane::TEI_ParagraphInterp::getHtmlVirtual(){
     return this->baseText();
 }
-
 
 /** --------------------------------------------------------------- TEI_ChunkInterp ---------------------------------
  * @brief M1MidPlane::TEI_ChunkInterp::getOneIfMatch
@@ -1170,7 +1173,7 @@ M1MidPlane::TEI_ChunkInterp::TEI_ChunkInterp(M1Store::Item_lv2* p_myself) : M1Mi
 }
 
 QString M1MidPlane::TEI_ChunkInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
-    QString l_base_text = M1Store::StorageStatic::maxLengthChop(baseText().replace(g_re_html_tags, ""), 50);
+    QString l_base_text = M1Store::StorageStatic::maxLengthChop(baseText().replace(g_re_html_tags, "").replace(g_re_space, " "), 50);
     if(m_chunk_tag == "name") return QString("<name> %1").arg(l_base_text);
     if(m_chunk_tag == "head") return QString("<head> %1").arg(l_base_text);
     if(m_chunk_tag == "hi") return QString("<hi> %1").arg(l_base_text);
@@ -1198,6 +1201,11 @@ QString M1MidPlane::TEI_ChunkInterp::baseText(){
     else return TEI_Container::baseText();
 }
 
+/** --------------------------------------------------------------- TEI_TableInterp ---------------------------------
+ * @brief M1MidPlane::TEI_TableInterp::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
 M1MidPlane::TEI_TableInterp* M1MidPlane::TEI_TableInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be a TEI_TableInterp? %1").arg(p_myself->dbgShort()))
     M1MidPlane::TEI_TableInterp* l_ret = nullptr;
@@ -1213,7 +1221,7 @@ M1MidPlane::TEI_TableInterp::TEI_TableInterp(M1Store::Item_lv2* p_myself) : M1Mi
 QString M1MidPlane::TEI_TableInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
     return QString("%1: %2")
         .arg(m_myself->text())
-        .arg(M1Store::StorageStatic::maxLengthChop(TEI_Container::get_heading().replace(g_re_html_tags, ""), 50));
+        .arg(M1Store::StorageStatic::maxLengthChop(TEI_Container::get_heading().replace(g_re_html_tags, "").replace(g_re_space, " "), 50));
 }
 QString M1MidPlane::TEI_TableInterp::baseText(){
     return "<table style=\"border-collapse: collapse;\">\n" + TEI_Container::baseText() + "</table>\n";
@@ -1222,6 +1230,11 @@ QString M1MidPlane::TEI_TableInterp::getHtmlVirtual(){
     return this->baseText();
 }
 
+/** --------------------------------------------------------------- TEI_RowInterp ---------------------------------
+ * @brief M1MidPlane::TEI_RowInterp::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
 M1MidPlane::TEI_RowInterp* M1MidPlane::TEI_RowInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be a TEI_RowInterp? %1").arg(p_myself->dbgShort()))
     M1MidPlane::TEI_RowInterp* l_ret = nullptr;
@@ -1237,7 +1250,7 @@ M1MidPlane::TEI_RowInterp::TEI_RowInterp(M1Store::Item_lv2* p_myself) : M1MidPla
 QString M1MidPlane::TEI_RowInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
     return QString("%1: %2")
         .arg(m_myself->text())
-        .arg(M1Store::StorageStatic::maxLengthChop(this->baseText().replace(g_re_html_tags, ""), 50));
+        .arg(M1Store::StorageStatic::maxLengthChop(this->baseText().replace(g_re_html_tags, "").replace(g_re_space, " "), 50));
 }
 QString M1MidPlane::TEI_RowInterp::getHtmlVirtual(){
     qCDebug(g_cat_tmp_spotlight).noquote() << "TEI_RowInterp getHtmlVirtual()" << this->baseText();
@@ -1248,6 +1261,11 @@ QString M1MidPlane::TEI_RowInterp::baseText(){
     return "<tr>\n" + TEI_Container::baseText() + "</tr>\n";
 }
 
+/** --------------------------------------------------------------- TEI_CellInterp ---------------------------------
+ * @brief M1MidPlane::TEI_CellInterp::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
 M1MidPlane::TEI_CellInterp* M1MidPlane::TEI_CellInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be a TEI_CellInterp? %1").arg(p_myself->dbgShort()))
     M1MidPlane::TEI_CellInterp* l_ret = nullptr;
@@ -1263,7 +1281,7 @@ M1MidPlane::TEI_CellInterp::TEI_CellInterp(M1Store::Item_lv2* p_myself) : M1MidP
 QString M1MidPlane::TEI_CellInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
     return QString("%1: %2")
         .arg(m_myself->text())
-        .arg(M1Store::StorageStatic::maxLengthChop(baseText().replace(g_re_html_tags, ""), 50));
+        .arg(M1Store::StorageStatic::maxLengthChop(baseText().replace(g_re_html_tags, "").replace(g_re_space, " "), 50));
 }
 QString M1MidPlane::TEI_CellInterp::getHtmlVirtual(){
     return QString("<table><tr>%1</tr></table>").arg(this->baseText());
@@ -1272,6 +1290,11 @@ QString M1MidPlane::TEI_CellInterp::baseText(){
     return "<td style=\"border: 1px solid black; padding: .3em\">\n" + TEI_Container::baseText() + "</td>\n";
 }
 
+/** --------------------------------------------------------------- TEI_FigureInterp ---------------------------------
+ * @brief M1MidPlane::TEI_FigureInterp::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
 M1MidPlane::TEI_FigureInterp* M1MidPlane::TEI_FigureInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
     M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be a TEI_FigureInterp? %1").arg(p_myself->dbgShort()))
     M1MidPlane::TEI_FigureInterp* l_ret = nullptr;
@@ -1285,11 +1308,98 @@ M1MidPlane::TEI_FigureInterp* M1MidPlane::TEI_FigureInterp::getOneIfMatch(M1Stor
 
 M1MidPlane::TEI_FigureInterp::TEI_FigureInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::TEI_Container::TEI_Container(p_myself){}
 QString M1MidPlane::TEI_FigureInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
-    return QString("<figure> %1").arg(M1Store::StorageStatic::maxLengthChop(TEI_Container::get_heading().replace(g_re_html_tags, ""), 50));
+    return QString("<figure> %1")
+        .arg(M1Store::StorageStatic::maxLengthChop(TEI_Container::get_heading().replace(g_re_html_tags, "").replace(g_re_space, " "), 50));
 }
 QString M1MidPlane::TEI_FigureInterp::getHtmlVirtual(){return this->baseText();}
 QString M1MidPlane::TEI_FigureInterp::baseText(){
     return QString("<p style=\"padding-left:2em;\">\n<img src=\"%1\" style=\"display: block; margin: 0 auto; max-width: 90%; height: auto;\"/>\n%2</p>\n")
         .arg(QUrl::fromPercentEncoding(m_myself->getField(M1Env::TEI_GRAPHIC_SIID).toUtf8()))
         .arg(TEI_Container::baseText());
+}
+
+/** --------------------------------------------------------------- TEI_QuoteInterp ---------------------------------
+ * @brief M1MidPlane::TEI_QuoteInterp::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
+M1MidPlane::TEI_QuoteInterp* M1MidPlane::TEI_QuoteInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be a TEI_QuoteInterp? %1").arg(p_myself->dbgShort()))
+    M1MidPlane::TEI_QuoteInterp* l_ret = nullptr;
+    if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::TEXT_QUOTE_SIID)){
+        l_ret = new TEI_QuoteInterp(p_myself);
+        qCDebug(g_cat_tmp_spotlight).noquote() << "TEI_QuoteInterp" << p_myself->dbgShort();
+    }
+    M1_FUNC_EXIT
+    return l_ret;
+}
+
+M1MidPlane::TEI_QuoteInterp::TEI_QuoteInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::TEI_Container::TEI_Container(p_myself){}
+QString M1MidPlane::TEI_QuoteInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
+    return QString("<quote> %1")
+        .arg(M1Store::StorageStatic::maxLengthChop(TEI_Container::baseText().replace(g_re_html_tags, "").replace(g_re_space, " "), 50));
+}
+QString M1MidPlane::TEI_QuoteInterp::getHtmlVirtual(){
+    return this->baseText();
+}
+QString M1MidPlane::TEI_QuoteInterp::baseText(){
+    return "<p style=\"padding-left: 2em; font-style: italic;\">" + TEI_Container::baseText() + "</p>\n";
+}
+
+/** --------------------------------------------------------------- TEI_ListInterp ---------------------------------
+ * @brief M1MidPlane::TEI_ListInterp::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
+M1MidPlane::TEI_ListInterp* M1MidPlane::TEI_ListInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be a TEI_ListInterp? %1").arg(p_myself->dbgShort()))
+    M1MidPlane::TEI_ListInterp* l_ret = nullptr;
+    if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::TEXT_LIST_SIID)){
+        l_ret = new TEI_ListInterp(p_myself);
+        qCDebug(g_cat_tmp_spotlight).noquote() << "TEI_ListInterp" << p_myself->dbgShort();
+    }
+    M1_FUNC_EXIT
+    return l_ret;
+}
+
+M1MidPlane::TEI_ListInterp::TEI_ListInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::TEI_Container::TEI_Container(p_myself){}
+
+QString M1MidPlane::TEI_ListInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
+    return QString("<list type=%1> %2")
+        .arg(m_myself->getField(M1Env::TEI_LIST_TYPE_SIID))
+        .arg(M1Store::StorageStatic::maxLengthChop(TEI_Container::baseText().replace(g_re_html_tags, "").replace(g_re_space, " "), 50));
+}
+QString M1MidPlane::TEI_ListInterp::getHtmlVirtual(){
+    return this->baseText();
+}
+QString M1MidPlane::TEI_ListInterp::baseText(){
+    return "<ul>\n" + TEI_Container::baseText() + "</ul>\n";
+}
+
+/** --------------------------------------------------------------- TEI_ItemInterp ---------------------------------
+ * @brief M1MidPlane::TEI_ItemInterp::getOneIfMatch
+ * @param p_myself
+ * @return
+ */
+M1MidPlane::TEI_ItemInterp* M1MidPlane::TEI_ItemInterp::getOneIfMatch(M1Store::Item_lv2* p_myself){
+    M1_FUNC_ENTRY(g_cat_interp_base, QString("Will this be a TEI_ItemInterp? %1").arg(p_myself->dbgShort()))
+    M1MidPlane::TEI_ItemInterp* l_ret = nullptr;
+    if(p_myself->isFullVertex() && p_myself->isOfType(M1Env::TEXT_ITEM_SIID)){
+        l_ret = new TEI_ItemInterp(p_myself);
+        qCDebug(g_cat_tmp_spotlight).noquote() << "TEI_ListInterp" << p_myself->dbgShort();
+    }
+    M1_FUNC_EXIT
+    return l_ret;
+}
+
+M1MidPlane::TEI_ItemInterp::TEI_ItemInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::TEI_Container::TEI_Container(p_myself){}
+QString M1MidPlane::TEI_ItemInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
+    return QString("<item> %1")
+        .arg(M1Store::StorageStatic::maxLengthChop(TEI_Container::baseText().replace(g_re_html_tags, "").replace(g_re_space, " "), 50));
+}
+QString M1MidPlane::TEI_ItemInterp::getHtmlVirtual(){
+    return this->baseText();
+}
+QString M1MidPlane::TEI_ItemInterp::baseText(){
+    return "<li>\n" + TEI_Container::baseText() + "</li>\n";
 }
