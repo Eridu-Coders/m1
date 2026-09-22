@@ -167,11 +167,11 @@ extern M1Env::SpecialItemID TEXT_CELL_SIID;
 // [TXFIG] Special Vertex ID of "TEI <figure> (type)"
 extern M1Env::SpecialItemID TEXT_FIGURE_SIID;
 // [TXQTE] Special Vertex ID of "TEI <quote> (type)"
-extern M1Env::SpecialItemID TEXT_LIST_SIID;
-// [TXLST] Special Vertex ID of "TEI <list> (type)"
-extern M1Env::SpecialItemID TEXT_ITEM_SIID;
-// [TXITM] Special Vertex ID of "TEI <item> (type)"
 extern M1Env::SpecialItemID TEXT_QUOTE_SIID;
+// [TXLST] Special Vertex ID of "TEI <list> (type)"
+extern M1Env::SpecialItemID TEXT_LIST_SIID;
+// [TXITM] Special Vertex ID of "TEI <item> (type)"
+extern M1Env::SpecialItemID TEXT_ITEM_SIID;
 // [TXTBK] Special Vertex ID of "Book (type)"
 extern M1Env::SpecialItemID TEXT_BOOK_SIID;
 // [TXTCH] Special Vertex ID of "Chapter (type)"

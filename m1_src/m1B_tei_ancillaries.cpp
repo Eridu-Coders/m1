@@ -582,9 +582,27 @@ M1Store::AuthorTEI M1Store::TEIInterface::readPersName(QXmlStreamReader& p_xml_r
 
 QString M1Store::TEIInterface::format_tt_token(const QXmlStreamReader& p_xml_reader){
     QString l_tok_name = p_xml_reader.name().toString();
-    return ((p_xml_reader.tokenType() != QXmlStreamReader::Characters) ?
-                ((p_xml_reader.tokenType() == QXmlStreamReader::StartElement) ? QString("<%1>").arg(l_tok_name) :
-                     ((p_xml_reader.tokenType() == QXmlStreamReader::EndElement) ? QString("</%1>").arg(l_tok_name) : l_tok_name)) :
-                M1Store::StorageStatic::maxLengthChop(p_xml_reader.text().toString().trimmed(), 100));
+    QString l_ret;
+
+    if(p_xml_reader.tokenType() == QXmlStreamReader::StartElement){
+        QXmlStreamAttributes attributes = p_xml_reader.attributes();
+        QString l_attr_string;
+        for (const QXmlStreamAttribute &l_attr : attributes) {
+            // Reconstruct the string: name="value"
+            l_attr_string += l_attr.qualifiedName().toString() +
+                          "=\"" +
+                          l_attr.value().toString() +
+                          "\" ";
+        }
+        l_ret = QString("<%1>%2").arg(l_tok_name).arg(l_attr_string.length() > 0 ? " " + l_attr_string : "");
+    }
+    else
+        l_ret = ((p_xml_reader.tokenType() == QXmlStreamReader::Characters) ?
+                    "CHAR: " + M1Store::StorageStatic::maxLengthChop(p_xml_reader.text().toString().trimmed(), 50) :
+                    ((p_xml_reader.tokenType() == QXmlStreamReader::EndElement) ?
+                        QString("</%1>").arg(l_tok_name) :
+                        "Bare Token: " + l_tok_name));
+
+    return l_ret + QString(" [%1]").arg(p_xml_reader.tokenType());
 }
 

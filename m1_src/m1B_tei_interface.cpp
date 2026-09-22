@@ -30,6 +30,9 @@ void M1Store::TEIInterface::loadTeiGeneric(const QString& p_file_path){
 
 /**
  * @brief M1Store::TEIInterface::loadTeiInternal1
+ *
+ * Slokas (BG)
+ *
  * @param p_full_load
  */
 void M1Store::TEIInterface::loadTeiInternal1(const QString& p_file_path, bool p_validate_only){
@@ -609,6 +612,14 @@ void M1Store::TEIInterface::loadTeiInternal1(const QString& p_file_path, bool p_
     if(! l_found_at_least_one_chapter) throw M1Env::M1Exception("No chapters", 1023);
 }
 
+/**
+ * @brief M1Store::TEIInterface::loadTeiInternal
+ *
+ * History textbook
+ *
+ * @param p_file_path
+ * @param p_validate_only
+ */
 void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_validate_only){
     qCDebug(g_cat_tei).noquote() << "loadTeiGeneric() loading file:" << p_file_path;
     QFile l_fin_tei(p_file_path);
@@ -625,6 +636,8 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
     int l_indent_count = 4;
     int l_heading_number = 1;
     int l_hi_number = 1;
+    int l_stanza_number = 1;
+    int l_verse_number = 1;
     cm_cur_paragraph_number = 1;
 
     QString l_hi_rend;
@@ -643,7 +656,6 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
 
     bool l_found_title = false;
     bool l_found_author = false;
-    bool l_in_text = false;
     bool l_in_table = false;
     bool l_picture_path_pending = false;
     // bool l_found_at_least_one_chapter = false;
@@ -654,21 +666,24 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
     // bool l_found_translations = false;
     // bool l_found_commentaries = false;
 
+    // ---- <teiHeader> ----
     while (!l_xml_reader.atEnd()) {
         QXmlStreamReader::TokenType l_tt = l_xml_reader.readNext();
         QStringView l_tok_name = l_xml_reader.name();
-        qCDebug(g_cat_tei).noquote() << cm_indent << "Token Type: " << l_tt << ((l_tt != QXmlStreamReader::Characters) ?
-                                                                                    format_tt_token(l_xml_reader) :
-                                                                                    M1Store::StorageStatic::maxLengthChop(l_xml_reader.text().toString().trimmed(), 60));
+
+        if( !(l_tt == QXmlStreamReader::Characters && l_xml_reader.text().toString().trimmed().length() == 0))
+            qCDebug(g_cat_tei).noquote() << cm_indent << format_tt_token(l_xml_reader);
+
         // text title(s)
-        if(l_picture_path_pending && l_tt == QXmlStreamReader::StartElement && !(l_tok_name == "graphic")) throw M1Env::M1Exception("<figure> not followed by <graphic>", 1000);
-        else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "title"){
+        if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "title"){
             QString l_type = l_xml_reader.attributes().value("type").toString();
 
             QXmlStreamReader::TokenType l_tt_title = l_xml_reader.readNext();
             if(l_tt_title != QXmlStreamReader::Characters) throw M1Env::M1Exception("<title> not followed by Characters", 1000);
             QString l_title_text = l_xml_reader.text().toString().trimmed();
-            qCDebug(g_cat_tei).noquote() << cm_indent << QString("<title type=\"%1\"> [%2]").arg(l_type).arg(l_title_text);
+            qCDebug(g_cat_tei).noquote() << cm_indent << QString("<title type=\"%1\"> [%2]")
+                                                             .arg(l_type)
+                                                             .arg(M1Store::StorageStatic::maxLengthChop(l_title_text, 50));
 
             if(l_type == "main" || l_type == QString("") ){
                 l_title = l_title_text;
@@ -693,7 +708,9 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
             while (!l_xml_reader.atEnd()) {
                 QXmlStreamReader::TokenType l_tt = l_xml_reader.readNext();
                 QStringView l_tok_name = l_xml_reader.name();
-                qCDebug(g_cat_tei).noquote() << cm_indent << "Token Type: " << l_tt << l_xml_reader.name();
+
+                if( !(l_tt == QXmlStreamReader::Characters && l_xml_reader.text().toString().trimmed().length() == 0))
+                    qCDebug(g_cat_tei).noquote() << cm_indent << "Inner" << format_tt_token(l_xml_reader);
 
                 if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "persName"){
                     QXmlStreamReader::TokenType l_tt_name = l_xml_reader.readNext();
@@ -712,10 +729,11 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
                     qCDebug(g_cat_tei).noquote() << cm_indent << QString("<persName> author : %1 Role : %2").arg(l_author_name).arg(l_author_role);
                 }
                 else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "author"){
-                    qCDebug(g_cat_tei).noquote() << cm_indent << QString("<author/> %1 (%2) [%3] author: %4")
-                    .arg(l_title)
-                        .arg(l_alt_title)
-                        .arg(l_sub_title)
+                    cm_indent.chop(l_indent_count);
+                    qCDebug(g_cat_tei).noquote() << cm_indent << QString("<author/> %1%2%3 author: %4")
+                        .arg(M1Store::StorageStatic::maxLengthChop(l_title, 40))
+                        .arg(l_alt_title.length() > 0 ? " (" + l_alt_title + ")" : "")
+                        .arg(l_sub_title.length() > 0 ? " [" + l_sub_title + "]" : "")
                         .arg(l_author_main);
                     break; // from <author> inner while
                 }
@@ -723,16 +741,26 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
         }
         // end of TEI header
         else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "teiHeader"){
-            qCDebug(g_cat_tei).noquote() << cm_indent << QString("<teiHeader/> %1 (%2) [%3] author: %4")
-                .arg(l_title)
-                .arg(l_alt_title)
-                .arg(l_sub_title)
+            qCDebug(g_cat_tei).noquote() << cm_indent << QString("<teiHeader/> %1%2%3 author: %4")
+                .arg(M1Store::StorageStatic::maxLengthChop(l_title, 30))
+                .arg(l_alt_title.length() > 0 ? " (" + l_alt_title + ")" : "")
+                .arg(l_sub_title.length() > 0 ? " [" + l_sub_title + "]" : "")
                 .arg(l_author_main);
 
             // + m_author_list as built above
             create_text(l_title, l_alt_title, l_sub_title, l_author_main);
-            l_in_text = true;
+            break; // from <teiHeader> loop
         }
+    }
+
+    // ---- <text> ----
+    while (!l_xml_reader.atEnd()) {
+        QXmlStreamReader::TokenType l_tt = l_xml_reader.readNext();
+        QStringView l_tok_name = l_xml_reader.name();
+
+        if( !(l_tt == QXmlStreamReader::Characters && l_xml_reader.text().toString().trimmed().length() == 0))
+            qCDebug(g_cat_tei).noquote() << cm_indent << format_tt_token(l_xml_reader);
+
         // if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "title"){
         //     QString l_type = l_xml_reader.attributes().value("type").toString();
         //     QXmlStreamReader::TokenType l_tt_interp = l_xml_reader.readNext();
@@ -740,6 +768,21 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
         //     QString l_title = l_xml_reader.text().toString().trimmed();
         //     qCDebug(g_cat_tei).noquote() << cm_indent + QString(" ").repeated(l_indent_count) << QString("<name type=%1>%2").arg(l_type).arg(l_title);
         // } figure
+        if(l_picture_path_pending && l_tt == QXmlStreamReader::StartElement && !(l_tok_name == "graphic")) throw M1Env::M1Exception("<figure> not followed by <graphic>", 1000);
+        else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "div"){
+            QString l_type = l_xml_reader.attributes().value("type").toString();
+            QString l_div_n = l_xml_reader.attributes().value("n").toString();
+
+            cm_tei_elements_stack.push(TEIStackLevel(TEIEntityType::Div, create_div(l_type, l_div_n)));
+
+            qCDebug(g_cat_tei).noquote() << cm_indent << QString("<div type=%1 n=%2> start").arg(l_type).arg(l_div_n);
+            cm_indent += QString(" ").repeated(l_indent_count);
+        }
+        else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "div"){
+            cm_tei_elements_stack.pop();
+
+            cm_indent.chop(l_indent_count);
+        }
         else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "list"){
             QString l_type = l_xml_reader.attributes().value("type").toString();
             cm_tei_elements_stack.push(TEIStackLevel(TEIEntityType::Table, create_list(l_type)));
@@ -787,44 +830,42 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
             cm_tei_elements_stack.pop();
             cm_indent.chop(l_indent_count);
         }
-        else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "div"){
-            QString l_type = l_xml_reader.attributes().value("type").toString();
-            QString l_div_n = l_xml_reader.attributes().value("n").toString();
-
-            cm_tei_elements_stack.push(TEIStackLevel(TEIEntityType::Div, create_div(l_type, l_div_n)));
-
-            qCDebug(g_cat_tei).noquote() << cm_indent << QString("<div type=%1 n=%2> start").arg(l_type).arg(l_div_n);
-            cm_indent += QString(" ").repeated(l_indent_count);
-        }
-        else if(l_tt == QXmlStreamReader::EndElement && l_tok_name == "div"){
-            cm_tei_elements_stack.pop();
-
-            cm_indent.chop(l_indent_count);
-        }
         else if(!l_in_table && l_tt == QXmlStreamReader::StartElement && l_tok_name == "head"){
             QString l_type = l_xml_reader.attributes().value("type").toString();
             cm_tei_elements_stack.push(TEIStackLevel(TEIEntityType::ChunkHeading, create_chunk(QString("Heading %1").arg(l_heading_number++), "head", l_type)));
             qCDebug(g_cat_tei).noquote() << cm_indent << QString("<head type=%1> start").arg(l_type);
             cm_indent += QString(" ").repeated(l_indent_count);
         }
-        else if(!l_in_table && l_tt == QXmlStreamReader::EndElement && l_tok_name == "head"){
+        else if(!l_in_table && l_tt == QXmlStreamReader::StartElement && l_tok_name == "lg"){
+            QString l_type = l_xml_reader.attributes().value("type").toString();
+            cm_tei_elements_stack.push(TEIStackLevel(TEIEntityType::ChunkStanza, create_chunk(QString("Stanza %1").arg(l_stanza_number++), "lg", l_type)));
+            qCDebug(g_cat_tei).noquote() << cm_indent << QString("<lg type=%1> start").arg(l_type);
+            cm_indent += QString(" ").repeated(l_indent_count);
+        }
+        else if(!l_in_table && l_tt == QXmlStreamReader::StartElement && l_tok_name == "l"){
+            QString l_type = l_xml_reader.attributes().value("type").toString();
+            cm_tei_elements_stack.push(TEIStackLevel(TEIEntityType::ChunkVerse, create_chunk(QString("Verse %1").arg(l_verse_number++), "l", l_type)));
+            qCDebug(g_cat_tei).noquote() << cm_indent << QString("<l type=%1> start").arg(l_type);
+            cm_indent += QString(" ").repeated(l_indent_count);
+        }
+        else if(!l_in_table && l_tt == QXmlStreamReader::EndElement && (l_tok_name == "l" || l_tok_name == "lg" || l_tok_name == "head")){
             cm_tei_elements_stack.pop();
 
             cm_indent.chop(l_indent_count);
         }
-        else if(!l_in_table && l_in_text && l_tt == QXmlStreamReader::StartElement && l_tok_name == "quote"){
+        else if(!l_in_table && l_tt == QXmlStreamReader::StartElement && l_tok_name == "quote"){
             cm_tei_elements_stack.push(TEIStackLevel(TEIEntityType::Paragraph, create_paragraph_quote(true)));
 
             qCDebug(g_cat_tei).noquote() << cm_indent << "<quote> start";
             cm_indent += QString(" ").repeated(l_indent_count);
         }
-        else if(!l_in_table && l_in_text && l_tt == QXmlStreamReader::StartElement && l_tok_name == "p"){
+        else if(!l_in_table && l_tt == QXmlStreamReader::StartElement && l_tok_name == "p"){
             cm_tei_elements_stack.push(TEIStackLevel(TEIEntityType::Paragraph, create_paragraph_quote()));
 
             qCDebug(g_cat_tei).noquote() << cm_indent << "<p> start";
             cm_indent += QString(" ").repeated(l_indent_count);
         }
-        else if(!l_in_table && l_in_text && l_tt == QXmlStreamReader::EndElement && (l_tok_name == "p" || l_tok_name == "quote")){
+        else if(!l_in_table && l_tt == QXmlStreamReader::EndElement && (l_tok_name == "p" || l_tok_name == "quote")){
             cm_tei_elements_stack.pop();
             cm_indent.chop(l_indent_count);
         }
@@ -875,7 +916,7 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
             cm_tei_elements_stack.pop();
             cm_indent.chop(l_indent_count);
         }
-        else if(l_in_text && l_tt == QXmlStreamReader::Characters){
+        else if(l_tt == QXmlStreamReader::Characters){
             QString l_text = l_xml_reader.text().toString().trimmed();
             if(l_text.length() > 0){
                 create_chunk(l_text, "Characters");

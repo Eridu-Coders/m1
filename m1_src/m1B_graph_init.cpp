@@ -134,9 +134,9 @@ M1Env::SpecialItemID M1Env::TEXT_TABLE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_ROW_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_CELL_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_FIGURE_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::TEXT_QUOTE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_LIST_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_ITEM_SIID = G_NONEX_SI_ID;
-M1Env::SpecialItemID M1Env::TEXT_QUOTE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_BOOK_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_CHAPTER_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_SENTENCE_SIID = G_NONEX_SI_ID;
@@ -347,9 +347,9 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::TEXT_ROW_SIID = M1Store::StorageStatic::getSpecialID("TXTRW");
     M1Env::TEXT_CELL_SIID = M1Store::StorageStatic::getSpecialID("TXTCL");
     M1Env::TEXT_FIGURE_SIID = M1Store::StorageStatic::getSpecialID("TXFIG");
-    M1Env::TEXT_LIST_SIID = M1Store::StorageStatic::getSpecialID("TXQTE");
-    M1Env::TEXT_ITEM_SIID = M1Store::StorageStatic::getSpecialID("TXLST");
-    M1Env::TEXT_QUOTE_SIID = M1Store::StorageStatic::getSpecialID("TXITM");
+    M1Env::TEXT_QUOTE_SIID = M1Store::StorageStatic::getSpecialID("TXQTE");
+    M1Env::TEXT_LIST_SIID = M1Store::StorageStatic::getSpecialID("TXLST");
+    M1Env::TEXT_ITEM_SIID = M1Store::StorageStatic::getSpecialID("TXITM");
     M1Env::TEXT_BOOK_SIID = M1Store::StorageStatic::getSpecialID("TXTBK");
     M1Env::TEXT_CHAPTER_SIID = M1Store::StorageStatic::getSpecialID("TXTCH");
     M1Env::TEXT_SENTENCE_SIID = M1Store::StorageStatic::getSpecialID("TXSNT");
@@ -1179,7 +1179,7 @@ void M1Env::GraphInit::init_base(){
         // mnemonic
         "TXQTE",
         // icon path
-        M1Env::TEXT_LIST_ICON_PATH);
+        M1Env::HL_QUOTE_ICON_PATH);
     l_txqte->setType("TYPE_");
 
     // creation of "TEI <list> (type)"
@@ -1194,7 +1194,7 @@ void M1Env::GraphInit::init_base(){
         // mnemonic
         "TXLST",
         // icon path
-        M1Env::TEXT_ITEM_ICON_PATH);
+        M1Env::TEXT_LIST_ICON_PATH);
     l_txlst->setType("TYPE_");
 
     // creation of "TEI <item> (type)"
@@ -1209,7 +1209,7 @@ void M1Env::GraphInit::init_base(){
         // mnemonic
         "TXITM",
         // icon path
-        M1Env::HL_QUOTE_ICON_PATH);
+        M1Env::TEXT_ITEM_ICON_PATH);
     l_txitm->setType("TYPE_");
 
     // creation of "Book (type)"

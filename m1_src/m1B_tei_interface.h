@@ -28,6 +28,8 @@ enum class TEIEntityType{
     ChunkTerm,
     ChunkHeading,
     ChunkNote,
+    ChunkStanza,
+    ChunkVerse,
     Table
 };
 

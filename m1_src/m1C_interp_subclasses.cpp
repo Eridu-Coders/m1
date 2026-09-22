@@ -1107,7 +1107,7 @@ M1MidPlane::TEI_DivInterp* M1MidPlane::TEI_DivInterp::getOneIfMatch(M1Store::Ite
 M1MidPlane::TEI_DivInterp::TEI_DivInterp(M1Store::Item_lv2* p_myself) : M1MidPlane::TEI_Container::TEI_Container(p_myself){}
 
 QString M1MidPlane::TEI_DivInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
-    return QString("%1: %2")
+    return QString("<div> %1: %2")
         .arg(m_myself->text())
         .arg(M1Store::StorageStatic::maxLengthChop(TEI_Container::get_heading().replace(g_re_html_tags, "").replace(g_re_space, " "), 50));
 }
@@ -1174,12 +1174,18 @@ M1MidPlane::TEI_ChunkInterp::TEI_ChunkInterp(M1Store::Item_lv2* p_myself) : M1Mi
 
 QString M1MidPlane::TEI_ChunkInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
     QString l_base_text = M1Store::StorageStatic::maxLengthChop(baseText().replace(g_re_html_tags, "").replace(g_re_space, " "), 50);
-    if(m_chunk_tag == "name") return QString("<name> %1").arg(l_base_text);
-    if(m_chunk_tag == "head") return QString("<head> %1").arg(l_base_text);
-    if(m_chunk_tag == "hi") return QString("<hi> %1").arg(l_base_text);
-    if(m_chunk_tag == "term") return QString("<term> %1").arg(l_base_text);
-    if(m_chunk_tag == "note") return QString("<note> %1").arg(l_base_text);
-    return l_base_text;
+    QString l_ret;
+
+    if(m_chunk_tag == "name") l_ret = QString("<name> %1").arg(l_base_text);
+    else if(m_chunk_tag == "head") l_ret = QString("<head> %1").arg(l_base_text);
+    else if(m_chunk_tag == "hi") l_ret = QString("<hi> %1").arg(l_base_text);
+    else if(m_chunk_tag == "term") l_ret = QString("<term> %1").arg(l_base_text);
+    else if(m_chunk_tag == "note") l_ret = QString("<note> %1").arg(l_base_text);
+    else if(m_chunk_tag == "lg") l_ret = QString("<lg> %1").arg(l_base_text);
+    else if(m_chunk_tag == "l") l_ret = QString("<l> %1").arg(l_base_text);
+    else l_ret =  l_base_text;
+
+    return l_ret.replace(g_re_space, " ");
 }
 QString M1MidPlane::TEI_ChunkInterp::getHtmlVirtual(){
     return baseText();
@@ -1187,7 +1193,8 @@ QString M1MidPlane::TEI_ChunkInterp::getHtmlVirtual(){
 
 QString M1MidPlane::TEI_ChunkInterp::baseText(){
     if(m_chunk_tag == "Characters") return m_myself->text();
-    if(m_chunk_tag == "name" || m_chunk_tag == "term") return QString("<span style=\"background-color: #ddd;\">%1</span>").arg(m_myself->text());
+    if(m_chunk_tag == "name" ) return QString("<span style=\"background-color: #fdd;\">%1</span>").arg(m_myself->text());
+    if(m_chunk_tag == "term" ) return QString("<span style=\"background-color: #ddf;\">%1</span>").arg(m_myself->text());
     if(m_chunk_tag == "hi") return QString("<%1>%3</%1>").arg(m_myself->getField(M1Env::TEI_REND_ATTR_SIID) == "bold" ? "b" : "i").arg(TEI_Container::baseText());
     if(m_chunk_tag == "note"){
         QString l_note_n = m_myself->getField(M1Store::TEI_N_ATTR_SIID);
@@ -1198,6 +1205,8 @@ QString M1MidPlane::TEI_ChunkInterp::baseText(){
             QString("        </span>\n") + \
             QString("    </span>\n");
     }
+    if(m_chunk_tag == "l") return TEI_Container::baseText() + "<br/>\n";
+    if(m_chunk_tag == "lg") return QString("<div style=\"padding-left: 2em; font-style: italic; margin-bottom: 1em;\">\n%1</div>\n").arg(TEI_Container::baseText());
     else return TEI_Container::baseText();
 }
 
