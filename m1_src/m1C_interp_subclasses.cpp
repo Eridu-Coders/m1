@@ -1056,36 +1056,26 @@ QString M1MidPlane::TEI_Container::baseText(){
             return m_myself->text();
     }
 
-    QStringList l_chunk_strings;
+    // chunks are joined using their own PCTLF (leading space) and PCTRT (trailing punctuation,
+    // glued to this chunk from what follows it in the source) fields instead of a plain space,
+    // so the original TEI spacing/punctuation is reproduced -- see TEIInterface::create_chunk()
+    // and the Characters-run handling in loadTeiInternal()
+    QString l_ret;
+    bool l_first = true;
     for(const auto& l_cur_chunk: m_descendant_list){
         QString l_base_text = l_cur_chunk->baseText();
-        // if(l_base_text.contains("✹")){ // For text highlights
-        //     QStringList l_ver_chunks;
-        //     QString l_ground_text;
-        //     for(const QString& l_version_text : l_base_text.split("✹")){
-        //         QString l_bt_bare = l_version_text;
-        //         l_bt_bare.replace(g_re_html_tags, "");
-        //         QString l_version;
-        //         QString l_text;
-        //         if(g_re_extract_vt.match(l_bt_bare).hasMatch()){
-        //             l_version = g_re_extract_vt.match(l_bt_bare).captured(1);
-        //             l_text = g_re_extract_vt.match(l_bt_bare).captured(2);
-        //         }
-        //         if(l_version == "Greek")
-        //             l_ground_text = QString("<span style=\"font-style: italic;\">%1</span>").arg(l_text);
-        //         else
-        //             l_ver_chunks.append(QString("[%1] %2").arg(l_version).arg(l_text));
-        //     }
-        //     l_chunk_strings.append(
-        //         QString("<span class=\"tooltip\" style=\"font-style: italic; font-family: 'Noto Serif', 'Times New Roman', serif;\">%1").arg(l_ground_text) +
-        //         QString("<span class=\"tooltiptext\" style=\"font-style: italic; font-family: 'Noto Sans', 'Arial', sans-serif;\">%1</span>").arg(l_ver_chunks.join(" / ")) + "</span>");
-        // }
-        // else // ordinary chunks and paragraphs
-            l_chunk_strings.append(QString("%1").arg(l_base_text.replace(g_re_no_base, "")));
+        // trimmed: a chunk's own rendered HTML (e.g. the indented <span> block built for
+        // "note") may carry incidental leading/trailing whitespace that is not part of its
+        // content; only PCTLF/PCTRT are allowed to introduce separators between chunks
+        l_base_text = QString("%1").arg(l_base_text.replace(g_re_no_base, "")).trimmed();
+
+        if(!l_first) l_ret += l_cur_chunk->myself()->getField(M1Env::PCTLF_SIID);
+        l_ret += l_base_text;
+        l_ret += l_cur_chunk->myself()->getField(M1Env::PCTRT_SIID);
+        l_first = false;
     }
 
-    // return QString("m_descendant_list: %1").arg(m_descendant_list.size()) + l_chunk_strings.join(" ");
-    return l_chunk_strings.join(" ");
+    return l_ret;
 }
 
 /** --------------------------------------------------------------- TEI_DivInterp ---------------------------------
@@ -1180,10 +1170,16 @@ QString M1MidPlane::TEI_ChunkInterp::inTreeDisplayText(const M1Store::Item_lv2* 
     else if(m_chunk_tag == "head") l_ret = QString("<head> %1").arg(l_base_text);
     else if(m_chunk_tag == "hi") l_ret = QString("<hi> %1").arg(l_base_text);
     else if(m_chunk_tag == "term") l_ret = QString("<term> %1").arg(l_base_text);
+    else if(m_chunk_tag == "title") l_ret = QString("<title> %1").arg(l_base_text);
+    else if(m_chunk_tag == "q") l_ret = QString("<q> %1").arg(l_base_text);
+    else if(m_chunk_tag == "cit" || m_chunk_tag == "bibl" || m_chunk_tag == "author" || m_chunk_tag == "publisher" ||
+             m_chunk_tag == "date" || m_chunk_tag == "pubPlace" || m_chunk_tag == "citedRange" ||
+             m_chunk_tag == "biblScope" || m_chunk_tag == "ref")
+        l_ret = QString("<%1> %2").arg(m_chunk_tag).arg(l_base_text);
     else if(m_chunk_tag == "note") l_ret = QString("<note> %1").arg(l_base_text);
     else if(m_chunk_tag == "lg") l_ret = QString("<lg> %1").arg(l_base_text);
     else if(m_chunk_tag == "l") l_ret = QString("<l> %1").arg(l_base_text);
-    else l_ret =  l_base_text;
+    else l_ret = l_base_text;
 
     return l_ret.replace(g_re_space, " ");
 }
@@ -1193,8 +1189,26 @@ QString M1MidPlane::TEI_ChunkInterp::getHtmlVirtual(){
 
 QString M1MidPlane::TEI_ChunkInterp::baseText(){
     if(m_chunk_tag == "Characters") return m_myself->text();
-    if(m_chunk_tag == "name" ) return QString("<span style=\"background-color: #fdd;\">%1</span>").arg(m_myself->text());
-    if(m_chunk_tag == "term" ) return QString("<span style=\"background-color: #ddf;\">%1</span>").arg(m_myself->text());
+    // <name>/<term>/<title> are containers: their text is in their sub-chunks (their own label is
+    // "[tag] joined text"). TEI_Container::baseText() falls back on the label when there are no
+    // sub-chunks, which keeps texts imported before they became containers displaying correctly
+    if(m_chunk_tag == "name" ) return QString("<span style=\"background-color: #fdd;\">%1</span>").arg(TEI_Container::baseText());
+    if(m_chunk_tag == "term" ) return QString("<span style=\"background-color: #ddf;\">%1</span>").arg(TEI_Container::baseText());
+    if(m_chunk_tag == "title") return QString("<i>%1</i>").arg(TEI_Container::baseText());
+    // <q>: the quotation marks are not in the source text --> added here
+    if(m_chunk_tag == "q"){
+        QString l_quoted = QString("“%1”").arg(TEI_Container::baseText());
+        return m_myself->getField(M1Env::TEI_REND_ATTR_SIID) == "italic" ? QString("<i>%1</i>").arg(l_quoted) : l_quoted;
+    }
+    // <cit>: block made of the <quote> (rendered as an indented paragraph) followed by its <bibl>
+    if(m_chunk_tag == "cit") return QString("<div style=\"margin-bottom: 1em;\">\n%1</div>\n").arg(TEI_Container::baseText());
+    // <ref target="...">: link. <bibl> and the other bibliographic components (<author>, <date>, <publisher>,
+    // <pubPlace>, <citedRange>, <biblScope>) are rendered as plain text by the final else below
+    // (TEI_Container::baseText() returns the label of a child-less chunk)
+    if(m_chunk_tag == "ref"){
+        QString l_target = m_myself->getField(M1Env::TEI_TARGET_ATTR_SIID);
+        return l_target.length() > 0 ? QString("<a href=\"%1\">%2</a>").arg(l_target.toHtmlEscaped()).arg(m_myself->text()) : m_myself->text();
+    }
     if(m_chunk_tag == "hi") return QString("<%1>%3</%1>").arg(m_myself->getField(M1Env::TEI_REND_ATTR_SIID) == "bold" ? "b" : "i").arg(TEI_Container::baseText());
     if(m_chunk_tag == "note"){
         QString l_note_n = m_myself->getField(M1Store::TEI_N_ATTR_SIID);

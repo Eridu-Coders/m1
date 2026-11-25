@@ -79,6 +79,18 @@ extern M1Env::SpecialItemID TEI_N_ATTR_SIID;
 extern M1Env::SpecialItemID TEI_REND_ATTR_SIID;
 // [TEPCL] Special Vertex ID (Simple Edge type) TEI @place attribute (for <note>)
 extern M1Env::SpecialItemID TEI_PLACE_ATTR_SIID;
+// [TELNG] Special Vertex ID (Simple Edge type) TEI @xml:lang attribute
+extern M1Env::SpecialItemID TEI_LANG_ATTR_SIID;
+// [TEWHN] Special Vertex ID (Simple Edge type) TEI @when attribute (for <date>)
+extern M1Env::SpecialItemID TEI_WHEN_ATTR_SIID;
+// [TEUNT] Special Vertex ID (Simple Edge type) TEI @unit attribute (for <citedRange>, <biblScope>)
+extern M1Env::SpecialItemID TEI_UNIT_ATTR_SIID;
+// [TETGT] Special Vertex ID (Simple Edge type) TEI @target attribute (for <ref>)
+extern M1Env::SpecialItemID TEI_TARGET_ATTR_SIID;
+// [TEREF] Special Vertex ID (Simple Edge type) TEI @ref attribute (for <author>, <name>, <term>)
+extern M1Env::SpecialItemID TEI_REF_ATTR_SIID;
+// [TELVL] Special Vertex ID (Simple Edge type) TEI @level attribute (for <title>)
+extern M1Env::SpecialItemID TEI_LEVEL_ATTR_SIID;
 // [TETAG] Special Vertex ID (Simple Edge type) TEI tag name (for mult-tag nodes like TXTCK)
 extern M1Env::SpecialItemID TEI_TAG_NAME_SIID;
 // [TETBR] Special Vertex ID (Simple Edge type) TEI table row count

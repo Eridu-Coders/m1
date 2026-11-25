@@ -26,6 +26,10 @@ enum class TEIEntityType{
     ChunkName,
     ChunkHi,
     ChunkTerm,
+    ChunkTitle,
+    ChunkQ,
+    ChunkCit,
+    ChunkBibl,
     ChunkHeading,
     ChunkNote,
     ChunkStanza,
@@ -94,10 +98,36 @@ class TEIStackLevel{
 private:
     TEIEntityType m_type;
     M1Store::Item_lv2* m_item;
+    // last chunk created directly under this container so far, used to know
+    // whether the next chunk is the container's first child (--> no leading
+    // space) and, for punctuation glued to a following Characters run, which
+    // chunk the PCTRT field must be attached to. nullptr until the first child.
+    M1Store::Item_lv2* m_last_child = nullptr;
+    // plain text of all the Characters runs found inside this element (including
+    // inside its sub-elements, when these propagate it upwards on closing). Used to
+    // build the label of containers whose text is only known once they are closed
+    // (<name>, <term>, <title>)
+    QString m_joined_text;
+    // true when the source has whitespace between the end of the last child created in this
+    // container and the point currently reached --> the next chunk gets a leading space (PCTLF)
+    bool m_space_pending = false;
 public:
+    bool spacePending() const {return m_space_pending;}
+    void setSpacePending(bool p_pending){m_space_pending = p_pending;}
     TEIStackLevel(TEIEntityType p_type, M1Store::Item_lv2* p_item){m_type = p_type; m_item = p_item;}
     TEIEntityType type(){return m_type;}
     M1Store::Item_lv2* item(){return m_item;}
+    M1Store::Item_lv2* lastChild(){return m_last_child;}
+    void setLastChild(M1Store::Item_lv2* p_child){m_last_child = p_child;}
+    const QString& joinedText() const {return m_joined_text;}
+    // pieces are separated by a single space, except when the new piece begins with
+    // punctuation that is glued to what precedes it (". , ; : ! ? ) ] }" etc.)
+    void appendText(const QString& p_text){
+        static const QString l_glued_punct = QStringLiteral(".,;:!?)]}»›’”");
+        if(p_text.isEmpty()) return;
+        if(!m_joined_text.isEmpty() && !l_glued_punct.contains(p_text.at(0))) m_joined_text += " ";
+        m_joined_text += p_text;
+    }
 };
 
 class TEIInterface{
@@ -172,7 +202,8 @@ private:
         const QString& p_attr_n=QString(),
         const QString& p_note_place=QString(),
         const QString& p_hi_rend=QString(),
-        const QString& p_xml_id=QString()
+        const QString& p_xml_id=QString(),
+        const QString& p_xml_lang=QString()
     );
     static M1Store::Item_lv2* create_table(
         const int p_rows,

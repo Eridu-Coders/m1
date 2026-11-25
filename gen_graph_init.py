@@ -437,6 +437,12 @@ g_special_vertices = [
     ['TEINA', 'SI_IS_TYPE',                                None,                        'TEI_N_ATTR_SIID', None,            'Special Vertex ID (Simple Edge type) TEI @n attribute'],
     ['TERND', 'SI_IS_TYPE',                                None,                        'TEI_REND_ATTR_SIID', None,         'Special Vertex ID (Simple Edge type) TEI @rend attribute (for <hi>)'],
     ['TEPCL', 'SI_IS_TYPE',                                None,                        'TEI_PLACE_ATTR_SIID', None,        'Special Vertex ID (Simple Edge type) TEI @place attribute (for <note>)'],
+    ['TELNG', 'SI_IS_TYPE',                                None,                        'TEI_LANG_ATTR_SIID', None,         'Special Vertex ID (Simple Edge type) TEI @xml:lang attribute'],
+    ['TEWHN', 'SI_IS_TYPE',                                None,                        'TEI_WHEN_ATTR_SIID', None,         'Special Vertex ID (Simple Edge type) TEI @when attribute (for <date>)'],
+    ['TEUNT', 'SI_IS_TYPE',                                None,                        'TEI_UNIT_ATTR_SIID', None,         'Special Vertex ID (Simple Edge type) TEI @unit attribute (for <citedRange>, <biblScope>)'],
+    ['TETGT', 'SI_IS_TYPE',                                None,                        'TEI_TARGET_ATTR_SIID', None,       'Special Vertex ID (Simple Edge type) TEI @target attribute (for <ref>)'],
+    ['TEREF', 'SI_IS_TYPE',                                None,                        'TEI_REF_ATTR_SIID', None,          'Special Vertex ID (Simple Edge type) TEI @ref attribute (for <author>, <name>, <term>)'],
+    ['TELVL', 'SI_IS_TYPE',                                None,                        'TEI_LEVEL_ATTR_SIID', None,        'Special Vertex ID (Simple Edge type) TEI @level attribute (for <title>)'],
     ['TETAG', 'SI_IS_TYPE',                                None,                        'TEI_TAG_NAME_SIID', None,          'Special Vertex ID (Simple Edge type) TEI tag name (for mult-tag nodes like TXTCK)'],
     ['TETBR', 'SI_IS_TYPE',                                None,                        'TEI_TABLE_ROWS_SIID', None,        'Special Vertex ID (Simple Edge type) TEI table row count'],
     ['TETBC', 'SI_IS_TYPE',                                None,                        'TEI_TABLE_COLS_SIID', None,        'Special Vertex ID (Simple Edge type) TEI table column count'],
@@ -455,7 +461,7 @@ g_special_vertices = [
 g_vertices = [
 # 0123456789012345678901234567890
 # |---------|---------|---------|---------|---------|---------|               |---------|---------|---------| |---------|---------|---------|      |---------|---------|---------|
-# l_label,                       l_vertex_flag_list,              l_type_list, l_edges               l_mnemo, l_si_flag_list,                      l_icon_path,              l_pseudo_constant
+# l_label,                       l_vertex_flag_list,              l_type_list,l_edges                l_mnemo, l_si_flag_list,                      l_icon_path,              l_pseudo_constant
 ['Global graph root',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['FOLDR'],  None,                  'ROOT_', '0',                                 None,                     'ROOT_SIID'],
 ['Home',                         ['FULL_VERTEX',  'IS_SPECIAL'],  ['FOLDR'],  [('BLNGS',  'ROOT_')], 'HOME_', '0',                                 None,                     'HOME_SIID'],
 ['Root of all types',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'ROOT_')], 'TYPE_', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'TYPE_NODE_ICON_PATH',    'TYPE_NODE_SIID'],

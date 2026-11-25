@@ -79,6 +79,18 @@ M1Env::SpecialItemID M1Env::TEI_N_ATTR_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEI_REND_ATTR_SIID = G_NONEX_SI_ID;
 // [TEPCL] Special Vertex ID (Simple Edge type) TEI @place attribute (for <note>)
 M1Env::SpecialItemID M1Env::TEI_PLACE_ATTR_SIID = G_NONEX_SI_ID;
+// [TELNG] Special Vertex ID (Simple Edge type) TEI @xml:lang attribute
+M1Env::SpecialItemID M1Env::TEI_LANG_ATTR_SIID = G_NONEX_SI_ID;
+// [TEWHN] Special Vertex ID (Simple Edge type) TEI @when attribute (for <date>)
+M1Env::SpecialItemID M1Env::TEI_WHEN_ATTR_SIID = G_NONEX_SI_ID;
+// [TEUNT] Special Vertex ID (Simple Edge type) TEI @unit attribute (for <citedRange>, <biblScope>)
+M1Env::SpecialItemID M1Env::TEI_UNIT_ATTR_SIID = G_NONEX_SI_ID;
+// [TETGT] Special Vertex ID (Simple Edge type) TEI @target attribute (for <ref>)
+M1Env::SpecialItemID M1Env::TEI_TARGET_ATTR_SIID = G_NONEX_SI_ID;
+// [TEREF] Special Vertex ID (Simple Edge type) TEI @ref attribute (for <author>, <name>, <term>)
+M1Env::SpecialItemID M1Env::TEI_REF_ATTR_SIID = G_NONEX_SI_ID;
+// [TELVL] Special Vertex ID (Simple Edge type) TEI @level attribute (for <title>)
+M1Env::SpecialItemID M1Env::TEI_LEVEL_ATTR_SIID = G_NONEX_SI_ID;
 // [TETAG] Special Vertex ID (Simple Edge type) TEI tag name (for mult-tag nodes like TXTCK)
 M1Env::SpecialItemID M1Env::TEI_TAG_NAME_SIID = G_NONEX_SI_ID;
 // [TETBR] Special Vertex ID (Simple Edge type) TEI table row count
@@ -304,6 +316,12 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::TEI_N_ATTR_SIID = M1Store::StorageStatic::getSpecialID("TEINA");
     M1Env::TEI_REND_ATTR_SIID = M1Store::StorageStatic::getSpecialID("TERND");
     M1Env::TEI_PLACE_ATTR_SIID = M1Store::StorageStatic::getSpecialID("TEPCL");
+    M1Env::TEI_LANG_ATTR_SIID = M1Store::StorageStatic::getSpecialID("TELNG");
+    M1Env::TEI_WHEN_ATTR_SIID = M1Store::StorageStatic::getSpecialID("TEWHN");
+    M1Env::TEI_UNIT_ATTR_SIID = M1Store::StorageStatic::getSpecialID("TEUNT");
+    M1Env::TEI_TARGET_ATTR_SIID = M1Store::StorageStatic::getSpecialID("TETGT");
+    M1Env::TEI_REF_ATTR_SIID = M1Store::StorageStatic::getSpecialID("TEREF");
+    M1Env::TEI_LEVEL_ATTR_SIID = M1Store::StorageStatic::getSpecialID("TELVL");
     M1Env::TEI_TAG_NAME_SIID = M1Store::StorageStatic::getSpecialID("TETAG");
     M1Env::TEI_TABLE_ROWS_SIID = M1Store::StorageStatic::getSpecialID("TETBR");
     M1Env::TEI_TABLE_COLS_SIID = M1Store::StorageStatic::getSpecialID("TETBC");
@@ -547,6 +565,12 @@ void M1Env::GraphInit::dbg_dump_pseudo_constants(){
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_N_ATTR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TEINA"), 4, 16, QChar('0')).arg("TEINA");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_REND_ATTR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TERND"), 4, 16, QChar('0')).arg("TERND");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_PLACE_ATTR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TEPCL"), 4, 16, QChar('0')).arg("TEPCL");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_LANG_ATTR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TELNG"), 4, 16, QChar('0')).arg("TELNG");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_WHEN_ATTR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TEWHN"), 4, 16, QChar('0')).arg("TEWHN");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_UNIT_ATTR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TEUNT"), 4, 16, QChar('0')).arg("TEUNT");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_TARGET_ATTR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TETGT"), 4, 16, QChar('0')).arg("TETGT");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_REF_ATTR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TEREF"), 4, 16, QChar('0')).arg("TEREF");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_LEVEL_ATTR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TELVL"), 4, 16, QChar('0')).arg("TELVL");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_TAG_NAME_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TETAG"), 4, 16, QChar('0')).arg("TETAG");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_TABLE_ROWS_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TETBR"), 4, 16, QChar('0')).arg("TETBR");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_TABLE_COLS_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TETBC"), 4, 16, QChar('0')).arg("TETBC");
@@ -639,6 +663,18 @@ void M1Env::GraphInit::init_base(){
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TERND", nullptr);
     // Special Vertex ID (Simple Edge type) TEI @place attribute (for <note>)
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TEPCL", nullptr);
+    // Special Vertex ID (Simple Edge type) TEI @xml:lang attribute
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TELNG", nullptr);
+    // Special Vertex ID (Simple Edge type) TEI @when attribute (for <date>)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TEWHN", nullptr);
+    // Special Vertex ID (Simple Edge type) TEI @unit attribute (for <citedRange>, <biblScope>)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TEUNT", nullptr);
+    // Special Vertex ID (Simple Edge type) TEI @target attribute (for <ref>)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TETGT", nullptr);
+    // Special Vertex ID (Simple Edge type) TEI @ref attribute (for <author>, <name>, <term>)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TEREF", nullptr);
+    // Special Vertex ID (Simple Edge type) TEI @level attribute (for <title>)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TELVL", nullptr);
     // Special Vertex ID (Simple Edge type) TEI tag name (for mult-tag nodes like TXTCK)
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TETAG", nullptr);
     // Special Vertex ID (Simple Edge type) TEI table row count

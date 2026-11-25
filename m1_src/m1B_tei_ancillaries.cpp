@@ -164,7 +164,8 @@ M1Store::Item_lv2* M1Store::TEIInterface::create_chunk(
     const QString& p_attr_n,
     const QString& p_note_place,
     const QString& p_hi_rend,
-    const QString& p_xml_id
+    const QString& p_xml_id,
+    const QString& p_xml_lang
 ){
     M1Store::Item_lv2* l_new_chunk = M1Store::Item_lv2::getNew(
         // vertex flags
@@ -180,8 +181,21 @@ M1Store::Item_lv2* M1Store::TEIInterface::create_chunk(
     if(p_xml_id.length() > 0) l_new_chunk->setFieldEdge(p_xml_id, M1Env::TEI_XMLID_ATTR_SIID);
     if(p_hi_rend.length() > 0) l_new_chunk->setFieldEdge(p_hi_rend, M1Env::TEI_REND_ATTR_SIID);
     if(p_note_place.length() > 0) l_new_chunk->setFieldEdge(p_note_place, M1Env::TEI_PLACE_ATTR_SIID);
+    if(p_xml_lang.length() > 0) l_new_chunk->setFieldEdge(p_xml_lang, M1Env::TEI_LANG_ATTR_SIID);
+
+    // leading space: only when the source has whitespace between the previous sibling and this
+    // chunk (tracked by TEIStackLevel::spacePending(), see the Characters branch of loadTeiInternal()),
+    // so that e.g. "(<date>2020</date>)" or "AT&amp;T" are reproduced without spurious spaces. Never
+    // for the container's first child (nothing to separate from) nor for <note>/<l>/<lg>, which are
+    // always rendered as self-contained blocks (footnote popup, <br/>, indented <div>)
+    bool l_is_first_child = cm_tei_elements_stack.top().lastChild() == nullptr;
+    if(!l_is_first_child && cm_tei_elements_stack.top().spacePending() && p_tag != "note" && p_tag != "l" && p_tag != "lg")
+        l_new_chunk->setFieldEdge(" ", M1Env::PCTLF_SIID);
+    // from now on, we are inside (or just after) this chunk: no whitespace seen yet
+    cm_tei_elements_stack.top().setSpacePending(false);
 
     cm_tei_elements_stack.top().item()->linkTo(l_new_chunk, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+    cm_tei_elements_stack.top().setLastChild(l_new_chunk);
 
     return l_new_chunk;
 }
