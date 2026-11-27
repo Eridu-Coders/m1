@@ -49,6 +49,8 @@ set(PROJECT_SOURCES
         m1C_interp.h
         m1C_interp.cpp
         m1C_interp_subclasses.cpp
+        m1C_interp_tei.cpp
+        m1C_interp_tei_edit.cpp
         m1C_tree_row.cpp
         m1D_main_window.h
         m1D_main_window.cpp

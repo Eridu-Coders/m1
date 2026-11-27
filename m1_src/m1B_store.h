@@ -29,6 +29,7 @@ const unsigned int ITEM_NEXT_MMAP_SEGMENT   = 0x00010001; ///< LMDB key for next
 const unsigned int ITEM_NEXT_STRING         = 0x00010002; ///< LMDB key for next string ID
 const unsigned int ITEM_NEXT_SPECIAL        = 0x00010003; ///< LMDB key for next special ID
 const unsigned int CURRENT_VERSION          = 0x00010004; ///< LMDB key for the current version of the graph
+const unsigned int TEI_EDITOR_FONT_SIZE     = 0x00010005; ///< LMDB key for the TEI editor font size (points, 0 = UI default)
 //const unsigned int CURRENT_UPPER_COUNT  = 0x00010004; ///< LMDB key for the current upper count of cm_next_item
 /**@}*/ //end of UtilKeys
 
@@ -57,6 +58,7 @@ namespace M1Store{
         static StringID cm_next_string;             ///< next StringID counter (stored in util table)
         static SpecialItemID cm_next_special;       ///< next StringID counter (stored in util table)
         static unsigned int cm_current_version;     ///< current version of the graph
+        static unsigned int cm_tei_editor_font_size;///< TEI editor font size in points, 0 = UI default (stored in util table)
 
         /// mnemonic --> special id and ItemID --> special id associative arrays
         static std::map<QString, SpecialItem*> cm_mnemonic_to_special;
@@ -122,6 +124,9 @@ namespace M1Store{
         static void dbgSpecialDump();
     public:
         static void storeSetUp(bool p_reset = false);
+        /// TEI editor font size in points (0 = UI default)
+        static unsigned int teiEditorFontSize(){return cm_tei_editor_font_size;}
+        static void setTeiEditorFontSize(unsigned int p_size);
         static void mmapSync();
         static void storeShutDown();
 

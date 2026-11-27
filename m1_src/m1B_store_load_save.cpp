@@ -76,6 +76,17 @@ void M1Store::StorageStatic::loadUtilites(MDB_txn *p_txn){
                                 ((l_rc == MDB_NOTFOUND) ? QString("%1 --> KEY NOT FOUND").arg(l_key_val, 8, 16, QChar('0')) :
                                      QString("retrieved: 0x%1 --> %2 [%3]").arg(l_key_val, 8, 16, QChar('0')).arg(cm_current_version).arg(l_data.mv_size));
 
+    // loading TEI editor font size (editor setting, absent from older databases --> 0 = UI default)
+    l_key_val = TEI_EDITOR_FONT_SIZE;
+    l_rc = mdb_get(p_txn, cm_dbi_util, &l_key, &l_data);
+    if(l_rc == MDB_NOTFOUND)
+        cm_tei_editor_font_size = 0;
+    else
+        cm_tei_editor_font_size = *((unsigned int *)(l_data.mv_data));
+    qCDebug(g_cat_store) << QString("TEI_EDITOR_FONT_SIZE: ") +
+                                ((l_rc == MDB_NOTFOUND) ? QString("%1 --> KEY NOT FOUND").arg(l_key_val, 8, 16, QChar('0')) :
+                                     QString("retrieved: 0x%1 --> %2 [%3]").arg(l_key_val, 8, 16, QChar('0')).arg(cm_tei_editor_font_size).arg(l_data.mv_size));
+
     // loading next special item
     l_key_val = ITEM_NEXT_SPECIAL;
     l_rc = mdb_get(p_txn, cm_dbi_util, &l_key, &l_data);
@@ -169,6 +180,12 @@ void M1Store::StorageStatic::saveUtilities(MDB_txn *p_txn){
     E(mdb_put(l_txn, cm_dbi_util, &l_key, &l_data, 0));
     qCDebug(g_cat_store) << QString("CURRENT_VERSION: 0x%2 --> %1").arg(cm_current_version).arg(l_key_val, 8, 16, QChar('0'));
 
+    // storing TEI editor font size
+    l_key_val = TEI_EDITOR_FONT_SIZE;
+    l_data.mv_data = &(cm_tei_editor_font_size);
+    E(mdb_put(l_txn, cm_dbi_util, &l_key, &l_data, 0));
+    qCDebug(g_cat_store) << QString("TEI_EDITOR_FONT_SIZE: 0x%2 --> %1").arg(cm_tei_editor_font_size).arg(l_key_val, 8, 16, QChar('0'));
+
     l_data.mv_size = sizeof(SpecialItemID);
 
     // storing next Special Item id
@@ -215,6 +232,30 @@ void M1Store::StorageStatic::saveUtilities(MDB_txn *p_txn){
         // dbgUtilDump();
     }
     M1_FUNC_EXIT
+}
+
+/**
+ * @brief sets the TEI editor font size and writes it immediately into the util table (own transaction)
+ * @param p_size font size in points (0 = UI default)
+ */
+void M1Store::StorageStatic::setTeiEditorFontSize(unsigned int p_size){
+    Q_ASSERT_X( cm_lmdb_env != NULL, "Storage::setTeiEditorFontSize()", "LMDB env must be initialized");
+    if(p_size == cm_tei_editor_font_size) return;
+    cm_tei_editor_font_size = p_size;
+
+    int l_rc; // LMDB return code (for use with return code test macros)
+    MDB_txn* l_txn;
+    MDB_val l_key, l_data;
+    qint32 l_key_val = TEI_EDITOR_FONT_SIZE;
+    l_key.mv_size = sizeof(qint32);
+    l_key.mv_data = &l_key_val;
+    l_data.mv_size = sizeof(unsigned int);
+    l_data.mv_data = &cm_tei_editor_font_size;
+
+    E(mdb_txn_begin(cm_lmdb_env, NULL, 0, &l_txn));
+    E(mdb_put(l_txn, cm_dbi_util, &l_key, &l_data, 0));
+    E(mdb_txn_commit(l_txn));
+    qCDebug(g_cat_store) << QString("TEI_EDITOR_FONT_SIZE: 0x%2 --> %1 (saved)").arg(cm_tei_editor_font_size).arg(l_key_val, 8, 16, QChar('0'));
 }
 
 /**

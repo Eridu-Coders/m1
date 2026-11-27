@@ -21,6 +21,7 @@
 
 namespace M1MidPlane{
     class Interp;
+    class TEI_DocBuilder;
 }
 
 namespace M1UI{
@@ -185,6 +186,7 @@ public:
 
     bool isEmpty(){return m_myself == nullptr;}
     QString getHtml(const M1Store::Item_lv2* p_edge);
+    QString debugHtml(const M1Store::Item_lv2* p_edge);
     void setParent(M1UI::TreeRow* p_tree_row){m_tree_row = p_tree_row;}
 
     virtual QWidget *get_edit_widget();
@@ -603,6 +605,12 @@ public:
     // virtual QString getHtmlVirtual();
     virtual QString baseText();
     QString get_heading(){return m_heading == nullptr ? "" : m_heading->baseText();}
+
+    // rich text editor (see m1C_interp_tei_edit.cpp)
+    virtual QWidget* get_edit_widget();
+    virtual void buildTextDoc(TEI_DocBuilder& p_builder);
+    const std::vector<std::shared_ptr<Interp>>& descendants(){initialize(); return m_descendant_list;}
+    std::shared_ptr<Interp> headingInterp(){initialize(); return m_heading;}
 };
 
 /**
@@ -616,6 +624,7 @@ public:
 
     TEI_DivInterp(M1Store::Item_lv2* p_myself);
     virtual QString className() {return "TEI_DivInterp";}
+    virtual void buildTextDoc(TEI_DocBuilder& p_builder);
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual QString getHtmlVirtual();
     virtual QString baseText();
@@ -649,6 +658,9 @@ public:
 
     TEI_ChunkInterp(M1Store::Item_lv2* p_myself);
     virtual QString className() {return "TEI_ChunkInterp";}
+    virtual void buildTextDoc(TEI_DocBuilder& p_builder);
+    const QString& chunkTag() const {return m_chunk_tag;}
+    bool isBlockLevel() const;
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual QString getHtmlVirtual();
     virtual QString baseText();
@@ -661,6 +673,7 @@ public:
 
     TEI_TableInterp(M1Store::Item_lv2* p_myself);
     virtual QString className() {return "TEI_TableInterp";}
+    virtual void buildTextDoc(TEI_DocBuilder& p_builder);
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual QString getHtmlVirtual();
     virtual QString baseText();
@@ -673,6 +686,7 @@ public:
 
     TEI_RowInterp(M1Store::Item_lv2* p_myself);
     virtual QString className() {return "TEI_RowInterp";}
+    virtual void buildTextDoc(TEI_DocBuilder& p_builder);
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual QString getHtmlVirtual();
     virtual QString baseText();
@@ -696,6 +710,7 @@ public:
 
     TEI_FigureInterp(M1Store::Item_lv2* p_myself);
     virtual QString className() {return "TEI_FigureInterp";}
+    virtual void buildTextDoc(TEI_DocBuilder& p_builder);
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual QString getHtmlVirtual();
     virtual QString baseText();
@@ -708,6 +723,7 @@ public:
 
     TEI_QuoteInterp(M1Store::Item_lv2* p_myself);
     virtual QString className() {return "TEI_QuoteInterp";}
+    virtual void buildTextDoc(TEI_DocBuilder& p_builder);
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual QString getHtmlVirtual();
     virtual QString baseText();
@@ -720,6 +736,7 @@ public:
 
     TEI_ListInterp(M1Store::Item_lv2* p_myself);
     virtual QString className() {return "TEI_ListInterp";}
+    virtual void buildTextDoc(TEI_DocBuilder& p_builder);
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual QString getHtmlVirtual();
     virtual QString baseText();
@@ -732,6 +749,7 @@ public:
 
     TEI_ItemInterp(M1Store::Item_lv2* p_myself);
     virtual QString className() {return "TEI_ItemInterp";}
+    virtual void buildTextDoc(TEI_DocBuilder& p_builder);
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual QString getHtmlVirtual();
     virtual QString baseText();

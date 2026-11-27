@@ -42,6 +42,7 @@ M1Store::ItemID M1Store::StorageStatic::cm_next_string{0};
 M1Store::SpecialItemID M1Store::StorageStatic::cm_next_special{0};
 // current version of graph structure
 unsigned int M1Store::StorageStatic::cm_current_version{0};
+unsigned int M1Store::StorageStatic::cm_tei_editor_font_size{0};
 
 // Mnemonic --> SpecialItem* associative array
 std::map<QString, M1Store::SpecialItem*> M1Store::StorageStatic::cm_mnemonic_to_special;

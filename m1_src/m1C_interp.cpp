@@ -339,16 +339,23 @@ QString M1MidPlane::Interp::getHtml(const M1Store::Item_lv2* p_edge){
 
     QString l_own_html = getHtmlVirtual();
     QString l_ret_html =
-        l_own_html.left(4) == "http" ? l_own_html : cm_html_template.arg(l_own_html +
-            QString("<p class=\"technical sepabove\"><span style=\"font-weight: bold;\">Class</span>: %1</p>\n").arg(className()) +
-            base_edge_html_fragment(p_edge) +
-            base_html_fragment()
-        );
+        l_own_html.left(4) == "http" ? l_own_html : cm_html_template.arg(l_own_html + debugHtml(p_edge));
 
     qCDebug(g_cat_interp_base) << "l_ret_html:" << l_ret_html.length();
 
     M1_FUNC_EXIT
     return l_ret_html;
+}
+
+/**
+ * @brief technical (debug) section appended at the bottom of the HTML display: class, edge, target
+ * @param p_edge the edge leading to this item (may be nullptr: edge section omitted)
+ * @return
+ */
+QString M1MidPlane::Interp::debugHtml(const M1Store::Item_lv2* p_edge){
+    return QString("<p class=\"technical sepabove\"><span style=\"font-weight: bold;\">Class</span>: %1</p>\n").arg(className()) +
+           (p_edge == nullptr ? QString() : base_edge_html_fragment(p_edge)) +
+           base_html_fragment();
 }
 
 /**
