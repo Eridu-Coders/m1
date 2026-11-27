@@ -58,6 +58,7 @@ namespace M1Env{
     const unsigned long long IS_AUTO                = 0x0000000000000020; ///< 1 --> this is an AUTO_ edge
     const unsigned long long EDGE_IS_OPEN           = 0x0000000000000080; ///< 1 --> this edge is open (recursive descent)
     const unsigned long long EDGE_SEPABOVE          = 0x0000000000000100; ///< 1 --> this edge has a horizontal separator above it
+    const unsigned long long EDGE_DEAD              = 0x0000000000000200; ///< 1 --> this edge is dead (deleted)
 
     const unsigned long long SPECIAL_ITEM_ID_MASK   = 0xFFFF000000000000; ///< Mask of the area used to store the SpecialItemID of a vertex, when applicable (IS_SPECIAL is set)
 
@@ -116,6 +117,7 @@ namespace M1Env{
     static const char* LMDB_SPECIAL_MMAP_FILE       = "specials.m1";                ///< name of mmap() file for special items
     static const char* STATIC_DATA_PATH             = "../Static";                  ///< root dir for static data storage
     static const char* INTERP_HTML_TEMPLATE         = "Interp_html_template.html";  ///< name of mmap() file for special items
+    static const char* COUNTRY_CODES_FILE           = "country_phone_codes.json";   ///< phone country codes list (in STORE_DATA_PATH), loaded at startup
 /**@}*/ //end of StoreConst
 
 /**
@@ -176,7 +178,10 @@ namespace M1Env{
     static const char* TEXT_FIGURE_ICON_PATH = "../m1_src/Icons/picture.svg";                   ///<
     static const char* TEXT_LIST_ICON_PATH = "../m1_src/Icons/list.svg";                        ///<
     static const char* TEXT_ITEM_ICON_PATH = "../m1_src/Icons/item.svg";                        ///<
-/**@}*/ //end of IconPaths
+    static const char* CONTACT_ID_ICON_PATH = "../m1_src/Icons/ContactID.svg";                  ///<
+    static const char* EQUIVALENT_ICON_PATH = "../m1_src/Icons/Equivalent.svg";                 ///<
+    static const char* WORKS_ICON_PATH = "../m1_src/Icons/work.svg";                            ///<
+/**@}*/ //end of IconPaths WORKS_ICON_PATH
 
     static const bool SKIP_HEAVY_CHECKING = true; ///< true --> skip time-consuming Q_ASSERT in setType() and linkTo()
 } // end of M1Env namespace

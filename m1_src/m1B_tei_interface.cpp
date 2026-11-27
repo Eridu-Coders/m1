@@ -613,6 +613,26 @@ void M1Store::TEIInterface::loadTeiInternal1(const QString& p_file_path, bool p_
 }
 
 /**
+ * @brief Store the key of a <name>, <author> or <term> chunk in a NMTMK field
+ *
+ * The key is @xml:id if present, otherwise @ref (leading '#' removed, so that a reference
+ * and the xml:id it points to yield the same key). Nothing is stored if neither is present.
+ * @param p_chunk the chunk created for the element
+ * @param p_xml_id value of @xml:id ("" if absent)
+ * @param p_ref value of @ref ("" if absent)
+ * @return the key ("" if none)
+ */
+QString M1Store::TEIInterface::setNameTermKey(M1Store::Item_lv2* p_chunk, const QString& p_xml_id, const QString& p_ref){
+    QString l_key = p_xml_id.trimmed();
+    if(l_key.length() == 0){
+        l_key = p_ref.trimmed();
+        if(l_key.startsWith('#')) l_key.remove(0, 1);
+    }
+    if(l_key.length() > 0) p_chunk->setFieldEdge(l_key, M1Env::TEI_NAME_TERM_KEY_SIID);
+    return l_key;
+}
+
+/**
  * @brief M1Store::TEIInterface::loadTeiInternal
  *
  * History textbook
@@ -641,6 +661,16 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
     // running count of <note> elements since the beginning of the text, used as @n when it is missing
     int l_note_number = 1;
     cm_cur_paragraph_number = 1;
+    // Person nodes may have been created/changed since the last import
+    cm_person_cache_loaded = false;
+    // <person> data from the header <listPerson> (Person nodes are created only for keys found there)
+    cm_list_person.clear();
+    cm_person_done.clear();
+
+    // header <monogr>: the work this text belongs to
+    QString l_work_title;
+    QString l_work_key;
+    QList<std::pair<QString, QString>> l_work_authors;
 
     QString l_hi_rend;
     QString l_hi_type;
@@ -676,8 +706,18 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
         if( !(l_tt == QXmlStreamReader::Characters && l_xml_reader.text().toString().trimmed().length() == 0))
             qCDebug(g_cat_tei).noquote() << cm_indent << format_tt_token(l_xml_reader);
 
+        // work this text belongs to (title, author(s)) --> see linkTextToWork() below
+        if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "monogr")
+            readMonogr(l_xml_reader, l_work_title, l_work_key, l_work_authors);
+        // persons list --> cm_list_person (used to create Person nodes for <name>/<author> keys)
+        else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "listPerson")
+            readListPerson(l_xml_reader);
+        // other lists (<listBibl>, <listPlace>, <listOrg>, <listEvent>, ...) ignored for the moment. Skipped entirely so that
+        // the <title>/<author> elements they contain are not mistaken for those of the text
+        else if(l_tt == QXmlStreamReader::StartElement && l_tok_name.startsWith(QString("list")))
+            l_xml_reader.skipCurrentElement();
         // text title(s)
-        if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "title"){
+        else if(l_tt == QXmlStreamReader::StartElement && l_tok_name == "title"){
             QString l_type = l_xml_reader.attributes().value("type").toString();
 
             QXmlStreamReader::TokenType l_tt_title = l_xml_reader.readNext();
@@ -751,14 +791,32 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
 
             // + m_author_list as built above
             create_text(l_title, l_alt_title, l_sub_title, l_author_main);
+            // after create_text() so that <listPerson> (read in the meantime) is available for the work author(s)
+            linkTextToWork(cm_text_root, l_work_title, l_work_key, l_work_authors);
             break; // from <teiHeader> loop
         }
     }
 
     // ---- <text> ----
+    // @xml:id / @ref of a <figure>, held until the <graphic> that creates the figure node
+    QString l_figure_xml_id;
+    QString l_figure_ref;
     while (!l_xml_reader.atEnd()) {
         QXmlStreamReader::TokenType l_tt = l_xml_reader.readNext();
         QStringView l_tok_name = l_xml_reader.name();
+
+        // @xml:id / @ref of the current start tag, whatever the tag. Captured here because some branches
+        // below consume the element (readElementText()). Stored at the end of the loop body on the node created
+        // for the element (cm_last_created, set by the create_xxx() functions)
+        QString l_start_tag;
+        QString l_start_xml_id;
+        QString l_start_ref;
+        if(l_tt == QXmlStreamReader::StartElement){
+            l_start_tag = l_tok_name.toString();
+            l_start_xml_id = l_xml_reader.attributes().value("xml:id").toString().trimmed();
+            l_start_ref = l_xml_reader.attributes().value("ref").toString().trimmed();
+            cm_last_created = nullptr;
+        }
 
         if( !(l_tt == QXmlStreamReader::Characters && l_xml_reader.text().toString().trimmed().length() == 0))
             qCDebug(g_cat_tei).noquote() << cm_indent << format_tt_token(l_xml_reader);
@@ -969,6 +1027,7 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
             if(l_unit.length() > 0) l_chunk->setFieldEdge(l_unit, M1Env::TEI_UNIT_ATTR_SIID);
             if(l_target.length() > 0) l_chunk->setFieldEdge(l_target, M1Env::TEI_TARGET_ATTR_SIID);
             if(l_ref.length() > 0) l_chunk->setFieldEdge(l_ref, M1Env::TEI_REF_ATTR_SIID);
+            if(l_tag == "author") linkChunkToPerson(l_chunk, setNameTermKey(l_chunk, l_xml_id, l_ref));
             // no Characters token for this text will reach the main loop --> add it to the enclosing label here
             cm_tei_elements_stack.top().appendText(l_text);
 
@@ -1013,6 +1072,14 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
             M1Store::Item_lv2* l_chunk = create_chunk(QString("[%1]").arg(l_tag), l_tag, l_type, l_attr_n, "", l_rend, "", l_lang);
             // @level: <title> in a <bibl> (m = monograph, j = journal, a = article, ...)
             if(l_level.length() > 0) l_chunk->setFieldEdge(l_level, M1Env::TEI_LEVEL_ATTR_SIID);
+            // key of <name> and <term> (not <title>)
+            if(l_tag != "title"){
+                QString l_key = setNameTermKey(l_chunk,
+                                               l_xml_reader.attributes().value("xml:id").toString(),
+                                               l_xml_reader.attributes().value("ref").toString());
+                // <name> with a "LAST-NAME_First_name" key --> linked to its Person node
+                if(l_tag == "name") linkChunkToPerson(l_chunk, l_key);
+            }
             cm_tei_elements_stack.push(TEIStackLevel(l_entity_type, l_chunk));
             qCDebug(g_cat_tei).noquote() << cm_indent << QString("<%1 type=%2 n=%3 xml:lang=%4> start").arg(l_tag).arg(l_type).arg(l_attr_n).arg(l_lang);
             cm_indent += QString(" ").repeated(l_indent_count);
@@ -1061,6 +1128,32 @@ void M1Store::TEIInterface::loadTeiInternal(const QString& p_file_path, bool p_v
             // what precedes it. If the run was only glued punctuation (no whitespace), nothing pending
             if(!cm_tei_elements_stack.empty() && l_text_raw.length() > 0 && l_text_raw.at(l_text_raw.length() - 1).isSpace())
                 cm_tei_elements_stack.top().setSpacePending(true);
+        }
+
+        // store @xml:id (TEXID) and @ref (TEREF) of this start tag, if any, on the node created for it
+        if(l_tt == QXmlStreamReader::StartElement){
+            if(l_start_tag == "figure"){
+                // no node yet (created by the following <graphic>)
+                l_figure_xml_id = l_start_xml_id;
+                l_figure_ref = l_start_ref;
+            }
+            else{
+                if(l_start_tag == "graphic"){
+                    // the figure node stands for both <figure> and <graphic>: the <graphic> attributes take precedence
+                    if(l_start_xml_id.length() == 0) l_start_xml_id = l_figure_xml_id;
+                    if(l_start_ref.length() == 0) l_start_ref = l_figure_ref;
+                    l_figure_xml_id.clear();
+                    l_figure_ref.clear();
+                }
+                if(l_start_xml_id.length() > 0 || l_start_ref.length() > 0){
+                    if(cm_last_created != nullptr){
+                        if(l_start_xml_id.length() > 0) cm_last_created->setFieldEdge(l_start_xml_id, M1Env::TEI_XMLID_ATTR_SIID);
+                        if(l_start_ref.length() > 0) cm_last_created->setFieldEdge(l_start_ref, M1Env::TEI_REF_ATTR_SIID);
+                    }
+                    else qCDebug(g_cat_tei).noquote() << cm_indent << QString("<%1 xml:id=\"%2\" ref=\"%3\"> no node created for this element --> attributes not stored")
+                                                         .arg(l_start_tag).arg(l_start_xml_id).arg(l_start_ref);
+                }
+            }
         }
     }
 

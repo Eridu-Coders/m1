@@ -8,6 +8,7 @@
 #include "m1A_env.h"
 #include "m1A_constants.h"
 #include "m1B_graph_init.h"
+#include "m1B_lv2_iterators.h"
 
 /**
  * @brief M1Store::TEIInterface::cm_text_root
@@ -29,6 +30,11 @@ QXmlStreamReader::TokenType M1Store::TEIInterface::cm_tt;
 bool M1Store::TEIInterface::cm_no_read = false;
 
 std::stack<M1Store::TEIStackLevel> M1Store::TEIInterface::cm_tei_elements_stack;
+M1Store::Item_lv2* M1Store::TEIInterface::cm_last_created = nullptr;
+QMap<QString, M1Store::Item_lv2*> M1Store::TEIInterface::cm_person_by_key;
+bool M1Store::TEIInterface::cm_person_cache_loaded = false;
+QMap<QString, M1Store::PersonTEI> M1Store::TEIInterface::cm_list_person;
+QSet<QString> M1Store::TEIInterface::cm_person_done;
 int M1Store::TEIInterface::cm_cur_paragraph_number;
 
 M1Store::Item_lv2* M1Store::TEIInterface::create_list(const QString& p_list_type){
@@ -42,6 +48,7 @@ M1Store::Item_lv2* M1Store::TEIInterface::create_list(const QString& p_list_type
     if(p_list_type.length() > 0) l_new_list->setFieldEdge(QString("%1").arg(p_list_type), M1Env::TEI_LIST_TYPE_SIID);
     cm_tei_elements_stack.top().item()->linkTo(l_new_list, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
 
+    cm_last_created = l_new_list;
     return l_new_list;
 }
 M1Store::Item_lv2* M1Store::TEIInterface::create_item(){
@@ -54,6 +61,7 @@ M1Store::Item_lv2* M1Store::TEIInterface::create_item(){
     l_new_item->setType(M1Env::TEXT_ITEM_SIID);
     cm_tei_elements_stack.top().item()->linkTo(l_new_item, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
 
+    cm_last_created = l_new_item;
     return l_new_item;
 }
 
@@ -68,6 +76,7 @@ M1Store::Item_lv2* M1Store::TEIInterface::create_figure(const QString& p_picture
     if(p_picture_path.length() > 0) l_new_row->setFieldEdge(QString("%1").arg(p_picture_path), M1Env::TEI_GRAPHIC_SIID);
     cm_tei_elements_stack.top().item()->linkTo(l_new_row, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
 
+    cm_last_created = l_new_row;
     return l_new_row;
 }
 
@@ -82,6 +91,7 @@ M1Store::Item_lv2* M1Store::TEIInterface::create_table_row(const QString &p_role
     if(p_role.length() > 0) l_new_row->setFieldEdge(QString("%1").arg(p_role), M1Env::TEI_ROW_ROLE_SIID);
     cm_tei_elements_stack.top().item()->linkTo(l_new_row, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
 
+    cm_last_created = l_new_row;
     return l_new_row;
 }
 
@@ -95,6 +105,7 @@ M1Store::Item_lv2* M1Store::TEIInterface::create_table_cell(){
     l_new_cell->setType(M1Env::TEXT_CELL_SIID);
     cm_tei_elements_stack.top().item()->linkTo(l_new_cell, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
 
+    cm_last_created = l_new_cell;
     return l_new_cell;
 }
 M1Store::Item_lv2* M1Store::TEIInterface::create_table(
@@ -113,6 +124,7 @@ M1Store::Item_lv2* M1Store::TEIInterface::create_table(
     l_new_table->setFieldEdge(QString("%1").arg(p_columns), M1Env::TEI_TABLE_COLS_SIID);
     cm_tei_elements_stack.top().item()->linkTo(l_new_table, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
 
+    cm_last_created = l_new_table;
     return l_new_table;
 }
 
@@ -138,6 +150,7 @@ M1Store::Item_lv2* M1Store::TEIInterface::create_div(
     if(p_div_n.length() > 0)l_new_div->setFieldEdge(p_div_n, M1Env::TEI_N_ATTR_SIID);
     if(p_xml_id.length() > 0) l_new_div->setFieldEdge(p_xml_id, M1Env::TEI_XMLID_ATTR_SIID);
 
+    cm_last_created = l_new_div;
     return l_new_div;
 }
 
@@ -154,6 +167,7 @@ M1Store::Item_lv2* M1Store::TEIInterface::create_paragraph_quote(const bool p_is
         l_new_paragraph->setType(M1Env::TEXT_PARA_SIID);
     cm_tei_elements_stack.top().item()->linkTo(l_new_paragraph, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
 
+    cm_last_created = l_new_paragraph;
     return l_new_paragraph;
 }
 
@@ -197,6 +211,7 @@ M1Store::Item_lv2* M1Store::TEIInterface::create_chunk(
     cm_tei_elements_stack.top().item()->linkTo(l_new_chunk, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
     cm_tei_elements_stack.top().setLastChild(l_new_chunk);
 
+    cm_last_created = l_new_chunk;
     return l_new_chunk;
 }
 
@@ -240,9 +255,12 @@ void M1Store::TEIInterface::create_text(
     if(p_alt_title.length() > 0) (*l_text_root)->setFieldEdge(p_alt_title, M1Env::TEXT_ALT_TITLE_SIID);
     if(p_sub_title.length() > 0) (*l_text_root)->setFieldEdge(p_sub_title, M1Env::TEXT_SUB_TITLE_SIID);
 
-    // Author (main author role is just 'Author')
-    M1Store::Item_lv2* l_author = getPersonOrg(p_author_text, "Author", OrgOrPerson::Person, ReturnEntityOrRole::Entity);
-    (*l_text_root)->linkTo(l_author, M1Env::TEXT_WRITTEN_BY_SIID);
+    // Author (main author role is just 'Author'). None if the header has no author (e.g. chapters of a work, whose author
+    // is that of the work, see linkTextToWork())
+    if(p_author_text.trimmed().length() > 0){
+        M1Store::Item_lv2* l_author = getPersonOrg(p_author_text, "Author", OrgOrPerson::Person, ReturnEntityOrRole::Entity);
+        (*l_text_root)->linkTo(l_author, M1Env::TEXT_WRITTEN_BY_SIID);
+    }
 
     // Lexicon Root
     if(p_with_lexicon){
@@ -620,3 +638,412 @@ QString M1Store::TEIInterface::format_tt_token(const QXmlStreamReader& p_xml_rea
     return l_ret + QString(" [%1]").arg(p_xml_reader.tokenType());
 }
 
+
+/**
+ * @brief Read the <listPerson> of the TEI header (reader positioned on its start tag) into cm_list_person
+ *
+ * Only <person> elements having an @xml:id and at least one <persName> are kept. Within a <person>, only <persName>,
+ * <birth> and <death> are used (<note>, etc. are ignored). Nested lists are skipped. On return, the reader is
+ * positioned on the </listPerson> end tag.
+ *
+ * @param p_reader the XML reader
+ */
+void M1Store::TEIInterface::readListPerson(QXmlStreamReader& p_reader){
+    while(p_reader.readNextStartElement()){
+        if(p_reader.name() != QString("person")){
+            p_reader.skipCurrentElement();
+            continue;
+        }
+        QString l_key = p_reader.attributes().value("xml:id").toString().trimmed();
+        PersonTEI l_person;
+        while(p_reader.readNextStartElement()){
+            if(p_reader.name() == QString("persName")) l_person.m_names.append(readListPersName(p_reader));
+            else if(p_reader.name() == QString("birth")) l_person.m_birth = readPersonDate(p_reader);
+            else if(p_reader.name() == QString("death")) l_person.m_death = readPersonDate(p_reader);
+            else p_reader.skipCurrentElement();
+        }
+        if(l_key.length() > 0 && l_person.m_names.size() > 0){
+            if(cm_list_person.contains(l_key))
+                qCDebug(g_cat_tei).noquote() << QString("<listPerson> duplicate <person xml:id=\"%1\"> (last one kept)").arg(l_key);
+            cm_list_person[l_key] = l_person;
+        }
+        else
+            qCDebug(g_cat_tei).noquote() << QString("<listPerson> <person> without @xml:id or <persName> ignored [%1]").arg(l_key);
+    }
+    qCDebug(g_cat_tei).noquote() << QString("<listPerson> %1 person(s)").arg(cm_list_person.size());
+}
+
+/**
+ * @brief Read a <persName> (reader positioned on its start tag) and map its parts to Person fields
+ *
+ * - <roleName type="honorific"> --> PERHN, other <roleName> --> PERTL (", " separated)
+ * - <forename type="first"> or first untyped <forename> --> PERFN, other <forename> --> PERMN
+ * - <genName type="generational"> --> PERGN, other <genName> (regnal) --> PERRN
+ * - <surname type="patronymic">, <addName type="patronymic"> --> PERPN
+ * - <surname> --> PERLN
+ * - <addName type="toponymic">, <placeName> --> PERTB
+ * - <addName type="alias"> --> PERAL (", " separated)
+ * - other <addName> (cognomen, epithet, nickname, sobriquet, ...) --> PERNN (", " separated, document order)
+ * - <nameLink> is prefixed to the following part ("de" + "Sade" --> "de Sade", "d'" + "Arc" --> "d'Arc")
+ *
+ * The text of a part includes that of its descendants (<addName><nameLink>of</nameLink> <placeName>Babylon</placeName></addName>
+ * --> "of Babylon"). On return, the reader is positioned on the </persName> end tag.
+ *
+ * @param p_reader the XML reader
+ * @return the name fields, in the canonical field order (see PersonInterp::namesText())
+ */
+M1Store::PersNameTEI M1Store::TEIInterface::readListPersName(QXmlStreamReader& p_reader){
+    PersNameTEI l_name;
+    l_name.m_type = p_reader.attributes().value("type").toString().trimmed();
+    l_name.m_lang = p_reader.attributes().value("xml:lang").toString().trimmed();
+
+    QMap<M1Env::SpecialItemID, QStringList> l_parts;
+    QString l_pending_link;
+    while(p_reader.readNextStartElement()){
+        QString l_tag = p_reader.name().toString();
+        QString l_type = p_reader.attributes().value("type").toString().trimmed();
+        QString l_text = p_reader.readElementText(QXmlStreamReader::IncludeChildElements).simplified();
+        if(l_text.length() == 0) continue;
+
+        if(l_tag == "nameLink"){
+            l_pending_link = l_pending_link.length() > 0 ? l_pending_link + " " + l_text : l_text;
+            continue;
+        }
+        if(l_pending_link.length() > 0){
+            l_text = (l_pending_link.endsWith('\'') || l_pending_link.endsWith(QChar(0x2019))) ? l_pending_link + l_text : l_pending_link + " " + l_text;
+            l_pending_link.clear();
+        }
+
+        M1Env::SpecialItemID l_field;
+        if(l_tag == "roleName") l_field = (l_type == "honorific") ? M1Env::PERS_HONORIFIC_SIID : M1Env::PERS_TITLE_SIID;
+        else if(l_tag == "forename")
+            l_field = (l_type == "first" || (l_type != "middle" && !l_parts.contains(M1Env::PERS_FIRST_NAME_SIID))) ?
+                          M1Env::PERS_FIRST_NAME_SIID : M1Env::PERS_MIDDLE_NAME_SIID;
+        else if(l_tag == "genName") l_field = (l_type == "generational") ? M1Env::PERS_GENERATIONAL_SIID : M1Env::PERS_REGNAL_SIID;
+        else if(l_tag == "surname") l_field = (l_type == "patronymic") ? M1Env::PERS_PATRONYMIC_SIID : M1Env::PERS_LAST_NAME_SIID;
+        else if(l_tag == "placeName") l_field = M1Env::PERS_TOPONYMIC_SIID;
+        else if(l_tag == "addName"){
+            if(l_type == "patronymic") l_field = M1Env::PERS_PATRONYMIC_SIID;
+            else if(l_type == "toponymic") l_field = M1Env::PERS_TOPONYMIC_SIID;
+            else if(l_type == "alias") l_field = M1Env::PERS_ALIAS_SIID;
+            else l_field = M1Env::PERS_NICKNAME_SIID;
+        }
+        else{
+            qCDebug(g_cat_tei).noquote() << QString("<persName> part <%1> ignored [%2]").arg(l_tag).arg(l_text);
+            continue;
+        }
+        l_parts[l_field].append(l_text);
+    }
+    // trailing <nameLink> with nothing after it
+    if(l_pending_link.length() > 0) l_parts[M1Env::PERS_LAST_NAME_SIID].append(l_pending_link);
+
+    for(const M1Env::SpecialItemID l_field : persNameFields())
+        if(l_parts.contains(l_field)){
+            bool l_comma = (l_field == M1Env::PERS_TITLE_SIID || l_field == M1Env::PERS_NICKNAME_SIID || l_field == M1Env::PERS_ALIAS_SIID);
+            l_name.m_fields.append({l_field, l_parts[l_field].join(l_comma ? ", " : " ")});
+        }
+    return l_name;
+}
+
+/**
+ * @brief Read a <birth> or <death> element (reader positioned on its start tag)
+ *
+ * The element text is used if there is one ("c. 1810 BCE"), otherwise @when, or @notBefore/@notAfter ("1820 BCE/1800 BCE"),
+ * or @from/@to. ISO years lose their leading zeros ("0565-11-14" --> "565-11-14") and negative years become BCE
+ * ("-0685" --> "685 BCE").
+ *
+ * @param p_reader the XML reader
+ * @return the date text ("" if none)
+ */
+QString M1Store::TEIInterface::readPersonDate(QXmlStreamReader& p_reader){
+    auto l_fmt = [](const QString& p_iso) -> QString {
+        static const QRegularExpression ls_re(R"(^(-?)0*(\d+)(.*)$)");
+        QRegularExpressionMatch l_m = ls_re.match(p_iso.trimmed());
+        if(!l_m.hasMatch()) return p_iso.trimmed();
+        if(l_m.captured(1) == "-") return QString("%1%2 BCE").arg(l_m.captured(2)).arg(l_m.captured(3));
+        return l_m.captured(2) + l_m.captured(3);
+    };
+    QXmlStreamAttributes l_attr = p_reader.attributes();
+    QString l_text = p_reader.readElementText(QXmlStreamReader::IncludeChildElements).simplified();
+    if(l_text.length() > 0) return l_text;
+    if(l_attr.hasAttribute("when")) return l_fmt(l_attr.value("when").toString());
+    for(const auto& l_range : {std::pair<QString, QString>{"notBefore", "notAfter"}, std::pair<QString, QString>{"from", "to"}}){
+        QString l_lo = l_attr.value(l_range.first).toString();
+        QString l_hi = l_attr.value(l_range.second).toString();
+        if(l_lo.length() > 0 && l_hi.length() > 0) return QString("%1/%2").arg(l_fmt(l_lo)).arg(l_fmt(l_hi));
+        if(l_lo.length() > 0) return QString("after %1").arg(l_fmt(l_lo));
+        if(l_hi.length() > 0) return QString("before %1").arg(l_fmt(l_hi));
+    }
+    return "";
+}
+
+/**
+ * @brief Set the name fields of a Person node from a <persName>
+ */
+void M1Store::TEIInterface::setPersNameFields(M1Store::Item_lv2* p_person, const PersNameTEI& p_name){
+    for(const auto& l_field : p_name.m_fields)
+        p_person->setFieldEdge(l_field.second, l_field.first);
+}
+
+/**
+ * @brief Fill cm_person_by_key from the existing Person nodes having an NMTMK key (once per loadTeiInternal() call)
+ *
+ * Existing Person nodes (from previous imports) are found through the ITO edges of the Person type node
+ */
+void M1Store::TEIInterface::loadPersonCache(){
+    if(cm_person_cache_loaded) return;
+    cm_person_by_key.clear();
+    M1Store::Item_lv2* l_person_type = M1Store::Item_lv2::getExisting(M1Env::PERS_TYPE_SIID);
+    for(M1Store::Item_lv2_iterator l_it = l_person_type->getIteratorTop(); !l_it.beyondEnd(); l_it.next())
+        if(l_it.at()->isFullEdge() && l_it.at()->isOfType(M1Env::ITO_SIID)){
+            M1Store::Item_lv2* l_person = l_it.at()->getTarget_lv2();
+            QString l_key = l_person->getField(M1Env::TEI_NAME_TERM_KEY_SIID);
+            if(l_key.length() > 0) cm_person_by_key[l_key] = l_person;
+        }
+    cm_person_cache_loaded = true;
+    qCDebug(g_cat_tei).noquote() << QString("Person cache loaded: %1 keyed Person node(s)").arg(cm_person_by_key.size());
+}
+
+/**
+ * @brief Person node for a work author (<monogr>/<author xml:id="...">), created if necessary
+ *
+ * - key in <listPerson> --> getPersonFromKey()
+ * - otherwise, existing Person with that NMTMK key
+ * - otherwise, new Person: last word of the author text --> PERLN, the rest --> PERFN, key --> NMTMK
+ *
+ * @param p_key @xml:id (or @ref without '#') of the <author>; if empty, no Person is returned
+ * @param p_text text of the <author> ("Nicolas Reimen")
+ * @return the Person node (nullptr if no key)
+ */
+M1Store::Item_lv2* M1Store::TEIInterface::getPersonForAuthor(const QString& p_key, const QString& p_text){
+    if(p_key.length() == 0) return nullptr;
+    if(cm_list_person.contains(p_key)) return getPersonFromKey(p_key);
+
+    loadPersonCache();
+    M1Store::Item_lv2* l_person = cm_person_by_key.value(p_key, nullptr);
+    if(l_person == nullptr){
+        l_person = M1Store::Item_lv2::getNew(M1Env::FULL_VERTEX, "");
+        l_person->setType(M1Env::PERS_TYPE_SIID);
+        QStringList l_words = p_text.simplified().split(' ', Qt::SkipEmptyParts);
+        if(l_words.size() > 0) l_person->setFieldEdge(l_words.takeLast(), M1Env::PERS_LAST_NAME_SIID);
+        if(l_words.size() > 0) l_person->setFieldEdge(l_words.join(" "), M1Env::PERS_FIRST_NAME_SIID);
+        l_person->setFieldEdge(p_key, M1Env::TEI_NAME_TERM_KEY_SIID);
+        cm_person_by_key[p_key] = l_person;
+        qCDebug(g_cat_tei).noquote() << QString("New Person (work author) [%1] %2").arg(p_key).arg(p_text);
+    }
+    return l_person;
+}
+
+/**
+ * @brief Read the header <monogr> (reader positioned on its start tag): the work the text belongs to
+ *
+ * On return, the reader is positioned on the </monogr> end tag.
+ *
+ * @param p_reader the XML reader
+ * @param p_title [out] work title (<title> text)
+ * @param p_key [out] @xml:id of the <title> ("" if none)
+ * @param p_authors [out] (key, text) of each <author> (key = @xml:id or @ref without '#')
+ */
+void M1Store::TEIInterface::readMonogr(QXmlStreamReader& p_reader, QString& p_title, QString& p_key, QList<std::pair<QString, QString>>& p_authors){
+    while(p_reader.readNextStartElement()){
+        if(p_reader.name() == QString("title") && p_title.length() == 0){
+            p_key = p_reader.attributes().value("xml:id").toString().trimmed();
+            p_title = p_reader.readElementText(QXmlStreamReader::IncludeChildElements).simplified();
+        }
+        else if(p_reader.name() == QString("author")){
+            QString l_key = p_reader.attributes().value("xml:id").toString().trimmed();
+            if(l_key.length() == 0){
+                l_key = p_reader.attributes().value("ref").toString().trimmed();
+                if(l_key.startsWith('#')) l_key = l_key.mid(1);
+            }
+            p_authors.append({l_key, p_reader.readElementText(QXmlStreamReader::IncludeChildElements).simplified()});
+        }
+        else p_reader.skipCurrentElement();
+    }
+    qCDebug(g_cat_tei).noquote() << QString("<monogr> [%1] %2 (%3 author(s))").arg(p_key).arg(p_title).arg(p_authors.size());
+}
+
+/**
+ * @brief Connect the text root to the work it belongs to (from the header <monogr>): text --Belongs to--> work
+ *
+ * The work (type WORKS, label = title, TEXID = @xml:id of the <title>) is looked up among the existing works (by TEXID
+ * if there is a key, by label otherwise). If it does not exist, it is created and linked to its author(s)
+ * (work --Written by--> Person, see getPersonForAuthor()); an existing work is left as is.
+ *
+ * @param p_text the text root node
+ * @param p_title work title
+ * @param p_key @xml:id of the <monogr>/<title>
+ * @param p_authors (key, text) of the <monogr>/<author> elements
+ */
+void M1Store::TEIInterface::linkTextToWork(M1Store::Item_lv2* p_text, const QString& p_title, const QString& p_key,
+                                           const QList<std::pair<QString, QString>>& p_authors){
+    if(p_title.length() == 0 || p_text == nullptr) return;
+
+    M1Store::Item_lv2* l_work = nullptr;
+    M1Store::Item_lv2* l_works_type = M1Store::Item_lv2::getExisting(M1Env::WORKS_SIID);
+    for(M1Store::Item_lv2_iterator l_it = l_works_type->getIteratorTop(); !l_it.beyondEnd() && l_work == nullptr; l_it.next())
+        if(l_it.at()->isFullEdge() && l_it.at()->isOfType(M1Env::ITO_SIID)){
+            M1Store::Item_lv2* l_candidate = l_it.at()->getTarget_lv2();
+            if(p_key.length() > 0 ? l_candidate->getField(M1Env::TEI_XMLID_ATTR_SIID) == p_key : QString(l_candidate->text()) == p_title)
+                l_work = l_candidate;
+        }
+
+    if(l_work == nullptr){
+        l_work = M1Store::Item_lv2::getNew(M1Env::FULL_VERTEX, p_title.toUtf8().constData());
+        l_work->setType(M1Env::WORKS_SIID);
+        if(p_key.length() > 0) l_work->setFieldEdge(p_key, M1Env::TEI_XMLID_ATTR_SIID);
+        for(const auto& l_author : p_authors){
+            M1Store::Item_lv2* l_person = getPersonForAuthor(l_author.first, l_author.second);
+            if(l_person != nullptr)
+                l_work->linkTo(l_person, M1Env::TEXT_WRITTEN_BY_SIID, InsertionPoint::at_bottom, InsertionPoint::at_bottom);
+        }
+        qCDebug(g_cat_tei).noquote() << QString("New work [%1] %2").arg(p_key).arg(p_title);
+    }
+
+    // chapters listed below the work in import order
+    p_text->linkTo(l_work, M1Env::BLNGS_SIID, InsertionPoint::at_top, InsertionPoint::at_bottom);
+}
+
+/**
+ * @brief Person name fields, in canonical (display) order
+ */
+const QList<M1Env::SpecialItemID>& M1Store::TEIInterface::persNameFields(){
+    static const QList<M1Env::SpecialItemID> ls_fields{
+        M1Env::PERS_HONORIFIC_SIID, M1Env::PERS_FIRST_NAME_SIID, M1Env::PERS_MIDDLE_NAME_SIID, M1Env::PERS_REGNAL_SIID,
+        M1Env::PERS_PATRONYMIC_SIID, M1Env::PERS_NICKNAME_SIID, M1Env::PERS_LAST_NAME_SIID, M1Env::PERS_GENERATIONAL_SIID,
+        M1Env::PERS_TOPONYMIC_SIID, M1Env::PERS_ALIAS_SIID, M1Env::PERS_TITLE_SIID};
+    return ls_fields;
+}
+
+/**
+ * @brief Label of an alternate-name Person node: @type (birth --> "birth name", ...) + @xml:lang in brackets ("birth name [la]")
+ */
+QString M1Store::TEIInterface::altPersNameLabel(const PersNameTEI& p_name){
+    static const QMap<QString, QString> ls_type_labels{{"birth", "birth name"}, {"regnal", "regnal name"}, {"full", "full name"}};
+    QString l_label = ls_type_labels.value(p_name.m_type, p_name.m_type);
+    if(p_name.m_lang.length() > 0) l_label = l_label.length() > 0 ? QString("%1 [%2]").arg(l_label).arg(p_name.m_lang) : QString("[%1]").arg(p_name.m_lang);
+    return l_label;
+}
+
+/**
+ * @brief Identity of an alternate name (label + name fields), used to avoid adding the same alternate name twice
+ */
+QString M1Store::TEIInterface::persNameSignature(const QString& p_label, const QList<std::pair<M1Env::SpecialItemID, QString>>& p_fields){
+    QStringList l_parts{p_label};
+    for(const auto& l_field : p_fields) l_parts.append(QString("%1=%2").arg(l_field.first).arg(l_field.second));
+    return l_parts.join("|");
+}
+
+/**
+ * @brief Create an alternate-name Person node and link it to the main one (main --EQV_1--> alternate, EQV_2 reciprocal)
+ */
+void M1Store::TEIInterface::addAltPersName(M1Store::Item_lv2* p_person, const PersNameTEI& p_name){
+    M1Store::Item_lv2* l_alt = M1Store::Item_lv2::getNew(M1Env::FULL_VERTEX, altPersNameLabel(p_name).toUtf8().constData());
+    l_alt->setType(M1Env::PERS_TYPE_SIID);
+    setPersNameFields(l_alt, p_name);
+    p_person->linkTo(l_alt, M1Env::EQUIVALENT_1_SIID, InsertionPoint::at_bottom, InsertionPoint::at_bottom);
+}
+
+/**
+ * @brief Complete an existing Person node with <listPerson> data (e.g. the same <person> in a later chapter)
+ *
+ * Nothing is overwritten: only empty fields (main name, birth/death dates) are filled and alternate names not yet
+ * present (same label and same fields) are added.
+ *
+ * @param p_person the existing Person node
+ * @param p_data <listPerson> data for its key
+ */
+void M1Store::TEIInterface::mergePerson(M1Store::Item_lv2* p_person, const PersonTEI& p_data){
+    int l_added = 0;
+    for(const auto& l_field : p_data.m_names.first().m_fields)
+        if(p_person->getField(l_field.first).length() == 0){
+            p_person->setFieldEdge(l_field.second, l_field.first);
+            l_added++;
+        }
+    for(const auto& l_date : {std::pair<M1Env::SpecialItemID, QString>{M1Env::PERS_BIRTH_DATE_SIID, p_data.m_birth},
+                              std::pair<M1Env::SpecialItemID, QString>{M1Env::PERS_DEATH_DATE_SIID, p_data.m_death}})
+        if(l_date.second.length() > 0 && p_person->getField(l_date.first).length() == 0){
+            p_person->setFieldEdge(l_date.second, l_date.first);
+            l_added++;
+        }
+
+    // existing alternate names
+    QSet<QString> l_existing;
+    for(M1Store::Item_lv2_iterator l_it = p_person->getIteratorTop(); !l_it.beyondEnd(); l_it.next())
+        if(l_it.at()->isFullEdge() && !l_it.at()->isDead() && l_it.at()->isOfType(M1Env::EQUIVALENT_1_SIID)){
+            M1Store::Item_lv2* l_alt = l_it.at()->getTarget_lv2();
+            QList<std::pair<M1Env::SpecialItemID, QString>> l_fields;
+            for(const M1Env::SpecialItemID l_field : persNameFields()){
+                QString l_val = l_alt->getField(l_field);
+                if(l_val.length() > 0) l_fields.append({l_field, l_val});
+            }
+            l_existing.insert(persNameSignature(QString(l_alt->text()), l_fields));
+        }
+    for(int i = 1; i < p_data.m_names.size(); i++){
+        const PersNameTEI& l_name = p_data.m_names.at(i);
+        QString l_sig = persNameSignature(altPersNameLabel(l_name), l_name.m_fields);
+        if(!l_existing.contains(l_sig)){
+            addAltPersName(p_person, l_name);
+            l_existing.insert(l_sig);
+            l_added++;
+        }
+    }
+    if(l_added > 0)
+        qCDebug(g_cat_tei).noquote() << QString("Person [%1] completed: %2 field(s)/alternate name(s) added")
+                                            .arg(p_person->getField(M1Env::TEI_NAME_TERM_KEY_SIID)).arg(l_added);
+}
+
+/**
+ * @brief Get the Person node having this key in its NMTMK field, or create it from the <listPerson> data if there is none
+ *
+ * Only keys present in the <listPerson> of the current file are considered (nullptr otherwise).
+ *
+ * Existing Person nodes (from previous imports, see loadPersonCache()) are completed with the <listPerson> data of the
+ * current file, without overwriting anything (see mergePerson()), once per import.
+ *
+ * A new Person node gets the fields of the first <persName>, the birth/death dates and the NMTMK key. Each additional
+ * <persName> becomes a separate Person node (no NMTMK key, label = its @type/@xml:lang, e.g. "birth name [la]"),
+ * linked to the main one by an EQV_1 edge (EQV_2 reciprocal).
+ *
+ * @param p_key @xml:id of a <person> in <listPerson>
+ * @return the Person node or nullptr if the key is not in <listPerson>
+ */
+M1Store::Item_lv2* M1Store::TEIInterface::getPersonFromKey(const QString& p_key){
+    if(!cm_list_person.contains(p_key)) return nullptr;
+
+    loadPersonCache();
+    const PersonTEI& l_data = cm_list_person[p_key];
+    M1Store::Item_lv2* l_person = cm_person_by_key.value(p_key, nullptr);
+    if(l_person == nullptr){
+        // no label: the display text is made from the name fields (see PersonInterp::inTreeDisplayText())
+        l_person = M1Store::Item_lv2::getNew(M1Env::FULL_VERTEX, "");
+        l_person->setType(M1Env::PERS_TYPE_SIID);
+        setPersNameFields(l_person, l_data.m_names.first());
+        if(l_data.m_birth.length() > 0) l_person->setFieldEdge(l_data.m_birth, M1Env::PERS_BIRTH_DATE_SIID);
+        if(l_data.m_death.length() > 0) l_person->setFieldEdge(l_data.m_death, M1Env::PERS_DEATH_DATE_SIID);
+        l_person->setFieldEdge(p_key, M1Env::TEI_NAME_TERM_KEY_SIID);
+        cm_person_by_key[p_key] = l_person;
+
+        for(int i = 1; i < l_data.m_names.size(); i++) addAltPersName(l_person, l_data.m_names.at(i));
+        qCDebug(g_cat_tei).noquote() << QString("New Person [%1] (%2 alternate name(s))").arg(p_key).arg(l_data.m_names.size() - 1);
+    }
+    else if(!cm_person_done.contains(p_key))
+        mergePerson(l_person, l_data);
+    cm_person_done.insert(p_key);
+    return l_person;
+}
+
+/**
+ * @brief Link a <name> or <author> chunk to the corresponding Person node (Person --Owns--> chunk, chunk --Belongs to--> Person)
+ *
+ * Nothing is done if the key is not the @xml:id of a <person> in the header <listPerson>
+ *
+ * @param p_chunk the <name> or <author> chunk
+ * @param p_key its NMTMK key
+ */
+void M1Store::TEIInterface::linkChunkToPerson(M1Store::Item_lv2* p_chunk, const QString& p_key){
+    M1Store::Item_lv2* l_person = getPersonFromKey(p_key);
+    if(l_person != nullptr)
+        // occurrences in document order below the Person node
+        l_person->linkTo(p_chunk, M1Env::OWNS_SIID, InsertionPoint::at_bottom, InsertionPoint::at_top);
+}

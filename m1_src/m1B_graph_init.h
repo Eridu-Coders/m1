@@ -3,10 +3,6 @@
 
 namespace M1Env{
 
-// [FOLDR] Special Vertex ID (Vertex type) of folders (ordinary vertices with no special role)
-extern M1Env::SpecialItemID FOLDER_SIID;
-// [AUTO_] Special Vertex ID (Edge type) of AUTO edges
-extern M1Env::SpecialItemID AUTO_SIID;
 // [OWNS_] Special Vertex ID (Edge type) of ownership edges
 extern M1Env::SpecialItemID OWNS_SIID;
 // [BLNGS] Special Vertex ID (Edge type) of ownership edges (reciprocal of OWNS_ above))
@@ -19,10 +15,34 @@ extern M1Env::SpecialItemID ITO_SIID;
 extern M1Env::SpecialItemID TEXT_WROTE_SIID;
 // [WRTBY] Special Vertex ID (Edge type) wrote / written by (reciprocal of WROTE above))
 extern M1Env::SpecialItemID TEXT_WRITTEN_BY_SIID;
+// [EQV_1] Special Vertex ID (Edge type) equivalence relation
+extern M1Env::SpecialItemID EQUIVALENT_1_SIID;
+// [EQV_2] Special Vertex ID (Edge type) equivalence relation (reciprocal of EQV_1 above))
+extern M1Env::SpecialItemID EQUIVALENT_2_SIID;
 // [DTSDN] Special Vertex ID (Edge type) DS from / to
 extern M1Env::SpecialItemID DATA_SOURCE_FROM_SIID;
 // [DTSUP] Special Vertex ID (Edge type) DS from / to (reciprocal of DTSDN above))
 extern M1Env::SpecialItemID DATA_SOURCE_TO_SIID;
+// [C2OBG] Special Vertex ID (Edge type) begin chunk + reciprocal
+extern M1Env::SpecialItemID TW_CHUNK_2_OCC_BEGIN_SIID;
+// [O2CBG] Special Vertex ID (Edge type) begin chunk + reciprocal (reciprocal of C2OBG above))
+extern M1Env::SpecialItemID TW_OCC_2_CHUNK_BEGIN_SIID;
+// [C2OEN] Special Vertex ID (Edge type) end chunk + reciprocal
+extern M1Env::SpecialItemID TW_CHUNK_2_OCC_END_SIID;
+// [O2CEN] Special Vertex ID (Edge type) end chunk + reciprocal (reciprocal of C2OEN above))
+extern M1Env::SpecialItemID TW_OCC_2_CHUNK_END_SIID;
+// [FOLDR] Special Vertex ID (Vertex type) of folders (ordinary vertices with no special role)
+extern M1Env::SpecialItemID FOLDER_SIID;
+// [WFORM] Special Vertex ID (Vertex type) of word form vertices
+extern M1Env::SpecialItemID WFORM_SIID;
+// [URLNK] Special Vertex ID (Vertex type) Url link
+extern M1Env::SpecialItemID TEXT_URL_LINK_SIID;
+// [AUTO_] Special Vertex ID (Edge type) of AUTO edges
+extern M1Env::SpecialItemID AUTO_SIID;
+// [OCCUR] Special Vertex ID (Edge type) of form occurrence edges
+extern M1Env::SpecialItemID OCCUR_SIID;
+// [OCCIN] Special Vertex ID (Edge type) of form to point of occurrence edges
+extern M1Env::SpecialItemID OCCURS_IN_SIID;
 // [TXLNG] Special Vertex ID (Simple Edge type) of text language field
 extern M1Env::SpecialItemID TEXT_LANGUAGE_SIID;
 // [SLKNM] Special Vertex ID (Simple Edge type) of sloka number field
@@ -31,12 +51,6 @@ extern M1Env::SpecialItemID TEXT_SLOKA_NUMBER_SIID;
 extern M1Env::SpecialItemID TEXT_CHAP_NUMBER_SIID;
 // [LFGRM] Special Vertex ID (Simple Edge type) Lexicon form Grammatical analysis
 extern M1Env::SpecialItemID TEXT_LEXICON_GRAMMAR_SIID;
-// [OCCUR] Special Vertex ID (Edge type) of form occurrence edges
-extern M1Env::SpecialItemID OCCUR_SIID;
-// [OCCIN] Special Vertex ID (Edge type) of form to point of occurrence edges
-extern M1Env::SpecialItemID OCCURS_IN_SIID;
-// [WFORM] Special Vertex ID (Vertex type) of word form vertices
-extern M1Env::SpecialItemID WFORM_SIID;
 // [TXVRT] Special Vertex ID (Simple edge type) text version type: (G)round/(T)ranaslation
 extern M1Env::SpecialItemID TEXT_VER_TYPE_SIID;
 // [TXATL] Special Vertex ID (Simple edge type) alternate text title
@@ -69,7 +83,7 @@ extern M1Env::SpecialItemID TEXT_WFW_TRANSLAT_SIID;
 extern M1Env::SpecialItemID TEXT_WFW_POS_SIID;
 // [WFGRM] Special Vertex ID (Simple Edge type) WfW form Grammatical analysis
 extern M1Env::SpecialItemID TEXT_WFW_GRM_SIID;
-// [TEXID] Special Vertex ID (Simple Edge type) TEI @xml:id attribute
+// [TEXID] Special Vertex ID (Simple Edge type) TEI @xml:id attribute irrespective of tag
 extern M1Env::SpecialItemID TEI_XMLID_ATTR_SIID;
 // [TETYP] Special Vertex ID (Simple Edge type) TEI @type attribute
 extern M1Env::SpecialItemID TEI_TYPE_ATTR_SIID;
@@ -87,10 +101,12 @@ extern M1Env::SpecialItemID TEI_WHEN_ATTR_SIID;
 extern M1Env::SpecialItemID TEI_UNIT_ATTR_SIID;
 // [TETGT] Special Vertex ID (Simple Edge type) TEI @target attribute (for <ref>)
 extern M1Env::SpecialItemID TEI_TARGET_ATTR_SIID;
-// [TEREF] Special Vertex ID (Simple Edge type) TEI @ref attribute (for <author>, <name>, <term>)
+// [TEREF] Special Vertex ID (Simple Edge type) TEI @ref attribute irrespective of tag
 extern M1Env::SpecialItemID TEI_REF_ATTR_SIID;
 // [TELVL] Special Vertex ID (Simple Edge type) TEI @level attribute (for <title>)
 extern M1Env::SpecialItemID TEI_LEVEL_ATTR_SIID;
+// [NMTMK] Special Vertex ID (Simple Edge type) TEI <name>/<author>/<term> key (@xml:id, or @ref without leading #)
+extern M1Env::SpecialItemID TEI_NAME_TERM_KEY_SIID;
 // [TETAG] Special Vertex ID (Simple Edge type) TEI tag name (for mult-tag nodes like TXTCK)
 extern M1Env::SpecialItemID TEI_TAG_NAME_SIID;
 // [TETBR] Special Vertex ID (Simple Edge type) TEI table row count
@@ -103,16 +119,36 @@ extern M1Env::SpecialItemID TEI_ROW_ROLE_SIID;
 extern M1Env::SpecialItemID TEI_GRAPHIC_SIID;
 // [TELTP] Special Vertex ID (Simple Edge type) TEI <list> type
 extern M1Env::SpecialItemID TEI_LIST_TYPE_SIID;
-// [URLNK] Special Vertex ID (Vertex type) Url link
-extern M1Env::SpecialItemID TEXT_URL_LINK_SIID;
-// [C2OBG] Special Vertex ID (Edge type) begin chunk + reciprocal
-extern M1Env::SpecialItemID TW_CHUNK_2_OCC_BEGIN_SIID;
-// [O2CBG] Special Vertex ID (Edge type) begin chunk + reciprocal (reciprocal of C2OBG above))
-extern M1Env::SpecialItemID TW_OCC_2_CHUNK_BEGIN_SIID;
-// [C2OEN] Special Vertex ID (Edge type) end chunk + reciprocal
-extern M1Env::SpecialItemID TW_CHUNK_2_OCC_END_SIID;
-// [O2CEN] Special Vertex ID (Edge type) end chunk + reciprocal (reciprocal of C2OEN above))
-extern M1Env::SpecialItemID TW_OCC_2_CHUNK_END_SIID;
+// [PERFN] Special Vertex ID (Simple Edge type) Person first name / praenomen
+extern M1Env::SpecialItemID PERS_FIRST_NAME_SIID;
+// [PERMN] Special Vertex ID (Simple Edge type) Person middle name(s)
+extern M1Env::SpecialItemID PERS_MIDDLE_NAME_SIID;
+// [PERPN] Special Vertex ID (Simple Edge type) Person patronymic
+extern M1Env::SpecialItemID PERS_PATRONYMIC_SIID;
+// [PERNN] Special Vertex ID (Simple Edge type) Person nickname / cognomen
+extern M1Env::SpecialItemID PERS_NICKNAME_SIID;
+// [PERLN] Special Vertex ID (Simple Edge type) Person last name / nomen
+extern M1Env::SpecialItemID PERS_LAST_NAME_SIID;
+// [PERHN] Special Vertex ID (Simple Edge type) Person honorific (Sir, Dr., Saint, ...)
+extern M1Env::SpecialItemID PERS_HONORIFIC_SIID;
+// [PERTL] Special Vertex ID (Simple Edge type) Person title (ecclesiastical, nobility, ...)
+extern M1Env::SpecialItemID PERS_TITLE_SIID;
+// [PERTB] Special Vertex ID (Simple Edge type) Person toponymic byname (of Seville, da Vinci, ...)
+extern M1Env::SpecialItemID PERS_TOPONYMIC_SIID;
+// [PERBN] Special Vertex ID (Simple Edge type) Person birth date (free text)
+extern M1Env::SpecialItemID PERS_BIRTH_DATE_SIID;
+// [PERDN] Special Vertex ID (Simple Edge type) Person death date (free text)
+extern M1Env::SpecialItemID PERS_DEATH_DATE_SIID;
+// [PERRN] Special Vertex ID (Simple Edge type) Person regnal / generational number (XIV, Jr., ...)
+extern M1Env::SpecialItemID PERS_REGNAL_SIID;
+// [PERGN] Special Vertex ID (Simple Edge type) Person generational suffix (Jr., Sr., II, ...) displayed after the last name
+extern M1Env::SpecialItemID PERS_GENERATIONAL_SIID;
+// [PERAL] Special Vertex ID (Simple Edge type) Person alias(es) / pseudonym(s)
+extern M1Env::SpecialItemID PERS_ALIAS_SIID;
+// [MSGLK] Special Vertex ID (Simple Edge type) Phone number messaging app links (W/T/S/V)
+extern M1Env::SpecialItemID PHONE_MSG_LINKS_SIID;
+// [PHNCC] Special Vertex ID (Simple Edge type) Phone number country code
+extern M1Env::SpecialItemID PHONE_COUNTRY_CODE_SIID;
 
 // [ROOT_] Special Vertex ID of "Global graph root"
 extern M1Env::SpecialItemID ROOT_SIID;
@@ -126,10 +162,36 @@ extern M1Env::SpecialItemID TEXT_WORK_SIID;
 extern M1Env::SpecialItemID PERS_TYPE_SIID;
 // [ORGN_] Special Vertex ID of "Organization (type)"
 extern M1Env::SpecialItemID ORG_TYPE_SIID;
+// [CTCID] Special Vertex ID of "Contact ID (type)"
+extern M1Env::SpecialItemID CONTACT_ID_SIID;
+// [EMLCI] Special Vertex ID of "E-mail ID (type)"
+extern M1Env::SpecialItemID CTC_EMAIL_SIID;
+// [PHNCI] Special Vertex ID of "Phone Number (type)"
+extern M1Env::SpecialItemID CTC_PHONE_SIID;
+// [DCDCI] Special Vertex ID of "Discord ID (type)"
+extern M1Env::SpecialItemID CTC_DISCORD_SIID;
+// [FBKCI] Special Vertex ID of "Facebook URL (type)"
+extern M1Env::SpecialItemID CTC_FACEBOOK_SIID;
+// [SCTCI] Special Vertex ID of "SnapChat URL (type)"
+extern M1Env::SpecialItemID CTC_SNAPCHAT_SIID;
+// [ISTCI] Special Vertex ID of "Instagram URL (type)"
+extern M1Env::SpecialItemID CTC_INSTAGRAM_SIID;
+// [WCTCI] Special Vertex ID of "WeChat URL (type)"
+extern M1Env::SpecialItemID CTC_WECHAT_SIID;
+// [LKNCI] Special Vertex ID of "LinkedIn URL (type)"
+extern M1Env::SpecialItemID CTC_LINKEDIN_SIID;
+// [TWTCI] Special Vertex ID of "X URL (type)"
+extern M1Env::SpecialItemID CTC_X_SIID;
+// [YTBCI] Special Vertex ID of "YouTube URL (type)"
+extern M1Env::SpecialItemID CTC_YOUTUBE_SIID;
+// [SCKCI] Special Vertex ID of "Substack URL (type)"
+extern M1Env::SpecialItemID CTC_SUBSTACK_SIID;
 // [RLFLD] Special Vertex ID of "Role folder"
 extern M1Env::SpecialItemID ROLE_FLDR_SIID;
 // [TEXT_] Special Vertex ID of "Texts Root (type)"
 extern M1Env::SpecialItemID TEXT_SIID;
+// [WORKS] Special Vertex ID of "Works Root (type)"
+extern M1Env::SpecialItemID WORKS_SIID;
 // [_MSG_] Special Vertex ID of "Inboxes / Message Root Type"
 extern M1Env::SpecialItemID MSG_TYPE_SIID;
 // [ME___] Special Vertex ID of "Me"

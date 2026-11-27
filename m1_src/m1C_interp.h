@@ -10,6 +10,12 @@
 #include <QVBoxLayout>
 #include <QTimer>
 #include <QTextEdit>
+#include <QLineEdit>
+#include <QComboBox>
+#include <QCheckBox>
+#include <QPointer>
+#include <QFormLayout>
+#include <QPushButton>
 
 #include <memory>
 
@@ -138,7 +144,8 @@ public:
     virtual ~Drag();
 };
 
-} // namespace M1MidPlane
+} // namespace M1UI
+
 namespace M1MidPlane{
 
 class Interp : public QObject{
@@ -151,10 +158,10 @@ private:
     static std::map<M1Env::ItemID, std::shared_ptr<Interp>> cm_interp_map;
 
     QTextEdit* m_text_edit = nullptr;
-    M1UI::TreeRow* m_tree_row = nullptr;
 
     QString m_dbgOneLinerCache;
 protected:
+    M1UI::TreeRow* m_tree_row = nullptr;
     M1Store::Item_lv2* m_myself  = nullptr;
     static QString cm_html_template;
 
@@ -245,6 +252,19 @@ public:
     // virtual QString baseText();
 };
 
+/**
+ * @brief Interp for work nodes (WORKS): label preceded by the author name(s) in brackets, like TextInterp
+ */
+class WorkInterp : public Interp{
+    Q_OBJECT
+public:
+    static WorkInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    WorkInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "WorkInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+};
+
 class TextInterp : public Interp{
     Q_OBJECT
 private:
@@ -252,7 +272,9 @@ private:
     bool m_initialized = false;
 
     void initialize();
+    QString authorText() const;
 public:
+    static QString authorsOf(const M1Store::Item_lv2* p_item);
     static TextInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
 
     TextInterp(M1Store::Item_lv2* p_myself);
@@ -481,6 +503,90 @@ public:
     virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
     virtual QString getHtmlVirtual();
     virtual QWidget* get_edit_widget();
+};
+
+/**
+ * @brief One entry of the phone country codes list (loaded at startup from STORE_DATA_PATH/COUNTRY_CODES_FILE)
+ */
+struct PhoneCountryCode{
+    QString m_code;     ///< dialing code, e.g. "+33" (value stored in PHNCC fields)
+    QString m_label;    ///< country name(s) sharing that code, e.g. "France" or "Kazakhstan, Russia"
+};
+
+/**
+ * @brief Interp for Contact ID nodes (CTCID) - e-mail, phone numbers, Discord IDs and social media URLs
+ *
+ * URL subtypes are also typed URLNK and behave like UrlInterp (displayed in the browser panel)
+ */
+class ContactIdInterp : public Interp{
+    Q_OBJECT
+private:
+    static QList<PhoneCountryCode> cm_country_codes;
+public:
+    static void loadCountryCodes();
+    static const QList<PhoneCountryCode>& countryCodes(){return cm_country_codes;}
+    static const QList<std::pair<M1Env::SpecialItemID, QString>>& subtypes();
+    static bool isUrlSubtype(const M1Env::SpecialItemID p_subtype);
+    static M1Env::SpecialItemID subtypeOf(const M1Store::Item_lv2* p_contact);
+    static QString subtypeLabel(const M1Env::SpecialItemID p_subtype);
+
+    static ContactIdInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    ContactIdInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "ContactIdInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QIcon* vertexIcon(const M1Store::Item_lv2* p_edge=nullptr);
+    virtual QString getHtmlVirtual();
+};
+
+/**
+ * @brief Interp for Person nodes (PERSN) with name fields (PERHN, PERFN, PERMN, PERPN, PERNN, PERLN, PERTB, PERTL),
+ * birth/death dates (PERBN, PERDN) and owned Contact IDs
+ */
+class PersonInterp : public Interp{
+    Q_OBJECT
+private:
+    /// widgets of one contact ID row of the edit form
+    struct ContactRow{
+        M1Store::Item_lv2* m_contact = nullptr;
+        M1Store::Item_lv2* m_edge = nullptr;     ///< OWNS edge from this person to the contact
+        QLineEdit* m_value = nullptr;
+        QComboBox* m_country = nullptr;          ///< phone numbers only
+        QList<QCheckBox*> m_msg_links;           ///< phone numbers only (W, T, S, V)
+    };
+
+    QPointer<QWidget> m_form;
+    QLineEdit* m_label_edit = nullptr;
+    QList<std::pair<M1Env::SpecialItemID, QLineEdit*>> m_name_edits;
+    QFormLayout* m_names_layout = nullptr;
+    QList<QWidget*> m_full_only_edits;           ///< edits hidden in "short" mode (all but first/middle/last names)
+    QPushButton* m_mode_btn = nullptr;
+    static bool cm_full_mode;                    ///< last mode chosen (short/full), shared by all person forms
+    QVBoxLayout* m_contacts_layout = nullptr;
+    QComboBox* m_new_contact_type = nullptr;
+    std::vector<ContactRow> m_contact_rows;
+
+    QString namesText() const;
+    static QString localizedDates(const QString& p_text);
+public:
+    static QString shortName(const M1Store::Item_lv2* p_person);
+private:
+    void populateContacts();
+    void saveContactRows();
+    void refreshTree();
+public:
+    static PersonInterp* getOneIfMatch(M1Store::Item_lv2* p_myself);
+
+    PersonInterp(M1Store::Item_lv2* p_myself);
+    virtual QString className() {return "PersonInterp";}
+    virtual QString inTreeDisplayText(const M1Store::Item_lv2* p_edge);
+    virtual QString getHtmlVirtual();
+    virtual QWidget* get_edit_widget();
+public slots:
+    void save_person();
+    void toggle_mode(bool p_full);
+    void add_contact();
+    void delete_contact(M1Store::Item_lv2* p_edge);
 };
 
 class TEI_Container : public Interp{

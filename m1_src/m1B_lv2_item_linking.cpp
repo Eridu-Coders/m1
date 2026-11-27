@@ -540,3 +540,76 @@ M1Store::Item_lv2* M1Store::Item_lv2::create_descendant(
 
 /** @}*/
 // end of \defgroup LITO
+
+/**
+ * @brief [Private] remove this edge (full or simple) from the edge ring of its origin
+ *
+ * The edge is detached (its next/previous are looped back onto itself) but the item itself is not freed
+ */
+void M1Store::Item_lv2::removeFromRing(){
+    M1_FUNC_ENTRY(g_cat_lv2_members, QString("Removing edge from its ring: %1").arg(this->dbgShort()))
+    Q_ASSERT_X(this->isFullEdge() || this->isSimpleEdge(), "Item_lv2::removeFromRing()", "not an edge");
+
+    M1Store::Item_lv2* l_origin = this->getOrigin_lv2();
+    const ItemID l_id = this->item_id();
+    const ItemID l_next_id = this->next_item_id();
+
+    // id of the edge that will replace this one as first edge of the ring, if this one was the first edge
+    ItemID l_replacement_id = G_VOID_ITEM_ID;
+    if(l_next_id != l_id){
+        // ring with at least one other edge --> close the gap
+        M1Store::Item_lv2* l_previous = this->get_previous_lv2();
+        M1Store::Item_lv2* l_next = this->get_next_lv2();
+        l_previous->setNext_lv1(l_next_id);
+        l_next->setPrevious_lv1(l_previous->item_id());
+        l_replacement_id = l_next_id;
+    }
+    // otherwise this was the only edge of its ring --> the ring becomes empty (G_VOID_ITEM_ID first edge)
+
+    if(l_origin->firstEdge_item_id() == l_id) l_origin->setFirstEdge_lv1(l_replacement_id);
+    if(l_origin->firstEdgeSpecial_item_id() == l_id) l_origin->setFirstEdgeSpecial_lv1(l_replacement_id);
+
+    this->loopNextPrevious();
+    M1_FUNC_EXIT
+}
+
+/**
+ * @brief Remove this edge (and its reciprocal, if any) from the graph
+ *
+ * The edge items are not freed (no storage recycling yet) but they are no longer reachable from their origins
+ * and the incoming edge counters of their targets are decremented accordingly.
+ */
+void M1Store::Item_lv2::unlinkEdge(){
+    M1_FUNC_ENTRY(g_cat_lv2_members, QString("Unlinking edge: %1").arg(this->dbgShort()))
+    Q_ASSERT_X(this->isFullEdge() || this->isSimpleEdge(), "Item_lv2::unlinkEdge()", "not an edge");
+
+    if(this->isFullEdge()){
+        if(this->hasReciprocal()){
+            M1Store::Item_lv2* l_reciprocal = this->getReciprocalEdge_lv2();
+            l_reciprocal->removeFromRing();
+            // the target of the reciprocal is the origin of this edge
+            M1Store::Item_lv2* l_rec_target = l_reciprocal->getTarget_lv2();
+            if(l_rec_target->isFullVertex() || l_rec_target->isFullEdge()) l_rec_target->addIncomingEdges(-1);
+        }
+        // incoming edge counters only exist for full items (see Item_lv0::setTarget_lv0())
+        M1Store::Item_lv2* l_target = this->getTarget_lv2();
+        if(l_target->isFullVertex() || l_target->isFullEdge()) l_target->addIncomingEdges(-1);
+    }
+    this->removeFromRing();
+    M1_FUNC_EXIT
+}
+
+/**
+ * @brief Mark this edge (and its reciprocal, if any) as deleted by setting the EDGE_DEAD flag
+ *
+ * The edge stays in its ring (nothing is unhooked, so it can be recovered) but it is ignored by the tree display
+ */
+void M1Store::Item_lv2::deleteEdge(){
+    M1_FUNC_ENTRY(g_cat_lv2_members, QString("Deleting (EDGE_DEAD) edge: %1").arg(this->dbgShort()))
+    Q_ASSERT_X(this->isFullEdge() || this->isSimpleEdge(), "Item_lv2::deleteEdge()", "not an edge");
+
+    this->setFlag(M1Env::EDGE_DEAD);
+    if(this->isFullEdge() && this->hasReciprocal())
+        this->getReciprocalEdge_lv2()->setFlag(M1Env::EDGE_DEAD);
+    M1_FUNC_EXIT
+}

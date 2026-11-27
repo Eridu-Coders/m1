@@ -40,6 +40,9 @@ void M1MidPlane::Interp::init(){
     QTextStream l_in_ts(&l_file);
     l_in_ts.setEncoding(QStringConverter::Utf8);
     cm_html_template = l_in_ts.readAll();
+
+    // phone country codes list (Contact IDs)
+    ContactIdInterp::loadCountryCodes();
 }
 /** --------------------------------------------------------------- Interp Root Class ---------------------------------
  * @brief M1MidPlane::Interp::getInterp
@@ -75,8 +78,11 @@ std::shared_ptr<M1MidPlane::Interp> M1MidPlane::Interp::getInterp(M1Store::Item_
             // else if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break; DustbinInterp
             if((l_interp_raw = FieldInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = TextInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = WorkInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = RoleInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = WfWUnit::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = PersonInterp::getOneIfMatch(p_myself)) != nullptr) break;
+            else if((l_interp_raw = ContactIdInterp::getOneIfMatch(p_myself)) != nullptr) break; // before UrlInterp (URL contact IDs are also URLNK)
             else if((l_interp_raw = UrlInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = OccurInterp::getOneIfMatch(p_myself)) != nullptr) break;
             else if((l_interp_raw = FormInterp::getOneIfMatch(p_myself)) != nullptr) break;

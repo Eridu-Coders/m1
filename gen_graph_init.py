@@ -389,8 +389,7 @@ g_nlp_tag_list = [
 ]
 
 g_special_vertices = [
-    ['FOLDR', ['SI_IS_TYPE', 'SI_IS_SELECTABLE'],          'FOLDER_ICON_PATH',           'FOLDER_SIID', None,               'Special Vertex ID (Vertex type) of folders (ordinary vertices with no special role)'],
-    ['AUTO_', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'AUTO_ICON_PATH',             'AUTO_SIID', None,                 'Special Vertex ID (Edge type) of AUTO edges'],
+    # Edge type pairs
     # --------------------------- OWNS / BLNGS ---------------------------
     ['OWNS_', ['SI_IS_TYPE', 'SI_EDGE_TYPE',
                'SI_IS_SELECTABLE'],                        'OWNS_ICON_PATH',             'OWNS_SIID',
@@ -404,18 +403,33 @@ g_special_vertices = [
     # --------------------------- WROTE / WRTBY ---------------------------
     ['WROTE', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'TEXT_WROTE_ICON_PATH',      'TEXT_WROTE_SIID',
     ('WRTBY', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'TEXT_WRITTEN_BY_ICON_PATH', 'TEXT_WRITTEN_BY_SIID'),            'Special Vertex ID (Edge type) wrote / written by'],
+    # --------------------------- WROTE / WRTBY ---------------------------
+    ['EQV_1', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'EQUIVALENT_ICON_PATH',      'EQUIVALENT_1_SIID',
+    ('EQV_2', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'EQUIVALENT_ICON_PATH',      'EQUIVALENT_2_SIID'),               'Special Vertex ID (Edge type) equivalence relation'],
     # --------------------------- DS from / to ----------------------------
     ['DTSDN', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'DATA_SOURCE_ICON_PATH',     'DATA_SOURCE_FROM_SIID',
     ('DTSUP', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'DATA_SOURCE_ICON_PATH',     'DATA_SOURCE_TO_SIID'),             'Special Vertex ID (Edge type) DS from / to'],
+    # --------------------------- HS2OB / OC2HB ---------------------------
+    ['C2OBG', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_BEGIN_ICON_PATH', 'TW_CHUNK_2_OCC_BEGIN_SIID',
+    ('O2CBG', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_BEGIN_ICON_PATH', 'TW_OCC_2_CHUNK_BEGIN_SIID'), 'Special Vertex ID (Edge type) begin chunk + reciprocal'],
+    # --------------------------- HS2OE / OC2HE ---------------------------
+    ['C2OEN', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_END_ICON_PATH',   'TW_CHUNK_2_OCC_END_SIID',
+    ('O2CEN', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_END_ICON_PATH',   'TW_OCC_2_CHUNK_END_SIID'),   'Special Vertex ID (Edge type) end chunk + reciprocal'],
     # ---------------------------------------------------------------------
+    # Edge-less vertex types
+    ['FOLDR', ['SI_IS_TYPE', 'SI_IS_SELECTABLE'],          'FOLDER_ICON_PATH',           'FOLDER_SIID', None,               'Special Vertex ID (Vertex type) of folders (ordinary vertices with no special role)'],
+    ['WFORM', 'SI_IS_TYPE | SI_IS_ICON_TYPE',              'WFORM_ICON_PATH',           'WFORM_SIID', None,                 'Special Vertex ID (Vertex type) of word form vertices'],
+    ['URLNK', 'SI_IS_TYPE',                                'TEXT_URL_LINK_ICON_PATH',   'TEXT_URL_LINK_SIID', None,         'Special Vertex ID (Vertex type) Url link'],
+    # Edge types
+    ['AUTO_', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'AUTO_ICON_PATH',             'AUTO_SIID', None,                 'Special Vertex ID (Edge type) of AUTO edges'],
+    ['OCCUR', ['SI_IS_TYPE', 'SI_EDGE_TYPE',
+               'SI_IS_SPECIAL_EDGE'],                      'OCCURRENCE_ICON_PATH',      'OCCUR_SIID', None,                 'Special Vertex ID (Edge type) of form occurrence edges'],
+    ['OCCIN', ['SI_IS_TYPE', 'SI_EDGE_TYPE',],             'OCCURRENCE_ICON_PATH',      'OCCURS_IN_SIID', None,             'Special Vertex ID (Edge type) of form to point of occurrence edges'],
+    # Fields
     ['TXLNG', 'SI_IS_TYPE',                                None,                        'TEXT_LANGUAGE_SIID', None,         'Special Vertex ID (Simple Edge type) of text language field'],
     ['SLKNM', 'SI_IS_TYPE',                                None,                        'TEXT_SLOKA_NUMBER_SIID', None,     'Special Vertex ID (Simple Edge type) of sloka number field'],
     ['CHPNM', 'SI_IS_TYPE',                                None,                        'TEXT_CHAP_NUMBER_SIID', None,      'Special Vertex ID (Simple Edge type) of chapter number field'],
     ['LFGRM', 'SI_IS_TYPE',                                None,                        'TEXT_LEXICON_GRAMMAR_SIID', None,  'Special Vertex ID (Simple Edge type) Lexicon form Grammatical analysis'],
-    ['OCCUR', ['SI_IS_TYPE', 'SI_EDGE_TYPE',
-               'SI_IS_SPECIAL_EDGE'],                      'OCCURRENCE_ICON_PATH',      'OCCUR_SIID', None,                 'Special Vertex ID (Edge type) of form occurrence edges'],
-    ['OCCIN', ['SI_IS_TYPE', 'SI_EDGE_TYPE',],             'OCCURRENCE_ICON_PATH',      'OCCURS_IN_SIID', None,             'Special Vertex ID (Edge type) of form to point of occurrence edges'],
-    ['WFORM', 'SI_IS_TYPE | SI_IS_ICON_TYPE',              'WFORM_ICON_PATH',           'WFORM_SIID', None,                 'Special Vertex ID (Vertex type) of word form vertices'],
     ['TXVRT', 'SI_IS_TYPE',                                None,                        'TEXT_VER_TYPE_SIID', None,         'Special Vertex ID (Simple edge type) text version type: (G)round/(T)ranaslation'],
     ['TXATL', 'SI_IS_TYPE',                                None,                        'TEXT_ALT_TITLE_SIID', None,        'Special Vertex ID (Simple edge type) alternate text title'],
     ['TXSBT', 'SI_IS_TYPE',                                None,                        'TEXT_SUB_TITLE_SIID', None,        'Special Vertex ID (Simple edge type) text subtitle'],
@@ -432,7 +446,7 @@ g_special_vertices = [
     ['WFTRN', 'SI_IS_TYPE',                                None,                        'TEXT_WFW_TRANSLAT_SIID', None,     'Special Vertex ID (Simple Edge type) WfW unit Translation field'],
     ['WFPOS', 'SI_IS_TYPE',                                None,                        'TEXT_WFW_POS_SIID', None,          'Special Vertex ID (Simple Edge type) WfW form POS tag'],
     ['WFGRM', 'SI_IS_TYPE',                                None,                        'TEXT_WFW_GRM_SIID', None,          'Special Vertex ID (Simple Edge type) WfW form Grammatical analysis'],
-    ['TEXID', 'SI_IS_TYPE',                                None,                        'TEI_XMLID_ATTR_SIID', None,        'Special Vertex ID (Simple Edge type) TEI @xml:id attribute'],
+    ['TEXID', 'SI_IS_TYPE',                                None,                        'TEI_XMLID_ATTR_SIID', None,        'Special Vertex ID (Simple Edge type) TEI @xml:id attribute irrespective of tag'],
     ['TETYP', 'SI_IS_TYPE',                                None,                        'TEI_TYPE_ATTR_SIID', None,         'Special Vertex ID (Simple Edge type) TEI @type attribute'],
     ['TEINA', 'SI_IS_TYPE',                                None,                        'TEI_N_ATTR_SIID', None,            'Special Vertex ID (Simple Edge type) TEI @n attribute'],
     ['TERND', 'SI_IS_TYPE',                                None,                        'TEI_REND_ATTR_SIID', None,         'Special Vertex ID (Simple Edge type) TEI @rend attribute (for <hi>)'],
@@ -441,21 +455,32 @@ g_special_vertices = [
     ['TEWHN', 'SI_IS_TYPE',                                None,                        'TEI_WHEN_ATTR_SIID', None,         'Special Vertex ID (Simple Edge type) TEI @when attribute (for <date>)'],
     ['TEUNT', 'SI_IS_TYPE',                                None,                        'TEI_UNIT_ATTR_SIID', None,         'Special Vertex ID (Simple Edge type) TEI @unit attribute (for <citedRange>, <biblScope>)'],
     ['TETGT', 'SI_IS_TYPE',                                None,                        'TEI_TARGET_ATTR_SIID', None,       'Special Vertex ID (Simple Edge type) TEI @target attribute (for <ref>)'],
-    ['TEREF', 'SI_IS_TYPE',                                None,                        'TEI_REF_ATTR_SIID', None,          'Special Vertex ID (Simple Edge type) TEI @ref attribute (for <author>, <name>, <term>)'],
+    ['TEREF', 'SI_IS_TYPE',                                None,                        'TEI_REF_ATTR_SIID', None,          'Special Vertex ID (Simple Edge type) TEI @ref attribute irrespective of tag'],
     ['TELVL', 'SI_IS_TYPE',                                None,                        'TEI_LEVEL_ATTR_SIID', None,        'Special Vertex ID (Simple Edge type) TEI @level attribute (for <title>)'],
+    ['NMTMK', 'SI_IS_TYPE',                                None,                        'TEI_NAME_TERM_KEY_SIID', None,     'Special Vertex ID (Simple Edge type) TEI <name>/<author>/<term> key (@xml:id, or @ref without leading #)'],
     ['TETAG', 'SI_IS_TYPE',                                None,                        'TEI_TAG_NAME_SIID', None,          'Special Vertex ID (Simple Edge type) TEI tag name (for mult-tag nodes like TXTCK)'],
     ['TETBR', 'SI_IS_TYPE',                                None,                        'TEI_TABLE_ROWS_SIID', None,        'Special Vertex ID (Simple Edge type) TEI table row count'],
     ['TETBC', 'SI_IS_TYPE',                                None,                        'TEI_TABLE_COLS_SIID', None,        'Special Vertex ID (Simple Edge type) TEI table column count'],
     ['TERRL', 'SI_IS_TYPE',                                None,                        'TEI_ROW_ROLE_SIID', None,          'Special Vertex ID (Simple Edge type) TEI table row role'],
     ['TEGRP', 'SI_IS_TYPE',                                None,                        'TEI_GRAPHIC_SIID', None,           'Special Vertex ID (Simple Edge type) TEI <graphic> path'],
     ['TELTP', 'SI_IS_TYPE',                                None,                        'TEI_LIST_TYPE_SIID', None,         'Special Vertex ID (Simple Edge type) TEI <list> type'],
-    ['URLNK', 'SI_IS_TYPE',                                'TEXT_URL_LINK_ICON_PATH',   'TEXT_URL_LINK_SIID', None,         'Special Vertex ID (Vertex type) Url link'],
-    # --------------------------- HS2OB / OC2HB ---------------------------
-    ['C2OBG', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_BEGIN_ICON_PATH', 'TW_CHUNK_2_OCC_BEGIN_SIID',
-    ('O2CBG', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_BEGIN_ICON_PATH', 'TW_OCC_2_CHUNK_BEGIN_SIID'), 'Special Vertex ID (Edge type) begin chunk + reciprocal'],
-    # --------------------------- HS2OE / OC2HE ---------------------------
-    ['C2OEN', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_END_ICON_PATH',   'TW_CHUNK_2_OCC_END_SIID',
-    ('O2CEN', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_END_ICON_PATH',   'TW_OCC_2_CHUNK_END_SIID'),   'Special Vertex ID (Edge type) end chunk + reciprocal'],
+    # --------------------------- Person name fields ----------------------
+    ['PERFN', 'SI_IS_TYPE',                                None,                        'PERS_FIRST_NAME_SIID', None,       'Special Vertex ID (Simple Edge type) Person first name / praenomen'],
+    ['PERMN', 'SI_IS_TYPE',                                None,                        'PERS_MIDDLE_NAME_SIID', None,      'Special Vertex ID (Simple Edge type) Person middle name(s)'],
+    ['PERPN', 'SI_IS_TYPE',                                None,                        'PERS_PATRONYMIC_SIID', None,       'Special Vertex ID (Simple Edge type) Person patronymic'],
+    ['PERNN', 'SI_IS_TYPE',                                None,                        'PERS_NICKNAME_SIID', None,         'Special Vertex ID (Simple Edge type) Person nickname / cognomen'],
+    ['PERLN', 'SI_IS_TYPE',                                None,                        'PERS_LAST_NAME_SIID', None,        'Special Vertex ID (Simple Edge type) Person last name / nomen'],
+    ['PERHN', 'SI_IS_TYPE',                                None,                        'PERS_HONORIFIC_SIID', None,        'Special Vertex ID (Simple Edge type) Person honorific (Sir, Dr., Saint, ...)'],
+    ['PERTL', 'SI_IS_TYPE',                                None,                        'PERS_TITLE_SIID', None,            'Special Vertex ID (Simple Edge type) Person title (ecclesiastical, nobility, ...)'],
+    ['PERTB', 'SI_IS_TYPE',                                None,                        'PERS_TOPONYMIC_SIID', None,        'Special Vertex ID (Simple Edge type) Person toponymic byname (of Seville, da Vinci, ...)'],
+    ['PERBN', 'SI_IS_TYPE',                                None,                        'PERS_BIRTH_DATE_SIID', None,       'Special Vertex ID (Simple Edge type) Person birth date (free text)'],
+    ['PERDN', 'SI_IS_TYPE',                                None,                        'PERS_DEATH_DATE_SIID', None,       'Special Vertex ID (Simple Edge type) Person death date (free text)'],
+    ['PERRN', 'SI_IS_TYPE',                                None,                        'PERS_REGNAL_SIID', None,           'Special Vertex ID (Simple Edge type) Person regnal / generational number (XIV, Jr., ...)'],
+    ['PERGN', 'SI_IS_TYPE',                                None,                        'PERS_GENERATIONAL_SIID', None,     'Special Vertex ID (Simple Edge type) Person generational suffix (Jr., Sr., II, ...) displayed after the last name'],
+    ['PERAL', 'SI_IS_TYPE',                                None,                        'PERS_ALIAS_SIID', None,            'Special Vertex ID (Simple Edge type) Person alias(es) / pseudonym(s)'],
+    # --------------------------- Contact ID fields -----------------------
+    ['MSGLK', 'SI_IS_TYPE',                                None,                        'PHONE_MSG_LINKS_SIID', None,       'Special Vertex ID (Simple Edge type) Phone number messaging app links (W/T/S/V)'],
+    ['PHNCC', 'SI_IS_TYPE',                                None,                        'PHONE_COUNTRY_CODE_SIID', None,    'Special Vertex ID (Simple Edge type) Phone number country code'],
 ]
 
 g_vertices = [
@@ -470,9 +495,24 @@ g_vertices = [
                                                                                                                'SI_IS_SELECTABLE'],                'PERSON_ICON_PATH',       'PERS_TYPE_SIID'],
 ['Organization (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'ORGN_', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
                                                                                                                'SI_IS_SELECTABLE'],                'ORGANIZATION_ICON_PATH', 'ORG_TYPE_SIID'],
+['Contact ID (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'CTCID', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
+                                                                                                               'SI_IS_ICON_TYPE'],                 'CONTACT_ID_ICON_PATH',   'CONTACT_ID_SIID'],
+['E-mail ID (type)',             ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_', 'CTCID'], None,          'EMLCI', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'CONTACT_ID_ICON_PATH',   'CTC_EMAIL_SIID'],
+['Phone Number (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_', 'CTCID'], None,          'PHNCI', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'CONTACT_ID_ICON_PATH',   'CTC_PHONE_SIID'],
+['Discord ID (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_', 'CTCID'], None,          'DCDCI', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'CONTACT_ID_ICON_PATH',   'CTC_DISCORD_SIID'],
+['Facebook URL (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_', 'CTCID'], None,          'FBKCI', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'CONTACT_ID_ICON_PATH',   'CTC_FACEBOOK_SIID'],
+['SnapChat URL (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_', 'CTCID'], None,          'SCTCI', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'CONTACT_ID_ICON_PATH',   'CTC_SNAPCHAT_SIID'],
+['Instagram URL (type)',         ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_', 'CTCID'], None,          'ISTCI', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'CONTACT_ID_ICON_PATH',   'CTC_INSTAGRAM_SIID'],
+['WeChat URL (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_', 'CTCID'], None,          'WCTCI', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'CONTACT_ID_ICON_PATH',   'CTC_WECHAT_SIID'],
+['LinkedIn URL (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_', 'CTCID'], None,          'LKNCI', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'CONTACT_ID_ICON_PATH',   'CTC_LINKEDIN_SIID'],
+['X URL (type)',                 ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_', 'CTCID'], None,          'TWTCI', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'CONTACT_ID_ICON_PATH',   'CTC_X_SIID'],
+['YouTube URL (type)',           ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_', 'CTCID'], None,          'YTBCI', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'CONTACT_ID_ICON_PATH',   'CTC_YOUTUBE_SIID'],
+['Substack URL (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_', 'CTCID'], None,          'SCKCI', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'CONTACT_ID_ICON_PATH',   'CTC_SUBSTACK_SIID'],
 ['Role folder',                  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  None,                  'RLFLD', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'ROLE_FOLDER_ICON_PATH',  'ROLE_FLDR_SIID'],
 ['Texts Root (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'TEXT_', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
                                                                                                                'SI_IS_SELECTABLE'],                'TEXT_ICON_PATH',         'TEXT_SIID'],
+['Works Root (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], 'WORKS', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
+                                                                                                               'SI_IS_SELECTABLE'],                'WORKS_ICON_PATH',        'WORKS_SIID'],
 #['Baghavad Gita',                ['FULL_VERTEX',  'IS_SPECIAL'],  ['FOLDR'],  [('BLNGS',  'HOME_')], 'BGRT_', '0',                                 None,                     'BG_ROOT_SIID'],
 #['The Republic (Plato)',         ['FULL_VERTEX',  'IS_SPECIAL'],  ['FOLDR'],  [('BLNGS',  'HOME_')], 'REPRT', '0',                                 None,                     'REPUBLIC_ROOT_SIID'],
 ['Inboxes / Message Root Type',  ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'HOME_')], '_MSG_', ['SI_IS_TYPE'],                      None,                     'MSG_TYPE_SIID'],

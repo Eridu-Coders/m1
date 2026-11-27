@@ -138,6 +138,8 @@ M1UI::TreeRow* M1UI::TreeDisplay::addRowRecur(
 
     for(M1Store::Item_lv2_iterator it = p_root->getIteratorTop(); !it.beyondEnd(); it.next()){
         M1UI::TreeRow* l_tr = nullptr;
+        // deleted edges are not displayed
+        if(it.at()->isDead()) continue;
         // instantiate the line for this edge
         if(it.at()->isOfType(M1Env::AUTO_SIID)){
             qCDebug(g_cat_tree_display) << "current edge (auto) : " << it.at()->dbgShort() << " Auto? " << it.at()->isOfType(M1Env::AUTO_SIID);

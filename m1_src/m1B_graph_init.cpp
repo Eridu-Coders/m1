@@ -3,10 +3,6 @@
 #include "m1B_store.h"
 #include "m1B_lv2_item.h"
 
-// [FOLDR] Special Vertex ID (Vertex type) of folders (ordinary vertices with no special role)
-M1Env::SpecialItemID M1Env::FOLDER_SIID = G_NONEX_SI_ID;
-// [AUTO_] Special Vertex ID (Edge type) of AUTO edges
-M1Env::SpecialItemID M1Env::AUTO_SIID = G_NONEX_SI_ID;
 // [OWNS_] Special Vertex ID (Edge type) of ownership edges
 M1Env::SpecialItemID M1Env::OWNS_SIID = G_NONEX_SI_ID;
 // [BLNGS] Special Vertex ID (Edge type) of ownership edges (reciprocal of OWNS_ above))
@@ -19,10 +15,34 @@ M1Env::SpecialItemID M1Env::ITO_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_WROTE_SIID = G_NONEX_SI_ID;
 // [WRTBY] Special Vertex ID (Edge type) wrote / written by (reciprocal of WROTE above))
 M1Env::SpecialItemID M1Env::TEXT_WRITTEN_BY_SIID = G_NONEX_SI_ID;
+// [EQV_1] Special Vertex ID (Edge type) equivalence relation
+M1Env::SpecialItemID M1Env::EQUIVALENT_1_SIID = G_NONEX_SI_ID;
+// [EQV_2] Special Vertex ID (Edge type) equivalence relation (reciprocal of EQV_1 above))
+M1Env::SpecialItemID M1Env::EQUIVALENT_2_SIID = G_NONEX_SI_ID;
 // [DTSDN] Special Vertex ID (Edge type) DS from / to
 M1Env::SpecialItemID M1Env::DATA_SOURCE_FROM_SIID = G_NONEX_SI_ID;
 // [DTSUP] Special Vertex ID (Edge type) DS from / to (reciprocal of DTSDN above))
 M1Env::SpecialItemID M1Env::DATA_SOURCE_TO_SIID = G_NONEX_SI_ID;
+// [C2OBG] Special Vertex ID (Edge type) begin chunk + reciprocal
+M1Env::SpecialItemID M1Env::TW_CHUNK_2_OCC_BEGIN_SIID = G_NONEX_SI_ID;
+// [O2CBG] Special Vertex ID (Edge type) begin chunk + reciprocal (reciprocal of C2OBG above))
+M1Env::SpecialItemID M1Env::TW_OCC_2_CHUNK_BEGIN_SIID = G_NONEX_SI_ID;
+// [C2OEN] Special Vertex ID (Edge type) end chunk + reciprocal
+M1Env::SpecialItemID M1Env::TW_CHUNK_2_OCC_END_SIID = G_NONEX_SI_ID;
+// [O2CEN] Special Vertex ID (Edge type) end chunk + reciprocal (reciprocal of C2OEN above))
+M1Env::SpecialItemID M1Env::TW_OCC_2_CHUNK_END_SIID = G_NONEX_SI_ID;
+// [FOLDR] Special Vertex ID (Vertex type) of folders (ordinary vertices with no special role)
+M1Env::SpecialItemID M1Env::FOLDER_SIID = G_NONEX_SI_ID;
+// [WFORM] Special Vertex ID (Vertex type) of word form vertices
+M1Env::SpecialItemID M1Env::WFORM_SIID = G_NONEX_SI_ID;
+// [URLNK] Special Vertex ID (Vertex type) Url link
+M1Env::SpecialItemID M1Env::TEXT_URL_LINK_SIID = G_NONEX_SI_ID;
+// [AUTO_] Special Vertex ID (Edge type) of AUTO edges
+M1Env::SpecialItemID M1Env::AUTO_SIID = G_NONEX_SI_ID;
+// [OCCUR] Special Vertex ID (Edge type) of form occurrence edges
+M1Env::SpecialItemID M1Env::OCCUR_SIID = G_NONEX_SI_ID;
+// [OCCIN] Special Vertex ID (Edge type) of form to point of occurrence edges
+M1Env::SpecialItemID M1Env::OCCURS_IN_SIID = G_NONEX_SI_ID;
 // [TXLNG] Special Vertex ID (Simple Edge type) of text language field
 M1Env::SpecialItemID M1Env::TEXT_LANGUAGE_SIID = G_NONEX_SI_ID;
 // [SLKNM] Special Vertex ID (Simple Edge type) of sloka number field
@@ -31,12 +51,6 @@ M1Env::SpecialItemID M1Env::TEXT_SLOKA_NUMBER_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_CHAP_NUMBER_SIID = G_NONEX_SI_ID;
 // [LFGRM] Special Vertex ID (Simple Edge type) Lexicon form Grammatical analysis
 M1Env::SpecialItemID M1Env::TEXT_LEXICON_GRAMMAR_SIID = G_NONEX_SI_ID;
-// [OCCUR] Special Vertex ID (Edge type) of form occurrence edges
-M1Env::SpecialItemID M1Env::OCCUR_SIID = G_NONEX_SI_ID;
-// [OCCIN] Special Vertex ID (Edge type) of form to point of occurrence edges
-M1Env::SpecialItemID M1Env::OCCURS_IN_SIID = G_NONEX_SI_ID;
-// [WFORM] Special Vertex ID (Vertex type) of word form vertices
-M1Env::SpecialItemID M1Env::WFORM_SIID = G_NONEX_SI_ID;
 // [TXVRT] Special Vertex ID (Simple edge type) text version type: (G)round/(T)ranaslation
 M1Env::SpecialItemID M1Env::TEXT_VER_TYPE_SIID = G_NONEX_SI_ID;
 // [TXATL] Special Vertex ID (Simple edge type) alternate text title
@@ -69,7 +83,7 @@ M1Env::SpecialItemID M1Env::TEXT_WFW_TRANSLAT_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_WFW_POS_SIID = G_NONEX_SI_ID;
 // [WFGRM] Special Vertex ID (Simple Edge type) WfW form Grammatical analysis
 M1Env::SpecialItemID M1Env::TEXT_WFW_GRM_SIID = G_NONEX_SI_ID;
-// [TEXID] Special Vertex ID (Simple Edge type) TEI @xml:id attribute
+// [TEXID] Special Vertex ID (Simple Edge type) TEI @xml:id attribute irrespective of tag
 M1Env::SpecialItemID M1Env::TEI_XMLID_ATTR_SIID = G_NONEX_SI_ID;
 // [TETYP] Special Vertex ID (Simple Edge type) TEI @type attribute
 M1Env::SpecialItemID M1Env::TEI_TYPE_ATTR_SIID = G_NONEX_SI_ID;
@@ -87,10 +101,12 @@ M1Env::SpecialItemID M1Env::TEI_WHEN_ATTR_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEI_UNIT_ATTR_SIID = G_NONEX_SI_ID;
 // [TETGT] Special Vertex ID (Simple Edge type) TEI @target attribute (for <ref>)
 M1Env::SpecialItemID M1Env::TEI_TARGET_ATTR_SIID = G_NONEX_SI_ID;
-// [TEREF] Special Vertex ID (Simple Edge type) TEI @ref attribute (for <author>, <name>, <term>)
+// [TEREF] Special Vertex ID (Simple Edge type) TEI @ref attribute irrespective of tag
 M1Env::SpecialItemID M1Env::TEI_REF_ATTR_SIID = G_NONEX_SI_ID;
 // [TELVL] Special Vertex ID (Simple Edge type) TEI @level attribute (for <title>)
 M1Env::SpecialItemID M1Env::TEI_LEVEL_ATTR_SIID = G_NONEX_SI_ID;
+// [NMTMK] Special Vertex ID (Simple Edge type) TEI <name>/<author>/<term> key (@xml:id, or @ref without leading #)
+M1Env::SpecialItemID M1Env::TEI_NAME_TERM_KEY_SIID = G_NONEX_SI_ID;
 // [TETAG] Special Vertex ID (Simple Edge type) TEI tag name (for mult-tag nodes like TXTCK)
 M1Env::SpecialItemID M1Env::TEI_TAG_NAME_SIID = G_NONEX_SI_ID;
 // [TETBR] Special Vertex ID (Simple Edge type) TEI table row count
@@ -103,16 +119,36 @@ M1Env::SpecialItemID M1Env::TEI_ROW_ROLE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEI_GRAPHIC_SIID = G_NONEX_SI_ID;
 // [TELTP] Special Vertex ID (Simple Edge type) TEI <list> type
 M1Env::SpecialItemID M1Env::TEI_LIST_TYPE_SIID = G_NONEX_SI_ID;
-// [URLNK] Special Vertex ID (Vertex type) Url link
-M1Env::SpecialItemID M1Env::TEXT_URL_LINK_SIID = G_NONEX_SI_ID;
-// [C2OBG] Special Vertex ID (Edge type) begin chunk + reciprocal
-M1Env::SpecialItemID M1Env::TW_CHUNK_2_OCC_BEGIN_SIID = G_NONEX_SI_ID;
-// [O2CBG] Special Vertex ID (Edge type) begin chunk + reciprocal (reciprocal of C2OBG above))
-M1Env::SpecialItemID M1Env::TW_OCC_2_CHUNK_BEGIN_SIID = G_NONEX_SI_ID;
-// [C2OEN] Special Vertex ID (Edge type) end chunk + reciprocal
-M1Env::SpecialItemID M1Env::TW_CHUNK_2_OCC_END_SIID = G_NONEX_SI_ID;
-// [O2CEN] Special Vertex ID (Edge type) end chunk + reciprocal (reciprocal of C2OEN above))
-M1Env::SpecialItemID M1Env::TW_OCC_2_CHUNK_END_SIID = G_NONEX_SI_ID;
+// [PERFN] Special Vertex ID (Simple Edge type) Person first name / praenomen
+M1Env::SpecialItemID M1Env::PERS_FIRST_NAME_SIID = G_NONEX_SI_ID;
+// [PERMN] Special Vertex ID (Simple Edge type) Person middle name(s)
+M1Env::SpecialItemID M1Env::PERS_MIDDLE_NAME_SIID = G_NONEX_SI_ID;
+// [PERPN] Special Vertex ID (Simple Edge type) Person patronymic
+M1Env::SpecialItemID M1Env::PERS_PATRONYMIC_SIID = G_NONEX_SI_ID;
+// [PERNN] Special Vertex ID (Simple Edge type) Person nickname / cognomen
+M1Env::SpecialItemID M1Env::PERS_NICKNAME_SIID = G_NONEX_SI_ID;
+// [PERLN] Special Vertex ID (Simple Edge type) Person last name / nomen
+M1Env::SpecialItemID M1Env::PERS_LAST_NAME_SIID = G_NONEX_SI_ID;
+// [PERHN] Special Vertex ID (Simple Edge type) Person honorific (Sir, Dr., Saint, ...)
+M1Env::SpecialItemID M1Env::PERS_HONORIFIC_SIID = G_NONEX_SI_ID;
+// [PERTL] Special Vertex ID (Simple Edge type) Person title (ecclesiastical, nobility, ...)
+M1Env::SpecialItemID M1Env::PERS_TITLE_SIID = G_NONEX_SI_ID;
+// [PERTB] Special Vertex ID (Simple Edge type) Person toponymic byname (of Seville, da Vinci, ...)
+M1Env::SpecialItemID M1Env::PERS_TOPONYMIC_SIID = G_NONEX_SI_ID;
+// [PERBN] Special Vertex ID (Simple Edge type) Person birth date (free text)
+M1Env::SpecialItemID M1Env::PERS_BIRTH_DATE_SIID = G_NONEX_SI_ID;
+// [PERDN] Special Vertex ID (Simple Edge type) Person death date (free text)
+M1Env::SpecialItemID M1Env::PERS_DEATH_DATE_SIID = G_NONEX_SI_ID;
+// [PERRN] Special Vertex ID (Simple Edge type) Person regnal / generational number (XIV, Jr., ...)
+M1Env::SpecialItemID M1Env::PERS_REGNAL_SIID = G_NONEX_SI_ID;
+// [PERGN] Special Vertex ID (Simple Edge type) Person generational suffix (Jr., Sr., II, ...) displayed after the last name
+M1Env::SpecialItemID M1Env::PERS_GENERATIONAL_SIID = G_NONEX_SI_ID;
+// [PERAL] Special Vertex ID (Simple Edge type) Person alias(es) / pseudonym(s)
+M1Env::SpecialItemID M1Env::PERS_ALIAS_SIID = G_NONEX_SI_ID;
+// [MSGLK] Special Vertex ID (Simple Edge type) Phone number messaging app links (W/T/S/V)
+M1Env::SpecialItemID M1Env::PHONE_MSG_LINKS_SIID = G_NONEX_SI_ID;
+// [PHNCC] Special Vertex ID (Simple Edge type) Phone number country code
+M1Env::SpecialItemID M1Env::PHONE_COUNTRY_CODE_SIID = G_NONEX_SI_ID;
 
 M1Env::SpecialItemID M1Env::ROOT_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::HOME_SIID = G_NONEX_SI_ID;
@@ -120,8 +156,21 @@ M1Env::SpecialItemID M1Env::TYPE_NODE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_WORK_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::PERS_TYPE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::ORG_TYPE_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::CONTACT_ID_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::CTC_EMAIL_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::CTC_PHONE_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::CTC_DISCORD_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::CTC_FACEBOOK_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::CTC_SNAPCHAT_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::CTC_INSTAGRAM_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::CTC_WECHAT_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::CTC_LINKEDIN_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::CTC_X_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::CTC_YOUTUBE_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::CTC_SUBSTACK_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::ROLE_FLDR_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::TEXT_SIID = G_NONEX_SI_ID;
+M1Env::SpecialItemID M1Env::WORKS_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::MSG_TYPE_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::ME_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::DUSTBIN_SIID = G_NONEX_SI_ID;
@@ -278,23 +327,30 @@ M1Env::SpecialItemID M1Env::NT_SP_SIID = G_NONEX_SI_ID;
 QList<M1Env::SpecialItemID> M1Env::GraphInit::cm_gram_attr_list;
 
 void M1Env::GraphInit::set_pseudo_constants(){
-    M1Env::FOLDER_SIID = M1Store::StorageStatic::getSpecialID("FOLDR");
-    M1Env::AUTO_SIID = M1Store::StorageStatic::getSpecialID("AUTO_");
     M1Env::OWNS_SIID = M1Store::StorageStatic::getSpecialID("OWNS_");
     M1Env::BLNGS_SIID = M1Store::StorageStatic::getSpecialID("BLNGS");
     M1Env::ISA_SIID = M1Store::StorageStatic::getSpecialID("_ISA_");
     M1Env::ITO_SIID = M1Store::StorageStatic::getSpecialID("_ITO_");
     M1Env::TEXT_WROTE_SIID = M1Store::StorageStatic::getSpecialID("WROTE");
     M1Env::TEXT_WRITTEN_BY_SIID = M1Store::StorageStatic::getSpecialID("WRTBY");
+    M1Env::EQUIVALENT_1_SIID = M1Store::StorageStatic::getSpecialID("EQV_1");
+    M1Env::EQUIVALENT_2_SIID = M1Store::StorageStatic::getSpecialID("EQV_2");
     M1Env::DATA_SOURCE_FROM_SIID = M1Store::StorageStatic::getSpecialID("DTSDN");
     M1Env::DATA_SOURCE_TO_SIID = M1Store::StorageStatic::getSpecialID("DTSUP");
+    M1Env::TW_CHUNK_2_OCC_BEGIN_SIID = M1Store::StorageStatic::getSpecialID("C2OBG");
+    M1Env::TW_OCC_2_CHUNK_BEGIN_SIID = M1Store::StorageStatic::getSpecialID("O2CBG");
+    M1Env::TW_CHUNK_2_OCC_END_SIID = M1Store::StorageStatic::getSpecialID("C2OEN");
+    M1Env::TW_OCC_2_CHUNK_END_SIID = M1Store::StorageStatic::getSpecialID("O2CEN");
+    M1Env::FOLDER_SIID = M1Store::StorageStatic::getSpecialID("FOLDR");
+    M1Env::WFORM_SIID = M1Store::StorageStatic::getSpecialID("WFORM");
+    M1Env::TEXT_URL_LINK_SIID = M1Store::StorageStatic::getSpecialID("URLNK");
+    M1Env::AUTO_SIID = M1Store::StorageStatic::getSpecialID("AUTO_");
+    M1Env::OCCUR_SIID = M1Store::StorageStatic::getSpecialID("OCCUR");
+    M1Env::OCCURS_IN_SIID = M1Store::StorageStatic::getSpecialID("OCCIN");
     M1Env::TEXT_LANGUAGE_SIID = M1Store::StorageStatic::getSpecialID("TXLNG");
     M1Env::TEXT_SLOKA_NUMBER_SIID = M1Store::StorageStatic::getSpecialID("SLKNM");
     M1Env::TEXT_CHAP_NUMBER_SIID = M1Store::StorageStatic::getSpecialID("CHPNM");
     M1Env::TEXT_LEXICON_GRAMMAR_SIID = M1Store::StorageStatic::getSpecialID("LFGRM");
-    M1Env::OCCUR_SIID = M1Store::StorageStatic::getSpecialID("OCCUR");
-    M1Env::OCCURS_IN_SIID = M1Store::StorageStatic::getSpecialID("OCCIN");
-    M1Env::WFORM_SIID = M1Store::StorageStatic::getSpecialID("WFORM");
     M1Env::TEXT_VER_TYPE_SIID = M1Store::StorageStatic::getSpecialID("TXVRT");
     M1Env::TEXT_ALT_TITLE_SIID = M1Store::StorageStatic::getSpecialID("TXATL");
     M1Env::TEXT_SUB_TITLE_SIID = M1Store::StorageStatic::getSpecialID("TXSBT");
@@ -322,25 +378,49 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::TEI_TARGET_ATTR_SIID = M1Store::StorageStatic::getSpecialID("TETGT");
     M1Env::TEI_REF_ATTR_SIID = M1Store::StorageStatic::getSpecialID("TEREF");
     M1Env::TEI_LEVEL_ATTR_SIID = M1Store::StorageStatic::getSpecialID("TELVL");
+    M1Env::TEI_NAME_TERM_KEY_SIID = M1Store::StorageStatic::getSpecialID("NMTMK");
     M1Env::TEI_TAG_NAME_SIID = M1Store::StorageStatic::getSpecialID("TETAG");
     M1Env::TEI_TABLE_ROWS_SIID = M1Store::StorageStatic::getSpecialID("TETBR");
     M1Env::TEI_TABLE_COLS_SIID = M1Store::StorageStatic::getSpecialID("TETBC");
     M1Env::TEI_ROW_ROLE_SIID = M1Store::StorageStatic::getSpecialID("TERRL");
     M1Env::TEI_GRAPHIC_SIID = M1Store::StorageStatic::getSpecialID("TEGRP");
     M1Env::TEI_LIST_TYPE_SIID = M1Store::StorageStatic::getSpecialID("TELTP");
-    M1Env::TEXT_URL_LINK_SIID = M1Store::StorageStatic::getSpecialID("URLNK");
-    M1Env::TW_CHUNK_2_OCC_BEGIN_SIID = M1Store::StorageStatic::getSpecialID("C2OBG");
-    M1Env::TW_OCC_2_CHUNK_BEGIN_SIID = M1Store::StorageStatic::getSpecialID("O2CBG");
-    M1Env::TW_CHUNK_2_OCC_END_SIID = M1Store::StorageStatic::getSpecialID("C2OEN");
-    M1Env::TW_OCC_2_CHUNK_END_SIID = M1Store::StorageStatic::getSpecialID("O2CEN");
+    M1Env::PERS_FIRST_NAME_SIID = M1Store::StorageStatic::getSpecialID("PERFN");
+    M1Env::PERS_MIDDLE_NAME_SIID = M1Store::StorageStatic::getSpecialID("PERMN");
+    M1Env::PERS_PATRONYMIC_SIID = M1Store::StorageStatic::getSpecialID("PERPN");
+    M1Env::PERS_NICKNAME_SIID = M1Store::StorageStatic::getSpecialID("PERNN");
+    M1Env::PERS_LAST_NAME_SIID = M1Store::StorageStatic::getSpecialID("PERLN");
+    M1Env::PERS_HONORIFIC_SIID = M1Store::StorageStatic::getSpecialID("PERHN");
+    M1Env::PERS_TITLE_SIID = M1Store::StorageStatic::getSpecialID("PERTL");
+    M1Env::PERS_TOPONYMIC_SIID = M1Store::StorageStatic::getSpecialID("PERTB");
+    M1Env::PERS_BIRTH_DATE_SIID = M1Store::StorageStatic::getSpecialID("PERBN");
+    M1Env::PERS_DEATH_DATE_SIID = M1Store::StorageStatic::getSpecialID("PERDN");
+    M1Env::PERS_REGNAL_SIID = M1Store::StorageStatic::getSpecialID("PERRN");
+    M1Env::PERS_GENERATIONAL_SIID = M1Store::StorageStatic::getSpecialID("PERGN");
+    M1Env::PERS_ALIAS_SIID = M1Store::StorageStatic::getSpecialID("PERAL");
+    M1Env::PHONE_MSG_LINKS_SIID = M1Store::StorageStatic::getSpecialID("MSGLK");
+    M1Env::PHONE_COUNTRY_CODE_SIID = M1Store::StorageStatic::getSpecialID("PHNCC");
     M1Env::ROOT_SIID = M1Store::StorageStatic::getSpecialID("ROOT_");
     M1Env::HOME_SIID = M1Store::StorageStatic::getSpecialID("HOME_");
     M1Env::TYPE_NODE_SIID = M1Store::StorageStatic::getSpecialID("TYPE_");
     M1Env::TEXT_WORK_SIID = M1Store::StorageStatic::getSpecialID("TXWKK");
     M1Env::PERS_TYPE_SIID = M1Store::StorageStatic::getSpecialID("PERSN");
     M1Env::ORG_TYPE_SIID = M1Store::StorageStatic::getSpecialID("ORGN_");
+    M1Env::CONTACT_ID_SIID = M1Store::StorageStatic::getSpecialID("CTCID");
+    M1Env::CTC_EMAIL_SIID = M1Store::StorageStatic::getSpecialID("EMLCI");
+    M1Env::CTC_PHONE_SIID = M1Store::StorageStatic::getSpecialID("PHNCI");
+    M1Env::CTC_DISCORD_SIID = M1Store::StorageStatic::getSpecialID("DCDCI");
+    M1Env::CTC_FACEBOOK_SIID = M1Store::StorageStatic::getSpecialID("FBKCI");
+    M1Env::CTC_SNAPCHAT_SIID = M1Store::StorageStatic::getSpecialID("SCTCI");
+    M1Env::CTC_INSTAGRAM_SIID = M1Store::StorageStatic::getSpecialID("ISTCI");
+    M1Env::CTC_WECHAT_SIID = M1Store::StorageStatic::getSpecialID("WCTCI");
+    M1Env::CTC_LINKEDIN_SIID = M1Store::StorageStatic::getSpecialID("LKNCI");
+    M1Env::CTC_X_SIID = M1Store::StorageStatic::getSpecialID("TWTCI");
+    M1Env::CTC_YOUTUBE_SIID = M1Store::StorageStatic::getSpecialID("YTBCI");
+    M1Env::CTC_SUBSTACK_SIID = M1Store::StorageStatic::getSpecialID("SCKCI");
     M1Env::ROLE_FLDR_SIID = M1Store::StorageStatic::getSpecialID("RLFLD");
     M1Env::TEXT_SIID = M1Store::StorageStatic::getSpecialID("TEXT_");
+    M1Env::WORKS_SIID = M1Store::StorageStatic::getSpecialID("WORKS");
     M1Env::MSG_TYPE_SIID = M1Store::StorageStatic::getSpecialID("_MSG_");
     M1Env::ME_SIID = M1Store::StorageStatic::getSpecialID("ME___");
     M1Env::DUSTBIN_SIID = M1Store::StorageStatic::getSpecialID("DSTBN");
@@ -531,19 +611,23 @@ void M1Env::GraphInit::set_pseudo_constants(){
 void M1Env::GraphInit::dbg_dump_pseudo_constants(){
     qCDebug(g_cat_silence) << QString("================ Constants dump ========");
 
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::FOLDER_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("FOLDR"), 4, 16, QChar('0')).arg("FOLDR");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::AUTO_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("AUTO_"), 4, 16, QChar('0')).arg("AUTO_");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::OWNS_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("OWNS_"), 4, 16, QChar('0')).arg("OWNS_");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::ISA_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("_ISA_"), 4, 16, QChar('0')).arg("_ISA_");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WROTE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WROTE"), 4, 16, QChar('0')).arg("WROTE");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::EQUIVALENT_1_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("EQV_1"), 4, 16, QChar('0')).arg("EQV_1");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::DATA_SOURCE_FROM_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("DTSDN"), 4, 16, QChar('0')).arg("DTSDN");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TW_CHUNK_2_OCC_BEGIN_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("C2OBG"), 4, 16, QChar('0')).arg("C2OBG");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TW_CHUNK_2_OCC_END_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("C2OEN"), 4, 16, QChar('0')).arg("C2OEN");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::FOLDER_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("FOLDR"), 4, 16, QChar('0')).arg("FOLDR");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::WFORM_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WFORM"), 4, 16, QChar('0')).arg("WFORM");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_URL_LINK_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("URLNK"), 4, 16, QChar('0')).arg("URLNK");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::AUTO_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("AUTO_"), 4, 16, QChar('0')).arg("AUTO_");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::OCCUR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("OCCUR"), 4, 16, QChar('0')).arg("OCCUR");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::OCCURS_IN_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("OCCIN"), 4, 16, QChar('0')).arg("OCCIN");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_LANGUAGE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TXLNG"), 4, 16, QChar('0')).arg("TXLNG");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_SLOKA_NUMBER_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("SLKNM"), 4, 16, QChar('0')).arg("SLKNM");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_CHAP_NUMBER_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("CHPNM"), 4, 16, QChar('0')).arg("CHPNM");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_LEXICON_GRAMMAR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("LFGRM"), 4, 16, QChar('0')).arg("LFGRM");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::OCCUR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("OCCUR"), 4, 16, QChar('0')).arg("OCCUR");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::OCCURS_IN_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("OCCIN"), 4, 16, QChar('0')).arg("OCCIN");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::WFORM_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WFORM"), 4, 16, QChar('0')).arg("WFORM");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_VER_TYPE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TXVRT"), 4, 16, QChar('0')).arg("TXVRT");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_ALT_TITLE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TXATL"), 4, 16, QChar('0')).arg("TXATL");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_SUB_TITLE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TXSBT"), 4, 16, QChar('0')).arg("TXSBT");
@@ -571,22 +655,31 @@ void M1Env::GraphInit::dbg_dump_pseudo_constants(){
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_TARGET_ATTR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TETGT"), 4, 16, QChar('0')).arg("TETGT");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_REF_ATTR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TEREF"), 4, 16, QChar('0')).arg("TEREF");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_LEVEL_ATTR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TELVL"), 4, 16, QChar('0')).arg("TELVL");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_NAME_TERM_KEY_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("NMTMK"), 4, 16, QChar('0')).arg("NMTMK");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_TAG_NAME_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TETAG"), 4, 16, QChar('0')).arg("TETAG");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_TABLE_ROWS_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TETBR"), 4, 16, QChar('0')).arg("TETBR");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_TABLE_COLS_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TETBC"), 4, 16, QChar('0')).arg("TETBC");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_ROW_ROLE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TERRL"), 4, 16, QChar('0')).arg("TERRL");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_GRAPHIC_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TEGRP"), 4, 16, QChar('0')).arg("TEGRP");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_LIST_TYPE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TELTP"), 4, 16, QChar('0')).arg("TELTP");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_URL_LINK_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("URLNK"), 4, 16, QChar('0')).arg("URLNK");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TW_CHUNK_2_OCC_BEGIN_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("C2OBG"), 4, 16, QChar('0')).arg("C2OBG");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TW_CHUNK_2_OCC_END_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("C2OEN"), 4, 16, QChar('0')).arg("C2OEN");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::PERS_FIRST_NAME_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("PERFN"), 4, 16, QChar('0')).arg("PERFN");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::PERS_MIDDLE_NAME_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("PERMN"), 4, 16, QChar('0')).arg("PERMN");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::PERS_PATRONYMIC_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("PERPN"), 4, 16, QChar('0')).arg("PERPN");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::PERS_NICKNAME_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("PERNN"), 4, 16, QChar('0')).arg("PERNN");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::PERS_LAST_NAME_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("PERLN"), 4, 16, QChar('0')).arg("PERLN");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::PERS_HONORIFIC_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("PERHN"), 4, 16, QChar('0')).arg("PERHN");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::PERS_TITLE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("PERTL"), 4, 16, QChar('0')).arg("PERTL");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::PERS_TOPONYMIC_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("PERTB"), 4, 16, QChar('0')).arg("PERTB");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::PERS_BIRTH_DATE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("PERBN"), 4, 16, QChar('0')).arg("PERBN");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::PERS_DEATH_DATE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("PERDN"), 4, 16, QChar('0')).arg("PERDN");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::PERS_REGNAL_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("PERRN"), 4, 16, QChar('0')).arg("PERRN");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::PERS_GENERATIONAL_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("PERGN"), 4, 16, QChar('0')).arg("PERGN");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::PERS_ALIAS_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("PERAL"), 4, 16, QChar('0')).arg("PERAL");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::PHONE_MSG_LINKS_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("MSGLK"), 4, 16, QChar('0')).arg("MSGLK");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::PHONE_COUNTRY_CODE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("PHNCC"), 4, 16, QChar('0')).arg("PHNCC");
 }
 
 void M1Env::GraphInit::init_base(){
-    // Special Vertex ID (Vertex type) of folders (ordinary vertices with no special role)
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_IS_SELECTABLE, "FOLDR", M1Env::FOLDER_ICON_PATH);
-    // Special Vertex ID (Edge type) of AUTO edges
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE, "AUTO_", M1Env::AUTO_ICON_PATH);
     // Special Vertex ID (Edge type) of ownership edges
     M1Store::StorageStatic::getNewSpecialWithReciprocal(SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SELECTABLE,
         "OWNS_", M1Env::OWNS_ICON_PATH,
@@ -602,11 +695,38 @@ void M1Env::GraphInit::init_base(){
         "WROTE", M1Env::TEXT_WROTE_ICON_PATH,
         "WRTBY", M1Env::TEXT_WRITTEN_BY_ICON_PATH,
         SI_IS_TYPE | SI_EDGE_TYPE);
+    // Special Vertex ID (Edge type) equivalence relation
+    M1Store::StorageStatic::getNewSpecialWithReciprocal(SI_IS_TYPE | SI_EDGE_TYPE,
+        "EQV_1", M1Env::EQUIVALENT_ICON_PATH,
+        "EQV_2", M1Env::EQUIVALENT_ICON_PATH,
+        SI_IS_TYPE | SI_EDGE_TYPE);
     // Special Vertex ID (Edge type) DS from / to
     M1Store::StorageStatic::getNewSpecialWithReciprocal(SI_IS_TYPE | SI_EDGE_TYPE,
         "DTSDN", M1Env::DATA_SOURCE_ICON_PATH,
         "DTSUP", M1Env::DATA_SOURCE_ICON_PATH,
         SI_IS_TYPE | SI_EDGE_TYPE);
+    // Special Vertex ID (Edge type) begin chunk + reciprocal
+    M1Store::StorageStatic::getNewSpecialWithReciprocal(SI_IS_TYPE,
+        "C2OBG", M1Env::TW_SECTION_2_OCC_BEGIN_ICON_PATH,
+        "O2CBG", M1Env::TW_SECTION_2_OCC_BEGIN_ICON_PATH,
+        SI_IS_TYPE);
+    // Special Vertex ID (Edge type) end chunk + reciprocal
+    M1Store::StorageStatic::getNewSpecialWithReciprocal(SI_IS_TYPE,
+        "C2OEN", M1Env::TW_SECTION_2_OCC_END_ICON_PATH,
+        "O2CEN", M1Env::TW_SECTION_2_OCC_END_ICON_PATH,
+        SI_IS_TYPE);
+    // Special Vertex ID (Vertex type) of folders (ordinary vertices with no special role)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_IS_SELECTABLE, "FOLDR", M1Env::FOLDER_ICON_PATH);
+    // Special Vertex ID (Vertex type) of word form vertices
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_IS_ICON_TYPE, "WFORM", M1Env::WFORM_ICON_PATH);
+    // Special Vertex ID (Vertex type) Url link
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "URLNK", M1Env::TEXT_URL_LINK_ICON_PATH);
+    // Special Vertex ID (Edge type) of AUTO edges
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE, "AUTO_", M1Env::AUTO_ICON_PATH);
+    // Special Vertex ID (Edge type) of form occurrence edges
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SPECIAL_EDGE, "OCCUR", M1Env::OCCURRENCE_ICON_PATH);
+    // Special Vertex ID (Edge type) of form to point of occurrence edges
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE, "OCCIN", M1Env::OCCURRENCE_ICON_PATH);
     // Special Vertex ID (Simple Edge type) of text language field
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TXLNG", nullptr);
     // Special Vertex ID (Simple Edge type) of sloka number field
@@ -615,12 +735,6 @@ void M1Env::GraphInit::init_base(){
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "CHPNM", nullptr);
     // Special Vertex ID (Simple Edge type) Lexicon form Grammatical analysis
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "LFGRM", nullptr);
-    // Special Vertex ID (Edge type) of form occurrence edges
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SPECIAL_EDGE, "OCCUR", M1Env::OCCURRENCE_ICON_PATH);
-    // Special Vertex ID (Edge type) of form to point of occurrence edges
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE, "OCCIN", M1Env::OCCURRENCE_ICON_PATH);
-    // Special Vertex ID (Vertex type) of word form vertices
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_IS_ICON_TYPE, "WFORM", M1Env::WFORM_ICON_PATH);
     // Special Vertex ID (Simple edge type) text version type: (G)round/(T)ranaslation
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TXVRT", nullptr);
     // Special Vertex ID (Simple edge type) alternate text title
@@ -653,7 +767,7 @@ void M1Env::GraphInit::init_base(){
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "WFPOS", nullptr);
     // Special Vertex ID (Simple Edge type) WfW form Grammatical analysis
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "WFGRM", nullptr);
-    // Special Vertex ID (Simple Edge type) TEI @xml:id attribute
+    // Special Vertex ID (Simple Edge type) TEI @xml:id attribute irrespective of tag
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TEXID", nullptr);
     // Special Vertex ID (Simple Edge type) TEI @type attribute
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TETYP", nullptr);
@@ -671,10 +785,12 @@ void M1Env::GraphInit::init_base(){
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TEUNT", nullptr);
     // Special Vertex ID (Simple Edge type) TEI @target attribute (for <ref>)
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TETGT", nullptr);
-    // Special Vertex ID (Simple Edge type) TEI @ref attribute (for <author>, <name>, <term>)
+    // Special Vertex ID (Simple Edge type) TEI @ref attribute irrespective of tag
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TEREF", nullptr);
     // Special Vertex ID (Simple Edge type) TEI @level attribute (for <title>)
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TELVL", nullptr);
+    // Special Vertex ID (Simple Edge type) TEI <name>/<author>/<term> key (@xml:id, or @ref without leading #)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "NMTMK", nullptr);
     // Special Vertex ID (Simple Edge type) TEI tag name (for mult-tag nodes like TXTCK)
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TETAG", nullptr);
     // Special Vertex ID (Simple Edge type) TEI table row count
@@ -687,18 +803,36 @@ void M1Env::GraphInit::init_base(){
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TEGRP", nullptr);
     // Special Vertex ID (Simple Edge type) TEI <list> type
     M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TELTP", nullptr);
-    // Special Vertex ID (Vertex type) Url link
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "URLNK", M1Env::TEXT_URL_LINK_ICON_PATH);
-    // Special Vertex ID (Edge type) begin chunk + reciprocal
-    M1Store::StorageStatic::getNewSpecialWithReciprocal(SI_IS_TYPE,
-        "C2OBG", M1Env::TW_SECTION_2_OCC_BEGIN_ICON_PATH,
-        "O2CBG", M1Env::TW_SECTION_2_OCC_BEGIN_ICON_PATH,
-        SI_IS_TYPE);
-    // Special Vertex ID (Edge type) end chunk + reciprocal
-    M1Store::StorageStatic::getNewSpecialWithReciprocal(SI_IS_TYPE,
-        "C2OEN", M1Env::TW_SECTION_2_OCC_END_ICON_PATH,
-        "O2CEN", M1Env::TW_SECTION_2_OCC_END_ICON_PATH,
-        SI_IS_TYPE);
+    // Special Vertex ID (Simple Edge type) Person first name / praenomen
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERFN", nullptr);
+    // Special Vertex ID (Simple Edge type) Person middle name(s)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERMN", nullptr);
+    // Special Vertex ID (Simple Edge type) Person patronymic
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERPN", nullptr);
+    // Special Vertex ID (Simple Edge type) Person nickname / cognomen
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERNN", nullptr);
+    // Special Vertex ID (Simple Edge type) Person last name / nomen
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERLN", nullptr);
+    // Special Vertex ID (Simple Edge type) Person honorific (Sir, Dr., Saint, ...)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERHN", nullptr);
+    // Special Vertex ID (Simple Edge type) Person title (ecclesiastical, nobility, ...)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERTL", nullptr);
+    // Special Vertex ID (Simple Edge type) Person toponymic byname (of Seville, da Vinci, ...)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERTB", nullptr);
+    // Special Vertex ID (Simple Edge type) Person birth date (free text)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERBN", nullptr);
+    // Special Vertex ID (Simple Edge type) Person death date (free text)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERDN", nullptr);
+    // Special Vertex ID (Simple Edge type) Person regnal / generational number (XIV, Jr., ...)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERRN", nullptr);
+    // Special Vertex ID (Simple Edge type) Person generational suffix (Jr., Sr., II, ...) displayed after the last name
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERGN", nullptr);
+    // Special Vertex ID (Simple Edge type) Person alias(es) / pseudonym(s)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERAL", nullptr);
+    // Special Vertex ID (Simple Edge type) Phone number messaging app links (W/T/S/V)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "MSGLK", nullptr);
+    // Special Vertex ID (Simple Edge type) Phone number country code
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PHNCC", nullptr);
 
     // creation of "Global graph root"
     qCDebug(g_cat_silence) << QString("Creating <[ROOT_]-Global graph root> item");
@@ -795,6 +929,198 @@ void M1Env::GraphInit::init_base(){
     l_orgn->setType("TYPE_");
     l_orgn->linkTo(l_txwkk, "BLNGS", nullptr, true);
 
+    // creation of "Contact ID (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[CTCID]-Contact ID (type)> item");
+    M1Store::Item_lv2* l_ctcid = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Contact ID (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE | M1Env::SI_IS_ICON_TYPE,
+        // mnemonic
+        "CTCID",
+        // icon path
+        M1Env::CONTACT_ID_ICON_PATH);
+    l_ctcid->setType("TYPE_");
+    l_ctcid->linkTo(l_txwkk, "BLNGS", nullptr, true);
+
+    // creation of "E-mail ID (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[EMLCI]-E-mail ID (type)> item");
+    M1Store::Item_lv2* l_emlci = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "E-mail ID (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "EMLCI",
+        // icon path
+        M1Env::CONTACT_ID_ICON_PATH);
+    l_emlci->setType("TYPE_");
+    l_emlci->setType("CTCID");
+
+    // creation of "Phone Number (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[PHNCI]-Phone Number (type)> item");
+    M1Store::Item_lv2* l_phnci = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Phone Number (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "PHNCI",
+        // icon path
+        M1Env::CONTACT_ID_ICON_PATH);
+    l_phnci->setType("TYPE_");
+    l_phnci->setType("CTCID");
+
+    // creation of "Discord ID (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[DCDCI]-Discord ID (type)> item");
+    M1Store::Item_lv2* l_dcdci = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Discord ID (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "DCDCI",
+        // icon path
+        M1Env::CONTACT_ID_ICON_PATH);
+    l_dcdci->setType("TYPE_");
+    l_dcdci->setType("CTCID");
+
+    // creation of "Facebook URL (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[FBKCI]-Facebook URL (type)> item");
+    M1Store::Item_lv2* l_fbkci = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Facebook URL (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "FBKCI",
+        // icon path
+        M1Env::CONTACT_ID_ICON_PATH);
+    l_fbkci->setType("TYPE_");
+    l_fbkci->setType("CTCID");
+
+    // creation of "SnapChat URL (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[SCTCI]-SnapChat URL (type)> item");
+    M1Store::Item_lv2* l_sctci = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "SnapChat URL (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "SCTCI",
+        // icon path
+        M1Env::CONTACT_ID_ICON_PATH);
+    l_sctci->setType("TYPE_");
+    l_sctci->setType("CTCID");
+
+    // creation of "Instagram URL (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[ISTCI]-Instagram URL (type)> item");
+    M1Store::Item_lv2* l_istci = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Instagram URL (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "ISTCI",
+        // icon path
+        M1Env::CONTACT_ID_ICON_PATH);
+    l_istci->setType("TYPE_");
+    l_istci->setType("CTCID");
+
+    // creation of "WeChat URL (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[WCTCI]-WeChat URL (type)> item");
+    M1Store::Item_lv2* l_wctci = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "WeChat URL (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "WCTCI",
+        // icon path
+        M1Env::CONTACT_ID_ICON_PATH);
+    l_wctci->setType("TYPE_");
+    l_wctci->setType("CTCID");
+
+    // creation of "LinkedIn URL (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[LKNCI]-LinkedIn URL (type)> item");
+    M1Store::Item_lv2* l_lknci = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "LinkedIn URL (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "LKNCI",
+        // icon path
+        M1Env::CONTACT_ID_ICON_PATH);
+    l_lknci->setType("TYPE_");
+    l_lknci->setType("CTCID");
+
+    // creation of "X URL (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[TWTCI]-X URL (type)> item");
+    M1Store::Item_lv2* l_twtci = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "X URL (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "TWTCI",
+        // icon path
+        M1Env::CONTACT_ID_ICON_PATH);
+    l_twtci->setType("TYPE_");
+    l_twtci->setType("CTCID");
+
+    // creation of "YouTube URL (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[YTBCI]-YouTube URL (type)> item");
+    M1Store::Item_lv2* l_ytbci = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "YouTube URL (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "YTBCI",
+        // icon path
+        M1Env::CONTACT_ID_ICON_PATH);
+    l_ytbci->setType("TYPE_");
+    l_ytbci->setType("CTCID");
+
+    // creation of "Substack URL (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[SCKCI]-Substack URL (type)> item");
+    M1Store::Item_lv2* l_sckci = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Substack URL (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE,
+        // mnemonic
+        "SCKCI",
+        // icon path
+        M1Env::CONTACT_ID_ICON_PATH);
+    l_sckci->setType("TYPE_");
+    l_sckci->setType("CTCID");
+
     // creation of "Role folder"
     qCDebug(g_cat_silence) << QString("Creating <[RLFLD]-Role folder> item");
     M1Store::Item_lv2* l_rlfld = M1Store::Item_lv2::getNew(
@@ -825,6 +1151,22 @@ void M1Env::GraphInit::init_base(){
         M1Env::TEXT_ICON_PATH);
     l_text->setType("TYPE_");
     l_text->linkTo(l_home, "BLNGS", nullptr, true);
+
+    // creation of "Works Root (type)"
+    qCDebug(g_cat_silence) << QString("Creating <[WORKS]-Works Root (type)> item");
+    M1Store::Item_lv2* l_works = M1Store::Item_lv2::getNew(
+        // vertex flags
+        M1Env::FULL_VERTEX | M1Env::IS_SPECIAL,
+        // label
+        "Works Root (type)",
+        // Special Item flag
+        M1Env::SI_IS_TYPE | M1Env::SI_REQUIRES_EDGE | M1Env::SI_IS_SELECTABLE,
+        // mnemonic
+        "WORKS",
+        // icon path
+        M1Env::WORKS_ICON_PATH);
+    l_works->setType("TYPE_");
+    l_works->linkTo(l_home, "BLNGS", nullptr, true);
 
     // creation of "Inboxes / Message Root Type"
     qCDebug(g_cat_silence) << QString("Creating <[_MSG_]-Inboxes / Message Root Type> item");

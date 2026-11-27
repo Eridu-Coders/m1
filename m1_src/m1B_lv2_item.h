@@ -46,6 +46,7 @@ class Item_lv2 : public Item_lv1 {
         void createTypeEdges();
         void defaultEdges();
         void loopNextPrevious();
+        void removeFromRing();
         Item_lv2* findFieldEdge(const SpecialItem* p_field_type_si) const;
         std::shared_ptr<Item_lv2_iterator_base> getIteratorGeneric(Item_lv2* p_start_edge, const SpecialItemID p_edge_type, const SpecialItemID p_target_type) const;
         Item_lv2* setFieldInternal(const QString& p_content,
@@ -191,6 +192,10 @@ class Item_lv2 : public Item_lv1 {
         Item_lv2* linkTo(U, const char* p_mnemonic, Item_lv2* p_edge_above = nullptr, const bool p_at_top = false) = delete; // C++11 weirdness
         template <class V>
         Item_lv2* linkTo(ItemID p_target_id, const V, Item_lv2* p_edge_above = nullptr, const bool p_at_top = false) = delete; // C++11 weirdness
+
+        void unlinkEdge();
+        void deleteEdge();
+        bool isDead() const {return (flags() & M1Env::EDGE_DEAD) != 0;}
 
         Item_lv2* find_edge_generic(const SpecialItemID p_type_edge, const SpecialItemID p_type_target, bool p_special = false) const;
         // Item_lv2* find_edge(const char* p_mnemonic) const;

@@ -5,6 +5,7 @@
 
 #include <QString>
 #include <QXmlStreamReader>
+#include <QSet>
 
 #include "m1B_lv2_item.h"
 
@@ -38,6 +39,24 @@ enum class TEIEntityType{
 };
 
 // list of secondary authors
+/**
+ * @brief one <persName> of a <person> in the header <listPerson>: name parts by Person field (PERFN, PERLN, ...)
+ */
+struct PersNameTEI{
+    QList<std::pair<M1Env::SpecialItemID, QString>> m_fields; ///< field --> value (parts of the same kind already joined)
+    QString m_type;                                           ///< @type (birth, regnal, alias, ...)
+    QString m_lang;                                           ///< @xml:lang
+};
+
+/**
+ * @brief one <person> of the header <listPerson>
+ */
+struct PersonTEI{
+    QList<PersNameTEI> m_names; ///< first = main name, others = alternate names (EQV_1/EQV_2 linked Person nodes)
+    QString m_birth;
+    QString m_death;
+};
+
 class AuthorTEI{
 private:
     QString m_name;
@@ -135,6 +154,18 @@ class TEIInterface{
 private:
     // class members for loadTeiInternal() only
     static std::stack<TEIStackLevel> cm_tei_elements_stack;
+    /// last node created by one of the create_xxx() element functions below (lets loadTeiInternal() attach
+    /// @xml:id / @ref to the node created for the current start tag, whatever the tag)
+    static M1Store::Item_lv2* cm_last_created;
+    /// Person nodes by NMTMK key (see getPersonFromKey()) + whether it has been filled from the existing Person nodes
+    static QMap<QString, M1Store::Item_lv2*> cm_person_by_key;
+    static bool cm_person_cache_loaded;
+    /// <person> elements of the header <listPerson>, by @xml:id
+    static QMap<QString, PersonTEI> cm_list_person;
+    /// keys of the Person nodes already created or merged with <listPerson> data during the current import
+    static QSet<QString> cm_person_done;
+    /// Person name fields in canonical order (see readListPersName())
+    static const QList<M1Env::SpecialItemID>& persNameFields();
     static int cm_cur_paragraph_number;
 
     // class members for both loadTeiInternal() and loadTeiInternal1()
@@ -154,6 +185,22 @@ private:
     static bool cm_no_read;
 
     static void loadTeiInternal(const QString& p_file_path, bool p_validate_only=false);
+    static QString setNameTermKey(M1Store::Item_lv2* p_chunk, const QString& p_xml_id, const QString& p_ref);
+    static void readListPerson(QXmlStreamReader& p_reader);
+    static PersNameTEI readListPersName(QXmlStreamReader& p_reader);
+    static QString readPersonDate(QXmlStreamReader& p_reader);
+    static void setPersNameFields(M1Store::Item_lv2* p_person, const PersNameTEI& p_name);
+    static QString altPersNameLabel(const PersNameTEI& p_name);
+    static QString persNameSignature(const QString& p_label, const QList<std::pair<M1Env::SpecialItemID, QString>>& p_fields);
+    static void addAltPersName(M1Store::Item_lv2* p_person, const PersNameTEI& p_name);
+    static void mergePerson(M1Store::Item_lv2* p_person, const PersonTEI& p_data);
+    static void loadPersonCache();
+    static M1Store::Item_lv2* getPersonFromKey(const QString& p_key);
+    static M1Store::Item_lv2* getPersonForAuthor(const QString& p_key, const QString& p_text);
+    static void readMonogr(QXmlStreamReader& p_reader, QString& p_title, QString& p_key, QList<std::pair<QString, QString>>& p_authors);
+    static void linkTextToWork(M1Store::Item_lv2* p_text, const QString& p_title, const QString& p_key,
+                               const QList<std::pair<QString, QString>>& p_authors);
+    static void linkChunkToPerson(M1Store::Item_lv2* p_chunk, const QString& p_key);
     static void loadTeiInternal1(const QString& p_file_path, bool p_validate_only=false);
     // static void loadTeiInternal2(const QString& p_file_path, bool p_validate_only=false);
     // static void loadTeiInternal3(const QString& p_file_path, bool p_validate_only=false);
