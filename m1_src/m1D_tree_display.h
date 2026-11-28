@@ -58,6 +58,7 @@ namespace M1UI{
         void restoreAcceptDrop();
         void setShowFields(bool p_show_fields){m_show_fields = p_show_fields;}
         bool showFields() const {return m_show_fields;}
+        void ensureValidRoot();
 
         QVBoxLayout* tree_vb_layout(){return m_vb_layout;}
         QWidget* scroll_area_widget(){return m_scroll_area_widget;}

@@ -14,6 +14,9 @@
 #include "m1A_env.h"
 #include "m1B_store.h"
 #include "m1B_archive.h"
+#include "m1B_archive_internal.h"
+
+using namespace M1Store::ArchiveInternal;
 
 Q_LOGGING_CATEGORY(g_cat_archive, "store.archive")
 
@@ -28,23 +31,6 @@ Q_LOGGING_CATEGORY(g_cat_archive, "store.archive")
  * @{
  */
 namespace {
-    const quint32 MAGIC_BEGIN  = 0x4742314D;    ///< 'M1BG' (little endian)
-    const quint32 MAGIC_TX     = 0x5854314D;    ///< 'M1TX'
-    const quint32 MAGIC_COMMIT = 0x4D43314D;    ///< 'M1CM'
-    const quint32 FORMAT_VERSION = 1;
-
-    // record types
-    const quint8 REC_END      = 0xFF;
-    const quint8 REC_COUNTERS = 1;
-    const quint8 REC_ITEM     = 2;
-    const quint8 REC_SPECIAL  = 3;
-    const quint8 REC_STR_PUT  = 4;
-    const quint8 REC_STR_DEL  = 5;
-    const quint8 REC_UTIL_U32 = 6;
-
-    const qsizetype ITEM_BYTES = sizeof(M1Store::Item_lv0);
-    const qsizetype SPECIAL_BYTES = sizeof(M1Store::SpecialItem);
-
     // ------------------------------- paths -------------------------------
     fs::path storeDir(){return fs::path(M1Store::STORE_DATA_PATH);}
     fs::path archiveDir(){return storeDir() / M1Store::ARCHIVE_DIR;}
@@ -74,54 +60,6 @@ namespace {
         close(l_fd);
     }
 
-    // ------------------------------- serialization helpers -------------------------------
-    template<typename T> void put(QByteArray& p_buf, const T p_val){p_buf.append(reinterpret_cast<const char*>(&p_val), sizeof(T));}
-    void putBytes(QByteArray& p_buf, const QByteArray& p_data){put<quint32>(p_buf, p_data.size()); p_buf.append(p_data);}
-
-    /// bounds-checked reader over a byte buffer
-    struct Reader{
-        const char* m_data;
-        qsizetype m_len;
-        qsizetype m_pos = 0;
-        bool m_ok = true;
-        Reader(const char* p_data, qsizetype p_len) : m_data(p_data), m_len(p_len){}
-        template<typename T> T get(){
-            T l_val{};
-            if(!m_ok || m_pos + (qsizetype)sizeof(T) > m_len){m_ok = false; return l_val;}
-            memcpy(&l_val, m_data + m_pos, sizeof(T));
-            m_pos += sizeof(T);
-            return l_val;
-        }
-        const char* raw(qsizetype p_n){
-            if(!m_ok || p_n < 0 || m_pos + p_n > m_len){m_ok = false; return nullptr;}
-            const char* l_ret = m_data + m_pos;
-            m_pos += p_n;
-            return l_ret;
-        }
-        QByteArray bytes(){
-            quint32 l_n = get<quint32>();
-            const char* l_p = raw(l_n);
-            return l_p == nullptr ? QByteArray() : QByteArray(l_p, l_n);
-        }
-    };
-
-    /// standard CRC-32 (IEEE 802.3, reflected, poly 0xEDB88320)
-    quint32 crc32(const char* p_data, qsizetype p_len){
-        static quint32 l_table[256];
-        static bool l_init = false;
-        if(!l_init){
-            for(quint32 i = 0; i < 256; i++){
-                quint32 c = i;
-                for(int k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320u ^ (c >> 1)) : (c >> 1);
-                l_table[i] = c;
-            }
-            l_init = true;
-        }
-        quint32 l_crc = 0xFFFFFFFFu;
-        for(qsizetype i = 0; i < p_len; i++)
-            l_crc = l_table[(l_crc ^ static_cast<quint8>(p_data[i])) & 0xFF] ^ (l_crc >> 8);
-        return l_crc ^ 0xFFFFFFFFu;
-    }
 }
 /**@}*/ //end of ArchiveImpl
 
@@ -140,6 +78,16 @@ QByteArray M1Store::Archive::cm_ops;
 int M1Store::Archive::cm_log_fd = -1;
 bool M1Store::Archive::cm_recovery_pending = false;
 QString M1Store::Archive::cm_report;
+M1Env::StringID M1Store::Archive::cm_next_string_at_begin = 0;
+M1Env::SpecialItemID M1Store::Archive::cm_next_special_at_begin = 0;
+QVector<M1Store::Archive::TxPos> M1Store::Archive::cm_tx_index;
+qint64 M1Store::Archive::cm_log_size = 0;
+
+/// signals the UI (Rollback panel) when the set of committed transactions changes
+M1Store::ArchiveNotifier* M1Store::Archive::notifier(){
+    static ArchiveNotifier* l_notifier = new ArchiveNotifier();
+    return l_notifier;
+}
 
 // =====================================================================================================================
 // helpers
@@ -345,67 +293,39 @@ void M1Store::Archive::replayLog(){
  */
 bool M1Store::Archive::applyTransaction(const char* p_body, qsizetype p_len){
     int l_rc;
-    Reader l_r(p_body, p_len);
-    if(l_r.get<quint32>() != FORMAT_VERSION) return false;
-    cm_seq = l_r.get<quint64>();
-    l_r.get<qint64>();
-    QString l_label = QString::fromUtf8(l_r.bytes());
-    qCDebug(g_cat_archive) << "replaying transaction" << cm_seq << l_label;
+    ParsedTx l_tx;
+    if(!parseTransaction(p_body, p_len, l_tx)) return false;
+    cm_seq = l_tx.m_seq;
+    qCDebug(g_cat_archive) << "replaying transaction" << cm_seq << l_tx.m_label;
+
+    // counters first: open the segments created during the transaction
+    while(StorageStatic::cm_item_mmap_next_seg_id < l_tx.m_next_seg){
+        StorageStatic::openSegment(StorageStatic::cm_item_mmap_next_seg_id);
+        StorageStatic::cm_item_mmap_next_seg_id += 1;
+        StorageStatic::cm_item_next_upper_excluded += StorageStatic::cm_items_per_mmap_segment;
+    }
+    StorageStatic::cm_next_item = l_tx.m_next_item;
+    StorageStatic::cm_next_string = l_tx.m_next_string;
+    StorageStatic::cm_next_special = l_tx.m_next_special;
+
+    for(const ParsedItem& l_item : std::as_const(l_tx.m_items)){
+        if(l_item.m_id >= StorageStatic::cm_next_item) return false;
+        memcpy(static_cast<void*>(StorageStatic::getItemPointer_lv1(l_item.m_id)), l_item.m_after, ITEM_BYTES);
+    }
+    for(const ParsedSpecial& l_special : std::as_const(l_tx.m_specials)){
+        memcpy(static_cast<void*>(StorageStatic::getSpecialItemPointer(l_special.m_id)), l_special.m_after, SPECIAL_BYTES);
+        if(StorageStatic::cm_icon_path.size() <= l_special.m_id) StorageStatic::cm_icon_path.resize(l_special.m_id + 1);
+        StorageStatic::cm_icon_path[l_special.m_id] = l_special.m_icon_path;
+    }
 
     MDB_txn* l_txn;
     E(mdb_txn_begin(StorageStatic::cm_lmdb_env, NULL, 0, &l_txn));
-
-    bool l_end = false;
-    while(l_r.m_ok && !l_end){
-        const quint8 l_type = l_r.get<quint8>();
-        switch(l_type){
-        case REC_END:
-            l_end = true;
-            break;
-        case REC_COUNTERS:{
-            ItemID l_next_item = l_r.get<quint64>();
-            StringID l_next_string = l_r.get<quint64>();
-            SpecialItemID l_next_special = l_r.get<quint16>();
-            quint32 l_next_seg = l_r.get<quint32>();
-            if(!l_r.m_ok) break;
-            // open the segments created during the transaction
-            while(StorageStatic::cm_item_mmap_next_seg_id < l_next_seg){
-                StorageStatic::openSegment(StorageStatic::cm_item_mmap_next_seg_id);
-                StorageStatic::cm_item_mmap_next_seg_id += 1;
-                StorageStatic::cm_item_next_upper_excluded += StorageStatic::cm_items_per_mmap_segment;
-            }
-            StorageStatic::cm_next_item = l_next_item;
-            StorageStatic::cm_next_string = l_next_string;
-            StorageStatic::cm_next_special = l_next_special;
-            break;
-        }
-        case REC_ITEM:{
-            ItemID l_id = l_r.get<quint64>();
-            l_r.get<quint8>();          // new flag (for undo)
-            l_r.raw(ITEM_BYTES);        // before-image (for undo)
-            const char* l_after = l_r.raw(ITEM_BYTES);
-            if(!l_r.m_ok || l_id >= StorageStatic::cm_next_item){l_r.m_ok = false; break;}
-            memcpy(static_cast<void*>(StorageStatic::getItemPointer_lv1(l_id)), l_after, ITEM_BYTES);
-            break;
-        }
-        case REC_SPECIAL:{
-            SpecialItemID l_si_id = l_r.get<quint16>();
-            l_r.raw(SPECIAL_BYTES);     // before-image (for undo)
-            const char* l_after = l_r.raw(SPECIAL_BYTES);
-            QString l_icon_path = QString::fromUtf8(l_r.bytes());
-            if(!l_r.m_ok) break;
-            memcpy(static_cast<void*>(StorageStatic::getSpecialItemPointer(l_si_id)), l_after, SPECIAL_BYTES);
-            if(StorageStatic::cm_icon_path.size() <= l_si_id) StorageStatic::cm_icon_path.resize(l_si_id + 1);
-            StorageStatic::cm_icon_path[l_si_id] = l_icon_path;
-            break;
-        }
-        case REC_STR_PUT:
-        case REC_STR_DEL:{
-            StringID l_id = l_r.get<quint64>();
-            QByteArray l_bytes = l_r.bytes();
-            if(!l_r.m_ok) break;
+    for(const ParsedOp& l_op : std::as_const(l_tx.m_ops)){
+        if(l_op.m_type == REC_STR_PUT || l_op.m_type == REC_STR_DEL){
+            StringID l_id = l_op.m_id;
             MDB_val l_key{sizeof(StringID), &l_id};
-            if(l_type == REC_STR_PUT){
+            if(l_op.m_type == REC_STR_PUT){
+                QByteArray l_bytes = l_op.m_bytes;
                 MDB_val l_val{(size_t)l_bytes.size(), l_bytes.data()};
                 E(mdb_put(l_txn, StorageStatic::cm_dbi_string, &l_key, &l_val, 0));
             }
@@ -413,23 +333,12 @@ bool M1Store::Archive::applyTransaction(const char* p_body, qsizetype p_len){
                 l_rc = mdb_del(l_txn, StorageStatic::cm_dbi_string, &l_key, NULL);
                 CHECK(l_rc == MDB_SUCCESS || l_rc == MDB_NOTFOUND, "mdb_del() (replay)");
             }
-            break;
         }
-        case REC_UTIL_U32:{
-            quint32 l_key = l_r.get<quint32>();
-            l_r.get<quint32>();
-            quint32 l_after = l_r.get<quint32>();
-            if(!l_r.m_ok) break;
-            if(l_key == TEI_EDITOR_FONT_SIZE) StorageStatic::cm_tei_editor_font_size = l_after;
-            break;
-        }
-        default:
-            l_r.m_ok = false;
-        }
+        else if(l_op.m_type == REC_UTIL_U32 && l_op.m_key == TEI_EDITOR_FONT_SIZE)
+            StorageStatic::cm_tei_editor_font_size = l_op.m_after;
     }
-
     E(mdb_txn_commit(l_txn));
-    return l_r.m_ok && l_end;
+    return true;
 }
 
 /**
@@ -449,7 +358,9 @@ void M1Store::Archive::startSession(){
     createDirtyMarker();
 
     cm_seq = 0;
+    cm_tx_index.clear();
     cm_mode = Mode::Logging;
+    emit notifier()->logChanged();
 }
 
 /**
@@ -471,6 +382,7 @@ void M1Store::Archive::endSession(){
     StorageStatic::mmapSync();
 
     closeLog();
+    cm_tx_index.clear();
     fs::remove(logPath());
     fs::remove(dirtyPath());
     fsyncPath(archiveDir(), true);
@@ -528,6 +440,8 @@ void M1Store::Archive::openLog(bool p_truncate){
     closeLog();
     cm_log_fd = open(logPath().c_str(), O_WRONLY | O_CREAT | O_APPEND | (p_truncate ? O_TRUNC : 0), 0664);
     if(cm_log_fd < 0) qFatal("Archive::openLog() cannot open %s: %s", logPath().c_str(), strerror(errno));
+    struct stat l_st;
+    cm_log_size = (fstat(cm_log_fd, &l_st) == 0) ? l_st.st_size : 0;
     if(p_truncate && fsync(cm_log_fd) != 0) qCWarning(g_cat_archive) << "log fsync failed" << strerror(errno);
     fsyncPath(archiveDir(), true);
 }
@@ -562,6 +476,8 @@ void M1Store::Archive::begin(const QString& p_label){
         clearTransaction();
         cm_label = p_label;
         cm_next_item_at_begin = StorageStatic::cm_next_item;
+        cm_next_string_at_begin = StorageStatic::cm_next_string;
+        cm_next_special_at_begin = StorageStatic::cm_next_special;
     }
 }
 
@@ -632,6 +548,7 @@ void M1Store::Archive::writeFrame(const QByteArray& p_frame, bool p_sync){
         }
         l_done += l_n;
     }
+    cm_log_size += p_frame.size();
     if(p_sync && fdatasync(cm_log_fd) != 0) qFatal("Archive::writeFrame() fdatasync failed: %s", strerror(errno));
 }
 
@@ -666,6 +583,10 @@ void M1Store::Archive::writeTransaction(){
     put<quint64>(l_body, StorageStatic::cm_next_string);
     put<quint16>(l_body, StorageStatic::cm_next_special);
     put<quint32>(l_body, StorageStatic::cm_item_mmap_next_seg_id);
+    // (format 2) values at transaction start, for undo
+    put<quint64>(l_body, cm_next_item_at_begin);
+    put<quint64>(l_body, cm_next_string_at_begin);
+    put<quint16>(l_body, cm_next_special_at_begin);
 
     for(const ItemID l_id : std::as_const(cm_item_order)){
         put<quint8>(l_body, REC_ITEM);
@@ -691,10 +612,21 @@ void M1Store::Archive::writeTransaction(){
     l_frame.append(l_body);
     put<quint32>(l_frame, crc32(l_body.constData(), l_body.size()));
     put<quint32>(l_frame, MAGIC_COMMIT);
+
+    // index entry: a rollback of this transaction truncates the log at the end of the previous one
+    // (which also drops the begin marker frame written for this one)
+    TxPos l_pos;
+    l_pos.m_seq = cm_seq;
+    l_pos.m_truncate_at = cm_tx_index.isEmpty() ? 0 : cm_tx_index.last().m_end;
+    l_pos.m_frame_offset = cm_log_size;
+    l_pos.m_body_len = l_body.size();
     writeFrame(l_frame, true);
+    l_pos.m_end = cm_log_size;
+    cm_tx_index.append(l_pos);
 
     qCDebug(g_cat_archive) << "transaction" << cm_seq << cm_label << "committed:" << cm_item_order.size() << "item(s),"
                            << cm_special_order.size() << "special(s)," << l_frame.size() << "bytes";
+    emit notifier()->logChanged();
 }
 
 // =====================================================================================================================
@@ -745,4 +677,172 @@ void M1Store::Archive::logUtilU32(const unsigned int p_key, const quint32 p_befo
     put<quint32>(cm_ops, p_key);
     put<quint32>(cm_ops, p_before);
     put<quint32>(cm_ops, p_after);
+}
+
+// =====================================================================================================================
+// rollback (undo)
+// =====================================================================================================================
+
+/// true if the item exists in the store (allocated, i.e. not beyond the counter - e.g. after a rollback)
+bool M1Store::Archive::itemAlive(const ItemID p_item_id){
+    return p_item_id != G_VOID_ITEM_ID && p_item_id < StorageStatic::cm_next_item;
+}
+
+/// true if p_vertex (a pointer held by the UI) still designates an existing full vertex (it may have been rolled back)
+bool M1Store::Archive::vertexAlive(const Item_lv0* p_vertex){
+    if(p_vertex == nullptr) return false;
+    const ItemID l_id = p_vertex->item_id();
+    return itemAlive(l_id) &&
+           static_cast<const void*>(StorageStatic::getItemPointer_lv1(l_id)) == static_cast<const void*>(p_vertex) &&
+           (p_vertex->flags() & ITEM_NATURE_MASK) == FULL_VERTEX;
+}
+
+/// true if a rollback is possible now (logging active, no explicit transaction open)
+bool M1Store::Archive::canRollback(){
+    return cm_mode == Mode::Logging && (cm_depth == 0 || cm_implicit);
+}
+
+/**
+ * @brief read the body of a committed transaction back from the log (CRC-checked)
+ * @return the body, empty if it could not be read
+ */
+QByteArray M1Store::Archive::readBody(const TxPos& p_pos){
+    QByteArray l_frame(p_pos.m_body_len + 16, 0);
+    int l_fd = open(logPath().c_str(), O_RDONLY);
+    if(l_fd < 0){
+        qCCritical(g_cat_archive) << "cannot open the log for reading" << strerror(errno);
+        return QByteArray();
+    }
+    qsizetype l_done = 0;
+    while(l_done < l_frame.size()){
+        ssize_t l_n = pread(l_fd, l_frame.data() + l_done, l_frame.size() - l_done, p_pos.m_frame_offset + l_done);
+        if(l_n < 0 && errno == EINTR) continue;
+        if(l_n <= 0) break;
+        l_done += l_n;
+    }
+    close(l_fd);
+    if(l_done < l_frame.size()) return QByteArray();
+
+    quint32 l_magic, l_len, l_crc, l_trailer;
+    memcpy(&l_magic, l_frame.constData(), 4);
+    memcpy(&l_len, l_frame.constData() + 4, 4);
+    if(l_magic != MAGIC_TX || l_len != p_pos.m_body_len) return QByteArray();
+    const char* l_body = l_frame.constData() + 8;
+    memcpy(&l_crc, l_body + l_len, 4);
+    memcpy(&l_trailer, l_body + l_len + 4, 4);
+    if(l_trailer != MAGIC_COMMIT || l_crc != crc32(l_body, l_len)) return QByteArray();
+    return QByteArray(l_body, l_len);
+}
+
+/// number of transactions committed (and still in the log) in the current session
+int M1Store::Archive::transactionCount(){return cm_tx_index.size();}
+
+/// sequence number of the transaction at p_index (0 = oldest)
+quint64 M1Store::Archive::transactionSeq(int p_index){
+    return (p_index >= 0 && p_index < cm_tx_index.size()) ? cm_tx_index[p_index].m_seq : 0;
+}
+
+/**
+ * @brief undo the p_count most recent transactions of the current session
+ *
+ * Newest first, each transaction is reversed: string table operations in reverse order (STR_PUT --> delete,
+ * STR_DEL --> put the old value back), util values set back, item and special images replaced by their before-images,
+ * counters set back to their values at transaction start. Then the log is truncated at the end of the last remaining
+ * transaction (fdatasync).
+ *
+ * Crash safety: the rollback writes go to the mmap() areas / LMDB (not synced), the truncation comes last. A crash
+ * before the truncation --> recovery = snapshot + whole log = state before the rollback; after --> snapshot + truncated
+ * log = state after the rollback
+ *
+ * @param p_count number of transactions to undo (most recent ones)
+ * @return empty string if OK, otherwise an error message (nothing has been changed in that case)
+ */
+QString M1Store::Archive::rollback(int p_count){
+    if(cm_implicit){cm_implicit = false; commit();}
+    if(cm_mode != Mode::Logging) return "The archive log is not active (rollback impossible).";
+    if(cm_depth != 0) return "A transaction is in progress (rollback impossible).";
+    if(p_count <= 0) return QString();
+    if(p_count > cm_tx_index.size()) return "Not that many transactions in the log.";
+
+    // read and parse everything first: nothing is changed if any transaction cannot be read
+    const int l_first = cm_tx_index.size() - p_count;
+    QVector<QByteArray> l_bodies;
+    QVector<ParsedTx> l_txs;
+    for(int i = cm_tx_index.size() - 1; i >= l_first; i--){
+        QByteArray l_body = readBody(cm_tx_index[i]);
+        ParsedTx l_tx;
+        if(l_body.isEmpty() || !parseTransaction(l_body.constData(), l_body.size(), l_tx))
+            return QString("Transaction #%1 cannot be read back from the log (rollback cancelled).").arg(cm_tx_index[i].m_seq);
+        if(!l_tx.m_has_before_counters)
+            return QString("Transaction #%1 was written in an old log format (rollback cancelled).").arg(cm_tx_index[i].m_seq);
+        l_bodies.append(l_body);    // keeps the buffers alive (ParsedTx points into them)
+        l_txs.append(l_tx);
+    }
+
+    int l_rc;
+    bool l_specials_touched = false;
+    MDB_txn* l_txn;
+    E(mdb_txn_begin(StorageStatic::cm_lmdb_env, NULL, 0, &l_txn));
+    for(const ParsedTx& l_tx : std::as_const(l_txs)){
+        qCDebug(g_cat_archive) << "rolling back transaction" << l_tx.m_seq << l_tx.m_label;
+        // string table / util operations, in reverse order
+        for(qsizetype i = l_tx.m_ops.size() - 1; i >= 0; i--){
+            const ParsedOp& l_op = l_tx.m_ops[i];
+            if(l_op.m_type == REC_STR_PUT || l_op.m_type == REC_STR_DEL){
+                StringID l_id = l_op.m_id;
+                MDB_val l_key{sizeof(StringID), &l_id};
+                if(l_op.m_type == REC_STR_PUT){
+                    l_rc = mdb_del(l_txn, StorageStatic::cm_dbi_string, &l_key, NULL);
+                    CHECK(l_rc == MDB_SUCCESS || l_rc == MDB_NOTFOUND, "mdb_del() (rollback)");
+                }
+                else{
+                    QByteArray l_bytes = l_op.m_bytes;
+                    MDB_val l_val{(size_t)l_bytes.size(), l_bytes.data()};
+                    E(mdb_put(l_txn, StorageStatic::cm_dbi_string, &l_key, &l_val, 0));
+                }
+            }
+            else if(l_op.m_type == REC_UTIL_U32 && l_op.m_key == TEI_EDITOR_FONT_SIZE)
+                StorageStatic::cm_tei_editor_font_size = l_op.m_before;
+        }
+        // item and special before-images (counters still at their "after" values --> all items addressable)
+        for(const ParsedItem& l_item : std::as_const(l_tx.m_items))
+            memcpy(static_cast<void*>(StorageStatic::getItemPointer_lv1(l_item.m_id)), l_item.m_before, ITEM_BYTES);
+        for(const ParsedSpecial& l_special : std::as_const(l_tx.m_specials)){
+            memcpy(static_cast<void*>(StorageStatic::getSpecialItemPointer(l_special.m_id)), l_special.m_before, SPECIAL_BYTES);
+            l_specials_touched = true;
+        }
+        // counters (segments created by the transaction stay open: they are simply empty)
+        StorageStatic::cm_next_item = l_tx.m_next_item_before;
+        StorageStatic::cm_next_string = l_tx.m_next_string_before;
+        StorageStatic::cm_next_special = l_tx.m_next_special_before;
+    }
+    E(mdb_txn_commit(l_txn));
+
+    // special items: rebuild the lookup maps, drop the icons of the removed ones
+    if(l_specials_touched){
+        StorageStatic::cm_mnemonic_to_special.clear();
+        StorageStatic::cm_item_id_to_special.clear();
+        for(SpecialItemID i = 0; i < StorageStatic::cm_next_special; i++){
+            SpecialItem* l_slot = StorageStatic::getSpecialItemPointer(i);
+            StorageStatic::cm_mnemonic_to_special[l_slot->mnemonic()] = l_slot;
+            if(l_slot->itemId() != G_VOID_ITEM_ID) StorageStatic::cm_item_id_to_special[l_slot->itemId()] = l_slot;
+        }
+        if(StorageStatic::cm_icon_path.size() > StorageStatic::cm_next_special)
+            StorageStatic::cm_icon_path.resize(StorageStatic::cm_next_special);
+        while(StorageStatic::cm_type_icon.size() > StorageStatic::cm_next_special){
+            delete StorageStatic::cm_type_icon.last();
+            StorageStatic::cm_type_icon.removeLast();
+        }
+    }
+
+    // truncate the log (last step, see above). cm_seq is NOT decreased: sequence numbers stay unique within the session
+    const qint64 l_truncate_at = cm_tx_index[l_first].m_truncate_at;
+    if(ftruncate(cm_log_fd, l_truncate_at) != 0) qFatal("Archive::rollback() ftruncate failed: %s", strerror(errno));
+    if(fdatasync(cm_log_fd) != 0) qFatal("Archive::rollback() fdatasync failed: %s", strerror(errno));
+    cm_log_size = l_truncate_at;
+    cm_tx_index.resize(l_first);
+
+    qCDebug(g_cat_archive) << p_count << "transaction(s) rolled back, log truncated at" << l_truncate_at;
+    emit notifier()->logChanged();
+    return QString();
 }

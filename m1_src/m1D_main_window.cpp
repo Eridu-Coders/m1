@@ -5,6 +5,8 @@
 #include "m1D_main_window.h"
 #include "m1D_tree_display.h"
 #include "m1D_fields_panel.h"
+#include "m1D_rollback_panel.h"
+#include "m1B_archive.h"
 
 #include <QSplitter>
 #include <QWebEngineView>
@@ -14,6 +16,7 @@
 #include <QComboBox>
 #include <QPushButton>
 #include <QCheckBox>
+#include <QMessageBox>
 
 // g_cat_main_window
 Q_LOGGING_CATEGORY(g_cat_main_window, "main_window")
@@ -91,6 +94,10 @@ M1UI::MainWindow::MainWindow(QWidget *p_parent) : QMainWindow(p_parent){
     m_fields_panel = new M1UI::FieldsPanel(m_tab_widget);
     m_tab_widget->addTab(m_fields_panel, "fields");
 
+    // transactions of the current session, with undo
+    m_rollback_panel = new M1UI::RollbackPanel(m_tab_widget);
+    m_tab_widget->addTab(m_rollback_panel, "Rollback");
+
     m_menubar = new QMenuBar(this);
     m_menubar->setObjectName("menubar");
     // m_menubar->setGeometry(QRect(0, 0, 800, 20));
@@ -117,6 +124,8 @@ M1UI::MainWindow::MainWindow(QWidget *p_parent) : QMainWindow(p_parent){
                      m_tree_display_left, &M1UI::TreeDisplay::goHome);
     QObject::connect(l_refresh_btn, &QPushButton::clicked,
                      this, &MainWindow::refresh);
+    QObject::connect(m_rollback_panel, &M1UI::RollbackPanel::rollbackRequested,
+                     this, &MainWindow::rollback);
     // "fields" tick box: show all edges or only full edges leading to full vertices, then full refresh
     QObject::connect(l_fields_check, &QCheckBox::toggled, this, [this](bool p_checked){
         m_tree_display_left->setShowFields(p_checked);
@@ -203,6 +212,39 @@ void M1UI::MainWindow::refresh(){
     // rebuild from the same root: new TreeRows --> new Interps; the old ones are released with the old rows
     m_tree_display_left->gotoVertex(nullptr);
     m_fields_panel->setVertex(l_vertex);
+    M1_FUNC_EXIT
+}
+
+/**
+ * @brief [slot] Rollback button of the "Rollback" tab: confirmation, undo of the p_count most recent transactions,
+ * then full refresh (the tree root and the "fields" vertex are reset if they no longer exist)
+ * @param p_count number of transactions to undo
+ */
+void M1UI::MainWindow::rollback(int p_count){
+    M1_FUNC_ENTRY(g_cat_main_window, QString("Rollback %1 transaction(s)").arg(p_count));
+    QString l_question = QString("Undo the %1 most recent transaction%2?\n\nThis cannot be redone.")
+                             .arg(p_count).arg(p_count > 1 ? "s" : "");
+    if(m_edit_widget != nullptr && m_tab_widget->indexOf(m_edit_widget) >= 0)
+        l_question += "\nThe Edit tab will be closed (unsaved changes are lost).";
+    if(QMessageBox::question(this, "Rollback", l_question) != QMessageBox::Yes){
+        M1_FUNC_EXIT
+        return;
+    }
+
+    // the Edit tab may show items that are about to disappear
+    if(m_edit_widget != nullptr){
+        int l_index = m_tab_widget->indexOf(m_edit_widget);
+        if(l_index >= 0) m_tab_widget->removeTab(l_index);
+        m_edit_widget = nullptr;
+    }
+
+    const QString l_error = M1Store::Archive::rollback(p_count);
+    if(!l_error.isEmpty()) QMessageBox::warning(this, "Rollback", l_error);
+
+    // pointers held by the UI may designate vertices created by the rolled-back transactions
+    m_tree_display_left->ensureValidRoot();
+    if(!M1Store::Archive::vertexAlive(m_fields_panel->vertex())) m_fields_panel->setVertex(nullptr);
+    refresh();
     M1_FUNC_EXIT
 }
 

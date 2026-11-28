@@ -63,6 +63,10 @@ set(PROJECT_SOURCES
         m1B_archive.h
         m1B_archive.cpp
         m1B_archive_selftest.cpp
+        m1B_archive_internal.h
+        m1B_archive_describe.cpp
+        m1D_rollback_panel.h
+        m1D_rollback_panel.cpp
 )
 
 # m1D_passages_panel.h

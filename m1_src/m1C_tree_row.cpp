@@ -351,7 +351,7 @@ void M1UI::TreeRow::mousePressEvent(QMouseEvent *p_event){
     if(m_oc_x < p_event->pos().x() && p_event->pos().x() < m_oc_x + m_target_height){
         qCDebug(g_cat_interp_drag) << m_edge->dbgShort() << " OC clicked";
         {
-            M1Store::Transaction l_archive_tx("Open/close edge");
+            M1Store::Transaction l_archive_tx(M1Store::Archive::OPEN_CLOSE_LABEL);
             if(m_edge->flags() & M1Env::EDGE_IS_OPEN)
                 m_edge->unSetFlag(M1Env::EDGE_IS_OPEN);
             else

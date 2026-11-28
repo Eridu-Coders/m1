@@ -99,6 +99,7 @@ using namespace M1Env;
     class Item_lv0{
         friend class StorageStatic;
         friend class Item_lv2;
+        friend class Archive;       // reads logged item images (transaction descriptions)
     private:
         /** \defgroup ShareMb Shared Members - present in all 4 kinds of Items
          * \ingroup LV0

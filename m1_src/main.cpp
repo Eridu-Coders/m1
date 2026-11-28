@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
         // ("load-tei-2,q", "Load a TEI file - Plato Perseus Style - with EMBEDDED <w> tags")
         // ("load-tei-3,p", "Load a TEI file - Plato Perseus Style - with SEPARATE <w> tags")
         ("reset,r", "Reset (empty) storage")
-        ("archive-selftest", po::value<std::string>(), "(developer, on a COPY of the storage only) archive log crash test: 'crash', then 'check'")
+        ("archive-selftest", po::value<std::string>(), "(developer, on a COPY of the storage only) archive log crash test: 'crash', then 'check'; rollback test: 'rollback', then 'rbcheck'")
         // ("qmljsdebugger", po::value<std::vector<std::string>>(&l_fuck), "Fuck")
         ;
     // printf("X\n");

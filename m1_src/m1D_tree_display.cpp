@@ -352,6 +352,14 @@ void M1UI::TreeDisplay::create_descendant(M1Store::InsertionPoint p_where){
     gotoVertex(nullptr);
 }
 /**
+ * @brief after a rollback: if the root vertex no longer exists (created by a rolled-back transaction), go back to Home
+ * (the tree is not rebuilt here)
+ */
+void M1UI::TreeDisplay::ensureValidRoot(){
+    if(!M1Store::Archive::vertexAlive(m_root)) m_root = M1Store::Item_lv2::getExisting(M1Env::HOME_SIID);
+}
+
+/**
  * @brief M1UI::TreeDisplay::delete_edge - context menu "Delete Edge": marks the edge of the clicked row (and its reciprocal) as EDGE_DEAD
  */
 void M1UI::TreeDisplay::delete_edge(){

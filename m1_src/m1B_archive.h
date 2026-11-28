@@ -7,12 +7,43 @@
 #include <QByteArray>
 #include <QVector>
 #include <QHash>
+#include <QObject>
+#include <QStringList>
 
 #include "m1A_constants.h"
 
 namespace M1Store{
 
 using namespace M1Env;
+
+class Item_lv0;
+
+/**
+ * @brief QObject relay for Archive (a purely static class): logChanged() is emitted whenever the set of committed
+ * transactions changes (commit, rollback, new session)
+ * \ingroup LV1
+ */
+class ArchiveNotifier : public QObject{
+    Q_OBJECT
+public:
+    using QObject::QObject;
+signals:
+    void logChanged();
+};
+
+/**
+ * @brief human-readable description of a committed transaction (Rollback panel)
+ * \ingroup LV1
+ */
+struct TxDescription{
+    bool m_ok = false;              ///< false --> the transaction could not be read back from the log
+    quint64 m_seq = 0;
+    qint64 m_timestamp_ms = 0;      ///< commit time (ms since epoch)
+    QString m_label;                ///< transaction label (Transaction constructor parameter)
+    QString m_summary;              ///< one-line summary of the changes
+    QStringList m_details;          ///< one line per change / modified item
+    bool m_open_close = false;      ///< open/close edge transaction (filtered out by default in the Rollback panel)
+};
 
 /**
  * @brief Archive log - crash recovery (and, later, undo) for the store
@@ -34,6 +65,10 @@ using namespace M1Env;
  * implicit transaction, committed at the next event loop iteration (or at the next begin() / shutdown)
  *
  * During CLI imports, logging is suspended (suspend()) and a new snapshot is taken at the end (resume())
+ *
+ * Undo: rollback(n) reverses the n most recent transactions of the session (before-images, reverse string operations,
+ * counters at transaction start) and truncates the log accordingly. Only the current session can be rolled back
+ * (the log starts empty at each session start)
  *
  * Log format (native byte order) - a sequence of frames:
  * - begin marker:  'M1BG' u32 | len u32 | seq u64 | label (u32 len + UTF-8)  (written, without sync, at the first write of
@@ -58,6 +93,19 @@ private:
     static QString cm_label;                    ///< label of the current (outermost) transaction
     static quint64 cm_seq;                      ///< sequence number of the last transaction
     static ItemID cm_next_item_at_begin;        ///< cm_next_item at transaction start (--> items >= are new)
+    static StringID cm_next_string_at_begin;    ///< cm_next_string at transaction start (undo)
+    static SpecialItemID cm_next_special_at_begin; ///< cm_next_special at transaction start (undo)
+
+    /// position of a committed transaction in the log
+    struct TxPos{
+        quint64 m_seq;
+        qint64 m_truncate_at;       ///< log size to truncate to in order to remove this transaction (end of the previous one)
+        qint64 m_frame_offset;      ///< offset of the 'M1TX' frame
+        quint32 m_body_len;         ///< body length
+        qint64 m_end;               ///< offset just after the frame
+    };
+    static QVector<TxPos> cm_tx_index;          ///< committed transactions of the current session, oldest first
+    static qint64 cm_log_size;                  ///< current log file size
 
     static QVector<ItemID> cm_item_order;                       ///< items touched in the current transaction (touch order)
     static QHash<ItemID, QByteArray> cm_item_before;            ///< their before-images
@@ -80,6 +128,10 @@ private:
     static void closeLog();
     static void createDirtyMarker();
     static bool applyTransaction(const char* p_body, qsizetype p_len);
+    static QByteArray readBody(const TxPos& p_pos);
+    // describer helpers (m1B_archive_describe.cpp)
+    static QString imageText(const Item_lv0* p_img, const QHash<StringID, QByteArray>& p_strings);
+    static QString typeName(const Item_lv0* p_img);
 public:
     // ------------------------------- session life cycle -------------------------------
     static void wipe();
@@ -98,6 +150,18 @@ public:
     static void begin(const QString& p_label);
     static void commit();
     static bool inTransaction(){return cm_depth > 0;}
+
+    // ------------------------------- undo (Rollback panel) -------------------------------
+    /// label of the tree open/close transactions (filtered out by default in the Rollback panel)
+    static constexpr const char* OPEN_CLOSE_LABEL = "Open/close edge";
+    static ArchiveNotifier* notifier();
+    static int transactionCount();
+    static quint64 transactionSeq(int p_index);
+    static TxDescription describeTransaction(int p_index);
+    static bool canRollback();
+    static QString rollback(int p_count);
+    static bool itemAlive(const ItemID p_item_id);
+    static bool vertexAlive(const Item_lv0* p_vertex);
 
     // ------------------------------- hooks (called by Item_lv1 / StorageStatic) -------------------------------
     static void touchItem(const ItemID p_item_id);
