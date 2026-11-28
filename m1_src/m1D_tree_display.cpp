@@ -6,6 +6,9 @@
 #include "m1A_env.h"
 #include "m1B_graph_init.h"
 #include "m1B_lv2_iterators.h"
+#include "m1B_archive.h"
+
+#include <QMessageBox>
 
 Q_LOGGING_CATEGORY(g_cat_tree_display, "tree_display")
 
@@ -140,6 +143,8 @@ M1UI::TreeRow* M1UI::TreeDisplay::addRowRecur(
         M1UI::TreeRow* l_tr = nullptr;
         // deleted edges are not displayed
         if(it.at()->isDead()) continue;
+        // "fields" unticked --> only full edges leading to full vertices
+        if(!m_show_fields && !(it.at()->isFullEdge() && it.at()->getTarget_lv2()->isFullVertex())) continue;
         // instantiate the line for this edge
         if(it.at()->isOfType(M1Env::AUTO_SIID)){
             qCDebug(g_cat_tree_display) << "current edge (auto) : " << it.at()->dbgShort() << " Auto? " << it.at()->isOfType(M1Env::AUTO_SIID);
@@ -166,6 +171,8 @@ M1UI::TreeRow* M1UI::TreeDisplay::addRowRecur(
                          this, &M1UI::TreeDisplay::htmlReceive);
         QObject::connect(l_tr, &M1UI::TreeRow::emitEdit,
                          m_main_window, &M1UI::MainWindow::editReceive);
+        QObject::connect(l_tr, &M1UI::TreeRow::emitFocusedVertex,
+                         this, &M1UI::TreeDisplay::focusedVertexReceive);
 
         // recur if this edge is open and not already traversed
         if(it.at()->flags() & M1Env::EDGE_IS_OPEN && !p_edges_alrady_traversed.contains(it.at()->item_id())){
@@ -344,6 +351,28 @@ void M1UI::TreeDisplay::create_descendant(M1Store::InsertionPoint p_where){
     m_target_for_menu_actions->createDescendant(l_new_edge_type, l_new_vertex_type, p_where);
     gotoVertex(nullptr);
 }
+/**
+ * @brief M1UI::TreeDisplay::delete_edge - context menu "Delete Edge": marks the edge of the clicked row (and its reciprocal) as EDGE_DEAD
+ */
+void M1UI::TreeDisplay::delete_edge(){
+    M1Store::Item_lv2* l_edge = m_edge_for_menu_actions;
+    if(l_edge == nullptr || l_edge->isDead() || l_edge->isOfType(M1Env::AUTO_SIID)) return;
+
+    const QString l_target_text = l_edge->isFullEdge() ? QString(l_edge->getTarget_lv2()->text()) : QString(l_edge->text());
+    if(QMessageBox::question(this, "Delete Edge",
+                             QString("Delete the edge leading to \"%1\"?").arg(l_target_text)) != QMessageBox::Yes)
+        return;
+
+    qCDebug(g_cat_tree_display) << "Delete edge" << l_edge->dbgShort();
+    {
+        M1Store::Transaction l_archive_tx("Delete edge");
+        l_edge->deleteEdge();
+    }
+    m_edge_for_menu_actions = nullptr;
+    // full refresh: Interps already initialized (child lists, headings) may still reference the deleted edge's target
+    m_main_window->refresh();
+}
+
 void M1UI::TreeDisplay::dbg_interp_cache(){
     qCDebug(g_cat_tmp_spotlight()) << "dbg_interp_cache";
     emit emitHtml(M1MidPlane::Interp::dbgMapContents(true));

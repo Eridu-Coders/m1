@@ -135,6 +135,7 @@ signals:
     void gotoVertex(M1Store::Item_lv2* p_new_vertex, M1UI::TreeRow* p_sender);
     void emitHtml(const QString& p_html);
     void emitEdit(QWidget *p_edit_widget);
+    void emitFocusedVertex(M1Store::Item_lv2* p_vertex);
 };
 
 class Drag : public QDrag{
@@ -183,6 +184,7 @@ public:
     static std::shared_ptr<Interp> getInterp(M1Store::Item_lv2* p_myself);
     static QString dbgMapContents(bool p_html);
     static void garbageCollect();
+    static void clearCache();
 
     bool isEmpty(){return m_myself == nullptr;}
     QString getHtml(const M1Store::Item_lv2* p_edge);

@@ -10,6 +10,7 @@
 #include <QGraphicsSceneDragDropEvent>
 #include <QMimeData>
 #include <QDrag>
+#include "m1B_archive.h"
 
 // g_cat_passages_panel
 Q_LOGGING_CATEGORY(g_cat_passages_panel, "passages_panel")
@@ -122,6 +123,7 @@ QString M1UI::BasePassageItem::highlight(M1Store::Item_lv2* p_chunk, M1Store::It
     return this->text();
 }
 QString M1UI::WordItem::highlight(M1Store::Item_lv2* p_chunk, M1Store::Item_lv2* p_category, M1Store::Item_lv2* p_color){
+    M1Store::Transaction l_archive_tx("Highlight word");
     QString l_ret = BasePassageItem::highlight(p_chunk, p_category, p_color);
 
     p_chunk->linkTo(this->m_occ->myself(), M1Store::OWNS_SIID, M1Store::InsertionPoint::at_bottom, M1Store::InsertionPoint::at_top);
@@ -210,6 +212,7 @@ void M1UI::PassageEditor::move_backwards(int p_steps){
     */
 }
 QString M1UI::PassageEditor::bake_highlight(M1Store::Item_lv2* p_highlight_vertex, M1Store::Item_lv2* p_category, M1Store::Item_lv2* p_color){
+    M1Store::Transaction l_archive_tx("Highlight passage");
     qCDebug(g_cat_tmp_spotlight).noquote() << QString("PassageEditor Id:") << m_id << m_version_vertex->text() << p_category->dbgShort();
 
     M1Store::Item_lv2* l_highlight_chunk = p_highlight_vertex->create_descendant(
@@ -452,6 +455,7 @@ void M1UI::PassagesPanel::cat_select(int p_index){
 }
 // highlight
 void M1UI::PassagesPanel::highlight(){
+    M1Store::Transaction l_archive_tx("Highlight");
     qCDebug(g_cat_tmp_spotlight()) << QString("highlight()") << m_cat_list[m_current_cat]->text() << m_highlight_folder->dbgShort();
 
     M1Store::Item_lv2* l_highlight_vertex = m_highlight_folder->create_descendant(M1Env::OWNS_SIID, "", M1Env::TEXT_HIGHLIGHT_SIID);

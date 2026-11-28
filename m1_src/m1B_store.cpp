@@ -12,6 +12,7 @@
 #include "m1A_env.h"
 #include "m1B_graph_init.h"
 #include "m1B_store.h"
+#include "m1B_archive.h"
 
 // LMDB helper macros taken from the examples in the distrib. (require declaration "int l_rc;" wherever used)
 // cannot be factored back into m1B_store.h for some reason
@@ -86,7 +87,13 @@ void M1Store::StorageStatic::storeSetUp(bool p_reset){
         fs::remove_all(cm_lmdb_dir);
 
         clearMmapFiles();
+
+        // archive (snapshot, log, dirty marker)
+        M1Store::Archive::wipe();
     }
+    // crash recovery, step 1: restore the session snapshot (before LMDB and the mmap() areas are opened)
+    else if(M1Store::Archive::crashDetected())
+        M1Store::Archive::restoreSnapshot();
 
     // create LMDB storage path if not exists (placed here bc of the remove_all() above, in case of reset)
     if( !fs::is_directory(cm_lmdb_dir)) {
@@ -133,6 +140,10 @@ void M1Store::StorageStatic::storeSetUp(bool p_reset){
     // commit transaction
     E(mdb_txn_commit(l_txn));
 
+    // the segment count has just been loaded --> excluded upper bound of the current segment
+    // (previously left at its initMmapConstants() value, i.e. correct only for a 1-segment store)
+    cm_item_next_upper_excluded = cm_items_per_mmap_segment * cm_item_mmap_next_seg_id;
+
     // ------------------------------------ mmap() set-up -------------------------------------------------------------------------
     // mmap() init
     qCDebug(g_cat_store_mmap) << QString("mmap() init ... ");
@@ -142,6 +153,9 @@ void M1Store::StorageStatic::storeSetUp(bool p_reset){
 
     // specials
     openSpecialsMmap();
+
+    // crash recovery, step 2: replay the complete transactions of the archive log (no-op if no recovery is in progress)
+    M1Store::Archive::replayLog();
 
     // ------------------------------------ rest of init -------------------------------------------------------------------------
     // version updates
@@ -182,6 +196,9 @@ void M1Store::StorageStatic::storeSetUp(bool p_reset){
     // icons
     loadIcons();
 
+    // archive log: snapshot + empty log + dirty marker, then all further updates must be done within transactions
+    M1Store::Archive::startSession();
+
     qCDebug(g_cat_store) << "storage environment set-up complete";
 
     M1_FUNC_EXIT
@@ -198,6 +215,9 @@ void M1Store::StorageStatic::storeShutDown(){
     int l_rc;
 
     saveUtilities(nullptr);
+
+    // archive log: everything made durable, log and dirty marker deleted
+    M1Store::Archive::endSession();
 
     // set debug categories to just allow g_cat_silence (= "dump")
     M1Env::EnvStatic::setSilentMode(true);
@@ -357,7 +377,8 @@ M1Store::SpecialItem* M1Store::StorageStatic::getNewSpecialWithItem(
     const ItemID p_item_id,
     const FlagField p_flags,
     const char* p_mnemonic,
-    const char* p_icon_path
+    const char* p_icon_path,
+    const char* p_label
     // SpecialItemID* p_siid_var
     ){
     M1_FUNC_ENTRY(g_cat_store, QString("Creating special item [%1]%2 Icon: %3")
@@ -365,10 +386,12 @@ M1Store::SpecialItem* M1Store::StorageStatic::getNewSpecialWithItem(
                     .arg((p_item_id == G_VOID_ITEM_ID) ? " (item-less)" : " (associated to supplied Item)")
                     .arg((p_icon_path == nullptr) ? "<none>" : p_icon_path))
 
+    // archive log (before-image of the new slot)
+    M1Store::Archive::touchSpecial(cm_next_special);
     // gets the pointer
     M1Store::SpecialItem* l_ret = getSpecialItemPointer(cm_next_special);
     // sets the attributes, including the new SpecialItemID
-    l_ret->setAttr(p_item_id, cm_next_special, p_flags, p_mnemonic);
+    l_ret->setAttr(p_item_id, cm_next_special, p_flags, p_mnemonic, p_label);
     // increments top special item ID
     cm_next_special += 1;
     // update the mnemonic --> SpecialItem* map
@@ -396,12 +419,13 @@ M1Store::SpecialItem* M1Store::StorageStatic::getNewSpecialWithItem(
 M1Store::SpecialItem* M1Store::StorageStatic::getNewSpecialNoItem(
     const FlagField p_flags,
     const char* p_mnemonic,
-    const char* p_icon_path
+    const char* p_icon_path,
+    const char* p_label
     // SpecialItemID* p_siid_var
     ){
     // calls newSpecial() with G_VOID_ITEM_ID is ItemID
     // return getNewSpecialWithItem(G_VOID_ITEM_ID, p_flags | SI_HAS_NO_ITEM, p_mnemonic, p_icon_path, p_siid_var);
-    return getNewSpecialWithItem(G_VOID_ITEM_ID, p_flags | SI_HAS_NO_ITEM, p_mnemonic, p_icon_path);
+    return getNewSpecialWithItem(G_VOID_ITEM_ID, p_flags | SI_HAS_NO_ITEM, p_mnemonic, p_icon_path, p_label);
 }
 
 /**
@@ -421,16 +445,20 @@ void M1Store::StorageStatic::getNewSpecialWithReciprocal(
     const char* p_mnemonic_2,
     const char* p_icon_path_2,
     // SpecialItemID* p_siid_var_2,
-    const FlagField p_flags_2){
+    const FlagField p_flags_2,
+    const char* p_label_1,
+    const char* p_label_2){
     M1_FUNC_ENTRY(g_cat_store, QString("Creating reciprocal item-less special items [%1] and [%2]")
                                 .arg(p_mnemonic_1)
                                 .arg(p_mnemonic_2))
 
     // forces the flag SI_HAS_RECIPROCAL for both
-    M1Store::SpecialItem* l_s1 = getNewSpecialNoItem(p_flags | SI_HAS_RECIPROCAL, p_mnemonic_1, p_icon_path_1);
-    M1Store::SpecialItem* l_s2 = getNewSpecialNoItem(p_flags_2 | SI_HAS_RECIPROCAL, p_mnemonic_2, p_icon_path_2);
+    M1Store::SpecialItem* l_s1 = getNewSpecialNoItem(p_flags | SI_HAS_RECIPROCAL, p_mnemonic_1, p_icon_path_1, p_label_1);
+    M1Store::SpecialItem* l_s2 = getNewSpecialNoItem(p_flags_2 | SI_HAS_RECIPROCAL, p_mnemonic_2, p_icon_path_2, p_label_2);
 
     // iondicate that both are reciprocal of each other
+    M1Store::Archive::touchSpecial(l_s1->specialId());
+    M1Store::Archive::touchSpecial(l_s2->specialId());
     l_s1->setReciprocal(l_s2->specialId());
     l_s2->setReciprocal(l_s1->specialId());
 
@@ -510,5 +538,22 @@ QList<M1Store::SpecialItem*>& M1Store::StorageStatic::getSelectableVertexTypes()
 
     M1_FUNC_EXIT
     return l_ret_vertices;
+}
+/**
+ * @brief M1Store::Storage::getFieldTypes
+ * @return list of field types (special items with SI_FIELD_TYPE set), for the "fields" tab combo
+ */
+QList<M1Store::SpecialItem*>& M1Store::StorageStatic::getFieldTypes(){
+    M1_FUNC_ENTRY(g_cat_store, QString("Get list of field types"))
+    static QList<M1Store::SpecialItem*> l_ret_fields;
+
+    l_ret_fields.clear();
+    for(M1Env::SpecialItemID l_special_id = 0; l_special_id < cm_next_special; l_special_id++){
+        M1Store::SpecialItem* l_special_item = getSpecialItemPointer(l_special_id);
+        if(l_special_item->flags() & M1Env::SI_FIELD_TYPE) l_ret_fields.append(l_special_item);
+    }
+
+    M1_FUNC_EXIT
+    return l_ret_fields;
 }
 /**@}*/ //end of StoreAccess

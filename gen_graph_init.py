@@ -389,98 +389,101 @@ g_nlp_tag_list = [
 ]
 
 g_special_vertices = [
+    # [l_mnemo, l_label, l_flags, l_icon_path, l_pseudo_constant,
+    #  (reciprocal: l_mnemo_r, l_label_r, l_flags_r, l_icon_path_r, l_pseudo_constant_r) or None, l_comment]
+    # l_label --> M1Store::SpecialItem::m_label (max SPECIAL_ITEM_LABEL_LEN - 1 = 38 UTF-8 bytes)
     # Edge type pairs
     # --------------------------- OWNS / BLNGS ---------------------------
-    ['OWNS_', ['SI_IS_TYPE', 'SI_EDGE_TYPE',
-               'SI_IS_SELECTABLE'],                        'OWNS_ICON_PATH',             'OWNS_SIID',
-    ('BLNGS', ['SI_IS_TYPE', 'SI_EDGE_TYPE',
-               'SI_INSERT_AT_TOP', 'SI_IS_SELECTABLE'],    'BLNGS_ICON_PATH',            'BLNGS_SIID'),                     'Special Vertex ID (Edge type) of ownership edges'],
+    ['OWNS_', 'Owns',                      ['SI_IS_TYPE', 'SI_EDGE_TYPE',
+                                            'SI_IS_SELECTABLE'],                        'OWNS_ICON_PATH',             'OWNS_SIID',
+    ('BLNGS', 'Belongs to',                ['SI_IS_TYPE', 'SI_EDGE_TYPE',
+                                            'SI_INSERT_AT_TOP', 'SI_IS_SELECTABLE'],    'BLNGS_ICON_PATH',            'BLNGS_SIID'),                     'Special Vertex ID (Edge type) of ownership edges'],
     # --------------------------- ISA / ITO ---------------------------
-    ['_ISA_', ['SI_IS_TYPE', 'SI_EDGE_TYPE',
-               'SI_IS_SPECIAL_EDGE', 'SI_IS_SELECTABLE'],  'ISA_ICON_PATH',              'ISA_SIID',
-    ('_ITO_', ['SI_IS_TYPE', 'SI_EDGE_TYPE',
-               'SI_IS_SELECTABLE'],                        'ITO_ICON_PATH',              'ITO_SIID'),                       'Special Vertex ID (Edge type) of type edges'],
+    ['_ISA_', 'Is a',                      ['SI_IS_TYPE', 'SI_EDGE_TYPE',
+                                            'SI_IS_SPECIAL_EDGE', 'SI_IS_SELECTABLE'],  'ISA_ICON_PATH',              'ISA_SIID',
+    ('_ITO_', 'Type of',                   ['SI_IS_TYPE', 'SI_EDGE_TYPE',
+                                            'SI_IS_SELECTABLE'],                        'ITO_ICON_PATH',              'ITO_SIID'),                       'Special Vertex ID (Edge type) of type edges'],
     # --------------------------- WROTE / WRTBY ---------------------------
-    ['WROTE', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'TEXT_WROTE_ICON_PATH',      'TEXT_WROTE_SIID',
-    ('WRTBY', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'TEXT_WRITTEN_BY_ICON_PATH', 'TEXT_WRITTEN_BY_SIID'),            'Special Vertex ID (Edge type) wrote / written by'],
+    ['WROTE', 'Wrote',                     ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'TEXT_WROTE_ICON_PATH',      'TEXT_WROTE_SIID',
+    ('WRTBY', 'Written by',                ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'TEXT_WRITTEN_BY_ICON_PATH', 'TEXT_WRITTEN_BY_SIID'),            'Special Vertex ID (Edge type) wrote / written by'],
     # --------------------------- WROTE / WRTBY ---------------------------
-    ['EQV_1', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'EQUIVALENT_ICON_PATH',      'EQUIVALENT_1_SIID',
-    ('EQV_2', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'EQUIVALENT_ICON_PATH',      'EQUIVALENT_2_SIID'),               'Special Vertex ID (Edge type) equivalence relation'],
+    ['EQV_1', 'Equivalent (1)',            ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'EQUIVALENT_ICON_PATH',      'EQUIVALENT_1_SIID',
+    ('EQV_2', 'Equivalent (2)',            ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'EQUIVALENT_ICON_PATH',      'EQUIVALENT_2_SIID'),               'Special Vertex ID (Edge type) equivalence relation'],
     # --------------------------- DS from / to ----------------------------
-    ['DTSDN', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'DATA_SOURCE_ICON_PATH',     'DATA_SOURCE_FROM_SIID',
-    ('DTSUP', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'DATA_SOURCE_ICON_PATH',     'DATA_SOURCE_TO_SIID'),             'Special Vertex ID (Edge type) DS from / to'],
+    ['DTSDN', 'Data source from',          ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'DATA_SOURCE_ICON_PATH',     'DATA_SOURCE_FROM_SIID',
+    ('DTSUP', 'Data source to',            ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'DATA_SOURCE_ICON_PATH',     'DATA_SOURCE_TO_SIID'),             'Special Vertex ID (Edge type) DS from / to'],
     # --------------------------- HS2OB / OC2HB ---------------------------
-    ['C2OBG', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_BEGIN_ICON_PATH', 'TW_CHUNK_2_OCC_BEGIN_SIID',
-    ('O2CBG', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_BEGIN_ICON_PATH', 'TW_OCC_2_CHUNK_BEGIN_SIID'), 'Special Vertex ID (Edge type) begin chunk + reciprocal'],
+    ['C2OBG', 'Chunk to occurrence begin', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_BEGIN_ICON_PATH', 'TW_CHUNK_2_OCC_BEGIN_SIID',
+    ('O2CBG', 'Occurrence to chunk begin', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_BEGIN_ICON_PATH', 'TW_OCC_2_CHUNK_BEGIN_SIID'), 'Special Vertex ID (Edge type) begin chunk + reciprocal'],
     # --------------------------- HS2OE / OC2HE ---------------------------
-    ['C2OEN', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_END_ICON_PATH',   'TW_CHUNK_2_OCC_END_SIID',
-    ('O2CEN', 'SI_IS_TYPE',                               'TW_SECTION_2_OCC_END_ICON_PATH',   'TW_OCC_2_CHUNK_END_SIID'),   'Special Vertex ID (Edge type) end chunk + reciprocal'],
+    ['C2OEN', 'Chunk to occurrence end',   'SI_IS_TYPE',                               'TW_SECTION_2_OCC_END_ICON_PATH',   'TW_CHUNK_2_OCC_END_SIID',
+    ('O2CEN', 'Occurrence to chunk end',   'SI_IS_TYPE',                               'TW_SECTION_2_OCC_END_ICON_PATH',   'TW_OCC_2_CHUNK_END_SIID'),   'Special Vertex ID (Edge type) end chunk + reciprocal'],
     # ---------------------------------------------------------------------
     # Edge-less vertex types
-    ['FOLDR', ['SI_IS_TYPE', 'SI_IS_SELECTABLE'],          'FOLDER_ICON_PATH',           'FOLDER_SIID', None,               'Special Vertex ID (Vertex type) of folders (ordinary vertices with no special role)'],
-    ['WFORM', 'SI_IS_TYPE | SI_IS_ICON_TYPE',              'WFORM_ICON_PATH',           'WFORM_SIID', None,                 'Special Vertex ID (Vertex type) of word form vertices'],
-    ['URLNK', 'SI_IS_TYPE',                                'TEXT_URL_LINK_ICON_PATH',   'TEXT_URL_LINK_SIID', None,         'Special Vertex ID (Vertex type) Url link'],
+    ['FOLDR', 'Folder',                    ['SI_IS_TYPE', 'SI_IS_SELECTABLE'],          'FOLDER_ICON_PATH',           'FOLDER_SIID', None,               'Special Vertex ID (Vertex type) of folders (ordinary vertices with no special role)'],
+    ['WFORM', 'Word form',                 'SI_IS_TYPE | SI_IS_ICON_TYPE',              'WFORM_ICON_PATH',           'WFORM_SIID', None,                 'Special Vertex ID (Vertex type) of word form vertices'],
+    ['URLNK', 'URL link',                  'SI_IS_TYPE',                                'TEXT_URL_LINK_ICON_PATH',   'TEXT_URL_LINK_SIID', None,         'Special Vertex ID (Vertex type) Url link'],
     # Edge types
-    ['AUTO_', ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'AUTO_ICON_PATH',             'AUTO_SIID', None,                 'Special Vertex ID (Edge type) of AUTO edges'],
-    ['OCCUR', ['SI_IS_TYPE', 'SI_EDGE_TYPE',
-               'SI_IS_SPECIAL_EDGE'],                      'OCCURRENCE_ICON_PATH',      'OCCUR_SIID', None,                 'Special Vertex ID (Edge type) of form occurrence edges'],
-    ['OCCIN', ['SI_IS_TYPE', 'SI_EDGE_TYPE',],             'OCCURRENCE_ICON_PATH',      'OCCURS_IN_SIID', None,             'Special Vertex ID (Edge type) of form to point of occurrence edges'],
+    ['AUTO_', 'Auto edge',                 ['SI_IS_TYPE', 'SI_EDGE_TYPE'],              'AUTO_ICON_PATH',             'AUTO_SIID', None,                 'Special Vertex ID (Edge type) of AUTO edges'],
+    ['OCCUR', 'Occurrence',                ['SI_IS_TYPE', 'SI_EDGE_TYPE',
+                                            'SI_IS_SPECIAL_EDGE'],                      'OCCURRENCE_ICON_PATH',      'OCCUR_SIID', None,                 'Special Vertex ID (Edge type) of form occurrence edges'],
+    ['OCCIN', 'Occurs in',                 ['SI_IS_TYPE', 'SI_EDGE_TYPE',],             'OCCURRENCE_ICON_PATH',      'OCCURS_IN_SIID', None,             'Special Vertex ID (Edge type) of form to point of occurrence edges'],
     # Fields
-    ['TXLNG', 'SI_IS_TYPE',                                None,                        'TEXT_LANGUAGE_SIID', None,         'Special Vertex ID (Simple Edge type) of text language field'],
-    ['SLKNM', 'SI_IS_TYPE',                                None,                        'TEXT_SLOKA_NUMBER_SIID', None,     'Special Vertex ID (Simple Edge type) of sloka number field'],
-    ['CHPNM', 'SI_IS_TYPE',                                None,                        'TEXT_CHAP_NUMBER_SIID', None,      'Special Vertex ID (Simple Edge type) of chapter number field'],
-    ['LFGRM', 'SI_IS_TYPE',                                None,                        'TEXT_LEXICON_GRAMMAR_SIID', None,  'Special Vertex ID (Simple Edge type) Lexicon form Grammatical analysis'],
-    ['TXVRT', 'SI_IS_TYPE',                                None,                        'TEXT_VER_TYPE_SIID', None,         'Special Vertex ID (Simple edge type) text version type: (G)round/(T)ranaslation'],
-    ['TXATL', 'SI_IS_TYPE',                                None,                        'TEXT_ALT_TITLE_SIID', None,        'Special Vertex ID (Simple edge type) alternate text title'],
-    ['TXSBT', 'SI_IS_TYPE',                                None,                        'TEXT_SUB_TITLE_SIID', None,        'Special Vertex ID (Simple edge type) text subtitle'],
-    ['CAPTL', 'SI_IS_TYPE',                                None,                        'CAPTL_SIID', None,                 'Special Vertex ID (Simple edge type) of Occurrence field capitalization flag'],
-    ['PCTLF', 'SI_IS_TYPE',                                None,                        'PCTLF_SIID', None,                 'Special Vertex ID (Simple edge type) of Occurrence field left punctuation'],
-    ['PCTRT', 'SI_IS_TYPE',                                None,                        'PCTRT_SIID', None,                 'Special Vertex ID (Simple edge type) of Occurrence field right punctuation'],
-    ['MKPLF', 'SI_IS_TYPE',                                None,                        'MKPLF_SIID', None,                 'Special Vertex ID (Simple edge type) of Occurrence field markup left'],
-    ['MKPRT', 'SI_IS_TYPE',                                None,                        'MKPRT_SIID', None,                 'Special Vertex ID (Simple edge type) of Occurrence field markup right'],
-    ['STPOS', 'SI_IS_TYPE',                                None,                        'STPOS_SIID', None,                 'Special Vertex ID (Simple edge type) of Occurrence field sentence position'],
-    ['HLCLR', 'SI_IS_TYPE',                                None,                        'HLCLR_SIID', None,                 'Color of text highlight category'],
-    ['TRSLW', 'SI_IS_TYPE',                                None,                        'TEXT_WORD_TRANSLIT_SIID', None,    'Special Vertex ID (Simple Edge type) of Gita transliteration field'],
-    ['DCTRF', 'SI_IS_TYPE',                                None,                        'TEXT_WORD_DICT_REF_SIID', None,    'Special Vertex ID (Simple Edge type) of Gita dictionary ref. field'],
-    ['TRSLF', 'SI_IS_TYPE',                                None,                        'TEXT_WFW_TRANSLIT_SIID', None,     'Special Vertex ID (Simple Edge type) of Gita transliteration field'],
-    ['WFTRN', 'SI_IS_TYPE',                                None,                        'TEXT_WFW_TRANSLAT_SIID', None,     'Special Vertex ID (Simple Edge type) WfW unit Translation field'],
-    ['WFPOS', 'SI_IS_TYPE',                                None,                        'TEXT_WFW_POS_SIID', None,          'Special Vertex ID (Simple Edge type) WfW form POS tag'],
-    ['WFGRM', 'SI_IS_TYPE',                                None,                        'TEXT_WFW_GRM_SIID', None,          'Special Vertex ID (Simple Edge type) WfW form Grammatical analysis'],
-    ['TEXID', 'SI_IS_TYPE',                                None,                        'TEI_XMLID_ATTR_SIID', None,        'Special Vertex ID (Simple Edge type) TEI @xml:id attribute irrespective of tag'],
-    ['TETYP', 'SI_IS_TYPE',                                None,                        'TEI_TYPE_ATTR_SIID', None,         'Special Vertex ID (Simple Edge type) TEI @type attribute'],
-    ['TEINA', 'SI_IS_TYPE',                                None,                        'TEI_N_ATTR_SIID', None,            'Special Vertex ID (Simple Edge type) TEI @n attribute'],
-    ['TERND', 'SI_IS_TYPE',                                None,                        'TEI_REND_ATTR_SIID', None,         'Special Vertex ID (Simple Edge type) TEI @rend attribute (for <hi>)'],
-    ['TEPCL', 'SI_IS_TYPE',                                None,                        'TEI_PLACE_ATTR_SIID', None,        'Special Vertex ID (Simple Edge type) TEI @place attribute (for <note>)'],
-    ['TELNG', 'SI_IS_TYPE',                                None,                        'TEI_LANG_ATTR_SIID', None,         'Special Vertex ID (Simple Edge type) TEI @xml:lang attribute'],
-    ['TEWHN', 'SI_IS_TYPE',                                None,                        'TEI_WHEN_ATTR_SIID', None,         'Special Vertex ID (Simple Edge type) TEI @when attribute (for <date>)'],
-    ['TEUNT', 'SI_IS_TYPE',                                None,                        'TEI_UNIT_ATTR_SIID', None,         'Special Vertex ID (Simple Edge type) TEI @unit attribute (for <citedRange>, <biblScope>)'],
-    ['TETGT', 'SI_IS_TYPE',                                None,                        'TEI_TARGET_ATTR_SIID', None,       'Special Vertex ID (Simple Edge type) TEI @target attribute (for <ref>)'],
-    ['TEREF', 'SI_IS_TYPE',                                None,                        'TEI_REF_ATTR_SIID', None,          'Special Vertex ID (Simple Edge type) TEI @ref attribute irrespective of tag'],
-    ['TELVL', 'SI_IS_TYPE',                                None,                        'TEI_LEVEL_ATTR_SIID', None,        'Special Vertex ID (Simple Edge type) TEI @level attribute (for <title>)'],
-    ['NMTMK', 'SI_IS_TYPE',                                None,                        'TEI_NAME_TERM_KEY_SIID', None,     'Special Vertex ID (Simple Edge type) TEI <name>/<author>/<term> key (@xml:id, or @ref without leading #)'],
-    ['TETAG', 'SI_IS_TYPE',                                None,                        'TEI_TAG_NAME_SIID', None,          'Special Vertex ID (Simple Edge type) TEI tag name (for mult-tag nodes like TXTCK)'],
-    ['TETBR', 'SI_IS_TYPE',                                None,                        'TEI_TABLE_ROWS_SIID', None,        'Special Vertex ID (Simple Edge type) TEI table row count'],
-    ['TETBC', 'SI_IS_TYPE',                                None,                        'TEI_TABLE_COLS_SIID', None,        'Special Vertex ID (Simple Edge type) TEI table column count'],
-    ['TERRL', 'SI_IS_TYPE',                                None,                        'TEI_ROW_ROLE_SIID', None,          'Special Vertex ID (Simple Edge type) TEI table row role'],
-    ['TEGRP', 'SI_IS_TYPE',                                None,                        'TEI_GRAPHIC_SIID', None,           'Special Vertex ID (Simple Edge type) TEI <graphic> path'],
-    ['TELTP', 'SI_IS_TYPE',                                None,                        'TEI_LIST_TYPE_SIID', None,         'Special Vertex ID (Simple Edge type) TEI <list> type'],
+    ['SLKNM', 'Sloka number',              ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEXT_SLOKA_NUMBER_SIID', None,     'sloka number field'],
+    ['CHPNM', 'Chapter number',            ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEXT_CHAP_NUMBER_SIID', None,      'chapter number field'],
+    ['LFGRM', 'Lexicon form grammar',      ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEXT_LEXICON_GRAMMAR_SIID', None,  'Lexicon form Grammatical analysis'],
+    ['TXVRT', 'Text version type',         ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEXT_VER_TYPE_SIID', None,         'text version type: (G)round/(T)ranaslation'],
+    ['TXATL', 'Alternate title',           ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEXT_ALT_TITLE_SIID', None,        'alternate text title'],
+    ['TXSBT', 'Subtitle',                  ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEXT_SUB_TITLE_SIID', None,        'text subtitle'],
+    ['CAPTL', 'Capitalization',            ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'CAPTL_SIID', None,                 'Occurrence field capitalization flag'],
+    ['PCTLF', 'Left punctuation',          ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'PCTLF_SIID', None,                 'Occurrence field left punctuation'],
+    ['PCTRT', 'Right punctuation',         ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'PCTRT_SIID', None,                 'Occurrence field right punctuation'],
+    ['MKPLF', 'Left markup',               ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'MKPLF_SIID', None,                 'Occurrence field markup left'],
+    ['MKPRT', 'Right markup',              ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'MKPRT_SIID', None,                 'Occurrence field markup right'],
+    ['STPOS', 'Sentence position',         ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'STPOS_SIID', None,                 'Occurrence field sentence position'],
+    ['HLCLR', 'Highlight color',           ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'HLCLR_SIID', None,                 'Color of text highlight category'],
+    ['TRSLW', 'Word transliteration',      ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEXT_WORD_TRANSLIT_SIID', None,    'Gita transliteration field'],
+    ['DCTRF', 'Dictionary reference',      ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEXT_WORD_DICT_REF_SIID', None,    'Gita dictionary ref. field'],
+    ['TRSLF', 'WfW transliteration',       ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEXT_WFW_TRANSLIT_SIID', None,     'Gita transliteration field'],
+    ['WFTRN', 'WfW translation',           ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEXT_WFW_TRANSLAT_SIID', None,     'WfW unit Translation field'],
+    ['WFPOS', 'WfW POS tag',               ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEXT_WFW_POS_SIID', None,          'WfW form POS tag'],
+    ['WFGRM', 'WfW grammatical analysis',  ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEXT_WFW_GRM_SIID', None,          'WfW form Grammatical analysis'],
+    ['TXLNG', 'Text language',             ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEXT_LANGUAGE_SIID', None,         'TEI @xml:lang text language field'],
+    ['TEXID', 'TEI @xml:id',               ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEI_XMLID_ATTR_SIID', None,        'TEI @xml:id attribute irrespective of tag'],
+    ['TETYP', 'TEI @type',                 ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEI_TYPE_ATTR_SIID', None,         'TEI @type attribute'],
+    ['TEINA', 'TEI @n',                    ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEI_N_ATTR_SIID', None,            'TEI @n attribute'],
+    ['TERND', 'TEI @rend',                 ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEI_REND_ATTR_SIID', None,         'TEI @rend attribute (for <hi>)'],
+    ['TEPCL', 'TEI @place',                ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEI_PLACE_ATTR_SIID', None,        'TEI @place attribute (for <note>)'],
+    ['TELNG', 'TEI @xml:lang',             ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEI_LANG_ATTR_SIID', None,         'TEI @xml:lang attribute'],
+    ['TEWHN', 'TEI @when',                 ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEI_WHEN_ATTR_SIID', None,         'TEI @when attribute (for <date>)'],
+    ['TEUNT', 'TEI @unit',                 ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEI_UNIT_ATTR_SIID', None,         'TEI @unit attribute (for <citedRange>, <biblScope>)'],
+    ['TETGT', 'TEI @target',               ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEI_TARGET_ATTR_SIID', None,       'TEI @target attribute (for <ref>)'],
+    ['TEREF', 'TEI @ref',                  ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEI_REF_ATTR_SIID', None,          'TEI @ref attribute irrespective of tag'],
+    ['TELVL', 'TEI @level',                ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEI_LEVEL_ATTR_SIID', None,        'TEI @level attribute (for <title>)'],
+    ['NMTMK', 'TEI name/term key',         ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEI_NAME_TERM_KEY_SIID', None,     'TEI <name>/<author>/<term> key (@xml:id, or @ref without leading #)'],
+    ['TETAG', 'TEI tag name',              ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEI_TAG_NAME_SIID', None,          'TEI tag name (for mult-tag nodes like TXTCK)'],
+    ['TETBR', 'TEI table row count',       ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEI_TABLE_ROWS_SIID', None,        'TEI table row count'],
+    ['TETBC', 'TEI table column count',    ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEI_TABLE_COLS_SIID', None,        'TEI table column count'],
+    ['TERRL', 'TEI table row role',        ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEI_ROW_ROLE_SIID', None,          'TEI table row role'],
+    ['TEGRP', 'TEI graphic path',          ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEI_GRAPHIC_SIID', None,           'TEI <graphic> path'],
+    ['TELTP', 'TEI list type',             ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'TEI_LIST_TYPE_SIID', None,         'TEI <list> type'],
     # --------------------------- Person name fields ----------------------
-    ['PERFN', 'SI_IS_TYPE',                                None,                        'PERS_FIRST_NAME_SIID', None,       'Special Vertex ID (Simple Edge type) Person first name / praenomen'],
-    ['PERMN', 'SI_IS_TYPE',                                None,                        'PERS_MIDDLE_NAME_SIID', None,      'Special Vertex ID (Simple Edge type) Person middle name(s)'],
-    ['PERPN', 'SI_IS_TYPE',                                None,                        'PERS_PATRONYMIC_SIID', None,       'Special Vertex ID (Simple Edge type) Person patronymic'],
-    ['PERNN', 'SI_IS_TYPE',                                None,                        'PERS_NICKNAME_SIID', None,         'Special Vertex ID (Simple Edge type) Person nickname / cognomen'],
-    ['PERLN', 'SI_IS_TYPE',                                None,                        'PERS_LAST_NAME_SIID', None,        'Special Vertex ID (Simple Edge type) Person last name / nomen'],
-    ['PERHN', 'SI_IS_TYPE',                                None,                        'PERS_HONORIFIC_SIID', None,        'Special Vertex ID (Simple Edge type) Person honorific (Sir, Dr., Saint, ...)'],
-    ['PERTL', 'SI_IS_TYPE',                                None,                        'PERS_TITLE_SIID', None,            'Special Vertex ID (Simple Edge type) Person title (ecclesiastical, nobility, ...)'],
-    ['PERTB', 'SI_IS_TYPE',                                None,                        'PERS_TOPONYMIC_SIID', None,        'Special Vertex ID (Simple Edge type) Person toponymic byname (of Seville, da Vinci, ...)'],
-    ['PERBN', 'SI_IS_TYPE',                                None,                        'PERS_BIRTH_DATE_SIID', None,       'Special Vertex ID (Simple Edge type) Person birth date (free text)'],
-    ['PERDN', 'SI_IS_TYPE',                                None,                        'PERS_DEATH_DATE_SIID', None,       'Special Vertex ID (Simple Edge type) Person death date (free text)'],
-    ['PERRN', 'SI_IS_TYPE',                                None,                        'PERS_REGNAL_SIID', None,           'Special Vertex ID (Simple Edge type) Person regnal / generational number (XIV, Jr., ...)'],
-    ['PERGN', 'SI_IS_TYPE',                                None,                        'PERS_GENERATIONAL_SIID', None,     'Special Vertex ID (Simple Edge type) Person generational suffix (Jr., Sr., II, ...) displayed after the last name'],
-    ['PERAL', 'SI_IS_TYPE',                                None,                        'PERS_ALIAS_SIID', None,            'Special Vertex ID (Simple Edge type) Person alias(es) / pseudonym(s)'],
+    ['PERFN', 'First name',                ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'PERS_FIRST_NAME_SIID', None,       'Person first name / praenomen'],
+    ['PERMN', 'Middle name(s)',            ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'PERS_MIDDLE_NAME_SIID', None,      'Person middle name(s)'],
+    ['PERPN', 'Patronymic',                ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'PERS_PATRONYMIC_SIID', None,       'Person patronymic'],
+    ['PERNN', 'Nickname',                  ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'PERS_NICKNAME_SIID', None,         'Person nickname / cognomen'],
+    ['PERLN', 'Last name',                 ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'PERS_LAST_NAME_SIID', None,        'Person last name / nomen'],
+    ['PERHN', 'Honorific',                 ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'PERS_HONORIFIC_SIID', None,        'Person honorific (Sir, Dr., Saint, ...)'],
+    ['PERTL', 'Title',                     ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'PERS_TITLE_SIID', None,            'Person title (ecclesiastical, nobility, ...)'],
+    ['PERTB', 'Toponymic byname',          ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'PERS_TOPONYMIC_SIID', None,        'Person toponymic byname (of Seville, da Vinci, ...)'],
+    ['PERBN', 'Birth date',                ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'PERS_BIRTH_DATE_SIID', None,       'Person birth date (free text)'],
+    ['PERDN', 'Death date',                ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'PERS_DEATH_DATE_SIID', None,       'Person death date (free text)'],
+    ['PERRN', 'Regnal number',             ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'PERS_REGNAL_SIID', None,           'Person regnal / generational number (XIV, Jr., ...)'],
+    ['PERGN', 'Generational suffix',       ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'PERS_GENERATIONAL_SIID', None,     'Person generational suffix (Jr., Sr., II, ...) displayed after the last name'],
+    ['PERAL', 'Alias(es)',                 ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'PERS_ALIAS_SIID', None,            'Person alias(es) / pseudonym(s)'],
     # --------------------------- Contact ID fields -----------------------
-    ['MSGLK', 'SI_IS_TYPE',                                None,                        'PHONE_MSG_LINKS_SIID', None,       'Special Vertex ID (Simple Edge type) Phone number messaging app links (W/T/S/V)'],
-    ['PHNCC', 'SI_IS_TYPE',                                None,                        'PHONE_COUNTRY_CODE_SIID', None,    'Special Vertex ID (Simple Edge type) Phone number country code'],
+    ['MSGLK', 'Messaging app links',       ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'PHONE_MSG_LINKS_SIID', None,       'Phone number messaging app links (W/T/S/V)'],
+    ['PHNCC', 'Phone country code',        ['SI_IS_TYPE', 'SI_FIELD_TYPE'],             None,                        'PHONE_COUNTRY_CODE_SIID', None,    'Phone number country code'],
 ]
 
 g_vertices = [
@@ -496,7 +499,7 @@ g_vertices = [
 ['Organization (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'ORGN_', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
                                                                                                                'SI_IS_SELECTABLE'],                'ORGANIZATION_ICON_PATH', 'ORG_TYPE_SIID'],
 ['Contact ID (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_'],  [('BLNGS',  'TXWKK')], 'CTCID', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE',
-                                                                                                               'SI_IS_ICON_TYPE'],                 'CONTACT_ID_ICON_PATH',   'CONTACT_ID_SIID'],
+                                                                                                               'SI_IS_ICON_TYPE'],                 'TYPE_NODE_ICON_PATH',    'CONTACT_ID_SIID'],
 ['E-mail ID (type)',             ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_', 'CTCID'], None,          'EMLCI', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'CONTACT_ID_ICON_PATH',   'CTC_EMAIL_SIID'],
 ['Phone Number (type)',          ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_', 'CTCID'], None,          'PHNCI', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'CONTACT_ID_ICON_PATH',   'CTC_PHONE_SIID'],
 ['Discord ID (type)',            ['FULL_VERTEX',  'IS_SPECIAL'],  ['TYPE_', 'CTCID'], None,          'DCDCI', ['SI_IS_TYPE', 'SI_REQUIRES_EDGE'],  'CONTACT_ID_ICON_PATH',   'CTC_DISCORD_SIID'],
@@ -948,6 +951,30 @@ def do_plato():
         l_fout.write(l_plato_code)
 
 
+# max number of UTF-8 bytes in M1Store::SpecialItem::m_label (SPECIAL_ITEM_LABEL_LEN - 1 for the \\0 terminator)
+SPECIAL_ITEM_LABEL_MAX_BYTES = 38
+
+def check_si_label(p_mnemo, p_label, p_fatal):
+    """
+    Check that a special item label fits in M1Store::SpecialItem::m_label.
+    :param p_mnemo: mnemonic (for the message)
+    :param p_label: the label
+    :param p_fatal: if True, raise an exception if too long; otherwise print a warning (the C++ side truncates)
+    """
+    l_len = len(p_label.encode('utf-8'))
+    if l_len > SPECIAL_ITEM_LABEL_MAX_BYTES:
+        l_msg = f'[{p_mnemo}] label "{p_label}" is {l_len} bytes long (max {SPECIAL_ITEM_LABEL_MAX_BYTES})'
+        if p_fatal:
+            raise ValueError(l_msg)
+        print(f'WARNING: {l_msg} --> will be truncated in SpecialItem::m_label')
+
+def c_string(p_text):
+    """
+    :param p_text: a Python string
+    :return: a C string literal with \\ and " escaped
+    """
+    return '"' + p_text.replace('\\', '\\\\').replace('"', '\\"') + '"'
+
 # ------------- main() -------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     # gita
@@ -1046,14 +1073,14 @@ if __name__ == '__main__':
     l_dump = ''
     l_declaration = ''
     l_extern_declaration = ''
-    for l_mnemo, _, _, l_pseudo_constant, l_reciprocal, l_comment in g_special_vertices:
+    for l_mnemo, _, _, _, l_pseudo_constant, l_reciprocal, l_comment in g_special_vertices:
         l_extern_declaration += f'// [{l_mnemo}] {l_comment}\nextern M1Env::SpecialItemID {l_pseudo_constant};\n'
         l_declaration += f'// [{l_mnemo}] {l_comment}\nM1Env::SpecialItemID M1Env::{l_pseudo_constant} = G_NONEX_SI_ID;\n'
         l_initialization += f'    M1Env::{l_pseudo_constant} = M1Store::StorageStatic::getSpecialID("{l_mnemo}");\n'
         l_dump += f'    qCDebug(g_cat_silence) << QString("0x%1 M1Env::{l_pseudo_constant} <-- %2").arg(M1Store::StorageStatic::getSpecialID("{l_mnemo}"), 4, 16, QChar(\'0\')).arg("{l_mnemo}");\n'
         add_mnemo(l_mnemo)
         if l_reciprocal:
-            l_mnemo_r, l_flags_r, l_icon_path_r, l_pseudo_constant_r = l_reciprocal
+            l_mnemo_r, _, l_flags_r, l_icon_path_r, l_pseudo_constant_r = l_reciprocal
             add_mnemo(l_mnemo_r)
             l_extern_declaration += (f'// [{l_mnemo_r}] {l_comment} (reciprocal of {l_mnemo} above))\n' +
                                      f'extern M1Env::SpecialItemID {l_pseudo_constant_r};\n')
@@ -1079,12 +1106,14 @@ if __name__ == '__main__':
 
     # main code
     l_base_code = ''
-    for l_mnemo, l_flags, l_icon_path, _, l_reciprocal, l_comment in g_special_vertices:
+    for l_mnemo, l_label, l_flags, l_icon_path, _, l_reciprocal, l_comment in g_special_vertices:
+        check_si_label(l_mnemo, l_label, p_fatal=True)
         if isinstance(l_flags, list):
             l_flags = ' | '.join(l_flags)
         l_icon_path = f'M1Env::{l_icon_path}' if l_icon_path else 'nullptr'
         if l_reciprocal:
-            l_mnemo_r, l_flags_r, l_icon_path_r, l_pseudo_constant_r = l_reciprocal
+            l_mnemo_r, l_label_r, l_flags_r, l_icon_path_r, l_pseudo_constant_r = l_reciprocal
+            check_si_label(l_mnemo_r, l_label_r, p_fatal=True)
             if isinstance(l_flags_r, list):
                 l_flags_r = ' | '.join(l_flags_r)
             l_icon_path_r = f'M1Env::{l_icon_path_r}' if l_icon_path_r else 'nullptr'
@@ -1092,13 +1121,18 @@ if __name__ == '__main__':
                             f'    M1Store::StorageStatic::getNewSpecialWithReciprocal({l_flags},\n' +
                             f'        "{l_mnemo}", {l_icon_path},\n' +
                             f'        "{l_mnemo_r}", {l_icon_path_r},\n' +
-                            f'        {l_flags_r});\n')
+                            f'        {l_flags_r},\n' +
+                            f'        {c_string(l_label)}, {c_string(l_label_r)});\n')
         else:
-            l_base_code += f'    // {l_comment}\n    M1Store::StorageStatic::getNewSpecialNoItem({l_flags}, "{l_mnemo}", {l_icon_path});\n'
+            l_base_code += (f'    // {l_comment}\n    M1Store::StorageStatic::getNewSpecialNoItem({l_flags}, "{l_mnemo}", {l_icon_path}, ' +
+                            f'{c_string(l_label)});\n')
 
     l_base_code += '\n'
     l_mnemo_2_var = dict()
     for l_label, l_vertex_flag_list, l_type_list, l_edges, l_mnemo, l_si_flag_list, l_icon_path, l_pseudo_constant in g_vertices:
+        if l_mnemo:
+            # item label is passed on to the special item by Item_lv2::getNew() --> just warn if it will be truncated there
+            check_si_label(l_mnemo, l_label, p_fatal=False)
         l_var_name = 'l_' + l_mnemo.replace('_', '').lower()
         l_vertex_flag_string = ' | '.join([f'M1Env::{l_flag}' for l_flag in l_vertex_flag_list])
         l_debug_label = f'[{l_mnemo}]-{l_label}' if l_mnemo else f'{l_label}'
@@ -1158,9 +1192,9 @@ if __name__ == '__main__':
 #     ['PRABH', 'SI_IS_TYPE', None,                      'TEXT_WFW_PRABUPADA_SIID',    None, 'Special Vertex ID (Vertex type) of Gita translation source: Prabhupada'],
 #     ['SIVAN', 'SI_IS_TYPE', None,                      'TEXT_WFW_SIVANANDA_SIID',    None, 'Special Vertex ID (Vertex type) of Gita translation source: Sivananda'],
 #     ['GAMBI', 'SI_IS_TYPE', None,                      'TEXT_WFW_GAMBIRANANDA_SIID', None, 'Special Vertex ID (Vertex type) of Gita translation source: Gambirananda'],
-#     ['TRSLT', 'SI_IS_TYPE', None,                      'TEXT_WORD_TRANSLIT_SIID',    None, 'Special Vertex ID (Simple Edge type) of Gita transliteration field'],
-#     ['DCTRF', 'SI_IS_TYPE', None,                      'TEXT_WORD_DICT_REF_SIID',    None, 'Special Vertex ID (Simple Edge type) of Gita dictionary ref. field'],
-#     ['WFTRN', 'SI_IS_TYPE', None,                      'TEXT_WFW_TRANSL_SIID',       None, 'Special Vertex ID (Simple Edge type) WfW unit Translation field'],
+#     ['TRSLT', 'SI_IS_TYPE', None,                      'TEXT_WORD_TRANSLIT_SIID',    None, 'Gita transliteration field'],
+#     ['DCTRF', 'SI_IS_TYPE', None,                      'TEXT_WORD_DICT_REF_SIID',    None, 'Gita dictionary ref. field'],
+#     ['WFTRN', 'SI_IS_TYPE', None,                      'TEXT_WFW_TRANSL_SIID',       None, 'WfW unit Translation field'],
 #     ['URLNK', 'SI_IS_TYPE', 'TEXT_URL_LINK_ICON_PATH', 'TEXT_URL_LINK_SIID',         None, 'Special Vertex ID (Vertex type) Url link'],
 #     # --------------------------- HS2OB / OC2HB ---------------------------
 #     ['HS2OB', 'SI_IS_TYPE', 'TW_SECTION_2_OCC_BEGIN_ICON_PATH', 'TW_SECTION_2_OCC_BEGIN_SIID',

@@ -242,14 +242,13 @@ using namespace M1Env;
 
     // ----------------------------------------- SpecialItem ----------------------------------------------------
     /**
-     * @brief The Special Item class - Quick access for types, anchor nodes, etc - 32 bytes long.
+     * @brief The Special Item class - Quick access for types, anchor nodes, etc - 64 bytes long.
      *
      * Instances of this class live in the special items mmap() area
      * \ingroup LV0
      *
      * @todo Remove m_si_id from SpecialItem and m_item_id from Item_lv0
      * @todo bring m_mnemonic to 6 chars, to add \0 at the end
-     * @todo Add a string ID to SpecialItem, as a label
      */
 
     class SpecialItem{
@@ -261,7 +260,7 @@ using namespace M1Env;
         // StringID_16 m_icon_path;            ///< [2] path to icon (stored in the general string table)
         // StringID m_icon_path;               ///< [4] path to icon (stored in the general string table)
         char m_mnemonic[5];                 ///< [5] menmonic
-        char m_extra[7];                    ///< [5] extra data storage field (len = 3 to make total 32)
+        char m_label[SPECIAL_ITEM_LABEL_LEN];   ///< [39] label (UTF-8, \0 terminated, len = 39 to make total 64)
     public:
         static SpecialItem* cm_dummy;
         /**
@@ -277,7 +276,7 @@ using namespace M1Env;
         SpecialItem(const char* p_mnemo);
 
         void setAttr(const ItemID p_item_id, const SpecialItemID p_si_id,
-                     const FlagField p_flags, const char* p_mnemonic);
+                     const FlagField p_flags, const char* p_mnemonic, const char* p_label = nullptr);
 
         /// reciprocal ID setter
         void setReciprocal(const SpecialItemID p_si_id){m_si_id_reciprocal = p_si_id;}
@@ -290,6 +289,12 @@ using namespace M1Env;
         const char* mnemonic_raw() const {return m_mnemonic;}           ///< raw mnemonic pointer getter (!! NOT a \0 terminated string)
 
         QString mnemonic() const;
+        QString label() const {return QString::fromUtf8(m_label);}     ///< label getter
+        /// "<mnemonic> — <label>" (mnemonic alone if no label) - used for type selection combos
+        QString mnemonicAndLabel() const {
+            const QString l_label = label();
+            return l_label.isEmpty() ? mnemonic() : QString("%1 \u2014 %2").arg(mnemonic(), l_label);
+        }
         QString dbgString() const;
     };
 

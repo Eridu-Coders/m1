@@ -80,9 +80,10 @@ namespace M1Env{
  * @{
  */
     const unsigned int FULL_VERTEX_TEXT_LEN   = 32;  ///< text length for full vertices
-    const unsigned int SIMPLE_VERTEX_TEXT_LEN = 96;  ///< text length for simple vertices
+    const unsigned int SIMPLE_VERTEX_TEXT_LEN = 96;  ///< text length for simple vertices (fields)
     const unsigned int FULL_EDGE_TEXT_LEN     = 16;  ///< text length for full edges
-    const unsigned int SIMPLE_EDGE_TEXT_LEN   = 64;  ///< text length for simple edges
+    const unsigned int SIMPLE_EDGE_TEXT_LEN   = 64;  ///< text length for simple edges (fields)
+    const unsigned int SPECIAL_ITEM_LABEL_LEN = 39;  ///< label length in M1Store::SpecialItem (incl. \0 --> 38 usable UTF-8 bytes)
 /**@}*/ //end of TextLen
 
 /**
@@ -101,6 +102,7 @@ namespace M1Env{
     const unsigned long long SI_IS_ICON_TYPE    = 0x0000000000000080; ///< type for icon choice
     const unsigned long long SI_IS_SELECTABLE   = 0x0000000000000100; ///< type appears in the vertex/edge selection combos on left panel
     const unsigned long long SI_EDGE_TYPE       = 0x0000000000000200; ///< type appears in the vertex/edge selection combos on left panel
+    const unsigned long long SI_FIELD_TYPE      = 0x0000000000000400; ///< type appears in the field selection combo on right panel "fields" tab
 /**@}*/ //end of FlagsSpec
 
 /**
@@ -118,6 +120,10 @@ namespace M1Env{
     static const char* STATIC_DATA_PATH             = "../Static";                  ///< root dir for static data storage
     static const char* INTERP_HTML_TEMPLATE         = "Interp_html_template.html";  ///< name of mmap() file for special items
     static const char* COUNTRY_CODES_FILE           = "country_phone_codes.json";   ///< phone country codes list (in STORE_DATA_PATH), loaded at startup
+    static const char* ARCHIVE_DIR                  = "archive";                    ///< subdir (of STORE_DATA_PATH) for the archive log, snapshot and dirty marker
+    static const char* ARCHIVE_LOG_FILE             = "log.m1l";                    ///< archive log (committed transactions since the session snapshot)
+    static const char* ARCHIVE_DIRTY_FILE           = "dirty";                      ///< dirty marker: present while a session is running (--> crash if found at startup)
+    static const char* ARCHIVE_SNAPSHOT_DIR         = "snapshot";                   ///< copy of the storage files taken at session start
 /**@}*/ //end of StoreConst
 
 /**

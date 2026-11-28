@@ -15,6 +15,7 @@
 namespace M1UI{
 
 class TreeDisplay;
+class FieldsPanel;
 
 class MainWindow: public QMainWindow {
     Q_OBJECT
@@ -28,6 +29,8 @@ private:
 
     M1UI::TreeDisplay* m_tree_display_left;
     M1UI::TreeDisplay* m_tree_display_right;
+    M1UI::FieldsPanel* m_fields_panel;
+    QWidget* m_edit_widget = nullptr;   ///< current "Edit" tab widget (replaced on each emitEdit)
 
     void closeEvent(QCloseEvent *event);
 public:
@@ -39,6 +42,8 @@ public:
 public slots:
     void htmlReceive(const QString& p_html);
     void editReceive(QWidget *p_edit_widget);
+    void fieldsSaved();
+    void refresh();
 };
 
 }

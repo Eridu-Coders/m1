@@ -18,8 +18,13 @@ M1MidPlane::TEI_Container::TEI_Container(M1Store::Item_lv2* p_myself) : M1MidPla
 void M1MidPlane::TEI_Container::initialize(){
     if(!m_initialized){
         for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorAuto(); !l_it.beyondEnd(); l_it.next())
-            if(!l_it.at()->isFullEdge()) continue;
-            else if(l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_CHUNK_SIID) && l_it.at()->getTarget_lv2()->getField(M1Env::TEI_TAG_NAME_SIID) == "head")
+            // deleted (EDGE_DEAD) edges are ignored
+            if(!l_it.at()->isFullEdge() || l_it.at()->isDead()) continue;
+            // heading: only a <head> chunk *owned* by this container (not, e.g., the <head> a chunk belongs to,
+            // reached through its BLNGS edge -- that made baseText() of a child-less chunk inside a <head>
+            // recurse endlessly through its parent)
+            else if(l_it.at()->isOfType(M1Env::OWNS_SIID) &&
+                     l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_CHUNK_SIID) && l_it.at()->getTarget_lv2()->getField(M1Env::TEI_TAG_NAME_SIID) == "head")
                 m_heading = getInterp(l_it.at()->getTarget_lv2());
             else if((l_it.at()->isOfType(M1Env::OWNS_SIID) && (l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_CHUNK_SIID) ||
                                                                 l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_PARA_SIID)||

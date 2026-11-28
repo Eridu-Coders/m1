@@ -74,6 +74,7 @@ M1Store::SpecialItem::SpecialItem(const char* p_mnemo){
     // make sure the memonic member is initialized to 0 (normally not necessary
     memset(m_mnemonic, 0, 5);
     strncpy(m_mnemonic, p_mnemo, 5);
+    memset(m_label, 0, SPECIAL_ITEM_LABEL_LEN);
 }
 M1Store::SpecialItem* M1Store::SpecialItem::cm_dummy = new M1Store::SpecialItem("dummy");
 
@@ -96,9 +97,11 @@ QString M1Store::SpecialItem::mnemonic() const {
  * @param p_si_id special item ID
  * @param p_flags flags
  * @param p_mnemonic menmonic (the parameter is a \0 terminated C string but not the corresponding member)
+ * @param p_label label (UTF-8, \0 terminated). Truncated to SPECIAL_ITEM_LABEL_LEN - 1 bytes without splitting a
+ * multi-byte character. nullptr --> empty label
  */
 void M1Store::SpecialItem::setAttr(const ItemID p_item_id, const SpecialItemID p_si_id,
-                                   const FlagField p_flags, const char* p_mnemonic){
+                                   const FlagField p_flags, const char* p_mnemonic, const char* p_label){
     M1_FUNC_ENTRY(g_cat_lv0_special_item, QString("Setting attributes: p_item_id 0x%1 p_si_id 0x%2 p_flags 0b%3 p_mnemonic %4")
                                       .arg(p_item_id, 16, 16, QLatin1Char('0'))
                                       .arg(p_si_id, 4, 16, QLatin1Char('0'))
@@ -116,6 +119,19 @@ void M1Store::SpecialItem::setAttr(const ItemID p_item_id, const SpecialItemID p
     // make sure the memonic member is initialized to 0 (normally not necessary
     memset(m_mnemonic, 0, 5);
     strncpy(m_mnemonic, p_mnemonic, 5);
+
+    // label: zero the whole field, then copy at most SPECIAL_ITEM_LABEL_LEN - 1 bytes so that a \0 always remains.
+    // If truncation is needed, back off so as not to cut a UTF-8 multi-byte sequence in the middle
+    // (a byte of the form 10xxxxxx at the cut position is a continuation byte)
+    memset(m_label, 0, SPECIAL_ITEM_LABEL_LEN);
+    if(p_label != nullptr){
+        size_t l_len = strlen(p_label);
+        if(l_len > SPECIAL_ITEM_LABEL_LEN - 1){
+            l_len = SPECIAL_ITEM_LABEL_LEN - 1;
+            while(l_len > 0 && (static_cast<unsigned char>(p_label[l_len]) & 0xC0) == 0x80) l_len--;
+        }
+        memcpy(m_label, p_label, l_len);
+    }
 
     M1_FUNC_EXIT
 }
@@ -169,7 +185,7 @@ QString M1Store::SpecialItem::dbgString() const {
         l_item_dbg += " --ITEM--> " + l_item->dbgShort();
     }
 
-    return QString("0x%1 %2 0x%3 0b%4%5%6")
+    return QString("0x%1 %2 \"%7\" 0x%3 0b%4%5%6")
         .arg(m_si_id, 4, 16, QLatin1Char('0'))
         .arg(mnemonic())
         .arg(m_item_id, 16, 16, QLatin1Char('0'))
@@ -177,7 +193,8 @@ QString M1Store::SpecialItem::dbgString() const {
         .arg(l_item_dbg)
         .arg(m_flags & SI_HAS_RECIPROCAL ?
                  QString(" --RECIPROCAL--> ") + M1Store::StorageStatic::getSpecialItemPointer(m_si_id_reciprocal)->mnemonic():
-                 "");
+                 "")
+        .arg(label());
 }
 
 /**

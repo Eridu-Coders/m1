@@ -30,6 +30,7 @@
 #include <QMessageBox>
 #include <QScrollArea>
 #include <QMap>
+#include "m1B_archive.h"
 
 /** --------------------------------------------------------------- FieldInterp ---------------------------------
  * @brief M1MidPlane::FieldInterp::getOneIfMatch
@@ -179,7 +180,8 @@ QString M1MidPlane::TextInterp::getHtmlVirtual(){
 void M1MidPlane::TextInterp::initialize(){
     if(!m_initialized){
         for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorAuto(); !l_it.beyondEnd(); l_it.next())
-            if(!l_it.at()->isFullEdge()) continue;
+            // deleted (EDGE_DEAD) edges are ignored
+            if(!l_it.at()->isFullEdge() || l_it.at()->isDead()) continue;
             else if((l_it.at()->isOfType(M1Env::OWNS_SIID) && (l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_PARA_SIID) ||
                                                                 l_it.at()->getTarget_lv2()->isOfType(M1Env::TEXT_DIV_SIID))))
                 m_para_list.push_back(getInterp(l_it.at()->getTarget_lv2()));
@@ -1081,7 +1083,7 @@ M1MidPlane::DustbinInterp::DustbinInterp(M1Store::Item_lv2* p_myself) : M1MidPla
 QString M1MidPlane::DustbinInterp::inTreeDisplayText(const M1Store::Item_lv2* p_edge){
     int l_in_can_count = 0;
     for(M1Store::Item_lv2_iterator l_it = m_myself->getIteratorAuto(); !l_it.beyondEnd(); l_it.next())
-        if(l_it.at()->isOfType(M1Env::AUTO_SIID) || l_it.at()->isOfType(M1Env::BLNGS_SIID))
+        if(l_it.at()->isDead() || l_it.at()->isOfType(M1Env::AUTO_SIID) || l_it.at()->isOfType(M1Env::BLNGS_SIID))
             continue;
         else
             l_in_can_count += 1;
@@ -1570,6 +1572,7 @@ void M1MidPlane::PersonInterp::refreshTree(){
  * @brief Save button: label, name fields and contact IDs
  */
 void M1MidPlane::PersonInterp::save_person(){
+    M1Store::Transaction l_archive_tx("Save person");
     qCDebug(g_cat_interp_base).noquote() << "Saving Person" << m_myself->dbgShort();
     if(m_form.isNull()) return;
 
@@ -1604,6 +1607,7 @@ void M1MidPlane::PersonInterp::toggle_mode(bool p_full){
  * Pending edits in the form are saved first, since the form is rebuilt.
  */
 void M1MidPlane::PersonInterp::add_contact(){
+    M1Store::Transaction l_archive_tx("Add contact ID");
     if(m_form.isNull()) return;
     M1Env::SpecialItemID l_subtype = static_cast<M1Env::SpecialItemID>(m_new_contact_type->currentData().toUInt());
     qCDebug(g_cat_interp_base).noquote() << "Adding contact ID" << ContactIdInterp::subtypeLabel(l_subtype) << "to" << m_myself->dbgShort();
@@ -1625,6 +1629,7 @@ void M1MidPlane::PersonInterp::add_contact(){
  * @param p_edge the OWNS edge from this person to the contact ID
  */
 void M1MidPlane::PersonInterp::delete_contact(M1Store::Item_lv2* p_edge){
+    M1Store::Transaction l_archive_tx("Delete contact ID");
     if(m_form.isNull()) return;
     M1Store::Item_lv2* l_contact = p_edge->getTarget_lv2();
 

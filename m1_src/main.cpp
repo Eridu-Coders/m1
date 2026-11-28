@@ -9,6 +9,10 @@
 #include "m1B_store.h"
 #include "m1B_graph_init.h"
 #include "m1C_interp.h"
+#include "m1B_archive.h"
+
+#include <QMessageBox>
+#include <QTimer>
 
 #include <boost/program_options.hpp>
 #include <string>
@@ -43,6 +47,7 @@ int main(int argc, char *argv[])
         // ("load-tei-2,q", "Load a TEI file - Plato Perseus Style - with EMBEDDED <w> tags")
         // ("load-tei-3,p", "Load a TEI file - Plato Perseus Style - with SEPARATE <w> tags")
         ("reset,r", "Reset (empty) storage")
+        ("archive-selftest", po::value<std::string>(), "(developer, on a COPY of the storage only) archive log crash test: 'crash', then 'check'")
         // ("qmljsdebugger", po::value<std::vector<std::string>>(&l_fuck), "Fuck")
         ;
     // printf("X\n");
@@ -120,6 +125,14 @@ int main(int argc, char *argv[])
     M1Store::TEIInterface::init();
     M1Store::JsonInterface::init();
 
+    // bulk imports are not logged: if one crashes, recovery returns to the state before it.
+    // A new snapshot (including the imported data) is taken at the end (Archive::resume())
+    if(l_program_options_vm.count("archive-selftest"))
+        return M1Store::Archive::selfTest(QString::fromStdString(l_program_options_vm["archive-selftest"].as<std::string>()));
+
+    const bool l_import = l_program_options_vm.count("load-tei-1") || l_program_options_vm.count("load-tei");
+    if(l_import) M1Store::Archive::suspend();
+
     // if(l_program_options_vm.count("load-json")){
     //     try{
     //         std::cout << "Loading JSON file ..." << std::endl;
@@ -182,6 +195,8 @@ int main(int argc, char *argv[])
     //     }
     // }
 
+    if(l_import) M1Store::Archive::resume();
+
     // qCDebug(g_cat_main).noquote() << "Testing g_re_final_p: " << QString("भोगिनः। विष्णोश्चलति तद्भोगोऽत्यतीव हरितोषणम् इति पाद्मे।</p>").replace(g_re_final_p, "");
 
     // throw M1Env::M1Exception("", 0);
@@ -189,6 +204,14 @@ int main(int argc, char *argv[])
 
     M1UI::MainWindow w;
     w.show();
+
+    // crash recovery report (if the previous session did not end normally)
+    if(!M1Store::Archive::recoveryReport().isEmpty()){
+        std::cout << M1Store::Archive::recoveryReport().toStdString() << std::endl;
+        QTimer::singleShot(0, &w, [&w](){
+            QMessageBox::information(&w, "Crash recovery", M1Store::Archive::recoveryReport());
+        });
+    }
     int l_ret = a.exec();
     w.purge();
 

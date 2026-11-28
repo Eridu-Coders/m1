@@ -88,14 +88,16 @@ M1Store::Item_lv2_iterator_base::Item_lv2_iterator_base(Item_lv2* p_start_edge){
 }
 /**
  * @brief Base class version
- * @return true if m_current_edge is a full edge (and of course not nullptr)
+ * @return true if m_current_edge is not nullptr and not dead (EDGE_DEAD)
  */
 bool M1Store::Item_lv2_iterator_base::validEdge(){
     // return (m_current_edge != nullptr);
     qCDebug(g_cat_tmp_debug) << "m_current_edge != nullptr:" << (m_current_edge != nullptr ? "true" : "false");
     qCDebug(g_cat_tmp_debug) << "m_current_edge->isFullEdge():" << m_current_edge->isFullEdge();
     // return (m_current_edge != nullptr) && m_current_edge->isFullEdge();
-    return m_current_edge != nullptr;
+    // deleted (EDGE_DEAD) edges are never returned by iterators (they remain in the ring until garbage collection).
+    // Code that must see the raw ring (e.g. Item_lv2::edgeBelongs()) walks it with get_next_lv2() instead
+    return m_current_edge != nullptr && !m_current_edge->isDead();
 }
 
 /**

@@ -67,6 +67,7 @@
 #include <QSet>
 #include <QRegularExpression>
 #include <algorithm>
+#include "m1B_archive.h"
 
 namespace M1MidPlane{
 
@@ -478,6 +479,7 @@ public slots:
 
     /// writes changed chunk texts / separators to the graph. Returns false if nothing could be saved
     bool saveToGraph(){
+        M1Store::Transaction l_archive_tx("TEI editor save");
         QMap<M1Env::ItemID, QString> l_texts;
         QMap<TEI_DocBuilder::SepKey, QString> l_seps;
         int l_synthetic_len = 0;
@@ -721,7 +723,7 @@ private:
     /// OWNS edge from the parent of p_item (reciprocal of its BLNGS edge), nullptr if none
     static M1Store::Item_lv2* owningEdge(M1Store::Item_lv2* p_item){
         for(M1Store::Item_lv2_iterator l_it = p_item->getIteratorAuto(); !l_it.beyondEnd(); l_it.next())
-            if(l_it.at()->isFullEdge() && l_it.at()->isOfType(M1Env::BLNGS_SIID) && l_it.at()->hasReciprocal()){
+            if(l_it.at()->isFullEdge() && !l_it.at()->isDead() && l_it.at()->isOfType(M1Env::BLNGS_SIID) && l_it.at()->hasReciprocal()){
                 M1Store::Item_lv2* l_reciprocal = l_it.at()->getReciprocalEdge_lv2();
                 if(l_reciprocal->isOfType(M1Env::OWNS_SIID)) return l_reciprocal;
             }

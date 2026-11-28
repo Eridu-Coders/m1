@@ -43,111 +43,111 @@ extern M1Env::SpecialItemID AUTO_SIID;
 extern M1Env::SpecialItemID OCCUR_SIID;
 // [OCCIN] Special Vertex ID (Edge type) of form to point of occurrence edges
 extern M1Env::SpecialItemID OCCURS_IN_SIID;
-// [TXLNG] Special Vertex ID (Simple Edge type) of text language field
-extern M1Env::SpecialItemID TEXT_LANGUAGE_SIID;
-// [SLKNM] Special Vertex ID (Simple Edge type) of sloka number field
+// [SLKNM] sloka number field
 extern M1Env::SpecialItemID TEXT_SLOKA_NUMBER_SIID;
-// [CHPNM] Special Vertex ID (Simple Edge type) of chapter number field
+// [CHPNM] chapter number field
 extern M1Env::SpecialItemID TEXT_CHAP_NUMBER_SIID;
-// [LFGRM] Special Vertex ID (Simple Edge type) Lexicon form Grammatical analysis
+// [LFGRM] Lexicon form Grammatical analysis
 extern M1Env::SpecialItemID TEXT_LEXICON_GRAMMAR_SIID;
-// [TXVRT] Special Vertex ID (Simple edge type) text version type: (G)round/(T)ranaslation
+// [TXVRT] text version type: (G)round/(T)ranaslation
 extern M1Env::SpecialItemID TEXT_VER_TYPE_SIID;
-// [TXATL] Special Vertex ID (Simple edge type) alternate text title
+// [TXATL] alternate text title
 extern M1Env::SpecialItemID TEXT_ALT_TITLE_SIID;
-// [TXSBT] Special Vertex ID (Simple edge type) text subtitle
+// [TXSBT] text subtitle
 extern M1Env::SpecialItemID TEXT_SUB_TITLE_SIID;
-// [CAPTL] Special Vertex ID (Simple edge type) of Occurrence field capitalization flag
+// [CAPTL] Occurrence field capitalization flag
 extern M1Env::SpecialItemID CAPTL_SIID;
-// [PCTLF] Special Vertex ID (Simple edge type) of Occurrence field left punctuation
+// [PCTLF] Occurrence field left punctuation
 extern M1Env::SpecialItemID PCTLF_SIID;
-// [PCTRT] Special Vertex ID (Simple edge type) of Occurrence field right punctuation
+// [PCTRT] Occurrence field right punctuation
 extern M1Env::SpecialItemID PCTRT_SIID;
-// [MKPLF] Special Vertex ID (Simple edge type) of Occurrence field markup left
+// [MKPLF] Occurrence field markup left
 extern M1Env::SpecialItemID MKPLF_SIID;
-// [MKPRT] Special Vertex ID (Simple edge type) of Occurrence field markup right
+// [MKPRT] Occurrence field markup right
 extern M1Env::SpecialItemID MKPRT_SIID;
-// [STPOS] Special Vertex ID (Simple edge type) of Occurrence field sentence position
+// [STPOS] Occurrence field sentence position
 extern M1Env::SpecialItemID STPOS_SIID;
 // [HLCLR] Color of text highlight category
 extern M1Env::SpecialItemID HLCLR_SIID;
-// [TRSLW] Special Vertex ID (Simple Edge type) of Gita transliteration field
+// [TRSLW] Gita transliteration field
 extern M1Env::SpecialItemID TEXT_WORD_TRANSLIT_SIID;
-// [DCTRF] Special Vertex ID (Simple Edge type) of Gita dictionary ref. field
+// [DCTRF] Gita dictionary ref. field
 extern M1Env::SpecialItemID TEXT_WORD_DICT_REF_SIID;
-// [TRSLF] Special Vertex ID (Simple Edge type) of Gita transliteration field
+// [TRSLF] Gita transliteration field
 extern M1Env::SpecialItemID TEXT_WFW_TRANSLIT_SIID;
-// [WFTRN] Special Vertex ID (Simple Edge type) WfW unit Translation field
+// [WFTRN] WfW unit Translation field
 extern M1Env::SpecialItemID TEXT_WFW_TRANSLAT_SIID;
-// [WFPOS] Special Vertex ID (Simple Edge type) WfW form POS tag
+// [WFPOS] WfW form POS tag
 extern M1Env::SpecialItemID TEXT_WFW_POS_SIID;
-// [WFGRM] Special Vertex ID (Simple Edge type) WfW form Grammatical analysis
+// [WFGRM] WfW form Grammatical analysis
 extern M1Env::SpecialItemID TEXT_WFW_GRM_SIID;
-// [TEXID] Special Vertex ID (Simple Edge type) TEI @xml:id attribute irrespective of tag
+// [TXLNG] TEI @xml:lang text language field
+extern M1Env::SpecialItemID TEXT_LANGUAGE_SIID;
+// [TEXID] TEI @xml:id attribute irrespective of tag
 extern M1Env::SpecialItemID TEI_XMLID_ATTR_SIID;
-// [TETYP] Special Vertex ID (Simple Edge type) TEI @type attribute
+// [TETYP] TEI @type attribute
 extern M1Env::SpecialItemID TEI_TYPE_ATTR_SIID;
-// [TEINA] Special Vertex ID (Simple Edge type) TEI @n attribute
+// [TEINA] TEI @n attribute
 extern M1Env::SpecialItemID TEI_N_ATTR_SIID;
-// [TERND] Special Vertex ID (Simple Edge type) TEI @rend attribute (for <hi>)
+// [TERND] TEI @rend attribute (for <hi>)
 extern M1Env::SpecialItemID TEI_REND_ATTR_SIID;
-// [TEPCL] Special Vertex ID (Simple Edge type) TEI @place attribute (for <note>)
+// [TEPCL] TEI @place attribute (for <note>)
 extern M1Env::SpecialItemID TEI_PLACE_ATTR_SIID;
-// [TELNG] Special Vertex ID (Simple Edge type) TEI @xml:lang attribute
+// [TELNG] TEI @xml:lang attribute
 extern M1Env::SpecialItemID TEI_LANG_ATTR_SIID;
-// [TEWHN] Special Vertex ID (Simple Edge type) TEI @when attribute (for <date>)
+// [TEWHN] TEI @when attribute (for <date>)
 extern M1Env::SpecialItemID TEI_WHEN_ATTR_SIID;
-// [TEUNT] Special Vertex ID (Simple Edge type) TEI @unit attribute (for <citedRange>, <biblScope>)
+// [TEUNT] TEI @unit attribute (for <citedRange>, <biblScope>)
 extern M1Env::SpecialItemID TEI_UNIT_ATTR_SIID;
-// [TETGT] Special Vertex ID (Simple Edge type) TEI @target attribute (for <ref>)
+// [TETGT] TEI @target attribute (for <ref>)
 extern M1Env::SpecialItemID TEI_TARGET_ATTR_SIID;
-// [TEREF] Special Vertex ID (Simple Edge type) TEI @ref attribute irrespective of tag
+// [TEREF] TEI @ref attribute irrespective of tag
 extern M1Env::SpecialItemID TEI_REF_ATTR_SIID;
-// [TELVL] Special Vertex ID (Simple Edge type) TEI @level attribute (for <title>)
+// [TELVL] TEI @level attribute (for <title>)
 extern M1Env::SpecialItemID TEI_LEVEL_ATTR_SIID;
-// [NMTMK] Special Vertex ID (Simple Edge type) TEI <name>/<author>/<term> key (@xml:id, or @ref without leading #)
+// [NMTMK] TEI <name>/<author>/<term> key (@xml:id, or @ref without leading #)
 extern M1Env::SpecialItemID TEI_NAME_TERM_KEY_SIID;
-// [TETAG] Special Vertex ID (Simple Edge type) TEI tag name (for mult-tag nodes like TXTCK)
+// [TETAG] TEI tag name (for mult-tag nodes like TXTCK)
 extern M1Env::SpecialItemID TEI_TAG_NAME_SIID;
-// [TETBR] Special Vertex ID (Simple Edge type) TEI table row count
+// [TETBR] TEI table row count
 extern M1Env::SpecialItemID TEI_TABLE_ROWS_SIID;
-// [TETBC] Special Vertex ID (Simple Edge type) TEI table column count
+// [TETBC] TEI table column count
 extern M1Env::SpecialItemID TEI_TABLE_COLS_SIID;
-// [TERRL] Special Vertex ID (Simple Edge type) TEI table row role
+// [TERRL] TEI table row role
 extern M1Env::SpecialItemID TEI_ROW_ROLE_SIID;
-// [TEGRP] Special Vertex ID (Simple Edge type) TEI <graphic> path
+// [TEGRP] TEI <graphic> path
 extern M1Env::SpecialItemID TEI_GRAPHIC_SIID;
-// [TELTP] Special Vertex ID (Simple Edge type) TEI <list> type
+// [TELTP] TEI <list> type
 extern M1Env::SpecialItemID TEI_LIST_TYPE_SIID;
-// [PERFN] Special Vertex ID (Simple Edge type) Person first name / praenomen
+// [PERFN] Person first name / praenomen
 extern M1Env::SpecialItemID PERS_FIRST_NAME_SIID;
-// [PERMN] Special Vertex ID (Simple Edge type) Person middle name(s)
+// [PERMN] Person middle name(s)
 extern M1Env::SpecialItemID PERS_MIDDLE_NAME_SIID;
-// [PERPN] Special Vertex ID (Simple Edge type) Person patronymic
+// [PERPN] Person patronymic
 extern M1Env::SpecialItemID PERS_PATRONYMIC_SIID;
-// [PERNN] Special Vertex ID (Simple Edge type) Person nickname / cognomen
+// [PERNN] Person nickname / cognomen
 extern M1Env::SpecialItemID PERS_NICKNAME_SIID;
-// [PERLN] Special Vertex ID (Simple Edge type) Person last name / nomen
+// [PERLN] Person last name / nomen
 extern M1Env::SpecialItemID PERS_LAST_NAME_SIID;
-// [PERHN] Special Vertex ID (Simple Edge type) Person honorific (Sir, Dr., Saint, ...)
+// [PERHN] Person honorific (Sir, Dr., Saint, ...)
 extern M1Env::SpecialItemID PERS_HONORIFIC_SIID;
-// [PERTL] Special Vertex ID (Simple Edge type) Person title (ecclesiastical, nobility, ...)
+// [PERTL] Person title (ecclesiastical, nobility, ...)
 extern M1Env::SpecialItemID PERS_TITLE_SIID;
-// [PERTB] Special Vertex ID (Simple Edge type) Person toponymic byname (of Seville, da Vinci, ...)
+// [PERTB] Person toponymic byname (of Seville, da Vinci, ...)
 extern M1Env::SpecialItemID PERS_TOPONYMIC_SIID;
-// [PERBN] Special Vertex ID (Simple Edge type) Person birth date (free text)
+// [PERBN] Person birth date (free text)
 extern M1Env::SpecialItemID PERS_BIRTH_DATE_SIID;
-// [PERDN] Special Vertex ID (Simple Edge type) Person death date (free text)
+// [PERDN] Person death date (free text)
 extern M1Env::SpecialItemID PERS_DEATH_DATE_SIID;
-// [PERRN] Special Vertex ID (Simple Edge type) Person regnal / generational number (XIV, Jr., ...)
+// [PERRN] Person regnal / generational number (XIV, Jr., ...)
 extern M1Env::SpecialItemID PERS_REGNAL_SIID;
-// [PERGN] Special Vertex ID (Simple Edge type) Person generational suffix (Jr., Sr., II, ...) displayed after the last name
+// [PERGN] Person generational suffix (Jr., Sr., II, ...) displayed after the last name
 extern M1Env::SpecialItemID PERS_GENERATIONAL_SIID;
-// [PERAL] Special Vertex ID (Simple Edge type) Person alias(es) / pseudonym(s)
+// [PERAL] Person alias(es) / pseudonym(s)
 extern M1Env::SpecialItemID PERS_ALIAS_SIID;
-// [MSGLK] Special Vertex ID (Simple Edge type) Phone number messaging app links (W/T/S/V)
+// [MSGLK] Phone number messaging app links (W/T/S/V)
 extern M1Env::SpecialItemID PHONE_MSG_LINKS_SIID;
-// [PHNCC] Special Vertex ID (Simple Edge type) Phone number country code
+// [PHNCC] Phone number country code
 extern M1Env::SpecialItemID PHONE_COUNTRY_CODE_SIID;
 
 // [ROOT_] Special Vertex ID of "Global graph root"

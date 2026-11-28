@@ -14,6 +14,7 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QComboBox>
+#include "m1B_archive.h"
 
 // g_cat_interp_dev g_cat_tree_row
 // Q_LOGGING_CATEGORY(g_cat_interp_dev, "interp.dev") q_re_space
@@ -215,6 +216,11 @@ void M1UI::TreeRow::emitSignals(){
     if(m_html_cache.length() == 0) m_html_cache = m_target->getHtml(m_edge);
     emit emitHtml(m_html_cache);
     emit emitEdit(m_target->get_edit_widget());
+    // vertex whose fields are shown in the "fields" tab: the target of a full edge,
+    // or the origin if the row is itself a field (simple edge, or full edge leading to a simple vertex)
+    M1Store::Item_lv2* l_vertex = (m_edge->isFullEdge() && !m_edge->getTarget_lv2()->isSimpleVertex()) ?
+                                      m_edge->getTarget_lv2() : m_edge->getOrigin_lv2();
+    emit emitFocusedVertex(l_vertex);
     M1_FUNC_EXIT
 }
 
@@ -344,10 +350,13 @@ void M1UI::TreeRow::mousePressEvent(QMouseEvent *p_event){
 
     if(m_oc_x < p_event->pos().x() && p_event->pos().x() < m_oc_x + m_target_height){
         qCDebug(g_cat_interp_drag) << m_edge->dbgShort() << " OC clicked";
-        if(m_edge->flags() & M1Env::EDGE_IS_OPEN)
-            m_edge->unSetFlag(M1Env::EDGE_IS_OPEN);
-        else
-            m_edge->setFlag(M1Env::EDGE_IS_OPEN);
+        {
+            M1Store::Transaction l_archive_tx("Open/close edge");
+            if(m_edge->flags() & M1Env::EDGE_IS_OPEN)
+                m_edge->unSetFlag(M1Env::EDGE_IS_OPEN);
+            else
+                m_edge->setFlag(M1Env::EDGE_IS_OPEN);
+        }
         qCDebug(g_cat_interp_drag) << QString("GotoVertex after O/C BEFORE") << this->dbgOneLiner();
         emit gotoVertex(nullptr, this);
     }
@@ -418,6 +427,7 @@ void M1UI::TreeRow::dragLeaveEvent(QDragLeaveEvent *p_event){
  * @param p_event
  */
 void M1UI::TreeRow::dropEvent(QDropEvent *p_event){
+    M1Store::Transaction l_archive_tx("Drag & drop");
     qCDebug(g_cat_interp_drag) << QString("DROP p_event") << p_event->mimeData()->text() << p_event->mimeData()->formats() << this->dbgOneLiner();
     M1Env::ItemID l_payload_item_id = QString(p_event->mimeData()->text()).toLongLong();
     M1Store::Item_lv2* l_item_to = M1Store::Item_lv2::getExisting(l_payload_item_id);
@@ -472,6 +482,14 @@ void M1UI::TreeRow::contextMenuEvent(QContextMenuEvent *p_event) {
     QAction *l_dbg_garbage_collect = l_context_menu.addAction("Garbage Collection");
     connect(l_dbg_garbage_collect, &QAction::triggered,
             m_td_parent,           &M1UI::TreeDisplay::garbageCollect);
+
+    // at the bottom: delete the edge of this row (EDGE_DEAD) - not for the AUTO edge
+    l_context_menu.addSeparator();
+    m_td_parent->setEdgeForMenuActions(m_edge);
+    QAction *l_delete_edge = l_context_menu.addAction("Delete Edge");
+    l_delete_edge->setEnabled(m_edge != nullptr && !m_edge->isOfType(M1Env::AUTO_SIID));
+    connect(l_delete_edge, &QAction::triggered,
+            m_td_parent,   &M1UI::TreeDisplay::delete_edge);
 
     l_context_menu.exec(p_event->globalPos());
 }

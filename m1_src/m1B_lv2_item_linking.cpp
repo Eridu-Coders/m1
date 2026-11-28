@@ -448,13 +448,18 @@ bool M1Store::Item_lv2::edgeBelongs(Item_lv2* p_edge, bool p_edge_is_special){
                                       (this->firstEdgeSpecial_item_id() != G_VOID_ITEM_ID) :
                                       (this->firstEdge_item_id() != G_VOID_ITEM_ID);
     if( l_has_appropriate_ring ){
-        for(Item_lv2_iterator it = (p_edge_is_special ? this->getIteratorSpecial() : this->getIteratorTop()); !it.beyondEnd(); it.next()){
-            qCDebug(g_cat_lv2_members) << QString("Current Edge: %1").arg(it.at()->dbgHalfRight());
-            if(it.at()->item_id() == p_edge->item_id()){
+        // raw ring walk, not an iterator: iterators skip dead edges, but a dead edge still belongs to the ring
+        // (and may legitimately be used as an insertion point)
+        Item_lv2* l_first = p_edge_is_special ? this->getFirstEdgeSpecial_lv2() : this->getFirstEdge_lv2();
+        Item_lv2* l_current = l_first;
+        do {
+            qCDebug(g_cat_lv2_members) << QString("Current Edge: %1").arg(l_current->dbgHalfRight());
+            if(l_current->item_id() == p_edge->item_id()){
                 l_ret = true;
                 break;
             }
-        }
+            l_current = l_current->get_next_lv2();
+        } while(l_current->item_id() != l_first->item_id());
     }
 
     M1_FUNC_EXIT

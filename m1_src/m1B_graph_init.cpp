@@ -43,111 +43,111 @@ M1Env::SpecialItemID M1Env::AUTO_SIID = G_NONEX_SI_ID;
 M1Env::SpecialItemID M1Env::OCCUR_SIID = G_NONEX_SI_ID;
 // [OCCIN] Special Vertex ID (Edge type) of form to point of occurrence edges
 M1Env::SpecialItemID M1Env::OCCURS_IN_SIID = G_NONEX_SI_ID;
-// [TXLNG] Special Vertex ID (Simple Edge type) of text language field
-M1Env::SpecialItemID M1Env::TEXT_LANGUAGE_SIID = G_NONEX_SI_ID;
-// [SLKNM] Special Vertex ID (Simple Edge type) of sloka number field
+// [SLKNM] sloka number field
 M1Env::SpecialItemID M1Env::TEXT_SLOKA_NUMBER_SIID = G_NONEX_SI_ID;
-// [CHPNM] Special Vertex ID (Simple Edge type) of chapter number field
+// [CHPNM] chapter number field
 M1Env::SpecialItemID M1Env::TEXT_CHAP_NUMBER_SIID = G_NONEX_SI_ID;
-// [LFGRM] Special Vertex ID (Simple Edge type) Lexicon form Grammatical analysis
+// [LFGRM] Lexicon form Grammatical analysis
 M1Env::SpecialItemID M1Env::TEXT_LEXICON_GRAMMAR_SIID = G_NONEX_SI_ID;
-// [TXVRT] Special Vertex ID (Simple edge type) text version type: (G)round/(T)ranaslation
+// [TXVRT] text version type: (G)round/(T)ranaslation
 M1Env::SpecialItemID M1Env::TEXT_VER_TYPE_SIID = G_NONEX_SI_ID;
-// [TXATL] Special Vertex ID (Simple edge type) alternate text title
+// [TXATL] alternate text title
 M1Env::SpecialItemID M1Env::TEXT_ALT_TITLE_SIID = G_NONEX_SI_ID;
-// [TXSBT] Special Vertex ID (Simple edge type) text subtitle
+// [TXSBT] text subtitle
 M1Env::SpecialItemID M1Env::TEXT_SUB_TITLE_SIID = G_NONEX_SI_ID;
-// [CAPTL] Special Vertex ID (Simple edge type) of Occurrence field capitalization flag
+// [CAPTL] Occurrence field capitalization flag
 M1Env::SpecialItemID M1Env::CAPTL_SIID = G_NONEX_SI_ID;
-// [PCTLF] Special Vertex ID (Simple edge type) of Occurrence field left punctuation
+// [PCTLF] Occurrence field left punctuation
 M1Env::SpecialItemID M1Env::PCTLF_SIID = G_NONEX_SI_ID;
-// [PCTRT] Special Vertex ID (Simple edge type) of Occurrence field right punctuation
+// [PCTRT] Occurrence field right punctuation
 M1Env::SpecialItemID M1Env::PCTRT_SIID = G_NONEX_SI_ID;
-// [MKPLF] Special Vertex ID (Simple edge type) of Occurrence field markup left
+// [MKPLF] Occurrence field markup left
 M1Env::SpecialItemID M1Env::MKPLF_SIID = G_NONEX_SI_ID;
-// [MKPRT] Special Vertex ID (Simple edge type) of Occurrence field markup right
+// [MKPRT] Occurrence field markup right
 M1Env::SpecialItemID M1Env::MKPRT_SIID = G_NONEX_SI_ID;
-// [STPOS] Special Vertex ID (Simple edge type) of Occurrence field sentence position
+// [STPOS] Occurrence field sentence position
 M1Env::SpecialItemID M1Env::STPOS_SIID = G_NONEX_SI_ID;
 // [HLCLR] Color of text highlight category
 M1Env::SpecialItemID M1Env::HLCLR_SIID = G_NONEX_SI_ID;
-// [TRSLW] Special Vertex ID (Simple Edge type) of Gita transliteration field
+// [TRSLW] Gita transliteration field
 M1Env::SpecialItemID M1Env::TEXT_WORD_TRANSLIT_SIID = G_NONEX_SI_ID;
-// [DCTRF] Special Vertex ID (Simple Edge type) of Gita dictionary ref. field
+// [DCTRF] Gita dictionary ref. field
 M1Env::SpecialItemID M1Env::TEXT_WORD_DICT_REF_SIID = G_NONEX_SI_ID;
-// [TRSLF] Special Vertex ID (Simple Edge type) of Gita transliteration field
+// [TRSLF] Gita transliteration field
 M1Env::SpecialItemID M1Env::TEXT_WFW_TRANSLIT_SIID = G_NONEX_SI_ID;
-// [WFTRN] Special Vertex ID (Simple Edge type) WfW unit Translation field
+// [WFTRN] WfW unit Translation field
 M1Env::SpecialItemID M1Env::TEXT_WFW_TRANSLAT_SIID = G_NONEX_SI_ID;
-// [WFPOS] Special Vertex ID (Simple Edge type) WfW form POS tag
+// [WFPOS] WfW form POS tag
 M1Env::SpecialItemID M1Env::TEXT_WFW_POS_SIID = G_NONEX_SI_ID;
-// [WFGRM] Special Vertex ID (Simple Edge type) WfW form Grammatical analysis
+// [WFGRM] WfW form Grammatical analysis
 M1Env::SpecialItemID M1Env::TEXT_WFW_GRM_SIID = G_NONEX_SI_ID;
-// [TEXID] Special Vertex ID (Simple Edge type) TEI @xml:id attribute irrespective of tag
+// [TXLNG] TEI @xml:lang text language field
+M1Env::SpecialItemID M1Env::TEXT_LANGUAGE_SIID = G_NONEX_SI_ID;
+// [TEXID] TEI @xml:id attribute irrespective of tag
 M1Env::SpecialItemID M1Env::TEI_XMLID_ATTR_SIID = G_NONEX_SI_ID;
-// [TETYP] Special Vertex ID (Simple Edge type) TEI @type attribute
+// [TETYP] TEI @type attribute
 M1Env::SpecialItemID M1Env::TEI_TYPE_ATTR_SIID = G_NONEX_SI_ID;
-// [TEINA] Special Vertex ID (Simple Edge type) TEI @n attribute
+// [TEINA] TEI @n attribute
 M1Env::SpecialItemID M1Env::TEI_N_ATTR_SIID = G_NONEX_SI_ID;
-// [TERND] Special Vertex ID (Simple Edge type) TEI @rend attribute (for <hi>)
+// [TERND] TEI @rend attribute (for <hi>)
 M1Env::SpecialItemID M1Env::TEI_REND_ATTR_SIID = G_NONEX_SI_ID;
-// [TEPCL] Special Vertex ID (Simple Edge type) TEI @place attribute (for <note>)
+// [TEPCL] TEI @place attribute (for <note>)
 M1Env::SpecialItemID M1Env::TEI_PLACE_ATTR_SIID = G_NONEX_SI_ID;
-// [TELNG] Special Vertex ID (Simple Edge type) TEI @xml:lang attribute
+// [TELNG] TEI @xml:lang attribute
 M1Env::SpecialItemID M1Env::TEI_LANG_ATTR_SIID = G_NONEX_SI_ID;
-// [TEWHN] Special Vertex ID (Simple Edge type) TEI @when attribute (for <date>)
+// [TEWHN] TEI @when attribute (for <date>)
 M1Env::SpecialItemID M1Env::TEI_WHEN_ATTR_SIID = G_NONEX_SI_ID;
-// [TEUNT] Special Vertex ID (Simple Edge type) TEI @unit attribute (for <citedRange>, <biblScope>)
+// [TEUNT] TEI @unit attribute (for <citedRange>, <biblScope>)
 M1Env::SpecialItemID M1Env::TEI_UNIT_ATTR_SIID = G_NONEX_SI_ID;
-// [TETGT] Special Vertex ID (Simple Edge type) TEI @target attribute (for <ref>)
+// [TETGT] TEI @target attribute (for <ref>)
 M1Env::SpecialItemID M1Env::TEI_TARGET_ATTR_SIID = G_NONEX_SI_ID;
-// [TEREF] Special Vertex ID (Simple Edge type) TEI @ref attribute irrespective of tag
+// [TEREF] TEI @ref attribute irrespective of tag
 M1Env::SpecialItemID M1Env::TEI_REF_ATTR_SIID = G_NONEX_SI_ID;
-// [TELVL] Special Vertex ID (Simple Edge type) TEI @level attribute (for <title>)
+// [TELVL] TEI @level attribute (for <title>)
 M1Env::SpecialItemID M1Env::TEI_LEVEL_ATTR_SIID = G_NONEX_SI_ID;
-// [NMTMK] Special Vertex ID (Simple Edge type) TEI <name>/<author>/<term> key (@xml:id, or @ref without leading #)
+// [NMTMK] TEI <name>/<author>/<term> key (@xml:id, or @ref without leading #)
 M1Env::SpecialItemID M1Env::TEI_NAME_TERM_KEY_SIID = G_NONEX_SI_ID;
-// [TETAG] Special Vertex ID (Simple Edge type) TEI tag name (for mult-tag nodes like TXTCK)
+// [TETAG] TEI tag name (for mult-tag nodes like TXTCK)
 M1Env::SpecialItemID M1Env::TEI_TAG_NAME_SIID = G_NONEX_SI_ID;
-// [TETBR] Special Vertex ID (Simple Edge type) TEI table row count
+// [TETBR] TEI table row count
 M1Env::SpecialItemID M1Env::TEI_TABLE_ROWS_SIID = G_NONEX_SI_ID;
-// [TETBC] Special Vertex ID (Simple Edge type) TEI table column count
+// [TETBC] TEI table column count
 M1Env::SpecialItemID M1Env::TEI_TABLE_COLS_SIID = G_NONEX_SI_ID;
-// [TERRL] Special Vertex ID (Simple Edge type) TEI table row role
+// [TERRL] TEI table row role
 M1Env::SpecialItemID M1Env::TEI_ROW_ROLE_SIID = G_NONEX_SI_ID;
-// [TEGRP] Special Vertex ID (Simple Edge type) TEI <graphic> path
+// [TEGRP] TEI <graphic> path
 M1Env::SpecialItemID M1Env::TEI_GRAPHIC_SIID = G_NONEX_SI_ID;
-// [TELTP] Special Vertex ID (Simple Edge type) TEI <list> type
+// [TELTP] TEI <list> type
 M1Env::SpecialItemID M1Env::TEI_LIST_TYPE_SIID = G_NONEX_SI_ID;
-// [PERFN] Special Vertex ID (Simple Edge type) Person first name / praenomen
+// [PERFN] Person first name / praenomen
 M1Env::SpecialItemID M1Env::PERS_FIRST_NAME_SIID = G_NONEX_SI_ID;
-// [PERMN] Special Vertex ID (Simple Edge type) Person middle name(s)
+// [PERMN] Person middle name(s)
 M1Env::SpecialItemID M1Env::PERS_MIDDLE_NAME_SIID = G_NONEX_SI_ID;
-// [PERPN] Special Vertex ID (Simple Edge type) Person patronymic
+// [PERPN] Person patronymic
 M1Env::SpecialItemID M1Env::PERS_PATRONYMIC_SIID = G_NONEX_SI_ID;
-// [PERNN] Special Vertex ID (Simple Edge type) Person nickname / cognomen
+// [PERNN] Person nickname / cognomen
 M1Env::SpecialItemID M1Env::PERS_NICKNAME_SIID = G_NONEX_SI_ID;
-// [PERLN] Special Vertex ID (Simple Edge type) Person last name / nomen
+// [PERLN] Person last name / nomen
 M1Env::SpecialItemID M1Env::PERS_LAST_NAME_SIID = G_NONEX_SI_ID;
-// [PERHN] Special Vertex ID (Simple Edge type) Person honorific (Sir, Dr., Saint, ...)
+// [PERHN] Person honorific (Sir, Dr., Saint, ...)
 M1Env::SpecialItemID M1Env::PERS_HONORIFIC_SIID = G_NONEX_SI_ID;
-// [PERTL] Special Vertex ID (Simple Edge type) Person title (ecclesiastical, nobility, ...)
+// [PERTL] Person title (ecclesiastical, nobility, ...)
 M1Env::SpecialItemID M1Env::PERS_TITLE_SIID = G_NONEX_SI_ID;
-// [PERTB] Special Vertex ID (Simple Edge type) Person toponymic byname (of Seville, da Vinci, ...)
+// [PERTB] Person toponymic byname (of Seville, da Vinci, ...)
 M1Env::SpecialItemID M1Env::PERS_TOPONYMIC_SIID = G_NONEX_SI_ID;
-// [PERBN] Special Vertex ID (Simple Edge type) Person birth date (free text)
+// [PERBN] Person birth date (free text)
 M1Env::SpecialItemID M1Env::PERS_BIRTH_DATE_SIID = G_NONEX_SI_ID;
-// [PERDN] Special Vertex ID (Simple Edge type) Person death date (free text)
+// [PERDN] Person death date (free text)
 M1Env::SpecialItemID M1Env::PERS_DEATH_DATE_SIID = G_NONEX_SI_ID;
-// [PERRN] Special Vertex ID (Simple Edge type) Person regnal / generational number (XIV, Jr., ...)
+// [PERRN] Person regnal / generational number (XIV, Jr., ...)
 M1Env::SpecialItemID M1Env::PERS_REGNAL_SIID = G_NONEX_SI_ID;
-// [PERGN] Special Vertex ID (Simple Edge type) Person generational suffix (Jr., Sr., II, ...) displayed after the last name
+// [PERGN] Person generational suffix (Jr., Sr., II, ...) displayed after the last name
 M1Env::SpecialItemID M1Env::PERS_GENERATIONAL_SIID = G_NONEX_SI_ID;
-// [PERAL] Special Vertex ID (Simple Edge type) Person alias(es) / pseudonym(s)
+// [PERAL] Person alias(es) / pseudonym(s)
 M1Env::SpecialItemID M1Env::PERS_ALIAS_SIID = G_NONEX_SI_ID;
-// [MSGLK] Special Vertex ID (Simple Edge type) Phone number messaging app links (W/T/S/V)
+// [MSGLK] Phone number messaging app links (W/T/S/V)
 M1Env::SpecialItemID M1Env::PHONE_MSG_LINKS_SIID = G_NONEX_SI_ID;
-// [PHNCC] Special Vertex ID (Simple Edge type) Phone number country code
+// [PHNCC] Phone number country code
 M1Env::SpecialItemID M1Env::PHONE_COUNTRY_CODE_SIID = G_NONEX_SI_ID;
 
 M1Env::SpecialItemID M1Env::ROOT_SIID = G_NONEX_SI_ID;
@@ -347,7 +347,6 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::AUTO_SIID = M1Store::StorageStatic::getSpecialID("AUTO_");
     M1Env::OCCUR_SIID = M1Store::StorageStatic::getSpecialID("OCCUR");
     M1Env::OCCURS_IN_SIID = M1Store::StorageStatic::getSpecialID("OCCIN");
-    M1Env::TEXT_LANGUAGE_SIID = M1Store::StorageStatic::getSpecialID("TXLNG");
     M1Env::TEXT_SLOKA_NUMBER_SIID = M1Store::StorageStatic::getSpecialID("SLKNM");
     M1Env::TEXT_CHAP_NUMBER_SIID = M1Store::StorageStatic::getSpecialID("CHPNM");
     M1Env::TEXT_LEXICON_GRAMMAR_SIID = M1Store::StorageStatic::getSpecialID("LFGRM");
@@ -367,6 +366,7 @@ void M1Env::GraphInit::set_pseudo_constants(){
     M1Env::TEXT_WFW_TRANSLAT_SIID = M1Store::StorageStatic::getSpecialID("WFTRN");
     M1Env::TEXT_WFW_POS_SIID = M1Store::StorageStatic::getSpecialID("WFPOS");
     M1Env::TEXT_WFW_GRM_SIID = M1Store::StorageStatic::getSpecialID("WFGRM");
+    M1Env::TEXT_LANGUAGE_SIID = M1Store::StorageStatic::getSpecialID("TXLNG");
     M1Env::TEI_XMLID_ATTR_SIID = M1Store::StorageStatic::getSpecialID("TEXID");
     M1Env::TEI_TYPE_ATTR_SIID = M1Store::StorageStatic::getSpecialID("TETYP");
     M1Env::TEI_N_ATTR_SIID = M1Store::StorageStatic::getSpecialID("TEINA");
@@ -624,7 +624,6 @@ void M1Env::GraphInit::dbg_dump_pseudo_constants(){
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::AUTO_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("AUTO_"), 4, 16, QChar('0')).arg("AUTO_");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::OCCUR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("OCCUR"), 4, 16, QChar('0')).arg("OCCUR");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::OCCURS_IN_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("OCCIN"), 4, 16, QChar('0')).arg("OCCIN");
-    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_LANGUAGE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TXLNG"), 4, 16, QChar('0')).arg("TXLNG");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_SLOKA_NUMBER_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("SLKNM"), 4, 16, QChar('0')).arg("SLKNM");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_CHAP_NUMBER_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("CHPNM"), 4, 16, QChar('0')).arg("CHPNM");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_LEXICON_GRAMMAR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("LFGRM"), 4, 16, QChar('0')).arg("LFGRM");
@@ -644,6 +643,7 @@ void M1Env::GraphInit::dbg_dump_pseudo_constants(){
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_TRANSLAT_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WFTRN"), 4, 16, QChar('0')).arg("WFTRN");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_POS_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WFPOS"), 4, 16, QChar('0')).arg("WFPOS");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_WFW_GRM_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("WFGRM"), 4, 16, QChar('0')).arg("WFGRM");
+    qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEXT_LANGUAGE_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TXLNG"), 4, 16, QChar('0')).arg("TXLNG");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_XMLID_ATTR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TEXID"), 4, 16, QChar('0')).arg("TEXID");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_TYPE_ATTR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TETYP"), 4, 16, QChar('0')).arg("TETYP");
     qCDebug(g_cat_silence) << QString("0x%1 M1Env::TEI_N_ATTR_SIID <-- %2").arg(M1Store::StorageStatic::getSpecialID("TEINA"), 4, 16, QChar('0')).arg("TEINA");
@@ -684,155 +684,162 @@ void M1Env::GraphInit::init_base(){
     M1Store::StorageStatic::getNewSpecialWithReciprocal(SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SELECTABLE,
         "OWNS_", M1Env::OWNS_ICON_PATH,
         "BLNGS", M1Env::BLNGS_ICON_PATH,
-        SI_IS_TYPE | SI_EDGE_TYPE | SI_INSERT_AT_TOP | SI_IS_SELECTABLE);
+        SI_IS_TYPE | SI_EDGE_TYPE | SI_INSERT_AT_TOP | SI_IS_SELECTABLE,
+        "Owns", "Belongs to");
     // Special Vertex ID (Edge type) of type edges
     M1Store::StorageStatic::getNewSpecialWithReciprocal(SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SPECIAL_EDGE | SI_IS_SELECTABLE,
         "_ISA_", M1Env::ISA_ICON_PATH,
         "_ITO_", M1Env::ITO_ICON_PATH,
-        SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SELECTABLE);
+        SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SELECTABLE,
+        "Is a", "Type of");
     // Special Vertex ID (Edge type) wrote / written by
     M1Store::StorageStatic::getNewSpecialWithReciprocal(SI_IS_TYPE | SI_EDGE_TYPE,
         "WROTE", M1Env::TEXT_WROTE_ICON_PATH,
         "WRTBY", M1Env::TEXT_WRITTEN_BY_ICON_PATH,
-        SI_IS_TYPE | SI_EDGE_TYPE);
+        SI_IS_TYPE | SI_EDGE_TYPE,
+        "Wrote", "Written by");
     // Special Vertex ID (Edge type) equivalence relation
     M1Store::StorageStatic::getNewSpecialWithReciprocal(SI_IS_TYPE | SI_EDGE_TYPE,
         "EQV_1", M1Env::EQUIVALENT_ICON_PATH,
         "EQV_2", M1Env::EQUIVALENT_ICON_PATH,
-        SI_IS_TYPE | SI_EDGE_TYPE);
+        SI_IS_TYPE | SI_EDGE_TYPE,
+        "Equivalent (1)", "Equivalent (2)");
     // Special Vertex ID (Edge type) DS from / to
     M1Store::StorageStatic::getNewSpecialWithReciprocal(SI_IS_TYPE | SI_EDGE_TYPE,
         "DTSDN", M1Env::DATA_SOURCE_ICON_PATH,
         "DTSUP", M1Env::DATA_SOURCE_ICON_PATH,
-        SI_IS_TYPE | SI_EDGE_TYPE);
+        SI_IS_TYPE | SI_EDGE_TYPE,
+        "Data source from", "Data source to");
     // Special Vertex ID (Edge type) begin chunk + reciprocal
     M1Store::StorageStatic::getNewSpecialWithReciprocal(SI_IS_TYPE,
         "C2OBG", M1Env::TW_SECTION_2_OCC_BEGIN_ICON_PATH,
         "O2CBG", M1Env::TW_SECTION_2_OCC_BEGIN_ICON_PATH,
-        SI_IS_TYPE);
+        SI_IS_TYPE,
+        "Chunk to occurrence begin", "Occurrence to chunk begin");
     // Special Vertex ID (Edge type) end chunk + reciprocal
     M1Store::StorageStatic::getNewSpecialWithReciprocal(SI_IS_TYPE,
         "C2OEN", M1Env::TW_SECTION_2_OCC_END_ICON_PATH,
         "O2CEN", M1Env::TW_SECTION_2_OCC_END_ICON_PATH,
-        SI_IS_TYPE);
+        SI_IS_TYPE,
+        "Chunk to occurrence end", "Occurrence to chunk end");
     // Special Vertex ID (Vertex type) of folders (ordinary vertices with no special role)
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_IS_SELECTABLE, "FOLDR", M1Env::FOLDER_ICON_PATH);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_IS_SELECTABLE, "FOLDR", M1Env::FOLDER_ICON_PATH, "Folder");
     // Special Vertex ID (Vertex type) of word form vertices
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_IS_ICON_TYPE, "WFORM", M1Env::WFORM_ICON_PATH);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_IS_ICON_TYPE, "WFORM", M1Env::WFORM_ICON_PATH, "Word form");
     // Special Vertex ID (Vertex type) Url link
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "URLNK", M1Env::TEXT_URL_LINK_ICON_PATH);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "URLNK", M1Env::TEXT_URL_LINK_ICON_PATH, "URL link");
     // Special Vertex ID (Edge type) of AUTO edges
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE, "AUTO_", M1Env::AUTO_ICON_PATH);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE, "AUTO_", M1Env::AUTO_ICON_PATH, "Auto edge");
     // Special Vertex ID (Edge type) of form occurrence edges
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SPECIAL_EDGE, "OCCUR", M1Env::OCCURRENCE_ICON_PATH);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE | SI_IS_SPECIAL_EDGE, "OCCUR", M1Env::OCCURRENCE_ICON_PATH, "Occurrence");
     // Special Vertex ID (Edge type) of form to point of occurrence edges
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE, "OCCIN", M1Env::OCCURRENCE_ICON_PATH);
-    // Special Vertex ID (Simple Edge type) of text language field
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TXLNG", nullptr);
-    // Special Vertex ID (Simple Edge type) of sloka number field
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "SLKNM", nullptr);
-    // Special Vertex ID (Simple Edge type) of chapter number field
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "CHPNM", nullptr);
-    // Special Vertex ID (Simple Edge type) Lexicon form Grammatical analysis
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "LFGRM", nullptr);
-    // Special Vertex ID (Simple edge type) text version type: (G)round/(T)ranaslation
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TXVRT", nullptr);
-    // Special Vertex ID (Simple edge type) alternate text title
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TXATL", nullptr);
-    // Special Vertex ID (Simple edge type) text subtitle
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TXSBT", nullptr);
-    // Special Vertex ID (Simple edge type) of Occurrence field capitalization flag
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "CAPTL", nullptr);
-    // Special Vertex ID (Simple edge type) of Occurrence field left punctuation
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PCTLF", nullptr);
-    // Special Vertex ID (Simple edge type) of Occurrence field right punctuation
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PCTRT", nullptr);
-    // Special Vertex ID (Simple edge type) of Occurrence field markup left
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "MKPLF", nullptr);
-    // Special Vertex ID (Simple edge type) of Occurrence field markup right
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "MKPRT", nullptr);
-    // Special Vertex ID (Simple edge type) of Occurrence field sentence position
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "STPOS", nullptr);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_EDGE_TYPE, "OCCIN", M1Env::OCCURRENCE_ICON_PATH, "Occurs in");
+    // sloka number field
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "SLKNM", nullptr, "Sloka number");
+    // chapter number field
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "CHPNM", nullptr, "Chapter number");
+    // Lexicon form Grammatical analysis
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "LFGRM", nullptr, "Lexicon form grammar");
+    // text version type: (G)round/(T)ranaslation
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "TXVRT", nullptr, "Text version type");
+    // alternate text title
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "TXATL", nullptr, "Alternate title");
+    // text subtitle
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "TXSBT", nullptr, "Subtitle");
+    // Occurrence field capitalization flag
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "CAPTL", nullptr, "Capitalization");
+    // Occurrence field left punctuation
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "PCTLF", nullptr, "Left punctuation");
+    // Occurrence field right punctuation
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "PCTRT", nullptr, "Right punctuation");
+    // Occurrence field markup left
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "MKPLF", nullptr, "Left markup");
+    // Occurrence field markup right
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "MKPRT", nullptr, "Right markup");
+    // Occurrence field sentence position
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "STPOS", nullptr, "Sentence position");
     // Color of text highlight category
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "HLCLR", nullptr);
-    // Special Vertex ID (Simple Edge type) of Gita transliteration field
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TRSLW", nullptr);
-    // Special Vertex ID (Simple Edge type) of Gita dictionary ref. field
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "DCTRF", nullptr);
-    // Special Vertex ID (Simple Edge type) of Gita transliteration field
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TRSLF", nullptr);
-    // Special Vertex ID (Simple Edge type) WfW unit Translation field
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "WFTRN", nullptr);
-    // Special Vertex ID (Simple Edge type) WfW form POS tag
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "WFPOS", nullptr);
-    // Special Vertex ID (Simple Edge type) WfW form Grammatical analysis
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "WFGRM", nullptr);
-    // Special Vertex ID (Simple Edge type) TEI @xml:id attribute irrespective of tag
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TEXID", nullptr);
-    // Special Vertex ID (Simple Edge type) TEI @type attribute
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TETYP", nullptr);
-    // Special Vertex ID (Simple Edge type) TEI @n attribute
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TEINA", nullptr);
-    // Special Vertex ID (Simple Edge type) TEI @rend attribute (for <hi>)
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TERND", nullptr);
-    // Special Vertex ID (Simple Edge type) TEI @place attribute (for <note>)
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TEPCL", nullptr);
-    // Special Vertex ID (Simple Edge type) TEI @xml:lang attribute
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TELNG", nullptr);
-    // Special Vertex ID (Simple Edge type) TEI @when attribute (for <date>)
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TEWHN", nullptr);
-    // Special Vertex ID (Simple Edge type) TEI @unit attribute (for <citedRange>, <biblScope>)
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TEUNT", nullptr);
-    // Special Vertex ID (Simple Edge type) TEI @target attribute (for <ref>)
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TETGT", nullptr);
-    // Special Vertex ID (Simple Edge type) TEI @ref attribute irrespective of tag
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TEREF", nullptr);
-    // Special Vertex ID (Simple Edge type) TEI @level attribute (for <title>)
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TELVL", nullptr);
-    // Special Vertex ID (Simple Edge type) TEI <name>/<author>/<term> key (@xml:id, or @ref without leading #)
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "NMTMK", nullptr);
-    // Special Vertex ID (Simple Edge type) TEI tag name (for mult-tag nodes like TXTCK)
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TETAG", nullptr);
-    // Special Vertex ID (Simple Edge type) TEI table row count
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TETBR", nullptr);
-    // Special Vertex ID (Simple Edge type) TEI table column count
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TETBC", nullptr);
-    // Special Vertex ID (Simple Edge type) TEI table row role
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TERRL", nullptr);
-    // Special Vertex ID (Simple Edge type) TEI <graphic> path
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TEGRP", nullptr);
-    // Special Vertex ID (Simple Edge type) TEI <list> type
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "TELTP", nullptr);
-    // Special Vertex ID (Simple Edge type) Person first name / praenomen
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERFN", nullptr);
-    // Special Vertex ID (Simple Edge type) Person middle name(s)
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERMN", nullptr);
-    // Special Vertex ID (Simple Edge type) Person patronymic
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERPN", nullptr);
-    // Special Vertex ID (Simple Edge type) Person nickname / cognomen
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERNN", nullptr);
-    // Special Vertex ID (Simple Edge type) Person last name / nomen
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERLN", nullptr);
-    // Special Vertex ID (Simple Edge type) Person honorific (Sir, Dr., Saint, ...)
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERHN", nullptr);
-    // Special Vertex ID (Simple Edge type) Person title (ecclesiastical, nobility, ...)
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERTL", nullptr);
-    // Special Vertex ID (Simple Edge type) Person toponymic byname (of Seville, da Vinci, ...)
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERTB", nullptr);
-    // Special Vertex ID (Simple Edge type) Person birth date (free text)
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERBN", nullptr);
-    // Special Vertex ID (Simple Edge type) Person death date (free text)
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERDN", nullptr);
-    // Special Vertex ID (Simple Edge type) Person regnal / generational number (XIV, Jr., ...)
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERRN", nullptr);
-    // Special Vertex ID (Simple Edge type) Person generational suffix (Jr., Sr., II, ...) displayed after the last name
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERGN", nullptr);
-    // Special Vertex ID (Simple Edge type) Person alias(es) / pseudonym(s)
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PERAL", nullptr);
-    // Special Vertex ID (Simple Edge type) Phone number messaging app links (W/T/S/V)
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "MSGLK", nullptr);
-    // Special Vertex ID (Simple Edge type) Phone number country code
-    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE, "PHNCC", nullptr);
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "HLCLR", nullptr, "Highlight color");
+    // Gita transliteration field
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "TRSLW", nullptr, "Word transliteration");
+    // Gita dictionary ref. field
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "DCTRF", nullptr, "Dictionary reference");
+    // Gita transliteration field
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "TRSLF", nullptr, "WfW transliteration");
+    // WfW unit Translation field
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "WFTRN", nullptr, "WfW translation");
+    // WfW form POS tag
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "WFPOS", nullptr, "WfW POS tag");
+    // WfW form Grammatical analysis
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "WFGRM", nullptr, "WfW grammatical analysis");
+    // TEI @xml:lang text language field
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "TXLNG", nullptr, "Text language");
+    // TEI @xml:id attribute irrespective of tag
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "TEXID", nullptr, "TEI @xml:id");
+    // TEI @type attribute
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "TETYP", nullptr, "TEI @type");
+    // TEI @n attribute
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "TEINA", nullptr, "TEI @n");
+    // TEI @rend attribute (for <hi>)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "TERND", nullptr, "TEI @rend");
+    // TEI @place attribute (for <note>)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "TEPCL", nullptr, "TEI @place");
+    // TEI @xml:lang attribute
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "TELNG", nullptr, "TEI @xml:lang");
+    // TEI @when attribute (for <date>)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "TEWHN", nullptr, "TEI @when");
+    // TEI @unit attribute (for <citedRange>, <biblScope>)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "TEUNT", nullptr, "TEI @unit");
+    // TEI @target attribute (for <ref>)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "TETGT", nullptr, "TEI @target");
+    // TEI @ref attribute irrespective of tag
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "TEREF", nullptr, "TEI @ref");
+    // TEI @level attribute (for <title>)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "TELVL", nullptr, "TEI @level");
+    // TEI <name>/<author>/<term> key (@xml:id, or @ref without leading #)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "NMTMK", nullptr, "TEI name/term key");
+    // TEI tag name (for mult-tag nodes like TXTCK)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "TETAG", nullptr, "TEI tag name");
+    // TEI table row count
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "TETBR", nullptr, "TEI table row count");
+    // TEI table column count
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "TETBC", nullptr, "TEI table column count");
+    // TEI table row role
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "TERRL", nullptr, "TEI table row role");
+    // TEI <graphic> path
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "TEGRP", nullptr, "TEI graphic path");
+    // TEI <list> type
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "TELTP", nullptr, "TEI list type");
+    // Person first name / praenomen
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "PERFN", nullptr, "First name");
+    // Person middle name(s)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "PERMN", nullptr, "Middle name(s)");
+    // Person patronymic
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "PERPN", nullptr, "Patronymic");
+    // Person nickname / cognomen
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "PERNN", nullptr, "Nickname");
+    // Person last name / nomen
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "PERLN", nullptr, "Last name");
+    // Person honorific (Sir, Dr., Saint, ...)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "PERHN", nullptr, "Honorific");
+    // Person title (ecclesiastical, nobility, ...)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "PERTL", nullptr, "Title");
+    // Person toponymic byname (of Seville, da Vinci, ...)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "PERTB", nullptr, "Toponymic byname");
+    // Person birth date (free text)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "PERBN", nullptr, "Birth date");
+    // Person death date (free text)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "PERDN", nullptr, "Death date");
+    // Person regnal / generational number (XIV, Jr., ...)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "PERRN", nullptr, "Regnal number");
+    // Person generational suffix (Jr., Sr., II, ...) displayed after the last name
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "PERGN", nullptr, "Generational suffix");
+    // Person alias(es) / pseudonym(s)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "PERAL", nullptr, "Alias(es)");
+    // Phone number messaging app links (W/T/S/V)
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "MSGLK", nullptr, "Messaging app links");
+    // Phone number country code
+    M1Store::StorageStatic::getNewSpecialNoItem(SI_IS_TYPE | SI_FIELD_TYPE, "PHNCC", nullptr, "Phone country code");
 
     // creation of "Global graph root"
     qCDebug(g_cat_silence) << QString("Creating <[ROOT_]-Global graph root> item");
@@ -941,7 +948,7 @@ void M1Env::GraphInit::init_base(){
         // mnemonic
         "CTCID",
         // icon path
-        M1Env::CONTACT_ID_ICON_PATH);
+        M1Env::TYPE_NODE_ICON_PATH);
     l_ctcid->setType("TYPE_");
     l_ctcid->linkTo(l_txwkk, "BLNGS", nullptr, true);
 

@@ -58,6 +58,11 @@ set(PROJECT_SOURCES
         m1D_tree_display.cpp
         m1D_passages_panel.h
         m1D_passages_panel.cpp
+        m1D_fields_panel.h
+        m1D_fields_panel.cpp
+        m1B_archive.h
+        m1B_archive.cpp
+        m1B_archive_selftest.cpp
 )
 
 # m1D_passages_panel.h

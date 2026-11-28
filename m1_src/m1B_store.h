@@ -46,6 +46,7 @@ namespace M1Store{
     class StorageStatic{
         friend class Item_lv0;
         friend class SpecialItem;
+        friend class Archive;
     private:
         static fs::path cm_lmdb_dir;                ///< path to storage directory
         static fs::path cm_mmap_filepath_specials;  ///< path to specials mmap() file
@@ -70,7 +71,7 @@ namespace M1Store{
         * @ingroup GlobDec
         * @{
         */
-        static const unsigned short SPECIAL_SIZE_P2 = 5;                    ///< 32 = 2^4 = size of a special item
+        static const unsigned short SPECIAL_SIZE_P2 = 6;                    ///< 64 = 2^6 = size of a special item
         static const unsigned short ITEM_SIZE_P2 = 7;                       ///< 128 = 2^7 = size of an item
         static const unsigned short ITEMS_MMAP_SEGMENT_SIZE_P2 = 30;        ///< 1Gb = 2^30 = 0x4000, 0000 = 0b0100 0000 0000 0000, 0000 0000 0000 0000
         static const unsigned short SPECIAL_ITEMS_COUNT_P2 = 16;            ///< 65 536 = 2^16 = max number of special items
@@ -145,13 +146,15 @@ namespace M1Store{
             const ItemID p_item_id,
             const FlagField p_flags,
             const char* p_mnemonic,
-            const char* p_icon_path
+            const char* p_icon_path,
+            const char* p_label = nullptr
             // SpecialItemID* p_siid_var
             );
         static SpecialItem* getNewSpecialNoItem(
             const FlagField p_flags,
             const char* p_mnemonic,
-            const char* p_icon_path
+            const char* p_icon_path,
+            const char* p_label = nullptr
             // SpecialItemID* p_siid_var
             );
         static void getNewSpecialWithReciprocal(const FlagField p_flags,
@@ -161,13 +164,16 @@ namespace M1Store{
                                                 const char* p_mnemonic_2,
                                                 const char* p_icon_path_2,
                                                 // SpecialItemID* p_siid_var_2,
-                                                const FlagField p_flags_2);
+                                                const FlagField p_flags_2,
+                                                const char* p_label_1 = nullptr,
+                                                const char* p_label_2 = nullptr);
 
         /// get the current version number
         static unsigned int currentVersion(){return cm_current_version;}
 
         static QList<SpecialItem*>& getSelectableEdgeTypes();
         static QList<SpecialItem*>& getSelectableVertexTypes();
+        static QList<SpecialItem*>& getFieldTypes();
 
         static StringID dbg_get_string_id(Item_lv0& p_item) {return p_item.p.v.f.m_string_id;}
 

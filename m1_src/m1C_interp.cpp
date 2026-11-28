@@ -17,6 +17,7 @@
 #include <QPushButton>
 #include <QComboBox>
 #include <QTextStream>
+#include "m1B_archive.h"
 
 // g_cat_interp_dev g_cat_tree_row
 // Q_LOGGING_CATEGORY(g_cat_interp_dev, "interp.dev") q_re_space
@@ -145,11 +146,11 @@ QString M1MidPlane::Interp::dbgMapContents(bool p_html){
 
     QString l_row_template;
     if(p_html){
-        l_row_template = "<tr class=\"technical\"><td>%1:</td><td>(use count: %2)</td><td>%3</td></tr>";
+        l_row_template = "<tr class=\"technical\"><td>%1:</td><td>(%2)</td><td>%3</td></tr>";
         l_ret.append(QString("<p class=\"technical\">cm_interp_map [%1] contents:</p>\n<table>").arg(cm_interp_map.size()));
     }
     else{
-        l_row_template = "%1: (use count: %2) %3";
+        l_row_template = "%1: (%2) %3";
         l_ret.append(QString("cm_interp_map [%1] contents:").arg(cm_interp_map.size()));
     }
 
@@ -174,6 +175,18 @@ void M1MidPlane::Interp::garbageCollect(){
             l_it = cm_interp_map.erase(l_it);
         }
         else ++l_it;
+}
+
+/**
+ * @brief Completely empty the Interp cache (cm_interp_map)
+ *
+ * Interps still referenced elsewhere (e.g. by existing TreeRows) survive until those references are released;
+ * all subsequent getInterp() calls create fresh Interps.
+ */
+void M1MidPlane::Interp::clearCache(){
+    qCDebug(g_cat_tmp_spotlight()) << "Clearing Interp cache" << cm_interp_map.size();
+    invalidateAllCaches();
+    cm_interp_map.clear();
 }
 
 // QString M1MidPlane::Interp::cm_html_template =
@@ -410,6 +423,7 @@ QWidget *M1MidPlane::Interp::get_edit_widget(){
  * @brief M1MidPlane::Interp::save_text_edit
  */
 void M1MidPlane::Interp::save_text_edit(){
+    M1Store::Transaction l_archive_tx("Edit text");
     qCDebug(g_cat_tmp_spotlight()) << "Saving text edit field START: " << m_text_edit->toPlainText();
     /*
     if(m_myself->isSimpleEdge())
@@ -429,6 +443,7 @@ void M1MidPlane::Interp::save_text_edit(){
  * @param p_new_vertex_type
  */
 void M1MidPlane::Interp::createDescendant(M1Store::SpecialItem* p_new_edge_type, M1Store::SpecialItem* p_new_vertex_type, M1Store::InsertionPoint p_where){
+    M1Store::Transaction l_archive_tx("Create descendant");
     m_myself->create_descendant(
         p_new_edge_type->specialId(),
         "New",

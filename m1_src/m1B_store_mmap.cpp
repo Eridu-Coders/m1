@@ -13,6 +13,7 @@
 #include "m1A_env.h"
 #include "m1B_graph_init.h"
 #include "m1B_store.h"
+#include "m1B_archive.h"
 
 Q_LOGGING_CATEGORY(g_cat_store_mmap, "store.mmap")
 
@@ -58,14 +59,8 @@ void M1Store::StorageStatic::initMmapConstants(){
  * @brief M1Store::Storage::clearMmapFiles
  */
 void M1Store::StorageStatic::clearMmapFiles(){
-    if(fs::exists(cm_mmap_filepath_specials)) fs::remove(cm_mmap_filepath_specials);
-    // if(fs::exists(cm_mmap_filepath_items)) fs::remove(cm_mmap_filepath_items);
-    for(unsigned int l_seg_id = 0; l_seg_id < cm_item_mmap_next_seg_id; l_seg_id++){
-        QString l_filename = QString(M1Store::LMDB_ITEM_MMAP_FILE_TEMPLATE).arg(l_seg_id, 4, 16, QChar('0'));
-        qCDebug(g_cat_store_mmap) << QString("Deleting [%1]").arg(l_filename);
-        fs::path l_mmap_items_segment_filepath = fs::path(M1Store::STORE_DATA_PATH) / fs::path(l_filename.toStdString());
-        if(fs::exists(l_mmap_items_segment_filepath)) fs::remove(l_mmap_items_segment_filepath);
-    }
+    // all segment files (by name pattern, not by segment count: the count is not loaded yet at reset time) + specials
+    M1Store::Archive::removeMmapFiles(M1Store::STORE_DATA_PATH);
 }
 
 /**
@@ -160,7 +155,7 @@ void M1Store::StorageStatic::openSegment(unsigned int p_seg_id){
     // 'The mmap() function shall add an extra reference ...'
     close(l_fd);
 
-    if(cm_item_mmap_base == MAP_FAILED){
+    if(cm_item_mmap_base[p_seg_id] == MAP_FAILED){
         // mmap() error
         qCDebug(g_cat_store_mmap) << QString("mmap() error (items): [%1]-%2").arg(errno).arg(strerror(errno));
         qFatal("Aborting / mmap() items");
@@ -177,7 +172,7 @@ void M1Store::StorageStatic::closeMmapAreas(){
         // just to be sure
         msync(cm_item_mmap_base[l_seg_id], cm_item_mmap_seg_size, MS_SYNC);
         // actual mmap closing
-        qCDebug(g_cat_store_mmap) << QString("items segment [%1] munmap: %2").arg(l_seg_id).arg(munmap(cm_item_mmap_base, cm_item_mmap_seg_size));
+        qCDebug(g_cat_store_mmap) << QString("items segment [%1] munmap: %2").arg(l_seg_id).arg(munmap(cm_item_mmap_base[l_seg_id], cm_item_mmap_seg_size));
     }
 
     unsigned long l_special_mmap_size = (1 << SPECIAL_ITEMS_COUNT_P2) * sizeof(M1Store::SpecialItem);
@@ -228,10 +223,11 @@ M1Store::Item_lv1* M1Store::StorageStatic::getItemPointer_lv1(ItemID p_item_id){
  */
 M1Store::SpecialItem* M1Store::StorageStatic::getSpecialItemPointer(const SpecialItemID p_si_id){
     M1_FUNC_ENTRY(g_cat_store, QString("getSpecialItemPointer from SpecialItemID: 0x%1").arg(p_si_id, 4, 16, QChar('0')))
-    // shift left by 5 bits = mult by 32
+    // shift left by SPECIAL_SIZE_P2 (6) bits = mult by 64 (SpecialItem size)
+    static_assert(sizeof(SpecialItem) == (1 << SPECIAL_SIZE_P2), "sizeof(SpecialItem) must be 2^SPECIAL_SIZE_P2");
 
     M1_FUNC_EXIT
-    return (SpecialItem*)(cm_special_mmap_base + (p_si_id << 5));
+    return (SpecialItem*)(cm_special_mmap_base + (p_si_id << SPECIAL_SIZE_P2));
 }
 
 /**

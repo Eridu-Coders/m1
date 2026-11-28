@@ -426,7 +426,7 @@ void M1Store::Item_lv1::setFlagExtra(const M1Store::FlagField p_flag){
                "M1Store::Item::setFlagExtra()",
                "simple items do not have an extra flag field");
 
-    M1Store::FlagField l_flags = flags();
+    M1Store::FlagField l_flags = flagsExtra();
     l_flags = l_flags | p_flag;
     setFlagsExtra_lv1(l_flags);
 
@@ -446,7 +446,7 @@ void M1Store::Item_lv1::unSetFlagExtra(const M1Store::FlagField p_flag){
                "M1Store::Item::unSetFlagExtra()",
                "simple items do not have an extra flag field");
 
-    M1Store::FlagField l_flags = flags();
+    M1Store::FlagField l_flags = flagsExtra();
     l_flags = l_flags & (~p_flag);
     setFlagsExtra_lv1(l_flags);
 

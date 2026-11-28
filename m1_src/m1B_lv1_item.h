@@ -14,6 +14,10 @@ using namespace M1Env;
     /**
      * @brief The Item lv1 class - trapping and logging updates for undo and crash recovery
      * \ingroup LV1
+     *
+     * Every lv1 setter calls M1Store::Archive::touchItem() before delegating to lv0, so that the before-image of the item
+     * is recorded in the current transaction (see m1B_archive.h). All updates must therefore go through the lv1 setters
+     * (never the lv0 ones) and happen within a transaction (M1Store::Transaction guard).
      */
     class Item_lv1 : public Item_lv0 {
     private:

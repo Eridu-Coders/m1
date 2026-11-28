@@ -188,7 +188,7 @@ M1Store::Item_lv2* M1Store::Item_lv2::getNew(
 
     M1Store::Item_lv2* l_item_lv2 = getNew(p_flags, p_label);
     qCDebug(g_cat_lv2_constructors) << QString("Creating new special: %1").arg(p_mnemonic);
-    M1Store::SpecialItem* l_special = M1Store::StorageStatic::getNewSpecialWithItem(l_item_lv2->item_id(), p_flags_special, p_mnemonic, p_icon_path);
+    M1Store::SpecialItem* l_special = M1Store::StorageStatic::getNewSpecialWithItem(l_item_lv2->item_id(), p_flags_special, p_mnemonic, p_icon_path, p_label);
     l_item_lv2->storeSpecialItemID(l_special->specialId());
 
     qCDebug(g_cat_lv2_constructors) << QString("New: %1").arg(l_item_lv2->dbgShort());

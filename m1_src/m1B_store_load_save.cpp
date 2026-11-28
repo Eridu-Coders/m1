@@ -9,10 +9,12 @@
 #include <unistd.h>
 #include <string.h>
 #include <cmath>
+#include <algorithm>
 
 #include "m1A_env.h"
 #include "m1B_graph_init.h"
 #include "m1B_store.h"
+#include "m1B_archive.h"
 
 // LMDB helper macros taken from the examples in the distrib. (require declaration "int l_rc;" wherever used)
 // cannot be factored back into m1B_store.h for some reason
@@ -103,8 +105,12 @@ void M1Store::StorageStatic::loadUtilites(MDB_txn *p_txn){
     l_rc = mdb_get(p_txn, cm_dbi_util, &l_key, &l_data);
     if(l_rc == MDB_NOTFOUND)
         cm_item_mmap_next_seg_id = 0;
-    else
-        cm_item_mmap_next_seg_id = *((ItemID *)(l_data.mv_data));
+    else{
+        // stored as an 8-byte ItemID (see saveUtilities()); read according to the actual stored size
+        ItemID l_seg_id = 0;
+        memcpy(&l_seg_id, l_data.mv_data, std::min(l_data.mv_size, sizeof(ItemID)));
+        cm_item_mmap_next_seg_id = (unsigned int)(l_seg_id & 0xFFFFFFFF);
+    }
     qCDebug(g_cat_store) << QString("ITEM_NEXT_MMAP_SEGMENT: ") +
                                 ((l_rc == MDB_NOTFOUND) ? QString("%1 --> KEY NOT FOUND").arg(l_key_val, 8, 16, QChar('0')) :
                                      QString("retrieved: 0x%1 --> %2 [%3]").arg(l_key_val, 8, 16, QChar('0')).arg(cm_item_mmap_next_seg_id).arg(l_data.mv_size));
@@ -197,8 +203,11 @@ void M1Store::StorageStatic::saveUtilities(MDB_txn *p_txn){
     l_data.mv_size = sizeof(ItemID);
 
     // storing next segment number
+    // cm_item_mmap_next_seg_id is an unsigned int but the on-disk value has always been 8 bytes wide
+    // --> widened into an ItemID first (previously, 4 bytes of whatever followed it in memory were stored)
     l_key_val = ITEM_NEXT_MMAP_SEGMENT;
-    l_data.mv_data = &(cm_item_mmap_next_seg_id);
+    ItemID l_seg_id = cm_item_mmap_next_seg_id;
+    l_data.mv_data = &l_seg_id;
     E(mdb_put(l_txn, cm_dbi_util, &l_key, &l_data, 0));
     qCDebug(g_cat_store) << QString("ITEM_NEXT_MMAP_SEGMENT: 0x%1 --> %2").arg(l_key_val, 8, 16, QChar('0')).arg(cm_item_mmap_next_seg_id);
 
@@ -241,6 +250,9 @@ void M1Store::StorageStatic::saveUtilities(MDB_txn *p_txn){
 void M1Store::StorageStatic::setTeiEditorFontSize(unsigned int p_size){
     Q_ASSERT_X( cm_lmdb_env != NULL, "Storage::setTeiEditorFontSize()", "LMDB env must be initialized");
     if(p_size == cm_tei_editor_font_size) return;
+    // UI preference stored in the util table: own transaction (archive log)
+    M1Store::Transaction l_archive_tx("TEI editor font size");
+    M1Store::Archive::logUtilU32(TEI_EDITOR_FONT_SIZE, cm_tei_editor_font_size, p_size);
     cm_tei_editor_font_size = p_size;
 
     int l_rc; // LMDB return code (for use with return code test macros)
@@ -283,6 +295,9 @@ M1Store::StringID M1Store::StorageStatic::storeString(QString p_string){
     QByteArray l_utf8_bytes = p_string.toUtf8();
     l_data.mv_size = l_utf8_bytes.length() + 1; // +1 so that the null termination character also stored
     l_data.mv_data = l_utf8_bytes.data();
+
+    // archive log (the stored value includes the \0 terminator)
+    M1Store::Archive::logStringPut(l_ret_id, QByteArray(l_utf8_bytes.constData(), l_utf8_bytes.length() + 1));
 
     // QElapsedTimer l_timer;
     // l_timer.start();
@@ -374,6 +389,15 @@ void M1Store::StorageStatic::freeString(StringID p_string_id){
     // initiate transaction
     MDB_txn* l_txn;
     E(mdb_txn_begin(M1Store::StorageStatic::cm_lmdb_env, NULL, 0, &l_txn));
+
+    // archive log: value before deletion (for undo)
+    if(M1Store::Archive::mode() == M1Store::Archive::Mode::Logging){
+        MDB_val l_old;
+        if(mdb_get(l_txn, cm_dbi_string, &l_key, &l_old) == MDB_SUCCESS)
+            M1Store::Archive::logStringDel(p_string_id, QByteArray((const char*)l_old.mv_data, l_old.mv_size));
+        else
+            M1Store::Archive::logStringDel(p_string_id, QByteArray());
+    }
 
     // delete the key from the store
     l_rc = mdb_del(l_txn, cm_dbi_string, &l_key, NULL);
